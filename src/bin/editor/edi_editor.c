@@ -180,16 +180,68 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
    elm_scroller_region_show(editor->lines, 0, y, 10, h);
 }
 
+static void
+_edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   char buf[30];
+   int line;
+   int col;
+   Evas_Object *tb;
+   Evas_Textblock_Cursor *cur1, *cur2;
+
+   tb = elm_entry_textblock_get(obj);
+
+   cur1 = evas_object_textblock_cursor_get(tb);
+   cur2 = evas_object_textblock_cursor_new(tb);
+   line = evas_textblock_cursor_line_geometry_get(cur1, NULL, NULL, NULL, NULL) + 1;
+   evas_textblock_cursor_copy(cur1, cur2);
+   evas_textblock_cursor_line_char_first(cur2);
+   col = evas_textblock_cursor_pos_get(cur1) -
+      evas_textblock_cursor_pos_get(cur2) + 1;
+   evas_textblock_cursor_free(cur2);
+
+   snprintf(buf, sizeof(buf), "Line:%d, Column:%d", line, col);
+   elm_object_text_set((Evas_Object *)data, buf);
+}
+
+static void
+_edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor)
+{
+   Evas_Object *position;
+
+   position = elm_label_add(panel);
+   evas_object_size_hint_align_set(position, 1.0, 0.5);
+   evas_object_size_hint_weight_set(position, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(panel, position);
+   evas_object_show(position);
+   elm_object_disabled_set(position, EINA_TRUE);
+
+   _edit_cursor_moved(position, editor->entry, NULL);
+   evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
+}
+
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
 {
-   Evas_Object *txt, *lines, *box;
+   Evas_Object *txt, *lines, *vbox, *box, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
    Evas *e;
    Edi_Editor *editor;
 
-   box = elm_box_add(parent);
+   vbox = elm_box_add(parent);
+   evas_object_show(vbox);
+
+   box = elm_box_add(vbox);
    elm_box_horizontal_set(box, EINA_TRUE);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(vbox, box);
    evas_object_show(box);
+
+   statusbar = elm_box_add(vbox);
+   evas_object_size_hint_weight_set(statusbar, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(statusbar, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, statusbar);
+   evas_object_show(statusbar);
 
    lines = elm_entry_add(box);
    elm_entry_scrollable_set(lines, EINA_TRUE);
@@ -225,6 +277,8 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    evas_object_smart_callback_add(txt, "scroll", _scroll_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 
+   _edi_editor_statusbar_add(statusbar, editor);
+
    e = evas_object_evas_get(txt);
    ctrl = evas_key_modifier_mask_get(e, "Control");
    alt = evas_key_modifier_mask_get(e, "Alt");
@@ -238,5 +292,5 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
 
    evas_object_data_set(box, "editor", editor);
    _update_lines(editor);
-   return box;
+   return vbox;
 }
