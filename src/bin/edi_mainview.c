@@ -287,20 +287,20 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    const char *mime;
 
    options = data;
-   if (S_ISREG(stat->mode))
+   if (!S_ISREG(stat->mode))
+     return;
+
+   mime = efreet_mime_type_get(options->path);
+   if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
+     options->type = "text";
+   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
+     options->type = "text"; // TODO make a code view
+   else if (!strncasecmp(mime, "image/", 6))
+     options->type = "image";
+   else
      {
-        mime = efreet_mime_type_get(options->path);
-        if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
-          options->type = "text";
-        else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
-          options->type = "text"; // TODO make a code view
-        else if (!strncasecmp(mime, "image/", 6))
-          options->type = "image";
-        else
-          {
-             _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_tab_cb);
-             return;
-          }
+        _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_tab_cb);
+        return;
      }
 
    _edi_mainview_item_tab_add(options);
@@ -313,20 +313,20 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    const char *mime;
 
    options = data;
-   if (S_ISREG(stat->mode))
+   if (!S_ISREG(stat->mode))
+     return;
+
+   mime = efreet_mime_type_get(options->path);
+   if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
+     options->type = "text";
+   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
+     options->type = "text"; // TODO make a code view
+   else if (!strncasecmp(mime, "image/", 6))
+     options->type = "image";
+   else
      {
-        mime = efreet_mime_type_get(options->path);
-        if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
-          options->type = "text";
-        else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
-          options->type = "text"; // TODO make a code view
-        else if (!strncasecmp(mime, "image/", 6))
-          options->type = "image";
-        else
-          {
-             _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_win_cb);
-             return;
-          }
+        _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_win_cb);
+        return;
      }
 
    _edi_mainview_item_win_add(options);
