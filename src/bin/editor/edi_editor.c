@@ -18,7 +18,6 @@
 static void
 _update_lines(Edi_Editor *editor);
 
-
 static void
 _undo_do(Edi_Editor *editor, Elm_Entry_Change_Info *inf)
 {
@@ -222,13 +221,18 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor)
 
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
 {
-   Evas_Object *txt, *lines, *vbox, *box, *statusbar;
+   Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
    Evas *e;
    Edi_Editor *editor;
 
    vbox = elm_box_add(parent);
    evas_object_show(vbox);
+
+   searchbar = elm_box_add(vbox);
+   evas_object_size_hint_weight_set(searchbar, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(searchbar, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, searchbar);
 
    box = elm_box_add(vbox);
    elm_box_horizontal_set(box, EINA_TRUE);
@@ -277,6 +281,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    evas_object_smart_callback_add(txt, "scroll", _scroll_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 
+   edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor);
 
    e = evas_object_evas_get(txt);
@@ -290,7 +295,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    (void)!evas_object_key_grab(txt, "f", ctrl, shift | alt, 1);
    (void)!evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
 
-   evas_object_data_set(box, "editor", editor);
+   evas_object_data_set(vbox, "editor", editor);
    _update_lines(editor);
    return vbox;
 }

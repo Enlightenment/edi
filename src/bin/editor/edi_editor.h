@@ -13,6 +13,12 @@ extern "C" {
  */
 
 /**
+ * @typedef Edi_Editor_Search
+ * An instance of an editor search session.
+ */
+typedef struct _Edi_Editor_Search Edi_Editor_Search;
+
+/**
  * @typedef Edi_Editor
  * An instance of an editor view.
  */
@@ -25,10 +31,11 @@ typedef struct _Edi_Editor Edi_Editor;
 struct _Edi_Editor
 {
    Evas_Object *entry; /**< The main text entry widget for the editor */
-   Evas_Object *lines; 
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */
+   Evas_Object *lines;
+   Edi_Editor_Search *search;
 
    /* Add new members here. */
 };
@@ -55,21 +62,31 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path);
 /**
  * @}
  *
- * @brief Dialogs.
- * @defgroup Dialogs Functions that open other dialogs
+ * @brief Widgets.
+ * @defgroup Widget Functions that open or manipulate feature panels
  *
  * @{
  *
  */
 
 /**
+ * Add a search widget to the specified editor.
+ *
+ * @param parent The panel that the UI should be added to,
+ * @param editor The Edi_Editor instance that we are searching for text within.
+ *
+ * @ingroup Widgets
+ */
+EAPI void edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
+
+/**
  * Start a search in the specified editor.
  *
- * @param entry The elm_entry that we are searching for text within.
+ * @param editor the text editor instance to search within.
  *
- * @ingroup Dialogs
+ * @ingroup Widgets
  */
-EAPI void edi_editor_search(Evas_Object *entry);
+EAPI void edi_editor_search(Edi_Editor *editor);
 
 /**
  * @}

@@ -520,7 +520,7 @@ edi_mainview_search()
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if (editor)
-     edi_editor_search(editor->entry);
+     edi_editor_search(editor);
 }
 
 EAPI void
