@@ -227,6 +227,8 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    Edi_Editor *editor;
 
    vbox = elm_box_add(parent);
+   evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(vbox);
 
    searchbar = elm_box_add(vbox);
