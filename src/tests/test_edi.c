@@ -7,7 +7,7 @@
 
 #include "Edi.h"
 
-#define COPYRIGHT "Copyright © 2013 Cedric BAIL <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static void edi_test_basic(TCase *tc);
 

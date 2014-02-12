@@ -15,7 +15,7 @@
 
 #include "edi_private.h"
 
-#define COPYRIGHT "Copyright © 2013 Cedric BAIL <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static void
 _edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
