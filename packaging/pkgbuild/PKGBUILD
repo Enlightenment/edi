@@ -1,0 +1,60 @@
+# Maintainer: Enlightenment Developers <enlightenment-devel@enlightenment.org>
+pkgname=('edi-git' 'edi_doc-git')
+pkgver=1.8.99.8967.a1cfce6
+pkgrel=1
+pkgdesc="Enlightenment toolkit edi - GIT development snapshot"
+arch=('i686' 'x86_64' 'arm')
+url="http://andywilliams.me"
+license=('WTFPL')
+makedepends=('doxygen' 'imagemagick' 'git')
+depends=('elementary-git')
+optdepends=('emotion_generic_players' 'evas_generic_loaders')
+options=('!libtool' 'debug')
+provides=('edi')
+
+pkgver() {
+  cd "../.."
+
+  for _i in v_maj v_min v_mic; do
+    local v_ver=$v_ver.$(grep -m 1 $_i configure.ac | sed 's/m4//' | grep -o "[[:digit:]]*")
+  done
+
+  v_ver=$(awk -F , -v v_ver=${v_ver#.} '/^AC_INIT/ {gsub(/v_ver/, v_ver); gsub(/[\[\] -]/, ""); print $2}' configure.ac)
+
+  printf "$v_ver.$(git rev-list --count HEAD).$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd "../.."
+  export CFLAGS="$CFLAGS -fvisibility=hidden -fomit-frame-pointer"
+  [[ -e Makefile ]] && make clean distclean
+  ./configure --prefix=/usr \
+  --disable-static
+  make
+  make doc
+}
+
+package_edi-git() {
+  cd "../.."
+  make -j1 DESTDIR="$pkgdir/" install
+  install -Dm644 README "$pkgdir/usr/share/$pkgname/README"
+  install -Dm644 NEWS "$pkgdir/usr/share/$pkgname/NEWS"
+  install -Dm644 ChangeLog "$pkgdir/usr/share/$pkgname/ChangeLog"
+  install -Dm644 AUTHORS "$pkgdir/usr/share/$pkgname/AUTHORS"
+  install -Dm644 COMPLIANCE "$pkgdir/usr/share/$pkgname/COMPLIANCE"
+  install -Dm644 COPYING.images "$pkgdir/usr/share/licenses/$pkgname/COPYING.images"
+  sed -n '1,/details./p' COPYING > "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+  ln -s "../licenses/$pkgname/COPYING" "$pkgdir/usr/share/$pkgname/COPYING"
+  ln -s "../licenses/$pkgname/COPYING.images" "$pkgdir/usr/share/$pkgname/COPYING.images"
+}
+
+package_edi_doc-git() {
+  pkgdesc="Documentation for Edi"
+  arch=('any')
+  unset depends optdepends
+
+  cd "../.."
+  mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+  cp -a doc/html "$pkgdir/usr/share/doc/$pkgname/html"
+  cp -a doc/latex "$pkgdir/usr/share/doc/$pkgname/latex"
+}

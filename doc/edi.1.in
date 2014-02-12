@@ -1,0 +1,50 @@
+.TH EDI 1 "01 01 1970 FIXME" "@PACKAGE_NAME@ @PACKAGE_VERSION@"
+
+.SH NAME
+edi \- a demo application
+
+.SH SYNOPSIS
+.B edi
+[-d] [-f] [-t=THEME] [-m=MINES] [-L] [-C] [-V] [-h]
+
+.SH DESCRIPTION
+
+Edi is a demo application to show how to integrate EFL and autotools into a
+cross platform build. You should be able to generate an executable easily for all
+target supported by EFL with this edi.
+
+With no option, the program starts and display an Hello World.
+
+
+.SH OPTIONS
+
+.TP
+.B -L, --license
+Show license.
+
+.TP
+.B -C, --copyright
+Show copyright.
+
+.TP
+.B -V, --version
+Show program version.
+
+.TP
+.B -h, --help
+Print list of options with short description.
+
+
+.SH BUGS
+
+Reports are welcome. Send them at @PACKAGE_BUGREPORT@.
+
+
+.SH HOMEPAGE
+
+http://enlightenment.org
+
+
+.SH AUTHORS
+
+Andy Williams <andy@andyilliams.me> and various contributors.
