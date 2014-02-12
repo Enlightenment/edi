@@ -30,7 +30,7 @@ edi_init(void)
 
    return _edi_init;
 
- shutdown_eina:
+   shutdown_eina:
    eina_shutdown();
    _edi_init--;
 

@@ -40,7 +40,7 @@ static const Ecore_Getopt optdesc = {
   PACKAGE_VERSION,
   COPYRIGHT,
   "BSD with advertisement clause",
-  "An EFL edi program",
+  "The EFL IDE",
   0,
   {
     ECORE_GETOPT_STORE_TRUE('l', "list", "list available tests"),
