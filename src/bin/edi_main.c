@@ -171,7 +171,7 @@ edi_toolbar_setup(Evas_Object *win)
 static Evas_Object *
 edi_win_setup(void)
 {
-   Evas_Object *win, *content, *tb;
+   Evas_Object *win, *vbx, *content, *tb;
 
    win = elm_win_util_standard_add("main", "Edi");
    if (!win) return NULL;
@@ -179,11 +179,18 @@ edi_win_setup(void)
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_win_del, NULL);
 
-   content = edi_content_setup(win);
-   elm_win_resize_object_add(win, content);
+   vbx = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, vbx);
+   evas_object_show(vbx);
 
    tb = edi_toolbar_setup(win);
-   elm_box_pack_end(content, tb);
+   elm_box_pack_end(vbx, tb);
+
+   content = edi_content_setup(win);
+   evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(vbx, content);
 
    evas_object_resize(win, 420, 300);
    evas_object_show(win);
