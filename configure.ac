@@ -35,6 +35,7 @@ PKG_CHECK_MODULES([EFL],
  ecore >= 1.8.0
  edje >= 1.8.0
  elementary >= 1.8.0
+ eio >= 1.8.0
 ])
 
 # Check for tests and coverage

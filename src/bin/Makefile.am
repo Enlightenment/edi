@@ -9,7 +9,10 @@ AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -I$(top_srcdir)/src/lib/ \
 @EFL_CFLAGS@
 
-edi_SOURCES = edi_main.c
+edi_SOURCES = \
+edi_filepanel.c \
+edi_main.c
+
 edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la
 
 localedir = $(datadir)/locale

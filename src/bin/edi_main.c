@@ -8,16 +8,16 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
+#include <Eio.h>
 
 #include "gettext.h"
 
 #include "Edi.h"
+#include "edi_filepanel.h"
 
 #include "edi_private.h"
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
-
-static Elm_Genlist_Item_Class itc;
 
 static void
 _edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
@@ -25,68 +25,22 @@ _edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
    elm_exit();
 }
 
-static char *
-_text_get(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
-{
-   return strdup(data);
-}
-
-static Evas_Object *
-_content_get(void *data, Evas_Object *obj, const char *source)
-{
-   if (!strcmp(source, "elm.swallow.icon"))
-     {
-        Evas_Object *ic;
-
-        ic = elm_icon_add(obj);
-        if (!strcmp(data, "Dir"))
-          elm_icon_standard_set(ic, "folder");
-        else
-          elm_icon_standard_set(ic, "file");
-        evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
-        evas_object_show(ic);
-        return ic;
-     }
-   return NULL;
-}
-
-static Evas_Object *
-edi_filetree_setup(Evas_Object *win)
-{
-   Evas_Object *list;
-
-   list = elm_genlist_add(win);
-   evas_object_size_hint_min_set(list, 100, -1);
-   evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(list);
-
-   itc.item_style = "default";
-   itc.func.text_get = _text_get;
-   itc.func.content_get = _content_get;
-//   itc.func.state_get = _state_get;
-//   itc.func.del = _item_del;
-
-   elm_genlist_item_append(list, &itc, "File 1",
-			   NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-   elm_genlist_item_append(list, &itc, "File 2",
-			   NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-   elm_genlist_item_append(list, &itc, "Dir",
-			   NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-                                  
-   return list;
-}
-
 static Evas_Object *
 edi_content_setup(Evas_Object *win)
 {
-   Evas_Object *panes, *panes_h, *txt;
+   Evas_Object *panes, *panes_h, *panel, *txt;
 
    panes = elm_panes_add(win);
    evas_object_size_hint_weight_set(panes, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
    // add file list
-   elm_object_part_content_set(panes, "left", edi_filetree_setup(win));
+   panel = elm_box_add(win);
+   evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(panel);
+   edi_filepanel_add(panel);
+
+   elm_object_part_content_set(panes, "left", panel);
    elm_panes_content_left_size_set(panes, 0.2);
 
    // add panes
