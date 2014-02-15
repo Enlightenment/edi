@@ -1,5 +1,5 @@
-#ifndef EDI_H_
-# define EDI_H_
+#ifndef EDI_FILEPANEL_H_
+# define EDI_FILEPANEL_H_
 
 #include <Elementary.h>
 
@@ -11,6 +11,8 @@ extern "C" {
  * @file
  * @brief These routines are used for managing the Edi file panel.
  */
+
+ typedef void (*edi_filepanel_item_clicked_cb)(const char *path);
 
 /**
  * @brief UI management functions.
@@ -29,7 +31,8 @@ extern "C" {
  *
  * @ingroup UI
  */
-void edi_filepanel_add(Evas_Object *parent);
+void edi_filepanel_add(Evas_Object *parent,
+                       edi_filepanel_item_clicked_cb cb);
 
 /**
  * @}
@@ -41,4 +44,4 @@ void edi_filepanel_add(Evas_Object *parent);
 }
 #endif
 
-#endif /* EDI_H_ */
+#endif /* EDI_FILEPANEL_H_ */

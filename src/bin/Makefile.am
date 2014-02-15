@@ -11,6 +11,7 @@ AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 
 edi_SOURCES = \
 edi_filepanel.c \
+edi_mainview.c \
 edi_main.c
 
 edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la

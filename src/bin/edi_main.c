@@ -14,6 +14,7 @@
 
 #include "Edi.h"
 #include "edi_filepanel.h"
+#include "edi_mainview.h"
 
 #include "edi_private.h"
 
@@ -23,6 +24,12 @@ static void
 _edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    elm_exit();
+}
+
+static void
+_edi_file_open_cb(const char *path)
+{
+   edi_mainview_open(path);
 }
 
 static Evas_Object *
@@ -38,7 +45,7 @@ edi_content_setup(Evas_Object *win)
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(panel);
-   edi_filepanel_add(panel);
+   edi_filepanel_add(panel, _edi_file_open_cb);
 
    elm_object_part_content_set(panes, "left", panel);
    elm_panes_content_left_size_set(panes, 0.2);
@@ -53,13 +60,13 @@ edi_content_setup(Evas_Object *win)
    elm_object_part_content_set(panes, "right", panes_h);
 
    // add main content
-   txt = elm_entry_add(win);
-   elm_entry_scrollable_set(txt, EINA_TRUE);
-   elm_object_text_set(txt, "Main");
-   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(txt);
-   elm_object_part_content_set(panes_h, "top", txt);
+   panel = elm_box_add(win);
+   evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(panel);
+   edi_mainview_add(panel);
+
+   elm_object_part_content_set(panes_h, "top", panel);
 
    // add lower panel
    txt = elm_label_add(win);

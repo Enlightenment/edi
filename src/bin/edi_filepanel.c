@@ -15,6 +15,7 @@ static char *PROJECT_ROOT = "/home/andy/Code/E/edi";
 
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
+static edi_filepanel_item_clicked_cb _open_cb;
 
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
@@ -39,9 +40,16 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 }
 
 static void
-_item_del(void *data, Evas_Object *obj EINA_UNUSED)
+_item_del(void *data, Evas_Object *obj)
 {
    eina_stringshare_del(data);
+   eina_stringshare_del(elm_object_item_data_get(obj));
+}
+
+static void
+_item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   _open_cb((const char*)data);
 }
 
 static Evas_Object *
@@ -96,20 +104,21 @@ load_tree(char *path, Elm_Object_Item *parent)
 	      if (info->type == EINA_FILE_DIR)
 	        {
 		   newParent = elm_genlist_item_sorted_insert(list, &itc2, eina_stringshare_add(name),
-							      parent, ELM_GENLIST_ITEM_NONE, _item_sort, NULL, NULL);
+							      parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
 		   load_tree(info->path, newParent);
 	        }
 	      else if (info->type == EINA_FILE_REG)
 	        {
 		   elm_genlist_item_sorted_insert(list, &itc, eina_stringshare_add(name),
-						  parent, ELM_GENLIST_ITEM_NONE, _item_sort, NULL, NULL);
+						  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
 	        }
 	  }
      }
 }
 
 void
-edi_filepanel_add(Evas_Object *parent)
+edi_filepanel_add(Evas_Object *parent,
+                  edi_filepanel_item_clicked_cb cb)
 {
    list = elm_genlist_add(parent);
    evas_object_size_hint_min_set(list, 100, -1);
@@ -128,6 +137,7 @@ edi_filepanel_add(Evas_Object *parent)
 //   itc2.func.state_get = _state_get;
    itc2.func.del = _item_del;
 
+   _open_cb = cb;
    load_tree(PROJECT_ROOT, NULL);
 
    elm_box_pack_end(parent, list);
