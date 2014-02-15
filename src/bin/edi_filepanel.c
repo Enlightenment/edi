@@ -66,6 +66,17 @@ ignore_file(const char *file)
    return eina_str_has_prefix(file, ".");
 }
 
+static int
+_item_sort(const void *data1, const void *data2)
+{
+   const Elm_Object_Item *item1 = data1;
+   const Elm_Object_Item *item2 = data2;
+
+   const char *name1 = elm_object_item_data_get(item1);
+   const char *name2 = elm_object_item_data_get(item2);
+   return strcasecmp(name1, name2);
+}
+
 static void
 load_tree(char *path, Elm_Object_Item *parent)
 {
@@ -84,14 +95,14 @@ load_tree(char *path, Elm_Object_Item *parent)
 
 	      if (info->type == EINA_FILE_DIR)
 	        {
-		   newParent = elm_genlist_item_append(list, &itc2, eina_stringshare_add(name),
-						       parent, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+		   newParent = elm_genlist_item_sorted_insert(list, &itc2, eina_stringshare_add(name),
+							      parent, ELM_GENLIST_ITEM_NONE, _item_sort, NULL, NULL);
 		   load_tree(info->path, newParent);
 	        }
 	      else if (info->type == EINA_FILE_REG)
 	        {
-		   elm_genlist_item_append(list, &itc, eina_stringshare_add(name),
-				     parent, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+		   elm_genlist_item_sorted_insert(list, &itc, eina_stringshare_add(name),
+						  parent, ELM_GENLIST_ITEM_NONE, _item_sort, NULL, NULL);
 	        }
 	  }
      }
