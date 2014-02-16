@@ -32,6 +32,7 @@ extern "C" {
  * @ingroup UI
  */
 void edi_filepanel_add(Evas_Object *parent,
+                       const char *path,
                        edi_filepanel_item_clicked_cb cb);
 
 /**

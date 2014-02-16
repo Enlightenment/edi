@@ -20,8 +20,10 @@
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
+static Evas_Object *edi_win_setup(const char *path);
+
 static void
-_edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    elm_exit();
 }
@@ -33,7 +35,7 @@ _edi_file_open_cb(const char *path)
 }
 
 static Evas_Object *
-edi_content_setup(Evas_Object *win)
+edi_content_setup(Evas_Object *win, const char *path)
 {
    Evas_Object *panes, *panes_h, *panel, *txt;
 
@@ -45,7 +47,7 @@ edi_content_setup(Evas_Object *win)
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(panel);
-   edi_filepanel_add(panel, _edi_file_open_cb);
+   edi_filepanel_add(panel, path, _edi_file_open_cb);
 
    elm_object_part_content_set(panes, "left", panel);
    elm_panes_content_left_size_set(panes, 0.2);
@@ -136,16 +138,85 @@ edi_toolbar_setup(Evas_Object *win)
    return tb;
 }
 
-static Evas_Object *
-edi_win_setup(void)
+static void
+_edi_project_chosen_cb(void *data,
+                       Evas_Object *obj EINA_UNUSED,
+                       void *event_info)
 {
-   Evas_Object *win, *vbx, *content, *tb;
+    const char *selected;
 
-   win = elm_win_util_standard_add("main", "Edi");
+    evas_object_del(data);
+
+   selected = event_info;
+    if (selected)
+      edi_win_setup(selected);
+    else
+      elm_exit();
+}
+
+static Evas_Object *
+_edi_project_choose()
+{
+   Evas_Object *win, *fs;
+
+   elm_need_ethumb();
+   elm_need_efreet();
+
+   win = elm_win_util_standard_add("projectselector", "Choose a Project Folder");
    if (!win) return NULL;
 
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
-   evas_object_smart_callback_add(win, "delete,request", _edi_win_del, NULL);
+   evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
+
+   fs = elm_fileselector_add(win);
+   evas_object_size_hint_weight_set(fs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(fs, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_smart_callback_add(fs, "done", _edi_project_chosen_cb, win);
+   elm_win_resize_object_add(win, fs);
+   evas_object_show(fs);
+
+   elm_fileselector_expandable_set(fs, EINA_TRUE);
+   elm_fileselector_folder_only_set(fs, EINA_TRUE);
+   elm_fileselector_path_set(fs, getenv("HOME"));
+
+   evas_object_resize(win, 380, 260);
+   evas_object_show(win);
+
+   return win;
+}
+
+static char *
+_edi_win_title_get(const char *path)
+{
+   char *winname, *dirname, *fullpath;
+
+   fullpath = realpath(path, NULL);
+   dirname = basename(fullpath);
+   winname = malloc((8 + strlen(dirname)) * sizeof(char));
+   snprintf(winname, 8 + strlen(dirname), "Edi :: %s", dirname);
+   free(fullpath);
+
+   return winname;
+}
+
+static Evas_Object *
+edi_win_setup(const char *path)
+{
+   Evas_Object *win, *vbx, *content, *tb;
+   const char *winname;
+
+   if (!path) return _edi_project_choose();
+
+   elm_need_ethumb();
+   elm_need_efreet();
+
+   winname = _edi_win_title_get(path);
+   win = elm_win_util_standard_add("main", winname);
+   free(winname);
+   if (!win) return NULL;
+
+   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
+   evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
 
    vbx = elm_box_add(win);
    evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -155,12 +226,12 @@ edi_win_setup(void)
    tb = edi_toolbar_setup(win);
    elm_box_pack_end(vbx, tb);
 
-   content = edi_content_setup(win);
+   content = edi_content_setup(win, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbx, content);
 
-   evas_object_resize(win, 420, 300);
+   evas_object_resize(win, 560, 420);
    evas_object_show(win);
 
    return win;
@@ -168,12 +239,12 @@ edi_win_setup(void)
 
 static const Ecore_Getopt optdesc = {
   "edi",
-  "%prog [options]",
+  "%prog [options] [project-dir]",
   PACKAGE_VERSION,
   COPYRIGHT,
   "BSD with advertisement clause",
   "The EFL IDE",
-  0,
+  EINA_TRUE,
   {
     ECORE_GETOPT_LICENSE('L', "license"),
     ECORE_GETOPT_COPYRIGHT('C', "copyright"),
@@ -189,6 +260,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    Evas_Object *win;
    int args;
    Eina_Bool quit_option = EINA_FALSE;
+   const char *project_path = NULL;
 
    Ecore_Getopt_Value values[] = {
      ECORE_GETOPT_VALUE_BOOL(quit_option),
@@ -218,9 +290,14 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
         goto end;
      }
 
+   if (args < argc)
+     {
+        project_path = argv[args];
+     }
+
    elm_app_info_set(elm_main, "edi", "images/edi.png");
 
-   if (!(win = edi_win_setup()))
+   if (!(win = edi_win_setup(project_path)))
      goto end;
 
    edi_library_call();

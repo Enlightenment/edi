@@ -118,6 +118,7 @@ load_tree(char *path, Elm_Object_Item *parent)
 
 void
 edi_filepanel_add(Evas_Object *parent,
+                  const char *path,
                   edi_filepanel_item_clicked_cb cb)
 {
    list = elm_genlist_add(parent);
@@ -138,7 +139,7 @@ edi_filepanel_add(Evas_Object *parent,
    itc2.func.del = _item_del;
 
    _open_cb = cb;
-   load_tree(PROJECT_ROOT, NULL);
+   load_tree(path, NULL);
 
    elm_box_pack_end(parent, list);
 }
