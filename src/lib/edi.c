@@ -20,8 +20,8 @@ edi_init(void)
    _edi_lib_log_dom = eina_log_domain_register("edi", EINA_COLOR_CYAN);
    if (_edi_lib_log_dom < 0)
      {
-	EINA_LOG_ERR("Edi can not create its log domain.");
-	goto shutdown_eina;
+        EINA_LOG_ERR("Edi can not create its log domain.");
+        goto shutdown_eina;
      }
 
    // Put here your initialization logic of your library
@@ -44,8 +44,8 @@ edi_shutdown(void)
    if (_edi_init != 0) return _edi_init;
 
    eina_log_timing(_edi_lib_log_dom,
-		   EINA_LOG_STATE_START,
-		   EINA_LOG_STATE_SHUTDOWN);
+                   EINA_LOG_STATE_START,
+                   EINA_LOG_STATE_SHUTDOWN);
 
    // Put here your shutdown logic
 

@@ -81,33 +81,33 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
      {
-	EINA_LOG_CRIT("Could not parse arguments.");
-	goto end;
+        EINA_LOG_CRIT("Could not parse arguments.");
+        goto end;
      }
    else if (quit_option)
      {
-	goto end;
+        goto end;
      }
    else if (list_option)
      {
-	fprintf(stdout, "Available tests :\n");
-	for (i = 0; i < sizeof (tests) / sizeof (tests[0]); i++)
-	  fprintf(stdout, "\t%s\n", tests[i].name);
-	goto end;
+        fprintf(stdout, "Available tests :\n");
+        for (i = 0; i < sizeof (tests) / sizeof (tests[0]); i++)
+          fprintf(stdout, "\t%s\n", tests[i].name);
+        goto end;
      }
 
    s = suite_create("Edi");
 
    for (i = 0; i < sizeof (tests) / sizeof (tests[0]); i++)
      {
-	if (test && strcmp(tests[i].name, test))
-	  continue ;
+        if (test && strcmp(tests[i].name, test))
+          continue ;
 
-	tc =  tcase_create(tests[i].name);
-	tcase_set_timeout(tc, 0);
+        tc =  tcase_create(tests[i].name);
+        tcase_set_timeout(tc, 0);
 
-	tests[i].build(tc);
-	suite_add_tcase(s, tc);
+        tests[i].build(tc);
+        suite_add_tcase(s, tc);
      }
 
    sr = srunner_create(s);

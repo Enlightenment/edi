@@ -96,23 +96,23 @@ load_tree(char *path, Elm_Object_Item *parent)
    iter = eina_file_stat_ls(path);
    if (iter)
      {
-	EINA_ITERATOR_FOREACH(iter, info)
-	  {
-	      name = info->path + info->name_start;
-	      if (ignore_file(name)) continue;
+        EINA_ITERATOR_FOREACH(iter, info)
+          {
+              name = info->path + info->name_start;
+              if (ignore_file(name)) continue;
 
-	      if (info->type == EINA_FILE_DIR)
-	        {
-		   newParent = elm_genlist_item_sorted_insert(list, &itc2, eina_stringshare_add(name),
-							      parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
-		   load_tree(info->path, newParent);
-	        }
-	      else if (info->type == EINA_FILE_REG)
-	        {
-		   elm_genlist_item_sorted_insert(list, &itc, eina_stringshare_add(name),
-						  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
-	        }
-	  }
+              if (info->type == EINA_FILE_DIR)
+                {
+                   newParent = elm_genlist_item_sorted_insert(list, &itc2, eina_stringshare_add(name),
+                                                              parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
+                   load_tree(info->path, newParent);
+                }
+              else if (info->type == EINA_FILE_REG)
+                {
+                   elm_genlist_item_sorted_insert(list, &itc, eina_stringshare_add(name),
+                                                  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
+                }
+          }
      }
 }
 

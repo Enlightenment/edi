@@ -28,7 +28,7 @@ _get_item_for_path(const char *path)
 {
    Eina_List *list, *item;
    Elm_Object_Item *it;
-   
+
    list = elm_naviframe_items_get(nf);
    EINA_LIST_FOREACH(list, item, it)
      {
@@ -46,7 +46,7 @@ _edi_mainview_open_file_text(const char *path)
 {
    Evas_Object *txt;
    Elm_Object_Item *it, *tab;
-   
+
    it = _get_item_for_path(path);
    if (it)
      {
@@ -73,20 +73,20 @@ static void
 _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
    const char *path;
-   
+
    path = data;
    if (S_ISREG(stat->mode))
      {
         _edi_mainview_open_file_text(path);
      }
-   
+
    eina_stringshare_del(path);
 }
 
 EAPI void
 edi_mainview_open_path(const char *path)
 {
-   eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy, 
+   eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
                         eina_stringshare_add(path));
 }
 
