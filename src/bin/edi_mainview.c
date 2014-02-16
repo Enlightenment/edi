@@ -41,6 +41,7 @@ _get_item_for_path(const char *path)
    return NULL;
 }
 
+
 static void
 _edi_mainview_open_file_text(const char *path)
 {
@@ -56,8 +57,9 @@ _edi_mainview_open_file_text(const char *path)
         
    txt = elm_entry_add(nf);
    elm_entry_scrollable_set(txt, EINA_TRUE);
+   elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospaced font_size=12'");
    elm_entry_file_set(txt, path, ELM_TEXT_FORMAT_PLAIN_UTF8);
-   elm_entry_autosave_set(txt, EINA_TRUE);
+   elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
@@ -88,6 +90,64 @@ edi_mainview_open_path(const char *path)
 {
    eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
                         eina_stringshare_add(path));
+}
+
+EAPI void
+edi_mainview_save()
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (txt)
+     elm_entry_file_save(txt);
+}
+
+EAPI void
+edi_mainview_close()
+{
+   if (!elm_object_item_data_get(elm_naviframe_top_item_get(nf)))
+     return;
+
+   elm_naviframe_item_pop(nf);
+   elm_object_item_del(elm_toolbar_selected_item_get(tb));
+}
+
+EAPI void
+edi_mainview_cut()
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (txt)
+     elm_entry_selection_cut(txt);
+}
+
+EAPI void
+edi_mainview_copy()
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (txt)
+     elm_entry_selection_copy(txt);
+}
+
+EAPI void
+edi_mainview_paste()
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (txt)
+     elm_entry_selection_paste(txt);
 }
 
 EAPI void

@@ -25,7 +25,7 @@ extern "C" {
 /**
  * Initialize a new Edi main view and add it to the parent panel.
  *
- * @param win The window into which the panel will be loaded.
+ * @param parent The parent into which the panel will be loaded.
  *
  * @ingroup UI
  */
@@ -44,8 +44,49 @@ EAPI void edi_mainview_add(Evas_Object *parent);
  *
  */
 
-
+/**
+ * Open the file at path for editing.
+ *
+ * @param path The absolute path of the file to open.
+ *
+ * @ingroup Content
+ */
 EAPI void edi_mainview_open_path(const char *path);
+
+/**
+ * Save the current file.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_save();
+
+/**
+ * Close the current file.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_close();
+
+/**
+ * Cut the current selection into the clipboard.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_cut();
+
+/**
+ * Copy the current selection into the clipboard.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_copy();
+
+/**
+ * Paste the current clipboard contents at the current cursor position.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_paste();
 
 /**
  * @}

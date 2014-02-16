@@ -81,49 +81,56 @@ edi_content_setup(Evas_Object *win)
 }
 
 static void
-_tb_sel_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   printf("Toolbar button pressed\n");
+   edi_mainview_save();
+}
+
+static void
+_tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_mainview_close();
+}
+
+static void
+_tb_cut_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_mainview_cut();
+}
+
+static void
+_tb_copy_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_mainview_copy();
+}
+
+static void
+_tb_paste_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   edi_mainview_paste();
 }
 
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
-   Evas_Object *tb, *menu;
-   Elm_Object_Item *tb_it, *menu_it;
+   Evas_Object *tb;
+   Elm_Object_Item *tb_it;
 
    tb = elm_toolbar_add(win);
-   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
+   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
-   evas_object_size_hint_weight_set(tb, 0.0, 0.0);
+   elm_toolbar_align_set(tb, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
-   tb_it = elm_toolbar_item_append(tb, "document-print", "Hello", _tb_sel_cb, NULL);
-   elm_object_item_disabled_set(tb_it, EINA_TRUE);
-   elm_toolbar_item_priority_set(tb_it, -100);
+   tb_it = elm_toolbar_item_append(tb, "save", "Save", _tb_save_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "close", "Close", _tb_close_cb, NULL);
 
-   tb_it = elm_toolbar_item_append(tb, "folder-new", "World", _tb_sel_cb, NULL);
-   elm_toolbar_item_priority_set(tb_it, 100);
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   tb_it = elm_toolbar_item_append(tb, "object-rotate-right", "H", _tb_sel_cb, NULL);
-   elm_toolbar_item_priority_set(tb_it, -150);
-
-   tb_it = elm_toolbar_item_append(tb, "mail-send", "Comes", _tb_sel_cb, NULL);
-   elm_toolbar_item_priority_set(tb_it, -200);
-
-   tb_it = elm_toolbar_item_append(tb, "clock", "Elementary", _tb_sel_cb, NULL);
-   elm_toolbar_item_priority_set(tb_it, 0);
-
-   tb_it = elm_toolbar_item_append(tb, "refresh", "Menu", NULL, NULL);
-   elm_toolbar_item_menu_set(tb_it, EINA_TRUE);
-   elm_toolbar_item_priority_set(tb_it, -9999);
-   elm_toolbar_menu_parent_set(tb, win);
-   menu = elm_toolbar_item_menu_get(tb_it);
-
-   elm_menu_item_add(menu, NULL, "edit-cut", "Shrink", _tb_sel_cb, NULL);
-   menu_it = elm_menu_item_add(menu, NULL, "edit-copy", "Mode", _tb_sel_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-paste", "is set to", _tb_sel_cb, NULL);
-   elm_menu_item_add(menu, NULL, "edit-delete", "Scroll", _tb_sel_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);
    
    evas_object_show(tb);
    return tb;
