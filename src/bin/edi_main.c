@@ -29,7 +29,7 @@ _edi_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
 static void
 _edi_file_open_cb(const char *path)
 {
-   edi_mainview_open(path);
+   edi_mainview_open_path(path);
 }
 
 static Evas_Object *

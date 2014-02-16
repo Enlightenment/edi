@@ -45,7 +45,7 @@ EAPI void edi_mainview_add(Evas_Object *parent);
  */
 
 
-EAPI void edi_mainview_open(const char *path);
+EAPI void edi_mainview_open_path(const char *path);
 
 /**
  * @}
