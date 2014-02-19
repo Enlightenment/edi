@@ -10,9 +10,6 @@
 
 #include "edi_private.h"
 
-// TODO take this from the command line!
-static char *PROJECT_ROOT = "/home/andy/Code/E/edi";
-
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
@@ -29,9 +26,17 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    if (!strcmp(source, "elm.swallow.icon"))
      {
         Evas_Object *ic;
+        const char *iconpath;
 
         ic = elm_icon_add(obj);
-        elm_icon_standard_set(ic, "file");
+        // TODO hook into the selected theme somehow (currently owned by E...)
+        iconpath = efreet_mime_type_icon_get(data, "hicolor", 128);
+
+        if (iconpath)
+           elm_icon_file_set(ic, iconpath, NULL);
+        else
+          elm_icon_standard_set(ic, "file");
+
         evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
         evas_object_show(ic);
         return ic;
@@ -43,7 +48,6 @@ static void
 _item_del(void *data, Evas_Object *obj)
 {
    eina_stringshare_del(data);
-   eina_stringshare_del(elm_object_item_data_get(obj));
 }
 
 static void
@@ -71,7 +75,7 @@ _content_dir_get(void *data, Evas_Object *obj, const char *source)
 static Eina_Bool
 ignore_file(const char *file)
 {
-   return eina_str_has_prefix(file, ".");
+   return eina_str_has_prefix(basename(file), ".");
 }
 
 static int
@@ -98,19 +102,19 @@ load_tree(char *path, Elm_Object_Item *parent)
      {
         EINA_ITERATOR_FOREACH(iter, info)
           {
-              name = info->path + info->name_start;
+              name = eina_stringshare_add(info->path);
               if (ignore_file(name)) continue;
 
               if (info->type == EINA_FILE_DIR)
                 {
-                   newParent = elm_genlist_item_sorted_insert(list, &itc2, eina_stringshare_add(name),
-                                                              parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
+                   newParent = elm_genlist_item_sorted_insert(list, &itc2, name,
+                                                              parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, name);
                    load_tree(info->path, newParent);
                 }
               else if (info->type == EINA_FILE_REG)
                 {
-                   elm_genlist_item_sorted_insert(list, &itc, eina_stringshare_add(name),
-                                                  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, eina_stringshare_add(info->path));
+                   elm_genlist_item_sorted_insert(list, &itc, name,
+                                                  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, name);
                 }
           }
      }
