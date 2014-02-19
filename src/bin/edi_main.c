@@ -178,6 +178,7 @@ _edi_project_choose()
    elm_fileselector_expandable_set(fs, EINA_TRUE);
    elm_fileselector_folder_only_set(fs, EINA_TRUE);
    elm_fileselector_path_set(fs, getenv("HOME"));
+   elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
 
    evas_object_resize(win, 380, 260);
    evas_object_show(win);
@@ -188,13 +189,11 @@ _edi_project_choose()
 static char *
 _edi_win_title_get(const char *path)
 {
-   char *winname, *dirname, *fullpath;
+   char *winname, *dirname;
 
-   fullpath = realpath(path, NULL);
-   dirname = basename(fullpath);
+   dirname = basename(path);
    winname = malloc((8 + strlen(dirname)) * sizeof(char));
    snprintf(winname, 8 + strlen(dirname), "Edi :: %s", dirname);
-   free(fullpath);
 
    return winname;
 }
@@ -292,7 +291,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    if (args < argc)
      {
-        project_path = argv[args];
+        project_path = realpath(argv[args], NULL);
      }
 
    elm_app_info_set(elm_main, "edi", "images/edi.png");

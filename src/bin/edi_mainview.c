@@ -74,12 +74,18 @@ _edi_mainview_open_file_text(const char *path)
 static void
 _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
-   const char *path;
+   const char *path, *mime;
 
    path = data;
    if (S_ISREG(stat->mode))
      {
-        _edi_mainview_open_file_text(path);
+        mime = efreet_mime_type_get(path);
+        if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
+          _edi_mainview_open_file_text(path);
+        else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
+          _edi_mainview_open_file_text(path); // TODO make a code view
+        else
+          printf("Unknown mime %s\n", mime);
      }
 
    eina_stringshare_del(path);
