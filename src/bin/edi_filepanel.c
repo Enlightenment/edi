@@ -5,6 +5,8 @@
 #include <libgen.h>
 
 #include <Eina.h>
+#include <Eio.h>
+#include <elm_widget_fileselector.h>
 
 #include "edi_filepanel.h"
 
@@ -13,6 +15,9 @@
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
+
+static void
+_populate(Evas_Object *obj, const char *path, Elm_Object_Item *parent_it, const char *selected);
 
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
@@ -53,7 +58,10 @@ _item_del(void *data, Evas_Object *obj)
 static void
 _item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   _open_cb((const char*)data);
+   const char *path = data;
+
+   if (!ecore_file_is_dir(path))
+     _open_cb(path);
 }
 
 static Evas_Object *
@@ -73,51 +81,170 @@ _content_dir_get(void *data, Evas_Object *obj, const char *source)
 }
 
 static Eina_Bool
-ignore_file(const char *file)
+_ls_filter_cb(void *data,
+              Eio_File *handler EINA_UNUSED,
+              const Eina_File_Direct_Info *info)
 {
-   return eina_str_has_prefix(basename(file), ".");
+   return info->path[info->name_start] != '.';
 }
 
 static int
-_item_sort(const void *data1, const void *data2)
+_file_list_cmp(const void *data1, const void *data2)
 {
    const Elm_Object_Item *item1 = data1;
    const Elm_Object_Item *item2 = data2;
+   const Elm_Genlist_Item_Class *ca = elm_genlist_item_item_class_get(item1);
+   const Elm_Genlist_Item_Class *cb = elm_genlist_item_item_class_get(item2);
+
+   if (ca == &itc2)
+     {
+        if (cb != &itc2)
+          return -1;
+     }
+   else if (cb == &itc2)
+     {
+        return 1;
+     }
 
    const char *name1 = elm_object_item_data_get(item1);
    const char *name2 = elm_object_item_data_get(item2);
+   printf("n1 %s, n2 %s\n", name1, name2);
    return strcasecmp(name1, name2);
 }
 
 static void
-load_tree(char *path, Elm_Object_Item *parent)
+_listing_request_cleanup(Listing_Request *lreq)
 {
-   Eina_Iterator *iter;
-   Eina_File_Direct_Info *info;
-   Elm_Object_Item *newParent;
-   char *name;
+   eina_stringshare_del(lreq->path);
+   eina_stringshare_del(lreq->selected);
+   free(lreq);
+}
 
-   iter = eina_file_stat_ls(path);
-   if (iter)
+static void
+_on_list_expand_req(void *data       EINA_UNUSED,
+                    Evas_Object *obj EINA_UNUSED,
+                    void *event_info)
+{
+   Elm_Object_Item *it = event_info;
+
+   elm_genlist_item_expanded_set(it, EINA_TRUE);
+}
+
+static void
+_on_list_contract_req(void *data       EINA_UNUSED,
+                      Evas_Object *obj EINA_UNUSED,
+                      void *event_info)
+{
+   Elm_Object_Item *it = event_info;
+
+   elm_genlist_item_expanded_set(it, EINA_FALSE);
+}
+
+static void
+_on_list_expanded(void *data,
+                  Evas_Object *obj EINA_UNUSED,
+                  void *event_info)
+{
+   Elm_Object_Item *it = event_info;
+   const char *path = elm_object_item_data_get(it);
+
+   _populate(data, path, it, NULL);
+}
+
+static void
+_on_list_contracted(void *data       EINA_UNUSED,
+                    Evas_Object *obj EINA_UNUSED,
+                    void *event_info)
+{
+   Elm_Object_Item *it = event_info;
+
+   elm_genlist_item_subitems_clear(it);
+}
+
+static void
+_ls_main_cb(void *data,
+            Eio_File *handler,
+            const Eina_File_Direct_Info *info)
+{
+   Listing_Request *lreq = data;
+   Elm_Object_Item *item;
+   Elm_Genlist_Item_Class *clas = &itc;
+   const char  *path;
+
+   if (eio_file_check(handler)) return;
+
+   //if (!lreq->sd->files_view || lreq->sd->current != handler)
+     //{
+        //eio_file_cancel(handler);
+        //return;
+     //}
+
+//   _signal_first(lreq);
+
+   if (info->type == EINA_FILE_DIR)
      {
-        EINA_ITERATOR_FOREACH(iter, info)
-          {
-              name = eina_stringshare_add(info->path);
-              if (ignore_file(name)) continue;
-
-              if (info->type == EINA_FILE_DIR)
-                {
-                   newParent = elm_genlist_item_sorted_insert(list, &itc2, name,
-                                                              parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, name);
-                   load_tree(info->path, newParent);
-                }
-              else if (info->type == EINA_FILE_REG)
-                {
-                   elm_genlist_item_sorted_insert(list, &itc, name,
-                                                  parent, ELM_GENLIST_ITEM_NONE, _item_sort, _item_sel, name);
-                }
-          }
+        clas = &itc2;
      }
+
+   path = eina_stringshare_add(info->path);
+   item = elm_genlist_item_sorted_insert(list, clas, path, lreq->parent_it,
+                                         (clas == &itc2) ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
+                                         _file_list_cmp, _item_sel, path);
+
+   if (lreq->selected && !strcmp(info->path, lreq->selected))
+     {
+        elm_genlist_item_selected_set(item, EINA_TRUE);
+        elm_object_text_set(lreq->sd->name_entry, ecore_file_file_get(info->path));
+     }
+}
+
+static void
+_ls_done_cb(void *data, Eio_File *handler EINA_UNUSED)
+{
+   Listing_Request *lreq = data;
+
+   _listing_request_cleanup(lreq);
+}
+
+static void
+_ls_error_cb(void *data, Eio_File *handler, int error EINA_UNUSED)
+{
+   Listing_Request *lreq = data;
+
+   _listing_request_cleanup(lreq);
+}
+
+static void
+_populate(Evas_Object *obj,
+          const char *path,
+          Elm_Object_Item *parent_it,
+          const char *selected)
+{
+   if (!path) return;
+
+   Listing_Request *lreq;
+
+   //if (sd->monitor) eio_monitor_del(sd->monitor);
+   //if (sd->current) eio_file_cancel(sd->current);
+
+   lreq = malloc(sizeof (Listing_Request));
+   if (!lreq) return;
+
+   lreq->parent_it = parent_it;
+   lreq->obj = obj;
+   lreq->path = eina_stringshare_add(path);
+   lreq->first = EINA_TRUE;
+
+   if (selected)
+     lreq->selected = eina_stringshare_add(selected);
+   else
+     lreq->selected = NULL;
+
+   /* TODO: sub directory should be monitored for expand mode */
+   //sd->monitor = eio_monitor_add(path);
+   //sd->current = 
+   eio_file_stat_ls(path, _ls_filter_cb, _ls_main_cb,
+                                  _ls_done_cb, _ls_error_cb, lreq);
 }
 
 void
@@ -131,6 +258,11 @@ edi_filepanel_add(Evas_Object *parent,
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
 
+   evas_object_smart_callback_add(list, "expand,request", _on_list_expand_req, parent);
+   evas_object_smart_callback_add(list, "contract,request", _on_list_contract_req, parent);
+   evas_object_smart_callback_add(list, "expanded", _on_list_expanded, parent);
+   evas_object_smart_callback_add(list, "contracted", _on_list_contracted, parent);
+
    itc.item_style = "default";
    itc.func.text_get = _text_get;
    itc.func.content_get = _content_get;
@@ -143,7 +275,7 @@ edi_filepanel_add(Evas_Object *parent,
    itc2.func.del = _item_del;
 
    _open_cb = cb;
-   load_tree(path, NULL);
+   _populate(list, path, NULL, NULL);
 
    elm_box_pack_end(parent, list);
 }
