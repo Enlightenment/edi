@@ -1,0 +1,18 @@
+This project is in heavy development, we are currenty working towards the
+"Basic text editing" phase, the following work is still to be done:
+
+* Opening editor in a new window
+* info panel with logs and useful output
+* Allow an "open as" so we can open text files that have a weird mime type
+* Remember last project and allow new project to be loaded (new window or current)
+* No screen waste (toolbar, menu, tab are out of the way of the developer)
+
+Bugs to fix:
+
+* Tabs don't stay in sync with content view when re-opening a file
+* Icons are missing from toolbar and context menu
+* Remember position and size of window and panels
+
+The next phase is "Code aware editor" and it, along with other future phases
+are documented online at https://phab.enlightenment.org/w/edi/
+
