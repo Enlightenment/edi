@@ -41,19 +41,11 @@ _get_item_for_path(const char *path)
    return NULL;
 }
 
-
 static void
 _edi_mainview_open_file_text(const char *path)
 {
    Evas_Object *txt;
    Elm_Object_Item *it, *tab;
-
-   it = _get_item_for_path(path);
-   if (it)
-     {
-        elm_naviframe_item_promote(it);
-        return;
-     }
         
    txt = elm_entry_add(nf);
    elm_entry_scrollable_set(txt, EINA_TRUE);
@@ -65,6 +57,29 @@ _edi_mainview_open_file_text(const char *path)
    evas_object_show(txt);
 
    it = elm_naviframe_item_simple_push(nf, txt);
+   elm_object_item_data_set(it, path);
+   elm_naviframe_item_style_set(it, "overlap");
+   tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
+   elm_toolbar_item_selected_set(tab, EINA_TRUE);
+}
+
+static void
+_edi_mainview_open_file_image(const char *path)
+{
+   Evas_Object *img, *scroll;
+   Elm_Object_Item *it, *tab;
+
+   scroll = elm_scroller_add(nf);
+   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(scroll);
+   img = elm_image_add(scroll);
+   elm_image_file_set(img, path, NULL);
+   elm_image_no_scale_set(img, EINA_TRUE);
+   elm_object_content_set(scroll, img);
+   evas_object_show(img);
+
+   it = elm_naviframe_item_simple_push(nf, scroll);
    elm_object_item_data_set(it, path);
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
@@ -84,6 +99,8 @@ _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ei
           _edi_mainview_open_file_text(path);
         else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
           _edi_mainview_open_file_text(path); // TODO make a code view
+        else if (!strncasecmp(mime, "image/", 6))
+          _edi_mainview_open_file_image(path);
         else
           printf("Unknown mime %s\n", mime);
      }
@@ -94,6 +111,15 @@ _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ei
 EAPI void
 edi_mainview_open_path(const char *path)
 {
+   Elm_Object_Item *it;
+
+   it = _get_item_for_path(path);
+   if (it)
+     {
+        elm_naviframe_item_promote(it);
+        return;
+     }
+
    eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
                         eina_stringshare_add(path));
 }
