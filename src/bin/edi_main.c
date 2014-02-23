@@ -47,7 +47,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(panel);
-   edi_filepanel_add(panel, path, _edi_file_open_cb);
+   edi_filepanel_add(panel, win, path, _edi_file_open_cb);
 
    elm_object_part_content_set(panes, "left", panel);
    elm_panes_content_left_size_set(panes, 0.2);

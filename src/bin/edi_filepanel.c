@@ -16,8 +16,76 @@ static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
 
+static Evas_Object *menu, *_main_win;
+static const char *_menu_cb_path;
+
 static void
 _populate(Evas_Object *obj, const char *path, Elm_Object_Item *parent_it, const char *selected);
+
+static void
+_item_menu_open_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   if (ecore_file_is_dir(_menu_cb_path))
+     return;
+
+   _open_cb(_menu_cb_path);
+}
+
+static void
+_item_menu_xdgopen_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   int pid = fork();
+
+   if (pid == 0)
+     {
+        execlp("/usr/bin/xdg-open", "xdg-open", _menu_cb_path, NULL);
+        exit(0);
+     }
+}
+
+static void
+_item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *ev EINA_UNUSED)
+{
+   eina_stringshare_del(_menu_cb_path);
+   _menu_cb_path = NULL;
+}
+
+static void
+_item_menu_create(Evas_Object *win)
+{
+   Elm_Object_Item *menu_it;
+
+   menu = elm_menu_add(win);
+   evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
+
+   elm_menu_item_add(menu, NULL, NULL, "open", _item_menu_open_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "xdg-open",
+                               _item_menu_xdgopen_cb, NULL);
+}
+
+static void
+_item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
+                 Evas_Event_Mouse_Down *ev)
+{
+   Elm_Object_Item *it;
+   const char *path;
+
+   if (ev->button != 3) return;
+
+   it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
+   path = elm_object_item_data_get(it);
+
+   if (!menu)
+     _item_menu_create(_main_win);
+
+   _menu_cb_path = eina_stringshare_add(path);
+   elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
+   evas_object_show(menu);
+}
 
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
@@ -108,7 +176,7 @@ _file_list_cmp(const void *data1, const void *data2)
 
    const char *name1 = elm_object_item_data_get(item1);
    const char *name2 = elm_object_item_data_get(item2);
-   printf("n1 %s, n2 %s\n", name1, name2);
+
    return strcasecmp(name1, name2);
 }
 
@@ -190,12 +258,6 @@ _ls_main_cb(void *data,
    item = elm_genlist_item_sorted_insert(list, clas, path, lreq->parent_it,
                                          (clas == &itc2) ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
                                          _file_list_cmp, _item_sel, path);
-
-   if (lreq->selected && !strcmp(info->path, lreq->selected))
-     {
-        elm_genlist_item_selected_set(item, EINA_TRUE);
-        elm_object_text_set(lreq->sd->name_entry, ecore_file_file_get(info->path));
-     }
 }
 
 static void
@@ -248,15 +310,17 @@ _populate(Evas_Object *obj,
 }
 
 void
-edi_filepanel_add(Evas_Object *parent,
-                  const char *path,
-                  edi_filepanel_item_clicked_cb cb)
+edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
+                  const char *path, edi_filepanel_item_clicked_cb cb)
 {
    list = elm_genlist_add(parent);
    evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
+
+   evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
+                                  _item_clicked_cb, NULL);
 
    evas_object_smart_callback_add(list, "expand,request", _on_list_expand_req, parent);
    evas_object_smart_callback_add(list, "contract,request", _on_list_contract_req, parent);
@@ -275,6 +339,7 @@ edi_filepanel_add(Evas_Object *parent,
    itc2.func.del = _item_del;
 
    _open_cb = cb;
+   _main_win = win;
    _populate(list, path, NULL, NULL);
 
    elm_box_pack_end(parent, list);

@@ -27,13 +27,15 @@ extern "C" {
 /**
  * Initialize a new Edi filepanel and add it to the parent panel.
  *
- * @param win The window into which the panel will be loaded.
+ * @param parent The panel into which the panel will be loaded.
+ * @param win The main window of the application.
+ * @param win The project path being opened.
+ * @param win A callback to inform the app a file should be opened.
  *
  * @ingroup UI
  */
-void edi_filepanel_add(Evas_Object *parent,
-                       const char *path,
-                       edi_filepanel_item_clicked_cb cb);
+void edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
+                       const char *path, edi_filepanel_item_clicked_cb cb);
 
 /**
  * @}
