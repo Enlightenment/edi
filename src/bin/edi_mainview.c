@@ -57,7 +57,7 @@ _edi_mainview_open_file_text(const char *path)
         
    txt = elm_entry_add(nf);
    elm_entry_scrollable_set(txt, EINA_TRUE);
-   elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospaced font_size=12'");
+   elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospace font_size=12'");
    elm_entry_file_set(txt, path, ELM_TEXT_FORMAT_PLAIN_UTF8);
    elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
