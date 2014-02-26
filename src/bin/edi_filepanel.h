@@ -12,7 +12,10 @@ extern "C" {
  * @brief These routines are used for managing the Edi file panel.
  */
 
- typedef void (*edi_filepanel_item_clicked_cb)(const char *path);
+typedef void (*edi_filepanel_item_clicked_cb)(const char *path);
+
+typedef void (*edi_filepanel_item_type_clicked_cb)(const char *path,
+                                                   const char *type);
 
 /**
  * @brief UI management functions.
@@ -29,13 +32,15 @@ extern "C" {
  *
  * @param parent The panel into which the panel will be loaded.
  * @param win The main window of the application.
- * @param win The project path being opened.
- * @param win A callback to inform the app a file should be opened.
+ * @param path The project path being opened.
+ * @param cb A callback to inform the app a file should be opened.
+ * @param type_cb A callback to inform the app a file should be opened with a specified type.
  *
  * @ingroup UI
  */
 void edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
-                       const char *path, edi_filepanel_item_clicked_cb cb);
+                       const char *path, edi_filepanel_item_clicked_cb cb,
+                       edi_filepanel_item_type_clicked_cb type_cb);
 
 /**
  * @}

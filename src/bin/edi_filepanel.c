@@ -15,6 +15,7 @@
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
+static edi_filepanel_item_type_clicked_cb _open_type_cb;
 
 static Evas_Object *menu, *_main_win;
 static const char *_menu_cb_path;
@@ -46,6 +47,20 @@ _item_menu_xdgopen_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNU
 }
 
 static void
+_item_menu_open_as_text_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                           void *event_info EINA_UNUSED)
+{
+   _open_type_cb(_menu_cb_path, "text");
+}
+
+static void
+_item_menu_open_as_image_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                            void *event_info EINA_UNUSED)
+{
+   _open_type_cb(_menu_cb_path, "image");
+}
+
+static void
 _item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                         void *ev EINA_UNUSED)
 {
@@ -65,6 +80,9 @@ _item_menu_create(Evas_Object *win)
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "xdg-open",
                                _item_menu_xdgopen_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, NULL, "text", _item_menu_open_as_text_cb, NULL);
+   elm_menu_item_add(menu, menu_it, NULL, "image", _item_menu_open_as_image_cb, NULL);
 }
 
 static void
@@ -311,7 +329,8 @@ _populate(Evas_Object *obj,
 
 void
 edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
-                  const char *path, edi_filepanel_item_clicked_cb cb)
+                  const char *path, edi_filepanel_item_clicked_cb cb,
+                  edi_filepanel_item_type_clicked_cb type_cb)
 {
    list = elm_genlist_add(parent);
    evas_object_size_hint_min_set(list, 100, -1);
@@ -339,6 +358,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    itc2.func.del = _item_del;
 
    _open_cb = cb;
+   _open_type_cb = type_cb;
    _main_win = win;
    _populate(list, path, NULL, NULL);
 
