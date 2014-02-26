@@ -7,7 +7,6 @@ This project is in heavy development, we are currenty working towards the
 
 Bugs to fix:
 
-* Tabs don't stay in sync with content view when re-opening a file
 * Icons are missing from toolbar and context menu
 * Remember position and size of window and panels
 

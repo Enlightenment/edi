@@ -2,6 +2,7 @@
 # define EDI_MAINVIEW_H_
 
 #include <Elementary.h>
+#include <Evas.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,6 +13,28 @@ extern "C" {
  * @brief These routines are used for managing the main area of the Edi interface.
  */
  
+ /**
+ * @typedef Edi_Mainview_Item
+ * An item being displayed in the mainview.
+ */
+typedef struct _Edi_Mainview_Item Edi_Mainview_Item;
+
+/**
+ * @struct _Edi_Mainview_Item
+ * An item being displayed in the mainview.
+ */
+struct _Edi_Mainview_Item
+{
+   const char *path; /**< The path of the file in this mainview item */
+
+   Elm_Object_Item *tab; /**< The tab object connected to this view */
+   Elm_Object_Item *view; /**< The naviframe item that contains the view for this item */
+
+   /* Private */
+
+   /* Add new members here. */
+};
+
 /**
  * @brief UI management functions.
  * @defgroup UI

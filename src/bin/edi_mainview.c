@@ -23,7 +23,7 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
    elm_naviframe_item_promote(data);
 }
 
-static Elm_Object_Item *
+static Edi_Mainview_Item *
 _get_item_for_path(const char *path)
 {
    Eina_List *list, *item;
@@ -32,13 +32,26 @@ _get_item_for_path(const char *path)
    list = elm_naviframe_items_get(nf);
    EINA_LIST_FOREACH(list, item, it)
      {
-        const char *loaded;
-        loaded = elm_object_item_data_get(it);
+        Edi_Mainview_Item *item;
+        item = elm_object_item_data_get(it);
 
-        if (loaded && !strcmp(loaded, path))
-          return it;
+        if (item && !strcmp(item->path, path))
+          return item;
      }
    return NULL;
+}
+
+static Edi_Mainview_Item *
+_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view)
+{
+   Edi_Mainview_Item *item;
+
+   item = malloc(sizeof(Edi_Mainview_Item));
+   item->path = path;
+   item->tab = tab;
+   item->view = view;
+
+   return item;
 }
 
 static void
@@ -46,7 +59,8 @@ _edi_mainview_open_file_text(const char *path)
 {
    Evas_Object *txt;
    Elm_Object_Item *it, *tab;
-        
+   Edi_Mainview_Item *item;
+
    txt = elm_entry_add(nf);
    elm_entry_scrollable_set(txt, EINA_TRUE);
    elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospace font_size=12'");
@@ -57,10 +71,12 @@ _edi_mainview_open_file_text(const char *path)
    evas_object_show(txt);
 
    it = elm_naviframe_item_simple_push(nf, txt);
-   elm_object_item_data_set(it, path);
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
+
+   item = _edi_mainview_item_add(path, tab, it);
+   elm_object_item_data_set(it, item);
 }
 
 static void
@@ -68,6 +84,7 @@ _edi_mainview_open_file_image(const char *path)
 {
    Evas_Object *img, *scroll;
    Elm_Object_Item *it, *tab;
+   Edi_Mainview_Item *item;
 
    scroll = elm_scroller_add(nf);
    evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -80,10 +97,12 @@ _edi_mainview_open_file_image(const char *path)
    evas_object_show(img);
 
    it = elm_naviframe_item_simple_push(nf, scroll);
-   elm_object_item_data_set(it, path);
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
+
+   item = _edi_mainview_item_add(path, tab, it);
+   elm_object_item_data_set(it, item);
 }
 
 static void
@@ -111,12 +130,13 @@ _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ei
 EAPI void
 edi_mainview_open_path(const char *path, const char *type)
 {
-   Elm_Object_Item *it;
+   Edi_Mainview_Item *it;
 
    it = _get_item_for_path(path);
    if (it)
      {
-        elm_naviframe_item_promote(it);
+        elm_naviframe_item_promote(it->view);
+        elm_toolbar_item_selected_set(it->tab, EINA_TRUE);
         return;
      }
 
@@ -155,6 +175,7 @@ edi_mainview_close()
 
    elm_naviframe_item_pop(nf);
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
+   free(elm_object_item_data_get(elm_naviframe_top_item_get(nf)));
 }
 
 EAPI void
