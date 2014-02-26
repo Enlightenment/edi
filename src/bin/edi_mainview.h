@@ -45,24 +45,15 @@ EAPI void edi_mainview_add(Evas_Object *parent);
  */
 
 /**
- * Open the file at path for editing.
- *
- * @param path The absolute path of the file to open.
- *
- * @ingroup Content
- */
-EAPI void edi_mainview_open_path(const char *path);
-
-/**
  * Open the file at path for editing using the type specified.
  * Supported types are "text" and "image".
  *
  * @param path The absolute path of the file to open.
- * @param type The requested type to use when opening the file
+ * @param type The requested type to use when opening the file or NULL for auto-detect
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_path_type(const char *path, const char *type);
+EAPI void edi_mainview_open_path(const char *path, const char *type);
 
 /**
  * Save the current file.

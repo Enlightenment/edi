@@ -109,7 +109,7 @@ _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ei
 }
 
 EAPI void
-edi_mainview_open_path_type(const char *path, const char *type)
+edi_mainview_open_path(const char *path, const char *type)
 {
    Elm_Object_Item *it;
 
@@ -120,7 +120,12 @@ edi_mainview_open_path_type(const char *path, const char *type)
         return;
      }
 
-   if (!strcmp(type, "text"))
+   if (type == NULL)
+     {
+        eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
+                             eina_stringshare_add(path));
+     }
+   else if (!strcmp(type, "text"))
      {
         _edi_mainview_open_file_text(path);
      }
@@ -128,22 +133,6 @@ edi_mainview_open_path_type(const char *path, const char *type)
      {
         _edi_mainview_open_file_image(path);
      }
-}
-
-EAPI void
-edi_mainview_open_path(const char *path)
-{
-   Elm_Object_Item *it;
-
-   it = _get_item_for_path(path);
-   if (it)
-     {
-        elm_naviframe_item_promote(it);
-        return;
-     }
-
-   eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
-                        eina_stringshare_add(path));
 }
 
 EAPI void
