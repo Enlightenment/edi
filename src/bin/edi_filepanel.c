@@ -75,13 +75,13 @@ _item_menu_create(Evas_Object *win)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, NULL, "open", _item_menu_open_cb, NULL);
+   elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "xdg-open",
+   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
                                _item_menu_xdgopen_cb, NULL);
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, NULL, "text", _item_menu_open_as_text_cb, NULL);
-   elm_menu_item_add(menu, menu_it, NULL, "image", _item_menu_open_as_image_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "txt", "text", _item_menu_open_as_text_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "image", "image", _item_menu_open_as_image_cb, NULL);
 }
 
 static void

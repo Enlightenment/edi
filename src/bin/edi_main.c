@@ -131,8 +131,8 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_align_set(tb, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
-   tb_it = elm_toolbar_item_append(tb, "save", "Save", _tb_save_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "close", "Close", _tb_close_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "filesave", "Save", _tb_save_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "window-close", "Close", _tb_close_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
