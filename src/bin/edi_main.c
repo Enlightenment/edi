@@ -29,14 +29,17 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
 }
 
 static void
-_edi_file_open_cb(const char *path, const char *type)
+_edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 {
    if (type == NULL)
      INF("Opening %s", path);
    else
      INF("Opening %s as %s", path, type);
 
-   edi_mainview_open_path(path, type);
+   if (newwin)
+     edi_mainview_open_window_path(path, type);
+   else
+     edi_mainview_open_path(path, type);
 }
 
 static Evas_Object *
@@ -96,6 +99,12 @@ _tb_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_in
 }
 
 static void
+_tb_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_mainview_new_window();
+}
+
+static void
 _tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    edi_mainview_close();
@@ -132,6 +141,7 @@ edi_toolbar_setup(Evas_Object *win)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
    tb_it = elm_toolbar_item_append(tb, "filesave", "Save", _tb_save_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "window-new", "Open window", _tb_open_window_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "window-close", "Close", _tb_close_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);

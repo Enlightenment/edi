@@ -13,7 +13,8 @@ extern "C" {
  */
 
 typedef void (*edi_filepanel_item_clicked_cb)(const char *path,
-                                              const char *type);
+                                              const char *type,
+                                              Eina_Bool newwin);
 
 /**
  * @brief UI management functions.

@@ -29,7 +29,17 @@ _item_menu_open_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED
    if (ecore_file_is_dir(_menu_cb_path))
      return;
 
-   _open_cb(_menu_cb_path, NULL);
+   _open_cb(_menu_cb_path, NULL, EINA_FALSE);
+}
+
+static void
+_item_menu_open_window_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   if (ecore_file_is_dir(_menu_cb_path))
+     return;
+
+   _open_cb(_menu_cb_path, NULL, EINA_TRUE);
 }
 
 static void
@@ -49,14 +59,14 @@ static void
 _item_menu_open_as_text_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
-   _open_cb(_menu_cb_path, "text");
+   _open_cb(_menu_cb_path, "text", EINA_FALSE);
 }
 
 static void
 _item_menu_open_as_image_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                             void *event_info EINA_UNUSED)
 {
-   _open_cb(_menu_cb_path, "image");
+   _open_cb(_menu_cb_path, "image", EINA_FALSE);
 }
 
 static void
@@ -76,6 +86,7 @@ _item_menu_create(Evas_Object *win)
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
    elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, NULL);
+   elm_menu_item_add(menu, NULL, "window-new", "open new window", _item_menu_open_window_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
                                _item_menu_xdgopen_cb, NULL);
@@ -146,7 +157,7 @@ _item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED
    const char *path = data;
 
    if (!ecore_file_is_dir(path))
-     _open_cb(path, NULL);
+     _open_cb(path, NULL, EINA_FALSE);
 }
 
 static Evas_Object *

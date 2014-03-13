@@ -13,6 +13,8 @@
 
 static Evas_Object *nf, *tb;
 
+static Eina_List *_edi_mainview_items = NULL;
+
 static void
 dummy()
 {}
@@ -26,23 +28,20 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 static Edi_Mainview_Item *
 _get_item_for_path(const char *path)
 {
-   Eina_List *list, *item;
-   Elm_Object_Item *it;
+   Eina_List *item;
+   Edi_Mainview_Item *it;
 
-   list = elm_naviframe_items_get(nf);
-   EINA_LIST_FOREACH(list, item, it)
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
      {
-        Edi_Mainview_Item *item;
-        item = elm_object_item_data_get(it);
-
-        if (item && !strcmp(item->path, path))
-          return item;
+        if (it && !strcmp(it->path, path))
+          return it;
      }
    return NULL;
 }
 
 static Edi_Mainview_Item *
-_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view)
+_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view,
+                       Evas_Object *win)
 {
    Edi_Mainview_Item *item;
 
@@ -50,18 +49,19 @@ _edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view
    item->path = path;
    item->tab = tab;
    item->view = view;
+   item->win = win;
+
+   _edi_mainview_items = eina_list_append(_edi_mainview_items, item);
 
    return item;
 }
 
-static void
-_edi_mainview_open_file_text(const char *path)
+static Evas_Object *
+_edi_mainview_content_text_create(const char *path, Evas_Object *parent)
 {
    Evas_Object *txt;
-   Elm_Object_Item *it, *tab;
-   Edi_Mainview_Item *item;
 
-   txt = elm_entry_add(nf);
+   txt = elm_entry_add(parent);
    elm_entry_editable_set(txt, EINA_TRUE);
    elm_entry_scrollable_set(txt, EINA_TRUE);
    elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospace font_size=12'");
@@ -71,23 +71,15 @@ _edi_mainview_open_file_text(const char *path)
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
 
-   it = elm_naviframe_item_simple_push(nf, txt);
-   elm_naviframe_item_style_set(it, "overlap");
-   tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
-   elm_toolbar_item_selected_set(tab, EINA_TRUE);
-
-   item = _edi_mainview_item_add(path, tab, it);
-   elm_object_item_data_set(it, item);
+   return txt;
 }
 
-static void
-_edi_mainview_open_file_image(const char *path)
+static Evas_Object *
+_edi_mainview_content_image_create(const char *path, Evas_Object *parent)
 {
    Evas_Object *img, *scroll;
-   Elm_Object_Item *it, *tab;
-   Edi_Mainview_Item *item;
 
-   scroll = elm_scroller_add(nf);
+   scroll = elm_scroller_add(parent);
    evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(scroll);
@@ -97,17 +89,91 @@ _edi_mainview_open_file_image(const char *path)
    elm_object_content_set(scroll, img);
    evas_object_show(img);
 
-   it = elm_naviframe_item_simple_push(nf, scroll);
+   return scroll;
+}
+
+static Evas_Object *
+_edi_mainview_content_create(const char *path, const char *type, Evas_Object *parent)
+{
+   if (!strcmp(type, "text"))
+     {
+        return _edi_mainview_content_text_create(path, parent);
+     }
+   else if (!strcmp(type, "image"))
+     {
+        return _edi_mainview_content_image_create(path, parent);
+     }
+
+   return NULL;
+}
+
+static void
+_edi_mainview_item_tab_add(const char *path, const char *type)
+{
+   Evas_Object *content;
+   Elm_Object_Item *it, *tab;
+   Edi_Mainview_Item *item;
+
+   content = _edi_mainview_content_create(path, type, nf);
+
+   it = elm_naviframe_item_simple_push(nf, content);
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename(path), _promote, it);
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
 
-   item = _edi_mainview_item_add(path, tab, it);
+   item = _edi_mainview_item_add(path, tab, it, NULL);
    elm_object_item_data_set(it, item);
 }
 
 static void
-_edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
+_edi_mainview_item_select(Edi_Mainview_Item *item)
+{
+   if (item->win)
+     {
+        elm_win_raise(item->win);
+     }
+   else
+     {
+        elm_naviframe_item_promote(item->view);
+        elm_toolbar_item_selected_set(item->tab, EINA_TRUE);
+     }
+}
+
+static void
+_edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   Edi_Mainview_Item *it;
+
+   evas_object_hide(obj);
+
+   it = evas_object_data_get(obj, "edi_mainview_item");
+   _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+   free(it);
+}
+
+static void
+_edi_mainview_item_win_add(const char *path, const char *type)
+{
+   Evas_Object *win, *content;
+   Edi_Mainview_Item *item;
+
+   win = elm_win_util_standard_add("mainview", basename((char *)path));
+   if (!win) return;
+
+   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
+   evas_object_smart_callback_add(win, "delete,request", _edi_mainview_win_exit, NULL);
+   item = _edi_mainview_item_add(path, NULL, NULL, win);
+   evas_object_data_set(win, "edi_mainview_item", item);
+
+   content = _edi_mainview_content_create(path, type, win);
+   elm_win_resize_object_add(win, content);
+
+   evas_object_resize(win, 380, 260);
+   evas_object_show(win);
+}
+
+static void
+_edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
    const char *path, *mime;
 
@@ -116,11 +182,34 @@ _edi_mainview_open_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ei
      {
         mime = efreet_mime_type_get(path);
         if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
-          _edi_mainview_open_file_text(path);
+          _edi_mainview_item_tab_add(path, "text");
         else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
-          _edi_mainview_open_file_text(path); // TODO make a code view
+          _edi_mainview_item_tab_add(path, "text"); // TODO make a code view
         else if (!strncasecmp(mime, "image/", 6))
-          _edi_mainview_open_file_image(path);
+          _edi_mainview_item_tab_add(path, "image");
+        else
+          printf("Unknown mime %s\n", mime);
+     }
+
+   eina_stringshare_del(path);
+}
+
+
+static void
+_edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
+{
+   const char *path, *mime;
+
+   path = data;
+   if (S_ISREG(stat->mode))
+     {
+        mime = efreet_mime_type_get(path);
+        if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
+          _edi_mainview_item_win_add(path, "text");
+        else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
+          _edi_mainview_item_win_add(path, "text"); // TODO make a code view
+        else if (!strncasecmp(mime, "image/", 6))
+          _edi_mainview_item_win_add(path, "image");
         else
           printf("Unknown mime %s\n", mime);
      }
@@ -136,23 +225,44 @@ edi_mainview_open_path(const char *path, const char *type)
    it = _get_item_for_path(path);
    if (it)
      {
-        elm_naviframe_item_promote(it->view);
-        elm_toolbar_item_selected_set(it->tab, EINA_TRUE);
+        _edi_mainview_item_select(it);
         return;
      }
 
    if (type == NULL)
      {
-        eio_file_direct_stat(path, _edi_mainview_open_stat_done, dummy,
+        eio_file_direct_stat(path, _edi_mainview_tab_stat_done, dummy,
                              eina_stringshare_add(path));
      }
-   else if (!strcmp(type, "text"))
+   else
      {
-        _edi_mainview_open_file_text(path);
+        _edi_mainview_item_tab_add(path, type);
      }
-   else if (!strcmp(type, "image"))
+}
+
+EAPI void
+edi_mainview_open_window_path(const char *path, const char *type)
+{
+   Edi_Mainview_Item *it;
+
+   it = _get_item_for_path(path);
+   if (it)
      {
-        _edi_mainview_open_file_image(path);
+        _edi_mainview_item_select(it);
+        elm_naviframe_item_pop(nf);
+        elm_object_item_del(elm_toolbar_selected_item_get(tb));
+        _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+        free(it);
+     }
+
+   if (type == NULL)
+     {
+        eio_file_direct_stat(path, _edi_mainview_win_stat_done, dummy,
+                             eina_stringshare_add(path));
+     }
+   else
+     {
+        _edi_mainview_item_win_add(path, type);
      }
 }
 
@@ -169,14 +279,30 @@ edi_mainview_save()
 }
 
 EAPI void
+edi_mainview_new_window()
+{
+   Edi_Mainview_Item *item;
+
+   item = elm_object_item_data_get(elm_naviframe_top_item_get(nf));
+   if (!item)
+     return;
+
+   edi_mainview_open_window_path(item->path, NULL);
+}
+
+EAPI void
 edi_mainview_close()
 {
-   if (!elm_object_item_data_get(elm_naviframe_top_item_get(nf)))
+   Edi_Mainview_Item *it;
+
+   it = elm_object_item_data_get(elm_naviframe_top_item_get(nf));
+   if (!it)
      return;
 
    elm_naviframe_item_pop(nf);
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
-   free(elm_object_item_data_get(elm_naviframe_top_item_get(nf)));
+   _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+   free(it);
 }
 
 EAPI void
