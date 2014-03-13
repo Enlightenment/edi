@@ -151,13 +151,25 @@ _edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
    free(it);
 }
 
+static char *
+_edi_mainview_win_title_get(const char *path)
+{
+   char *winname, *filename;
+
+   filename = basename(path);
+   winname = malloc((8 + strlen(filename)) * sizeof(char));
+   snprintf(winname, 8 + strlen(filename), "Edi :: %s", filename);
+
+   return winname;
+}
+
 static void
 _edi_mainview_item_win_add(const char *path, const char *type)
 {
    Evas_Object *win, *content;
    Edi_Mainview_Item *item;
 
-   win = elm_win_util_standard_add("mainview", basename((char *)path));
+   win = elm_win_util_standard_add("mainview", _edi_mainview_win_title_get(path));
    if (!win) return;
 
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
