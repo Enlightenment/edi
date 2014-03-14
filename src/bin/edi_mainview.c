@@ -217,7 +217,7 @@ _edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
 static void
 _edi_mainview_choose_type(Evas_Object *parent, const char *path, void *cb)
 {
-   Evas_Object *popup, *cancel;
+   Evas_Object *popup, *cancel, *icon;
 
    popup = elm_popup_add(parent);
    _edi_mainview_choose_popup = popup;
@@ -227,8 +227,12 @@ _edi_mainview_choose_type(Evas_Object *parent, const char *path, void *cb)
    elm_object_part_text_set(popup, "title,text",
                             "Unrecognied file type");
 
-   elm_popup_item_append(popup, "text", NULL, cb, "text");
-   elm_popup_item_append(popup, "image", NULL, cb, "image");
+   icon = elm_icon_add(popup);
+   elm_icon_standard_set(icon, "txt");
+   elm_popup_item_append(popup, "text", icon, cb, "text");
+   icon = elm_icon_add(popup);
+   elm_icon_standard_set(icon, "image");
+   elm_popup_item_append(popup, "image", icon, cb, "image");
 
 
    cancel = elm_button_add(popup);
