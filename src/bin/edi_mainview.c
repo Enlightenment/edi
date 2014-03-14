@@ -11,7 +11,7 @@
 
 #include "edi_private.h"
 
-static Evas_Object *nf, *tb;
+static Evas_Object *nf, *tb, *_main_win;
 static Evas_Object *_edi_mainview_choose_popup;
 static const char *_edi_mainview_choose_path;
 
@@ -219,7 +219,7 @@ _edi_mainview_choose_type(Evas_Object *parent, const char *path, void *cb)
 {
    Evas_Object *popup, *cancel, *icon;
 
-   popup = elm_popup_add(parent);
+   popup = elm_popup_add(_main_win);
    _edi_mainview_choose_popup = popup;
    _edi_mainview_choose_path = path;
 
@@ -415,10 +415,12 @@ edi_mainview_paste()
 }
 
 EAPI void
-edi_mainview_add(Evas_Object *parent)
+edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
    Evas_Object *box, *txt;
    Elm_Object_Item *it;
+
+   _main_win = win;
 
    box = elm_box_add(parent);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
