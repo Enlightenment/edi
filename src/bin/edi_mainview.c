@@ -12,6 +12,8 @@
 #include "edi_private.h"
 
 static Evas_Object *nf, *tb;
+static Evas_Object *_edi_mainview_choose_popup;
+static const char *_edi_mainview_choose_path;
 
 static Eina_List *_edi_mainview_items = NULL;
 
@@ -185,6 +187,62 @@ _edi_mainview_item_win_add(const char *path, const char *type)
 }
 
 static void
+_edi_mainview_choose_type_tab_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_mainview_choose_popup);
+   edi_mainview_open_path(_edi_mainview_choose_path, (const char *) data);
+
+}
+
+static void
+_edi_mainview_choose_type_win_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_mainview_choose_popup);
+   edi_mainview_open_window_path(_edi_mainview_choose_path, (const char *) data);
+
+}
+
+static void
+_edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_mainview_choose_popup);
+}
+
+static void
+_edi_mainview_choose_type(Evas_Object *parent, const char *path, void *cb)
+{
+   Evas_Object *popup, *cancel;
+
+   popup = elm_popup_add(parent);
+   _edi_mainview_choose_popup = popup;
+   _edi_mainview_choose_path = path;
+
+   // popup title
+   elm_object_part_text_set(popup, "title,text",
+                            "Unrecognied file type");
+
+   elm_popup_item_append(popup, "text", NULL, cb, "text");
+   elm_popup_item_append(popup, "image", NULL, cb, "image");
+
+
+   cancel = elm_button_add(popup);
+   elm_object_text_set(cancel, "cancel");
+   elm_object_part_content_set(popup, "button1", cancel);
+   evas_object_smart_callback_add(cancel, "clicked",
+                                       _edi_mainview_choose_type_close_cb, NULL);
+
+   // popup show should be called after adding all the contents and the buttons
+   // of popup to set the focus into popup's contents correctly.
+   evas_object_show(popup);
+}
+
+static void
 _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
    const char *path, *mime;
@@ -200,12 +258,11 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
         else if (!strncasecmp(mime, "image/", 6))
           _edi_mainview_item_tab_add(path, "image");
         else
-          printf("Unknown mime %s\n", mime);
+          _edi_mainview_choose_type(nf, path, _edi_mainview_choose_type_tab_cb);
      }
 
    eina_stringshare_del(path);
 }
-
 
 static void
 _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
@@ -223,7 +280,7 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
         else if (!strncasecmp(mime, "image/", 6))
           _edi_mainview_item_win_add(path, "image");
         else
-          printf("Unknown mime %s\n", mime);
+          _edi_mainview_choose_type(nf, path, _edi_mainview_choose_type_win_cb);
      }
 
    eina_stringshare_del(path);
