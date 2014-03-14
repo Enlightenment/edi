@@ -61,5 +61,5 @@ void edi_logpanel_add(Evas_Object *parent)
    eina_log_print_cb_set(print_cb, NULL);
    eina_log_color_disable_set(EINA_TRUE);
 
-   elm_box_pack_end(parent, scroll);
+   elm_object_content_set(parent, scroll);
 }

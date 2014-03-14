@@ -45,50 +45,43 @@ _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
-   Evas_Object *panes, *panes_h, *panel;
+   Evas_Object *panes, *panel;
 
-   panes = elm_panes_add(win);
+   panes = elm_table_add(win);
    evas_object_size_hint_weight_set(panes, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-
-   // add panes
-   panes_h = elm_panes_add(win);
-   elm_panes_horizontal_set(panes_h, EINA_TRUE);
-   evas_object_size_hint_weight_set(panes_h, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(panes_h, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(panes_h);
-   elm_panes_content_right_size_set(panes_h, 0.15);
-   elm_object_part_content_set(panes, "right", panes_h);
-
-   // add lower panel
-   panel = elm_box_add(win);
-   evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(panel);
-   edi_logpanel_add(panel);
-
-   elm_object_part_content_set(panes_h, "bottom", panel);
 
    // add main content
    panel = elm_box_add(win);
    evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(panel);
-   edi_mainview_add(panel);
 
-   elm_object_part_content_set(panes_h, "top", panel);
+   edi_mainview_add(panel);
+   elm_table_pack(panes, panel, 0, 0, 6, 5);
+   evas_object_show(panel);
 
    // add file list
-   panel = elm_box_add(win);
-   evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   panel = elm_panel_add(win);
+   elm_panel_orient_set(panel, ELM_PANEL_ORIENT_LEFT);
+   evas_object_size_hint_weight_set(panel, 0.3, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   elm_panel_hidden_set(panel, EINA_FALSE);
+   edi_filepanel_add(panel, win, path, _edi_file_open_cb);
+   elm_table_pack(panes, panel, 0, 0, 1, 5);
+   evas_object_show(panel);
+
+   // add lower panel
+   panel = elm_panel_add(win);
+   elm_panel_orient_set(panel, ELM_PANEL_ORIENT_BOTTOM);
+   evas_object_size_hint_weight_set(panel, EVAS_HINT_EXPAND, 0.15);
    evas_object_size_hint_align_set(panel, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(panel);
-   edi_filepanel_add(panel, win, path, _edi_file_open_cb);
 
-   elm_object_part_content_set(panes, "left", panel);
-   elm_panes_content_left_size_set(panes, 0.2);
-
-   
+   elm_panel_hidden_set(panel, EINA_TRUE);
+   edi_logpanel_add(panel);
+   elm_table_pack(panes, panel, 0, 4, 6, 1);
    evas_object_show(panes);
+
    return panes;
 }
 
@@ -242,7 +235,7 @@ edi_win_setup(const char *path)
    tb = edi_toolbar_setup(win);
    elm_box_pack_end(vbx, tb);
 
-   content = edi_content_setup(win, path);
+   content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbx, content);

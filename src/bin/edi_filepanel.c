@@ -370,5 +370,5 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    _main_win = win;
    _populate(list, path, NULL, NULL);
 
-   elm_box_pack_end(parent, list);
+   elm_object_content_set(parent, list);
 }
