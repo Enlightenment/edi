@@ -142,6 +142,15 @@ EAPI void edi_mainview_paste();
 EAPI void edi_mainview_search();
 
 /**
+ * Go to a requested line in the current view's contents.
+ *
+ * @param line the line number (1 based) to scroll to
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_goto(int line);
+
+/**
  * @}
  *
  *

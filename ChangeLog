@@ -2,7 +2,7 @@
 
 	* Add simple build functions
 	* Create an edi_build binary for command line building
-	* Added simple search function
+	* Added simple search and goto line functions
 
 2014-03-31 ajwillia.ms (Andy Williams)
 

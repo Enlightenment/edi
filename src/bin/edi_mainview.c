@@ -141,6 +141,10 @@ _smart_cb_key_down(void *data, Evas *e EINA_UNUSED,
           {
              edi_mainview_save();
           }
+        else if (!strcmp(ev->key, "f"))
+          {
+             edi_mainview_search();
+          }
      }
 }
 
@@ -154,6 +158,7 @@ _edi_mainview_content_text_create(const char *path, Evas_Object *parent)
    txt = elm_entry_add(parent);
    elm_entry_editable_set(txt, EINA_TRUE);
    elm_entry_scrollable_set(txt, EINA_TRUE);
+   elm_entry_line_wrap_set(txt, EINA_FALSE);
    elm_entry_text_style_user_push(txt, "DEFAULT='font=Monospace font_size=12'");
    elm_entry_file_set(txt, path, ELM_TEXT_FORMAT_PLAIN_UTF8);
    elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
@@ -172,6 +177,7 @@ _edi_mainview_content_text_create(const char *path, Evas_Object *parent)
    evas_object_key_grab(txt, "Prior", ctrl, shift | alt, 1);
    evas_object_key_grab(txt, "Next", ctrl, shift | alt, 1);
    evas_object_key_grab(txt, "s", ctrl, shift | alt, 1);
+   evas_object_key_grab(txt, "f", ctrl, shift | alt, 1);
 
    return txt;
 }
@@ -514,6 +520,31 @@ edi_mainview_search()
    txt = elm_object_item_content_get(it);
    if (txt)
      edi_editor_search(txt);
+}
+
+EAPI void
+edi_mainview_goto(int line)
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+   Evas_Object *tb;
+   Evas_Textblock_Cursor *mcur;
+   Evas_Coord x, y, w, h;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (!txt || line <= 0)
+     return;
+
+   tb = elm_entry_textblock_get(txt);
+   mcur = evas_object_textblock_cursor_get(tb);
+
+   evas_textblock_cursor_line_set(mcur, line-1);
+   elm_entry_cursor_geometry_get(txt, &x, &y, &w, &h);
+   elm_scroller_region_show(txt, x, y, w, h);
+   elm_entry_calc_force(txt);
+
+   elm_object_focus_set(txt, EINA_TRUE);
 }
 
 EAPI void

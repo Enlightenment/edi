@@ -23,7 +23,7 @@
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel;
-static Evas_Object *_edi_main_win, *_edi_new_popup;
+static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
 
 static Evas_Object *edi_win_setup(const char *path);
 
@@ -182,12 +182,11 @@ _tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSE
 
    popup = elm_popup_add(_edi_main_win);
    _edi_new_popup = popup;
-
-   // popup title
    elm_object_part_text_set(popup, "title,text",
                             "Enter new file name");
 
    input = elm_entry_add(popup);
+   elm_entry_single_line_set(input, EINA_TRUE);
    elm_object_content_set(popup, input);
 
    button = elm_button_add(popup);
@@ -255,6 +254,58 @@ _tb_search_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UN
 }
 
 static void
+_tb_goto_go_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   int number;
+
+   number = atoi(elm_entry_entry_get((Evas_Object *) data));
+   edi_mainview_goto(number);
+
+   evas_object_del(_edi_goto_popup);
+}
+
+static void
+_tb_goto_cancel_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_goto_popup);
+}
+
+static void
+_tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   Evas_Object *popup, *input, *button;
+
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+
+   popup = elm_popup_add(_edi_main_win);
+   _edi_goto_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+                            "Enter line number");
+
+   input = elm_entry_add(popup);
+   elm_entry_single_line_set(input, EINA_TRUE);
+   elm_object_content_set(popup, input);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "cancel");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _tb_goto_cancel_cb, NULL);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "go");
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _tb_goto_go_cb, input);
+
+   evas_object_show(popup);
+}
+
+static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
@@ -301,7 +352,8 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   tb_it = elm_toolbar_item_append(tb, "edit-find", "Search", _tb_search_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "find", "Find", _tb_search_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "go-jump", "Goto Line", _tb_goto_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
