@@ -26,6 +26,7 @@ _search_in_entry(Evas_Object *entry, const char *text)
    const Evas_Object *tb = elm_entry_textblock_get(entry);
    Evas_Textblock_Cursor *end, *start, *mcur;
    size_t initial_pos;
+   Evas_Coord x, y, w, h;
 
    if (!text || !*text)
       return EINA_FALSE;
@@ -65,6 +66,7 @@ _search_in_entry(Evas_Object *entry, const char *text)
         found = strstr(utf8, text);
      }
 
+   elm_entry_select_none(entry);
    if (found)
      {
         size_t pos = 0;
@@ -75,11 +77,16 @@ _search_in_entry(Evas_Object *entry, const char *text)
              eina_unicode_utf8_next_get(utf8, &idx);
           }
 
-        elm_entry_select_none(entry);
         evas_textblock_cursor_pos_set(mcur, pos + initial_pos + strlen(text));
+        elm_entry_cursor_geometry_get(entry, &w, &h, NULL, NULL);
         elm_entry_cursor_selection_begin(entry);
         elm_entry_cursor_pos_set(entry, pos + initial_pos);
         elm_entry_cursor_selection_end(entry);
+
+        elm_entry_cursor_geometry_get(entry, &x, &y, NULL, NULL);
+        w -= x;
+        h -= y;
+        elm_scroller_region_show(entry, x, y, w, h);
         evas_textblock_cursor_copy(mcur, _current_search);
      }
 
@@ -118,9 +125,9 @@ edi_editor_search(Evas_Object *entry)
         return;
      }
 
-   _search_win = elm_win_util_standard_add("search", "Search");
+   _search_win = elm_win_add(entry, "search", ELM_WIN_TOOLBAR);
    elm_win_autodel_set(_search_win, EINA_TRUE);
-   elm_win_title_set(_search_win, "Search & Replace");
+   elm_win_title_set(_search_win, "Search");
    evas_object_smart_callback_add(_search_win, "delete,request", _search_win_del, entry);
 
    bg = elm_bg_add(_search_win);
