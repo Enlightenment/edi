@@ -3,6 +3,8 @@
 
 #include <Elementary.h>
 
+#include "Edi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

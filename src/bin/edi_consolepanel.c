@@ -6,12 +6,17 @@
 
 #include <Eina.h>
 #include <Ecore.h>
+#include <Elementary.h>
+#include <Elementary_Cursor.h>
+#include <regex.h>
 
 #include "edi_consolepanel.h"
+#include "edi_mainview.h"
 
 #include "edi_private.h"
 
 static Evas_Object *_console_box;
+static const char *_current_dir = NULL;
 
 static const char *_edi_consolepanel_icon_for_line(const char *line)
 {
@@ -25,18 +30,87 @@ static const char *_edi_consolepanel_icon_for_line(const char *line)
    return NULL;
 }
 
+static Eina_Bool _startswith_location(const char *line)
+{
+   regex_t regex;
+   int ret;
+
+   regcomp(&regex, "^[^/].*:[0-9]*:[0-9]* ", 0);
+   ret = !regexec(&regex, line, 0, NULL, 0);
+
+   regfree(&regex);
+   return ret;
+}
+
+static void _edi_consolepanel_clicked_cb(void *data, Evas *e EINA_UNUSED,
+                 Evas_Object *obj EINA_UNUSED, Evas_Event_Mouse_Down *ev)
+{
+   Edi_Path_Options *options;
+
+   if (strstr(data, edi_project_get()) != data)
+     return;
+
+   options = edi_path_options_create(data);
+   edi_mainview_open(options);
+}
+
+static void _edi_consolepanel_parse_directory(const char *line)
+{
+   const char *pos;
+
+   pos = strstr(line, "Entering directory '");
+   if (pos) 
+     {
+        if (_current_dir)
+          eina_stringshare_del(_current_dir);
+
+        _current_dir = eina_stringshare_add_length(pos + 20, strlen(pos) - 21);
+     }
+}
+
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    Evas_Object *txt, *icon, *box;
-   const char *type = NULL;
+   const char *buf, *pos, *file, *path, *type = NULL, *cursor = NULL;
+   int length;
 
    txt = elm_label_add(_console_box);
+
    if (err)
      evas_object_color_set(txt, 255, 63, 63, 255);
    else
      evas_object_color_set(txt, 255, 255, 255, 255);
 
-   elm_object_text_set(txt, line);
+   if (_startswith_location(line))
+     {
+        cursor = ELM_CURSOR_HAND1;
+        elm_object_cursor_set(txt, cursor);
+        elm_object_cursor_theme_search_enabled_set(txt, EINA_TRUE);
+
+        pos = strstr(line, " ");
+        length = strlen(line) - strlen(pos);
+        file = eina_stringshare_add_length(line, length);
+
+        buf = malloc(sizeof(char) * (strlen(line) + 8));
+        snprintf(buf, strlen(line) + 8, "<b>%s</b>%s/n", file, pos);
+        elm_object_text_set(txt, buf);
+
+        length = strlen(_current_dir) + strlen(file) + 2;
+        path = malloc(sizeof(char) * length);
+        snprintf(path, length, "%s/%s\n", _current_dir, file);
+
+        evas_object_event_callback_add(txt, EVAS_CALLBACK_MOUSE_DOWN,
+                                       _edi_consolepanel_clicked_cb, eina_stringshare_add(path));
+
+        free(path);
+        free(buf);
+     }
+   else
+     {
+        _edi_consolepanel_parse_directory(line);
+        elm_object_text_set(txt, line);
+     }
+
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(txt, 0.0, EVAS_HINT_FILL);
    evas_object_show(txt);
@@ -48,7 +122,14 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
    evas_object_size_hint_min_set(icon, 14, 14);
    evas_object_size_hint_max_set(icon, 14, 14);
    if (type)
-     elm_icon_standard_set(icon, type);
+     {
+        elm_icon_standard_set(icon, type);
+        if (cursor)
+          {
+             elm_object_cursor_set(icon, cursor);
+             elm_object_cursor_theme_search_enabled_set(icon, EINA_TRUE);
+          }
+     }
    evas_object_show(icon);
 
    box = elm_box_add(_console_box);

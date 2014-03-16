@@ -4,6 +4,8 @@
 #include <Elementary.h>
 #include <Evas.h>
 
+#include "Edi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,18 +14,12 @@ extern "C" {
  * @file
  * @brief These routines are used for managing the main area of the Edi interface.
  */
- 
- /**
- * @typedef Edi_Mainview_Item
- * An item being displayed in the mainview.
- */
-typedef struct _Edi_Mainview_Item Edi_Mainview_Item;
 
 /**
  * @struct _Edi_Mainview_Item
  * An item being displayed in the mainview.
  */
-struct _Edi_Mainview_Item
+typedef struct _Edi_Mainview_Item
 {
    const char *path; /**< The path of the file in this mainview item */
 
@@ -34,7 +30,7 @@ struct _Edi_Mainview_Item
    /* Private */
 
    /* Add new members here. */
-};
+} Edi_Mainview_Item;
 
 /**
  * @brief UI management functions.
@@ -74,11 +70,19 @@ EAPI void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
  * Supported types are "text" and "image".
  *
  * @param path The absolute path of the file to open.
- * @param type The requested type to use when opening the file or NULL for auto-detect
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_path(const char *path, const char *type);
+EAPI void edi_mainview_open_path(const char *path);
+
+/**
+ * Open the file described in the provided options - path and location etc.
+ *
+ * @param path The path and options of the file to open.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_open(Edi_Path_Options *options);
 
 /**
  * Open the file at path for editing in a new window using the type specified.
@@ -86,11 +90,20 @@ EAPI void edi_mainview_open_path(const char *path, const char *type);
  * If the path is already open it will be moved to a new window.
  *
  * @param path The absolute path of the file to open.
- * @param type The requested type to use when opening the file or NULL for auto-detect
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_window_path(const char *path, const char *type);
+EAPI void edi_mainview_open_window_path(const char *path);
+
+/**
+ * Open the file described in the provided options in a new window - path and location etc.
+ *
+ * @param path The path and options of the file to open.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_open_window(Edi_Path_Options *options);
+
 
 /**
  * Save the current file.

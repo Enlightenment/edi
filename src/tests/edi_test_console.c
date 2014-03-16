@@ -15,8 +15,19 @@ START_TEST (edi_console_icons)
 }
 END_TEST
 
+START_TEST (edi_console_parse)
+{
+   ck_assert(_startswith_location("test:1:1 error"));
+   ck_assert(!_startswith_location("test:56-3 false"));
+   ck_assert(!_startswith_location("test:1:1nospace"));
+   ck_assert(!_startswith_location("test:a:b testing"));
+   ck_assert(!_startswith_location("/test:1:1 absolute"));
+}
+END_TEST
+
 void edi_test_console(TCase *tc)
 {
    tcase_add_test(tc, edi_console_icons);
+   tcase_add_test(tc, edi_console_parse);
 }
 

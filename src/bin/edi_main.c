@@ -36,15 +36,20 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 {
+   Edi_Path_Options *options;
+
+   options = edi_path_options_create(path);
+   options->type = type;
+
    if (type == NULL)
      INF("Opening %s", path);
    else
      INF("Opening %s as %s", path, type);
 
    if (newwin)
-     edi_mainview_open_window_path(path, type);
+     edi_mainview_open_window(options);
    else
-     edi_mainview_open_path(path, type);
+     edi_mainview_open(options);
 }
 
 static void
@@ -159,7 +164,7 @@ _tb_new_create_cb(void *data,
    path = edi_project_file_path_get(name);
 
    fclose(fopen(path, "w"));
-   edi_mainview_open_path(path, NULL);
+   edi_mainview_open_path(path);
 
    evas_object_del(_edi_new_popup);
    free((char*)path);

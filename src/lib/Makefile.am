@@ -14,6 +14,7 @@ includes_HEADERS = Edi.h
 includesdir = $(includedir)/edi-@VMAJ@
 
 libedi_la_SOURCES = \
+edi_path.c \
 edi_builder.c \
 edi.c
 libedi_la_LIBADD = @EFL_LIBS@ -lm
