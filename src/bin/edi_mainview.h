@@ -137,6 +137,45 @@ EAPI void edi_mainview_paste();
 /**
  * @}
  *
+ *
+ * @brief Tab management functions.
+ * @defgroup Tabs
+ *
+ * @{
+ *
+ * Manipulating the open files within the application.
+ *
+ */
+
+/**
+ * Select the passed item in the mainview UI.
+ * By definition this will already be an open file as the Edi_Mainview_Item will
+ * only exist for an open item.
+ * If this is an external window it will raise that instead of selecting a tab.
+ *
+ * @ingroup Tabs
+ */
+EAPI void edi_mainview_item_select(Edi_Mainview_Item *item);
+
+/**
+ * Select the previous open tab.
+ * Previous means the next tab left, if there is one.
+ *
+ * @ingroup Tabs
+ */
+EAPI void edi_mainview_item_prev();
+
+/**
+ * Select the next open tab.
+ * Next means the next tab to the right, if there is one.
+ *
+ * @ingroup Tabs
+ */
+EAPI void edi_mainview_item_next();
+
+/**
+ * @}
+ *
  */
 
 #ifdef __cplusplus

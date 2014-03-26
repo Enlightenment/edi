@@ -21,6 +21,64 @@ static void
 dummy()
 {}
 
+EAPI void
+_edi_mainview_item_prev()
+{
+   Eina_List *item;
+   Elm_Object_Item *current;
+   Edi_Mainview_Item *it, *prev;
+
+   current = elm_naviframe_top_item_get(nf);
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (it && it->view == current)
+          {
+             edi_mainview_item_select(prev);
+             return;
+          }
+
+        prev = it;
+     }
+}
+
+EAPI void
+_edi_mainview_item_next()
+{
+   Eina_List *item;
+   Elm_Object_Item *current;
+   Edi_Mainview_Item *it;
+   Eina_Bool open_next = EINA_FALSE;
+
+   current = elm_naviframe_top_item_get(nf);
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (it && open_next)
+          {
+             edi_mainview_item_select(it);
+             return;
+          }
+
+        if (it && it->view == current)
+          open_next = EINA_TRUE;
+     }
+}
+
+EAPI void
+edi_mainview_item_select(Edi_Mainview_Item *item)
+{
+   if (item->win)
+     {
+        elm_win_raise(item->win);
+     }
+   else
+     {
+        elm_naviframe_item_promote(item->view);
+        elm_toolbar_item_selected_set(item->tab, EINA_TRUE);
+     }
+}
+
 static void
 _promote(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
@@ -58,10 +116,40 @@ _edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view
    return item;
 }
 
+static void
+_smart_cb_key_down(void *data, Evas *e EINA_UNUSED,
+                   Evas_Object *obj EINA_UNUSED, void *event)
+{
+   Eina_Bool ctrl, alt, shift;
+   Evas_Event_Key_Down *ev = event;
+
+   ctrl = evas_key_modifier_is_set(ev->modifiers, "Control");
+   alt = evas_key_modifier_is_set(ev->modifiers, "Alt");
+   shift = evas_key_modifier_is_set(ev->modifiers, "Shift");
+
+   if ((!alt) && (ctrl) && (!shift))
+     {
+        if (!strcmp(ev->key, "Prior"))
+          {
+             _edi_mainview_item_prev();
+          }
+        else if (!strcmp(ev->key, "Next"))
+          {
+             _edi_mainview_item_next();
+          }
+        else if (!strcmp(ev->key, "s"))
+          {
+             edi_mainview_save();
+          }
+     }
+}
+
 static Evas_Object *
 _edi_mainview_content_text_create(const char *path, Evas_Object *parent)
 {
    Evas_Object *txt;
+   Evas_Modifier_Mask ctrl, shift, alt;
+   Evas *e;
 
    txt = elm_entry_add(parent);
    elm_entry_editable_set(txt, EINA_TRUE);
@@ -72,6 +160,18 @@ _edi_mainview_content_text_create(const char *path, Evas_Object *parent)
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
+
+   evas_object_event_callback_add(txt, EVAS_CALLBACK_KEY_DOWN,
+                                  _smart_cb_key_down, txt);
+
+   e = evas_object_evas_get(txt);
+   ctrl = evas_key_modifier_mask_get(e, "Control");
+   alt = evas_key_modifier_mask_get(e, "Alt");
+   shift = evas_key_modifier_mask_get(e, "Shift");
+
+   evas_object_key_grab(txt, "Prior", ctrl, shift | alt, 1);
+   evas_object_key_grab(txt, "Next", ctrl, shift | alt, 1);
+   evas_object_key_grab(txt, "s", ctrl, shift | alt, 1);
 
    return txt;
 }
@@ -125,20 +225,6 @@ _edi_mainview_item_tab_add(const char *path, const char *type)
 
    item = _edi_mainview_item_add(path, tab, it, NULL);
    elm_object_item_data_set(it, item);
-}
-
-static void
-_edi_mainview_item_select(Edi_Mainview_Item *item)
-{
-   if (item->win)
-     {
-        elm_win_raise(item->win);
-     }
-   else
-     {
-        elm_naviframe_item_promote(item->view);
-        elm_toolbar_item_selected_set(item->tab, EINA_TRUE);
-     }
 }
 
 static void
@@ -298,7 +384,7 @@ edi_mainview_open_path(const char *path, const char *type)
    it = _get_item_for_path(path);
    if (it)
      {
-        _edi_mainview_item_select(it);
+        edi_mainview_item_select(it);
         return;
      }
 
@@ -321,7 +407,7 @@ edi_mainview_open_window_path(const char *path, const char *type)
    it = _get_item_for_path(path);
    if (it)
      {
-        _edi_mainview_item_select(it);
+        edi_mainview_item_select(it);
         elm_naviframe_item_pop(nf);
         elm_object_item_del(elm_toolbar_selected_item_get(tb));
         _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
