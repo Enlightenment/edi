@@ -236,6 +236,7 @@ _edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
 
    it = evas_object_data_get(obj, "edi_mainview_item");
    _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+   eina_stringshare_del(it->path);
    free(it);
 }
 
@@ -381,10 +382,12 @@ edi_mainview_open_path(const char *path, const char *type)
 {
    Edi_Mainview_Item *it;
 
+   path = eina_stringshare_add(path);
    it = _get_item_for_path(path);
    if (it)
      {
         edi_mainview_item_select(it);
+        eina_stringshare_del(path);
         return;
      }
 
@@ -461,6 +464,7 @@ edi_mainview_close()
    elm_naviframe_item_pop(nf);
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
    _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+   eina_stringshare_del(it->path);
    free(it);
 }
 

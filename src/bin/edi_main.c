@@ -21,6 +21,8 @@
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_filepanel, *_edi_logpanel;
+static Evas_Object *_edi_main_win, *_edi_new_popup;
+static const char *_edi_projectpath;
 
 static Evas_Object *edi_win_setup(const char *path);
 
@@ -123,38 +125,105 @@ edi_content_setup(Evas_Object *win, const char *path)
 }
 
 static void
-_tb_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_new_create_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
 {
+   const char *path, *name;
+   int len;
+
+   name = elm_entry_entry_get((Evas_Object *) data);
+
+   len = strlen(name) + strlen(_edi_projectpath) + 2;
+   path = malloc(sizeof(char) * len);
+   snprintf(path, len, "%s/%s", _edi_projectpath, name);
+
+   fclose(fopen(path, "w"));
+   edi_mainview_open_path(path, NULL);
+
+   evas_object_del(_edi_new_popup);
+   free(path);
+}
+
+static void
+_tb_new_cancel_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_new_popup);
+}
+
+static void
+_tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   Evas_Object *popup, *input, *button;
+
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+
+   popup = elm_popup_add(_edi_main_win);
+   _edi_new_popup = popup;
+
+   // popup title
+   elm_object_part_text_set(popup, "title,text",
+                            "Enter new file name");
+
+   input = elm_entry_add(popup);
+   elm_object_content_set(popup, input);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "cancel");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _tb_new_cancel_cb, NULL);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "create");
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _tb_new_create_cb, input);
+
+   evas_object_show(popup);
+}
+
+static void
+_tb_save_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_save();
 }
 
 static void
-_tb_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_new_window();
 }
 
 static void
-_tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_close();
 }
 
 static void
-_tb_cut_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_cut_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_cut();
 }
 
 static void
-_tb_copy_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_tb_copy_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_copy();
 }
 
 static void
 _tb_paste_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
    edi_mainview_paste();
 }
 
@@ -165,13 +234,16 @@ edi_toolbar_setup(Evas_Object *win)
    Elm_Object_Item *tb_it;
 
    tb = elm_toolbar_add(win);
-   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
+   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_align_set(tb, 0.0);
+   elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
-   tb_it = elm_toolbar_item_append(tb, "filesave", "Save", _tb_save_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "window-new", "Open window", _tb_open_window_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "document-new", "New File", _tb_new_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "document-save", "Save", _tb_save_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "window-new", "New window", _tb_open_window_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "window-close", "Close", _tb_close_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
@@ -180,7 +252,7 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);
-   
+
    evas_object_show(tb);
    return tb;
 }
@@ -190,15 +262,15 @@ _edi_project_chosen_cb(void *data,
                        Evas_Object *obj EINA_UNUSED,
                        void *event_info)
 {
-    const char *selected;
+   evas_object_del(data);
 
-    evas_object_del(data);
-
-   selected = event_info;
-    if (selected)
-      edi_win_setup(selected);
-    else
-      elm_exit();
+   if (event_info)
+     {
+        _edi_projectpath = event_info;
+        edi_win_setup(_edi_projectpath);
+     }
+   else
+     elm_exit();
 }
 
 static Evas_Object *
@@ -252,6 +324,7 @@ edi_win_setup(const char *path)
    const char *winname;
 
    if (!path) return _edi_project_choose();
+   _edi_projectpath = path;
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -261,6 +334,7 @@ edi_win_setup(const char *path)
    free(winname);
    if (!win) return NULL;
 
+   _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
 
