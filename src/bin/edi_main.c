@@ -162,7 +162,7 @@ _tb_new_create_cb(void *data,
    edi_mainview_open_path(path, NULL);
 
    evas_object_del(_edi_new_popup);
-   free(path);
+   free((char*)path);
 }
 
 static void
@@ -353,7 +353,7 @@ _edi_win_title_get(const char *path)
 {
    char *winname, *dirname;
 
-   dirname = basename(path);
+   dirname = basename((char*)path);
    winname = malloc((8 + strlen(dirname)) * sizeof(char));
    snprintf(winname, 8 + strlen(dirname), "Edi :: %s", dirname);
 
@@ -374,7 +374,7 @@ edi_win_setup(const char *path)
 
    winname = _edi_win_title_get(path);
    win = elm_win_util_standard_add("main", winname);
-   free(winname);
+   free((char*)winname);
    if (!win) return NULL;
 
    _edi_main_win = win;

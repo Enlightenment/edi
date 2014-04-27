@@ -16,7 +16,7 @@ void print_cb(const Eina_Log_Domain *domain,
               const char *fnc,
               int line,
               const char *fmt,
-              void *data,
+              EINA_UNUSED void *data,
               va_list args)
 {
    Evas_Object *txt;
