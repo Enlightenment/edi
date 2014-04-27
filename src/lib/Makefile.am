@@ -13,6 +13,8 @@ lib_LTLIBRARIES = libedi.la
 includes_HEADERS = Edi.h
 includesdir = $(includedir)/edi-@VMAJ@
 
-libedi_la_SOURCES = edi.c
+libedi_la_SOURCES = \
+edi_builder.c \
+edi.c
 libedi_la_LIBADD = @EFL_LIBS@ -lm
 libedi_la_LDFLAGS = @EFL_LTLIBRARY_FLAGS@

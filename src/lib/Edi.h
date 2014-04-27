@@ -89,16 +89,49 @@ EAPI int edi_shutdown(void);
  */
 
 /**
- * @brief Main group API that wont do anything
- * @defgroup Main Main
+ * @brief Main group API that manages Edi projects
+ * @defgroup Main Project level functions
  *
  * @{
  *
- * @brief A function that doesn't do any good nor any bad
+ * Set the current edi project that is loaded.
+ *
+ * @param path The path to the current project being loaded.
  *
  * @ingroup Main
  */
-EAPI void edi_library_call(void);
+EAPI void edi_project_set(const char *path);
+
+/**
+ * Get the current edi project that is loaded.
+ *
+ * @return the project that Edi is current working with.
+ *
+ * @ingroup Main
+ */
+EAPI const char *edi_project_get(void);
+
+/**
+ * Get the path to a file within the current project.
+ *
+ * @param file The file within a project to get the absolute path for.
+ *
+ * @return the full path to the requested file
+ *
+ * @ingroup Main
+ */
+EAPI const char *edi_project_file_path_get(const char *file);
+
+/**
+ * Find if a requested file exists within the current project.
+ *
+ * @param file The filename to check for existance within the current project.
+ *
+ * @return whether or not the requested file exists within the current project.
+ *
+ * @ingroup Main
+ */
+EAPI Eina_Bool edi_project_file_exists(const char *file);
 
 /**
  * @}

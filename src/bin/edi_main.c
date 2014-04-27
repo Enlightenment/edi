@@ -24,7 +24,6 @@
 
 static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel;
 static Evas_Object *_edi_main_win, *_edi_new_popup;
-static const char *_edi_projectpath;
 
 static Evas_Object *edi_win_setup(const char *path);
 
@@ -155,13 +154,9 @@ _tb_new_create_cb(void *data,
                              void *event_info EINA_UNUSED)
 {
    const char *path, *name;
-   int len;
 
    name = elm_entry_entry_get((Evas_Object *) data);
-
-   len = strlen(name) + strlen(_edi_projectpath) + 2;
-   path = malloc(sizeof(char) * len);
-   snprintf(path, len, "%s/%s", _edi_projectpath, name);
+   path = edi_project_file_path_get(name);
 
    fclose(fopen(path, "w"));
    edi_mainview_open_path(path, NULL);
@@ -255,17 +250,19 @@ _tb_paste_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
 static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   unsigned int printed, buffer_len = 512;
-   char buffer [buffer_len];
-   FILE *pf;
-
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
 
    edi_consolepanel_clear();
    edi_consolepanel_show();
 
-   ecore_exe_pipe_run("make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+   if (!edi_builder_can_build())
+     {
+        edi_consolepanel_append_error_line("Cowardly refusing to build unknown project type.");
+     }
+   else
+     {
+        edi_builder_build();
+     }
 }
 
 static Evas_Object *
@@ -312,8 +309,8 @@ _edi_project_chosen_cb(void *data,
 
    if (event_info)
      {
-        _edi_projectpath = event_info;
-        edi_win_setup(_edi_projectpath);
+        edi_project_set(event_info);
+        edi_win_setup(edi_project_get());
      }
    else
      elm_exit();
@@ -370,7 +367,7 @@ edi_win_setup(const char *path)
    const char *winname;
 
    if (!path) return _edi_project_choose();
-   _edi_projectpath = path;
+   edi_project_set(path);
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -466,8 +463,6 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    if (!(win = edi_win_setup(project_path)))
      goto end;
-
-   edi_library_call();
 
    elm_run();
 

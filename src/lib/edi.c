@@ -8,6 +8,7 @@
 
 static int _edi_init = 0;
 int _edi_lib_log_dom = -1;
+static const char *_edi_project_path;
 
 EAPI int
 edi_init(void)
@@ -58,7 +59,39 @@ edi_shutdown(void)
 }
 
 EAPI void
-edi_library_call(void)
+edi_project_set(const char *path)
 {
-   INF("Not really doing anything useful.");
+   _edi_project_path = path;
+}
+
+EAPI const char *
+edi_project_get()
+{
+   return _edi_project_path;
+}
+
+EAPI const char *
+edi_project_file_path_get(const char *file)
+{
+   const char *path;
+   int len;
+
+   len = strlen(file) + strlen(edi_project_get()) + 2;
+   path = malloc(sizeof(char) * len);
+   snprintf(path, len, "%s/%s", edi_project_get(), file);
+
+   return path;
+}
+
+EAPI Eina_Bool
+edi_project_file_exists(const char *file)
+{
+   const char *path;
+   Eina_Bool exists;
+
+   path = edi_project_file_path_get(file);
+   exists = ecore_file_exists(path);
+
+   free(path);
+   return exists;
 }
