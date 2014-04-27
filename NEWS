@@ -1,6 +1,9 @@
+Changes since Edi project started:
+----------------------------------
 
 pre-1.0 phase 2 "Code aware editor"
   - Simple build functions
+  - Added a command line builder application
 
 
 pre-1.0 phase 1 "Basic text editing"

@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+#include <edi_builder.h>
+
 /**
  * @file
  * @brief These routines are used for Edi library interaction.
