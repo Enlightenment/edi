@@ -73,7 +73,7 @@ endif
 
 if EFL_HAVE_TESTS
 
-TESTS = src/tests/edi_tests
+TESTS = src/tests/edi_suite
 
 lcov-check:
 if EFL_HAVE_LCOV

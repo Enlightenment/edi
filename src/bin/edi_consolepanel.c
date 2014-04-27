@@ -13,11 +13,8 @@
 
 static Evas_Object *_console_box;
 
-static const char *_edi_consolepanel_icon_for_line(const char *line, Eina_Bool err)
+static const char *_edi_consolepanel_icon_for_line(const char *line)
 {
-   if (!err)
-     return NULL;
-
    if (strstr(line, " error:") != NULL)
      return "error";
    if (strstr(line, " warning:") != NULL)
@@ -31,7 +28,7 @@ static const char *_edi_consolepanel_icon_for_line(const char *line, Eina_Bool e
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    Evas_Object *txt, *icon, *box;
-   const char *type;
+   const char *type = NULL;
 
    txt = elm_label_add(_console_box);
    if (err)
@@ -44,10 +41,14 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
    evas_object_size_hint_align_set(txt, 0.0, EVAS_HINT_FILL);
    evas_object_show(txt);
 
+   if (err)
+     type = _edi_consolepanel_icon_for_line(line);
+
    icon = elm_icon_add(_console_box);
    evas_object_size_hint_min_set(icon, 14, 14);
    evas_object_size_hint_max_set(icon, 14, 14);
-   elm_icon_standard_set(icon, _edi_consolepanel_icon_for_line(line, err));
+   if (type)
+     elm_icon_standard_set(icon, type);
    evas_object_show(icon);
 
    box = elm_box_add(_console_box);

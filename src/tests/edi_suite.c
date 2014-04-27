@@ -3,32 +3,35 @@
 #endif
 
 #include <Ecore_Getopt.h>
-#include <check.h>
 
 #include "Edi.h"
+#include "edi_suite.h"
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
-
-static void edi_test_basic(TCase *tc);
 
 static const struct {
    const char *name;
    void (*build)(TCase *tc);
 } tests[] = {
-  { "basic", edi_test_basic }
+  { "basic", edi_test_basic },
+  { "console", edi_test_console }
 };
 
 START_TEST(edi_initialization)
 {
+   const char *path;
+
    fail_if(edi_init() != 1);
 
-   edi_library_call();
+   path = "/tmp";
+   edi_project_set(path);
+   ck_assert_str_eq(edi_project_get(), path);
 
    fail_if(edi_shutdown() != 0);
 }
 END_TEST
 
-static void
+void
 edi_test_basic(TCase *tc)
 {
    tcase_add_test(tc, edi_initialization);
