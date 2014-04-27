@@ -65,6 +65,7 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      ECORE_GETOPT_VALUE_BOOL(quit_option),
      ECORE_GETOPT_VALUE_BOOL(quit_option),
      ECORE_GETOPT_VALUE_BOOL(quit_option),
+     ECORE_GETOPT_VALUE_NONE
    };
 
 #if ENABLE_NLS
