@@ -1,0 +1,14 @@
+
+pre-1.0 phase 2 "Code aware editor"
+  - Simple build functions
+
+
+pre-1.0 phase 1 "Basic text editing"
+  - Editing and saving text files
+  - Tabbed browsing of open files
+  - Opening editor in a new window
+  - Displaying directory for the project (directory)
+  - link files out to eternal viewers / editors
+  - No screen waste (toolbar, menu, tab are out of the way of the developer)
+  - info panel with logs and useful output
+  - Create new file

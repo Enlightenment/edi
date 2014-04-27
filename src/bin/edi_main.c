@@ -14,13 +14,15 @@
 
 #include "Edi.h"
 #include "edi_filepanel.h"
+#include "edi_logpanel.h"
+#include "edi_consolepanel.h"
 #include "edi_mainview.h"
 
 #include "edi_private.h"
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
-static Evas_Object *_edi_filepanel, *_edi_logpanel;
+static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel;
 static Evas_Object *_edi_main_win, *_edi_new_popup;
 static const char *_edi_projectpath;
 
@@ -54,16 +56,22 @@ _edi_toggle_panel(void *data, Evas_Object *obj,
    elm_panel_toggle((Evas_Object *) data);
 }
 
+void edi_consolepanel_show()
+{
+   elm_panel_hidden_set(_edi_consolepanel, EINA_FALSE);
+}
+
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
-   Evas_Object *panes, *content_out, *content_in, *button;
+   Evas_Object *panes, *content_out, *content_in, *tb, *button;
 
    panes = elm_table_add(win);
    evas_object_size_hint_weight_set(panes, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
    _edi_filepanel = elm_panel_add(win);
    _edi_logpanel = elm_panel_add(win);
+   _edi_consolepanel = elm_panel_add(win);
 
    // add main content
    content_out = elm_box_add(win);
@@ -88,14 +96,6 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_mainview_add(content_in, win);
    evas_object_show(content_in);
 
-   button = elm_button_add(content_out);
-   elm_object_text_set(button, "Logs                ");
-   evas_object_smart_callback_add(button, "clicked",
-                                  _edi_toggle_panel, _edi_logpanel);
-   evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(content_out, button);
-   evas_object_show(button);
-
    elm_table_pack(panes, content_out, 0, 0, 6, 5);
    evas_object_show(content_out);
 
@@ -110,15 +110,40 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_show(_edi_filepanel);
 
    // add lower panel
+   tb = elm_toolbar_add(content_out);
+   evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
+   elm_toolbar_align_set(tb, 1.0);
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
+   elm_box_pack_end(content_out, tb);
+   evas_object_show(tb);
+
+   elm_toolbar_item_append(tb, NULL, "Logs", _edi_toggle_panel, _edi_logpanel);
+   elm_toolbar_item_append(tb, NULL, "Console", _edi_toggle_panel, _edi_consolepanel);
+
    elm_panel_orient_set(_edi_logpanel, ELM_PANEL_ORIENT_BOTTOM);
    evas_object_size_hint_weight_set(_edi_logpanel, EVAS_HINT_EXPAND, 0.15);
    evas_object_size_hint_align_set(_edi_logpanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(_edi_logpanel);
 
+   elm_panel_hidden_set(_edi_logpanel, EINA_FALSE);
    elm_panel_hidden_set(_edi_logpanel, EINA_TRUE);
    edi_logpanel_add(_edi_logpanel);
    elm_table_pack(panes, _edi_logpanel, 0, 4, 6, 1);
    evas_object_show(_edi_logpanel);
+
+   elm_panel_orient_set(_edi_consolepanel, ELM_PANEL_ORIENT_BOTTOM);
+   evas_object_size_hint_weight_set(_edi_consolepanel, EVAS_HINT_EXPAND, 0.15);
+   evas_object_size_hint_align_set(_edi_consolepanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(_edi_consolepanel);
+
+   elm_panel_hidden_set(_edi_consolepanel, EINA_FALSE);
+   elm_panel_hidden_set(_edi_consolepanel, EINA_TRUE);
+   edi_consolepanel_add(_edi_consolepanel);
+   elm_table_pack(panes, _edi_consolepanel, 0, 4, 6, 1);
+   evas_object_show(_edi_consolepanel);
 
    evas_object_show(panes);
    return panes;
@@ -227,6 +252,22 @@ _tb_paste_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
    edi_mainview_paste();
 }
 
+static void
+_tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   unsigned int printed, buffer_len = 512;
+   char buffer [buffer_len];
+   FILE *pf;
+
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+
+   edi_consolepanel_clear();
+   edi_consolepanel_show();
+
+   ecore_exe_pipe_run("make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+}
+
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
@@ -252,6 +293,11 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
 
    evas_object_show(tb);
    return tb;

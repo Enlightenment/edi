@@ -9,7 +9,7 @@ extern "C" {
 
 /**
  * @file
- * @brief These routines are used for managing the Edi file panel.
+ * @brief These routines are used for managing the Edi log panel.
  */
 
 /**

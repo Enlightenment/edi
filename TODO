@@ -1,13 +1,23 @@
 This project is in heavy development, we are currenty working towards the
-"Basic text editing" phase, the following work is still to be done:
+"Code aware editor" phase, the following work is still to be done:
 
-* Remember last project and allow new project to be loaded (new window or current)
-* No screen waste (toolbar, menu, tab are out of the way of the developer)
+* Creation of new projects from name input and skeleton project files
+* Automatic code indenting / formatting
+* Syntax highlighting - from elm_code project (cedric and TAsn)
+* Code folding
+* Integrated console
+* notepad, vim and editing modes
+* Refactoring code capability
+* Documentation finding
+* Code expansion (nested display of function call body)
+* Compilation error message integrated in the flow of code
+* Cross reference for c, c++ and some scripting language
 
 Bugs to fix:
 
+* Remember last project and allow new project to be loaded (new window or current)
 * Remember position and size of window and panels
 
-The next phase is "Code aware editor" and it, along with other future phases
+The next phase is "Basic IDE" and it, along with other future phases
 are documented online at https://phab.enlightenment.org/w/edi/
 
