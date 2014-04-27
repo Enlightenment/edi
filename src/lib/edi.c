@@ -61,7 +61,10 @@ edi_shutdown(void)
 EAPI void
 edi_project_set(const char *path)
 {
-   _edi_project_path = path;
+   if (_edi_project_path)
+     eina_stringshare_del(_edi_project_path);
+
+   _edi_project_path = eina_stringshare_add(path);
 }
 
 EAPI const char *
