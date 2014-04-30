@@ -135,6 +135,13 @@ EAPI void edi_mainview_copy();
 EAPI void edi_mainview_paste();
 
 /**
+ * Search the current view's contents.
+ *
+ * @ingroup Content
+ */
+EAPI void edi_mainview_search();
+
+/**
  * @}
  *
  *

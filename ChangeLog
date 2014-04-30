@@ -1,7 +1,8 @@
 2014-04-27  ajwillia.ms (Andy Williams)
 
-        * Add simple build functions
+	* Add simple build functions
 	* Create an edi_build binary for command line building
+	* Added simple search function
 
 2014-03-31 ajwillia.ms (Andy Williams)
 

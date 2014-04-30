@@ -505,6 +505,18 @@ edi_mainview_paste()
 }
 
 EAPI void
+edi_mainview_search()
+{
+   Evas_Object *txt;
+   Elm_Object_Item *it;
+
+   it = elm_naviframe_top_item_get(nf);
+   txt = elm_object_item_content_get(it);
+   if (txt)
+     edi_editor_search(txt);
+}
+
+EAPI void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
    Evas_Object *box, *txt;

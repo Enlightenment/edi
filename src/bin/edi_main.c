@@ -248,6 +248,13 @@ _tb_paste_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
 }
 
 static void
+_tb_search_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+   edi_mainview_search();
+}
+
+static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
@@ -290,6 +297,11 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   tb_it = elm_toolbar_item_append(tb, "edit-find", "Search", _tb_search_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
