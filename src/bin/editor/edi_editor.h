@@ -13,6 +13,26 @@ extern "C" {
  */
 
 /**
+ * @typedef Edi_Editor
+ * An instance of an editor view.
+ */
+typedef struct _Edi_Editor Edi_Editor;
+
+/**
+ * @struct _Edi_Editor
+ * An instance of an editor view.
+ */
+struct _Edi_Editor
+{
+   Evas_Object *entry; /**< The main text entry widget for the editor */
+   Eina_List *undo_stack; /**< The list of operations that can be undone */
+
+   /* Private */
+
+   /* Add new members here. */
+};
+
+/**
  * @brief Editor.
  * @defgroup Editor The main text editor functions
  *
