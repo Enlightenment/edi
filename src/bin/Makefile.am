@@ -11,6 +11,7 @@ AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 
 edi_SOURCES = \
 editor/edi_editor_search.c \
+editor/edi_editor.c \
 edi_filepanel.c \
 edi_logpanel.c \
 edi_consolepanel.c \
