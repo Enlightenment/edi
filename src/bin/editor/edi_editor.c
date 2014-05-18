@@ -160,11 +160,11 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    alt = evas_key_modifier_mask_get(e, "Alt");
    shift = evas_key_modifier_mask_get(e, "Shift");
 
-   evas_object_key_grab(txt, "Prior", ctrl, shift | alt, 1);
-   evas_object_key_grab(txt, "Next", ctrl, shift | alt, 1);
-   evas_object_key_grab(txt, "s", ctrl, shift | alt, 1);
-   evas_object_key_grab(txt, "f", ctrl, shift | alt, 1);
-   evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(txt, "Prior", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(txt, "Next", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(txt, "s", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(txt, "f", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
 
    return txt;
 }

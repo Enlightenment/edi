@@ -264,7 +264,6 @@ _ls_main_cb(void *data,
             const Eina_File_Direct_Info *info)
 {
    Listing_Request *lreq = data;
-   Elm_Object_Item *item;
    Elm_Genlist_Item_Class *clas = &itc;
    const char  *path;
 
@@ -284,7 +283,7 @@ _ls_main_cb(void *data,
      }
 
    path = eina_stringshare_add(info->path);
-   item = elm_genlist_item_sorted_insert(list, clas, path, lreq->parent_it,
+   (void)!elm_genlist_item_sorted_insert(list, clas, path, lreq->parent_it,
                                          (clas == &itc2) ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
                                          _file_list_cmp, _item_sel, path);
 }
