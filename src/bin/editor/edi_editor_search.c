@@ -179,7 +179,7 @@ edi_editor_search(Evas_Object *entry)
    elm_box_pack_end(hbx, btn);
    evas_object_smart_callback_add(btn, "clicked", _search_clicked, entry);
 
-   evas_object_resize(_search_win, 300, 50);
+   evas_object_resize(_search_win, 300 * elm_config_scale_get(), 50 * elm_config_scale_get());
    evas_object_show(_search_win);
 
    _current_search = NULL;

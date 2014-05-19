@@ -213,7 +213,7 @@ _edi_mainview_item_win_add(Edi_Path_Options *options)
    content = _edi_mainview_content_create(options->path, options->type, win);
    elm_win_resize_object_add(win, content);
 
-   evas_object_resize(win, 380, 260);
+   evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
 }
 

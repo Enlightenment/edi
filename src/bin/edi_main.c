@@ -411,7 +411,7 @@ _edi_project_choose()
    elm_fileselector_path_set(fs, getenv("HOME"));
    elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
 
-   evas_object_resize(win, 380, 260);
+   evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
 
    return win;
@@ -464,7 +464,7 @@ edi_win_setup(const char *path)
    elm_box_pack_end(vbx, content);
 
    ERR("Loaded project at %s", path);
-   evas_object_resize(win, 560, 420);
+   evas_object_resize(win, 560 * elm_config_scale_get(), 420 * elm_config_scale_get());
    evas_object_show(win);
 
    return win;
