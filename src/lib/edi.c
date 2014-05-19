@@ -76,7 +76,7 @@ edi_project_get()
 EAPI const char *
 edi_project_file_path_get(const char *file)
 {
-   const char *path;
+   char *path;
    int len;
 
    len = strlen(file) + strlen(edi_project_get()) + 2;
@@ -95,6 +95,6 @@ edi_project_file_exists(const char *file)
    path = edi_project_file_path_get(file);
    exists = ecore_file_exists(path);
 
-   free(path);
+   free((void *)path);
    return exists;
 }

@@ -43,7 +43,7 @@ static Eina_Bool _startswith_location(const char *line)
 }
 
 static void _edi_consolepanel_clicked_cb(void *data, Evas *e EINA_UNUSED,
-                 Evas_Object *obj EINA_UNUSED, Evas_Event_Mouse_Down *ev)
+                 Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Path_Options *options;
 
@@ -71,7 +71,8 @@ static void _edi_consolepanel_parse_directory(const char *line)
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    Evas_Object *txt, *icon, *box;
-   const char *buf, *pos, *file, *path, *type = NULL, *cursor = NULL;
+   char *buf, *path;
+   const char *pos, *file, *type = NULL, *cursor = NULL;
    int length;
 
    txt = elm_label_add(_console_box);
@@ -158,33 +159,13 @@ void edi_consolepanel_clear()
    elm_box_clear(_console_box);
 }
 
-static Eina_Bool _stdin_handler_cb(void *data EINA_UNUSED, Ecore_Fd_Handler *fd_handler EINA_UNUSED)
-{
-   char message[BUFFER_SIZE];
-
-   if (!fgets(message, BUFFER_SIZE, stdin))
-     return ECORE_CALLBACK_RENEW;
-
-   edi_consolepanel_append_line(message);
-   return ECORE_CALLBACK_RENEW;
-}
-
-static Eina_Bool _stderr_handler_cb(void *data EINA_UNUSED, Ecore_Fd_Handler *fd_handler EINA_UNUSED)
-{
-   char message[BUFFER_SIZE];
-
-   if (!fgets(message, BUFFER_SIZE, stderr))
-     return ECORE_CALLBACK_RENEW;
-
-   edi_consolepanel_append_error_line(message);
-   return ECORE_CALLBACK_RENEW;
-}
-
 static Eina_Bool
-exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
+_exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
+   Ecore_Exe_Event_Data *ev;
    Ecore_Exe_Event_Data_Line *el;
 
+   ev = event_info;
    for (el = ev->lines; el && el->line; el++)
      edi_consolepanel_append_line(el->line);
 
@@ -192,10 +173,12 @@ exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
 }
 
 static Eina_Bool
-exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
+_exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
+   Ecore_Exe_Event_Data *ev;
    Ecore_Exe_Event_Data_Line *el;
 
+   ev = event_info;
    for (el = ev->lines; el && el->line; el++)
      edi_consolepanel_append_error_line(el->line);
 
@@ -221,6 +204,6 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    elm_object_content_set(parent, scroll);
 
-   ecore_event_handler_add(ECORE_EXE_EVENT_DATA, exe_data, NULL);
-   ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, exe_error, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
 }

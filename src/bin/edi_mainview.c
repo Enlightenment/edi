@@ -28,7 +28,7 @@ edi_mainview_item_prev()
 {
    Eina_List *item;
    Elm_Object_Item *current;
-   Edi_Mainview_Item *it, *prev;
+   Edi_Mainview_Item *it, *prev = NULL;
 
    current = elm_naviframe_top_item_get(nf);
 
@@ -102,7 +102,7 @@ _get_item_for_path(const char *path)
 }
 
 static Edi_Mainview_Item *
-_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Evas_Object *view,
+_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Elm_Object_Item *view,
                        Evas_Object *win)
 {
    Edi_Mainview_Item *item;
@@ -161,7 +161,6 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options)
    content = _edi_mainview_content_create(options->path, options->type, nf);
    if (options->line)
       edi_mainview_goto(options->line);
-
 
    it = elm_naviframe_item_simple_push(nf, content);
    elm_naviframe_item_style_set(it, "overlap");
@@ -250,7 +249,7 @@ _edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
 }
 
 static void
-_edi_mainview_choose_type(Evas_Object *parent, Edi_Path_Options *options, void *cb)
+_edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *options, void *cb)
 {
    Evas_Object *popup, *cancel, *icon;
 

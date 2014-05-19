@@ -18,10 +18,12 @@
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Eina_Bool
-exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
+_exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
+   Ecore_Exe_Event_Data *ev;
    Ecore_Exe_Event_Data_Line *el;
 
+   ev = event_info;
    for (el = ev->lines; el && el->line; el++)
      fprintf(stdout, "%s\n", el->line);
 
@@ -29,7 +31,7 @@ exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
 }
 
 static Eina_Bool
-exe_del(void *d EINA_UNUSED, int t EINA_UNUSED, Ecore_Exe_Event_Data *ev)
+_exe_del(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    ecore_main_loop_quit();
 
@@ -100,9 +102,9 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
         goto exit;
      }
 
-   ecore_event_handler_add(ECORE_EXE_EVENT_DATA, exe_data, NULL);
-   ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, exe_data, NULL);
-   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, exe_del, NULL); 
+   ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_data, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_del, NULL); 
 
    edi_builder_build();
    ecore_main_loop_begin();

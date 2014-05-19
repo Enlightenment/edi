@@ -23,7 +23,7 @@ static void
 _populate(Evas_Object *obj, const char *path, Elm_Object_Item *parent_it, const char *selected);
 
 static void
-_item_menu_open_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
    if (ecore_file_is_dir(_menu_cb_path))
@@ -33,7 +33,7 @@ _item_menu_open_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED
 }
 
 static void
-_item_menu_open_window_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
    if (ecore_file_is_dir(_menu_cb_path))
@@ -43,7 +43,7 @@ _item_menu_open_window_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA
 }
 
 static void
-_item_menu_xdgopen_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_xdgopen_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
    int pid = fork();
@@ -56,14 +56,14 @@ _item_menu_xdgopen_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNU
 }
 
 static void
-_item_menu_open_as_text_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_as_text_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
    _open_cb(_menu_cb_path, "text", EINA_FALSE);
 }
 
 static void
-_item_menu_open_as_image_cb(Elm_Object_Item *it EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_as_image_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                             void *event_info EINA_UNUSED)
 {
    _open_cb(_menu_cb_path, "image", EINA_FALSE);
@@ -97,11 +97,13 @@ _item_menu_create(Evas_Object *win)
 
 static void
 _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
-                 Evas_Event_Mouse_Down *ev)
+                 void *event_info)
 {
+   Evas_Event_Mouse_Down *ev;
    Elm_Object_Item *it;
    const char *path;
 
+   ev = event_info;
    if (ev->button != 3) return;
 
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
@@ -134,7 +136,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         iconpath = efreet_mime_type_icon_get(data, "hicolor", 128);
 
         if (iconpath)
-           elm_icon_file_set(ic, iconpath, NULL);
+           elm_image_file_set(ic, iconpath, NULL);
         else
           elm_icon_standard_set(ic, "file");
 
@@ -146,7 +148,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 }
 
 static void
-_item_del(void *data, Evas_Object *obj)
+_item_del(void *data, Evas_Object *obj EINA_UNUSED)
 {
    eina_stringshare_del(data);
 }
@@ -161,7 +163,7 @@ _item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED
 }
 
 static Evas_Object *
-_content_dir_get(void *data, Evas_Object *obj, const char *source)
+_content_dir_get(void *data EINA_UNUSED, Evas_Object *obj, const char *source)
 {
    if (!strcmp(source, "elm.swallow.icon"))
      {
@@ -177,8 +179,7 @@ _content_dir_get(void *data, Evas_Object *obj, const char *source)
 }
 
 static Eina_Bool
-_ls_filter_cb(void *data,
-              Eio_File *handler EINA_UNUSED,
+_ls_filter_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED,
               const Eina_File_Direct_Info *info)
 {
    return info->path[info->name_start] != '.';
@@ -297,7 +298,7 @@ _ls_done_cb(void *data, Eio_File *handler EINA_UNUSED)
 }
 
 static void
-_ls_error_cb(void *data, Eio_File *handler, int error EINA_UNUSED)
+_ls_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error EINA_UNUSED)
 {
    Listing_Request *lreq = data;
 
