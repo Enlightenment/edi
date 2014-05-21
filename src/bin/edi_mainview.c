@@ -526,7 +526,7 @@ edi_mainview_goto(int line)
    mcur = evas_object_textblock_cursor_get(tb);
 
    evas_textblock_cursor_line_set(mcur, line-1);
-   elm_entry_cursor_geometry_get(txt, &x, &y, &w, &h);
+   evas_object_textblock_line_number_geometry_get(tb, line, &x, &y, &w, &h);
    elm_scroller_region_show(txt, x, y, w, h);
    elm_entry_calc_force(txt);
 
