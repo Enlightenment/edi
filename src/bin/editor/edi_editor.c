@@ -160,11 +160,12 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
    Evas_Coord y, h;
    int line, lines, offset, line_height;
 
-   line_height = 14;
+   line_height = (int) (15.0 * elm_config_scale_get());
    elm_scroller_region_get(editor->entry, NULL, &y, NULL, &h);
    offset = y % line_height;
    line = (y - offset) / line_height + 1;
    lines = h / line_height + 2;
+   elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
 
    _set_offset(editor->lines, offset, h);
    _set_line(editor->lines, line, lines);
