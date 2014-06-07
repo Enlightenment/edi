@@ -5,7 +5,6 @@ This project is in heavy development, we are currenty working towards the
 * Redo changes that have been undone
 * Add a menu for easier access to some features
 * Search / replace in project / directory
-* Line numbers & go to line
 * Creation of new projects from name input and skeleton project files
 * Automatic code indenting / formatting
 * Syntax highlighting - from elm_code project (cedric and TAsn)

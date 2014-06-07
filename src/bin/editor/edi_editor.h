@@ -25,6 +25,7 @@ typedef struct _Edi_Editor Edi_Editor;
 struct _Edi_Editor
 {
    Evas_Object *entry; /**< The main text entry widget for the editor */
+   Evas_Object *lines; 
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */

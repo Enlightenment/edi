@@ -1,6 +1,10 @@
+2014-06-07  ajwillia.ms (Andy Williams)
+
+	* Add line numbers to the text editpr
+
 2014-05-15  ajwillia.ms (Andy Williams)
 
-    * Add basic undo support
+	* Add basic undo support
 
 2014-04-27  ajwillia.ms (Andy Williams)
 

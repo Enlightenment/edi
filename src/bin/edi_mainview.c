@@ -423,13 +423,16 @@ edi_mainview_open_window(Edi_Path_Options *options)
 EAPI void
 edi_mainview_save()
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (txt)
-     elm_entry_file_save(txt);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     elm_entry_file_save(editor->entry);
 }
 
 EAPI void
@@ -463,74 +466,88 @@ edi_mainview_close()
 EAPI void
 edi_mainview_cut()
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (txt)
-     elm_entry_selection_cut(txt);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     elm_entry_selection_cut(editor->entry);
 }
 
 EAPI void
 edi_mainview_copy()
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (txt)
-     elm_entry_selection_copy(txt);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     elm_entry_selection_copy(editor->entry);
 }
 
 EAPI void
 edi_mainview_paste()
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (txt)
-     elm_entry_selection_paste(txt);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     elm_entry_selection_paste(editor->entry);
 }
 
 EAPI void
 edi_mainview_search()
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (txt)
-     edi_editor_search(txt);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     edi_editor_search(editor->entry);
 }
 
 EAPI void
 edi_mainview_goto(int line)
 {
-   Evas_Object *txt;
+   Evas_Object *content;
    Elm_Object_Item *it;
+   Edi_Editor *editor;
    Evas_Object *tb;
    Evas_Textblock_Cursor *mcur;
    Evas_Coord x, y, w, h;
 
    it = elm_naviframe_top_item_get(nf);
-   txt = elm_object_item_content_get(it);
-   if (!txt || line <= 0)
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   if (!content || line <= 0)
      return;
 
-   tb = elm_entry_textblock_get(txt);
+   tb = elm_entry_textblock_get(editor->entry);
    mcur = evas_object_textblock_cursor_get(tb);
 
    evas_textblock_cursor_line_set(mcur, line-1);
-   evas_object_textblock_line_number_geometry_get(tb, line, &x, &y, &w, &h);
-   elm_scroller_region_show(txt, x, y, w, h);
-   elm_entry_calc_force(txt);
+   elm_entry_cursor_geometry_get(editor->entry, &x, &y, &w, &h);
+   elm_scroller_region_show(editor->entry, x, y, w, h);
+   elm_entry_calc_force(editor->entry);
 
-   elm_object_focus_set(txt, EINA_TRUE);
+   elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
 EAPI void
