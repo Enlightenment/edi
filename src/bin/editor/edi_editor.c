@@ -15,6 +15,9 @@
 
 #define EDITOR_FONT "DEFAULT='font=Monospace font_size=12'"
 
+static void
+_update_lines(Edi_Editor *editor);
+
 
 static void
 _undo_do(Edi_Editor *editor, Elm_Entry_Change_Info *inf)
@@ -94,6 +97,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
      }
 
    editor->undo_stack = eina_list_prepend(editor->undo_stack, change);
+   _update_lines(editor);
 }
 
 static void
@@ -132,24 +136,36 @@ _smart_cb_key_down(void *data, Evas *e EINA_UNUSED,
      }
 }
 
-static void _set_offset(Evas_Object *lines, int offset, int height)
+static int
+_get_lines_in_textblock(Evas_Object *textblock)
 {
-   elm_scroller_region_show(lines, 0, offset, 10, height);
+   int lines;
+   Evas_Textblock_Cursor *cursor;
+
+   cursor = evas_object_textblock_cursor_new(textblock);
+   evas_textblock_cursor_paragraph_last(cursor);
+   lines = evas_textblock_cursor_geometry_get(cursor, NULL, NULL, NULL, NULL, NULL, EVAS_TEXTBLOCK_CURSOR_BEFORE);
+
+   evas_textblock_cursor_free(cursor);
+   return lines + 1;
 }
 
-static void _set_line(Evas_Object *lines, int line, int count)
+static void
+_update_lines(Edi_Editor *editor)
 {
    Eina_Strbuf *content;
-   int i;
+   int lines, i;
+
+   lines = _get_lines_in_textblock(elm_entry_textblock_get(editor->entry));
 
    content = eina_strbuf_new();
    eina_strbuf_append(content, "<align=right>");
-   for (i = line; i < line + count; i++)
+   for (i = 1; i <= lines; i++)
      {
         eina_strbuf_append_printf(content, "%d<br>", i);
      }
-   eina_strbuf_append(content, "</align>");
-   elm_object_text_set(lines, eina_strbuf_string_get(content));
+   eina_strbuf_append(content, "<br><br></align>");
+   elm_object_text_set(editor->lines, eina_strbuf_string_get(content));
    eina_strbuf_free(content);
 }
 
@@ -158,17 +174,10 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
 {
    Edi_Editor *editor = data;
    Evas_Coord y, h;
-   int line, lines, offset, line_height;
 
-   line_height = (int) (15.0 * elm_config_scale_get());
-   elm_scroller_region_get(editor->entry, NULL, &y, NULL, &h);
-   offset = y % line_height;
-   line = (y - offset) / line_height + 1;
-   lines = h / line_height + 2;
+   elm_scroller_region_get(editor->entry, NULL, &y, NULL, NULL);
    elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
-
-   _set_offset(editor->lines, offset, h);
-   _set_line(editor->lines, line, lines);
+   elm_scroller_region_show(editor->lines, 0, y, 10, h);
 }
 
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
@@ -189,7 +198,6 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
 
    elm_entry_text_style_user_push(lines, EDITOR_FONT);
    evas_object_color_set(lines, 127, 127, 127, 255);
-   _set_line(lines, 1, 200);
 
    evas_object_size_hint_weight_set(lines, 0.052, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(lines, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -229,5 +237,6 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    (void)!evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
 
    evas_object_data_set(box, "editor", editor);
+   _update_lines(editor);
    return box;
 }
