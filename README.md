@@ -3,6 +3,8 @@ EDI - The Enlightened IDE
 
 This is a project to create a complete IDE using EFL.
 
+![EDI Logo](../blob/master/data/desktop/edi.png?raw=true)
+
 Using autotools to install this software is the usual:
 
 # ./autogen.sh
