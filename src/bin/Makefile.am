@@ -1,4 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
+AUTOMAKE_OPTIONS = subdir-objects
 
 bin_PROGRAMS = edi edi_build
 
@@ -12,6 +13,7 @@ AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 edi_SOURCES = \
 editor/edi_editor_search.c \
 editor/edi_editor.c \
+welcome/edi_welcome.c \
 edi_filepanel.c \
 edi_logpanel.c \
 edi_consolepanel.c \

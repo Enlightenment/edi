@@ -17,6 +17,7 @@
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "edi_mainview.h"
+#include "welcome/edi_welcome.h"
 
 #include "edi_private.h"
 
@@ -24,14 +25,6 @@
 
 static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel;
 static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
-
-static Evas_Object *edi_win_setup(const char *path);
-
-static void
-_edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   elm_exit();
-}
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
@@ -369,54 +362,6 @@ edi_toolbar_setup(Evas_Object *win)
    return tb;
 }
 
-static void
-_edi_project_chosen_cb(void *data,
-                       Evas_Object *obj EINA_UNUSED,
-                       void *event_info)
-{
-   evas_object_del(data);
-
-   if (event_info)
-     {
-        edi_project_set(event_info);
-        edi_win_setup(edi_project_get());
-     }
-   else
-     elm_exit();
-}
-
-static Evas_Object *
-_edi_project_choose()
-{
-   Evas_Object *win, *fs;
-
-   elm_need_ethumb();
-   elm_need_efreet();
-
-   win = elm_win_util_standard_add("projectselector", "Choose a Project Folder");
-   if (!win) return NULL;
-
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
-   evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
-
-   fs = elm_fileselector_add(win);
-   evas_object_size_hint_weight_set(fs, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(fs, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_smart_callback_add(fs, "done", _edi_project_chosen_cb, win);
-   elm_win_resize_object_add(win, fs);
-   evas_object_show(fs);
-
-   elm_fileselector_expandable_set(fs, EINA_TRUE);
-   elm_fileselector_folder_only_set(fs, EINA_TRUE);
-   elm_fileselector_path_set(fs, getenv("HOME"));
-   elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
-
-   evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
-   evas_object_show(win);
-
-   return win;
-}
-
 static char *
 _edi_win_title_get(const char *path)
 {
@@ -429,13 +374,18 @@ _edi_win_title_get(const char *path)
    return winname;
 }
 
-static Evas_Object *
-edi_win_setup(const char *path)
+static void
+_edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_close();
+}
+
+EAPI Evas_Object *
+edi_open(const char *path)
 {
    Evas_Object *win, *vbx, *content, *tb;
    const char *winname;
 
-   if (!path) return _edi_project_choose();
    edi_project_set(path);
 
    elm_need_ethumb();
@@ -468,6 +418,12 @@ edi_win_setup(const char *path)
    evas_object_show(win);
 
    return win;
+}
+
+EAPI void
+edi_close()
+{
+   elm_exit();
 }
 
 static const Ecore_Getopt optdesc = {
@@ -530,7 +486,12 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    elm_app_info_set(elm_main, "edi", "images/edi.png");
 
-   if (!(win = edi_win_setup(project_path)))
+   if (!project_path)
+     {
+        if (!edi_welcome_show())
+          goto end;
+     }
+   else if (!(win = edi_open(project_path)))
      goto end;
 
    elm_run();

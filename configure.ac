@@ -63,6 +63,7 @@ AM_GNU_GETTEXT([external])
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
+data/images/Makefile
 data/desktop/Makefile
 data/desktop/edi.desktop
 data/themes/Makefile

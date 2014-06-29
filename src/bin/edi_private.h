@@ -26,4 +26,8 @@ extern int _edi_lib_log_dom;
 
 #define EDI_CONTENT_AUTOSAVE EINA_TRUE
 
+EAPI Evas_Object *edi_open(const char *path);
+
+EAPI void edi_close();
+
 #endif
