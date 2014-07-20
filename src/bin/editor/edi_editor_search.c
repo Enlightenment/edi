@@ -22,6 +22,7 @@ struct _Edi_Editor_Search
 {
    Evas_Object *entry; /**< The search text widget */
    Evas_Object *widget; /**< The search UI panel we wish to show and hide */
+   Evas_Object *parent; /**< The parent panel we will insert into */
    Evas_Textblock_Cursor *current_search; /**< The current search cursor for this session */
 
    /* Add new members here. */
@@ -112,8 +113,11 @@ _edi_editor_search_hide(Edi_Editor *editor)
    Edi_Editor_Search *search;
 
    search = editor->search;
-   if (search)
-      evas_object_hide(search->widget);
+   if (search && eina_list_data_find(elm_box_children_get(search->parent), search->widget))
+     {
+        evas_object_hide(search->widget);
+        elm_box_unpack(search->parent, search->widget);
+     }
 }
 
 EAPI void
@@ -122,8 +126,11 @@ edi_editor_search(Edi_Editor *editor)
    Edi_Editor_Search *search;
 
    search = editor->search;
-   if (search)
-      evas_object_show(search->widget);
+   if (search && !eina_list_data_find(elm_box_children_get(search->parent), search->widget))
+     {
+        evas_object_show(search->widget);
+        elm_box_pack_end(search->parent, search->widget);
+     }
 }
 
 static void
@@ -148,45 +155,50 @@ _cancel_clicked(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_
 EAPI void
 edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *entry, *lbl, *btn;
+   Evas_Object *entry, *lbl, *btn, *box;
    Edi_Editor_Search *search;
 
-   elm_box_padding_set(parent, 15, 0);
-   elm_box_horizontal_set(parent, EINA_TRUE);
+   box = elm_box_add(parent);
+   elm_box_horizontal_set(box, EINA_TRUE);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, 0.5);
+   evas_object_size_hint_weight_set(box, 0.0, 0.0);
+   elm_box_padding_set(box, 15, 0);
 
-   lbl = elm_label_add(parent);
+   lbl = elm_label_add(box);
    elm_object_text_set(lbl, "Search term:");
    evas_object_size_hint_align_set(lbl, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(lbl, 0.0, 0.0);
-   elm_box_pack_end(parent, lbl);
+   elm_box_pack_end(box, lbl);
    evas_object_show(lbl);
 
-   entry = elm_entry_add(parent);
+   entry = elm_entry_add(box);
    elm_entry_scrollable_set(entry, EINA_TRUE);
    elm_entry_single_line_set(entry, EINA_TRUE);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(parent, entry);
+   elm_box_pack_end(box, entry);
    evas_object_show(entry);
 
-   btn = elm_button_add(parent);
+   btn = elm_button_add(box);
    elm_object_text_set(btn, "Search");
    evas_object_size_hint_align_set(btn, 1.0, 0.0);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
-   elm_box_pack_end(parent, btn);
+   elm_box_pack_end(box, btn);
    evas_object_smart_callback_add(btn, "clicked", _search_clicked, editor);
 
-   btn = elm_button_add(parent);
+   btn = elm_button_add(box);
    elm_object_text_set(btn, "Cancel");
    evas_object_size_hint_align_set(btn, 1.0, 0.0);
    evas_object_size_hint_weight_set(btn, 0.0, 0.0);
    evas_object_show(btn);
-   elm_box_pack_end(parent, btn);
+   elm_box_pack_end(box, btn);
    evas_object_smart_callback_add(btn, "clicked", _cancel_clicked, editor);
 
    search = calloc(1, sizeof(*search));
    search->entry = entry;
-   search->widget = parent;
+   search->parent = parent;
+   search->widget = box;
    editor->search = search;
+   evas_object_show(parent);
 }
