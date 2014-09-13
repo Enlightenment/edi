@@ -19,7 +19,8 @@ This project is in heavy development, we are currenty working towards the
 Bugs to fix:
 
 * Remember last project and allow new project to be loaded (new window or current)
-* Remember position and size of window and panels
+* Remember position and size of windows and panels
+* Monitor filesystem for changes and refresh file tree
 
 The next phase is "Basic IDE" and it, along with other future phases
 are documented online at https://phab.enlightenment.org/w/edi/
