@@ -16,7 +16,7 @@
 #include "edi_filepanel.h"
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
-#include "edi_mainview.h"
+#include "mainview/edi_mainview.h"
 #include "welcome/edi_welcome.h"
 
 #include "edi_private.h"

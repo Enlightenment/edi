@@ -17,7 +17,8 @@ welcome/edi_welcome.c \
 edi_filepanel.c \
 edi_logpanel.c \
 edi_consolepanel.c \
-edi_mainview.c \
+mainview/edi_mainview_item.c \
+mainview/edi_mainview.c \
 edi_main.c
 
 edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la

@@ -6,6 +6,8 @@
 
 #include "Edi.h"
 
+#include "mainview/edi_mainview_item.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,23 +16,6 @@ extern "C" {
  * @file
  * @brief These routines are used for managing the main area of the Edi interface.
  */
-
-/**
- * @struct _Edi_Mainview_Item
- * An item being displayed in the mainview.
- */
-typedef struct _Edi_Mainview_Item
-{
-   const char *path; /**< The path of the file in this mainview item */
-
-   Elm_Object_Item *tab; /**< The tab object connected to this view */
-   Elm_Object_Item *view; /**< The naviframe item that contains the view for this item */
-   Evas_Object *win; /**< The window for the item if it's displayed in a seperate window */
-
-   /* Private */
-
-   /* Add new members here. */
-} Edi_Mainview_Item;
 
 /**
  * @brief UI management functions.
@@ -175,6 +160,8 @@ EAPI void edi_mainview_goto(int line);
  * Manipulating the open files within the application.
  *
  */
+
+EAPI Edi_Mainview_Item *edi_mainview_item_current_get();
 
 /**
  * Select the passed item in the mainview UI.

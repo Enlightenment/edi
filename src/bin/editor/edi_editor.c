@@ -9,7 +9,7 @@
 
 #include "edi_editor.h"
 
-#include "edi_mainview.h"
+#include "mainview/edi_mainview.h"
 
 #include "edi_private.h"
 
@@ -204,9 +204,26 @@ _edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 }
 
 static void
-_edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor)
+_edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
-   Evas_Object *position;
+   Evas_Object *position, *mime;
+
+   elm_box_horizontal_set(panel, EINA_TRUE);
+
+   mime = elm_label_add(panel);
+   if (item->mimetype)
+     {
+        elm_object_text_set(mime, item->mimetype);
+     }
+   else
+     {
+        elm_object_text_set(mime, item->editortype);
+     }
+   evas_object_size_hint_align_set(mime, 0.0, 0.5);
+   evas_object_size_hint_weight_set(mime, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(panel, mime);
+   evas_object_show(mime);
+   elm_object_disabled_set(mime, EINA_TRUE);
 
    position = elm_label_add(panel);
    evas_object_size_hint_align_set(position, 1.0, 0.5);
@@ -219,7 +236,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor)
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
 }
 
-EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
+EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
@@ -267,7 +284,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    elm_entry_scrollable_set(txt, EINA_TRUE);
    elm_entry_line_wrap_set(txt, EINA_FALSE);
    elm_entry_text_style_user_push(txt, EDITOR_FONT);
-   elm_entry_file_set(txt, path, ELM_TEXT_FORMAT_PLAIN_UTF8);
+   elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
    elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -284,7 +301,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, const char *path)
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 
    edi_editor_search_add(searchbar, editor);
-   _edi_editor_statusbar_add(statusbar, editor);
+   _edi_editor_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(txt);
    ctrl = evas_key_modifier_mask_get(e, "Control");

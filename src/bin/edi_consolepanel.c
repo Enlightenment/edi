@@ -11,7 +11,7 @@
 #include <regex.h>
 
 #include "edi_consolepanel.h"
-#include "edi_mainview.h"
+#include "mainview/edi_mainview.h"
 
 #include "edi_private.h"
 

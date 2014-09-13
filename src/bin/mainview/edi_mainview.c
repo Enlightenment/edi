@@ -7,7 +7,8 @@
 #include <Eina.h>
 #include <Eio.h>
 
-#include "edi_mainview.h"
+#include "mainview/edi_mainview_item.h"
+#include "mainview/edi_mainview.h"
 
 #include "editor/edi_editor.h"
 
@@ -22,6 +23,26 @@ static Eina_List *_edi_mainview_items = NULL;
 static void
 dummy()
 {}
+
+EAPI Edi_Mainview_Item *
+edi_mainview_item_current_get()
+{
+   Eina_List *item;
+   Elm_Object_Item *current;
+   Edi_Mainview_Item *it;
+
+   current = elm_naviframe_top_item_get(nf);
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (it && it->view == current)
+          {
+             return it;
+          }
+     }
+
+   return NULL;
+}
 
 EAPI void
 edi_mainview_item_prev()
@@ -102,13 +123,15 @@ _get_item_for_path(const char *path)
 }
 
 static Edi_Mainview_Item *
-_edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Elm_Object_Item *view,
+_edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item *tab, Elm_Object_Item *view,
                        Evas_Object *win)
 {
    Edi_Mainview_Item *item;
 
    item = malloc(sizeof(Edi_Mainview_Item));
-   item->path = path;
+   item->path = path->path;
+   item->editortype = path->type;
+   item->mimetype = mime;
    item->tab = tab;
    item->view = view;
    item->win = win;
@@ -119,7 +142,7 @@ _edi_mainview_item_add(const char *path, Elm_Object_Item *tab, Elm_Object_Item *
 }
 
 static Evas_Object *
-_edi_mainview_content_image_create(const char *path, Evas_Object *parent)
+_edi_mainview_content_image_create(Edi_Mainview_Item *item, Evas_Object *parent)
 {
    Evas_Object *img, *scroll;
 
@@ -128,7 +151,7 @@ _edi_mainview_content_image_create(const char *path, Evas_Object *parent)
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(scroll);
    img = elm_image_add(scroll);
-   elm_image_file_set(img, path, NULL);
+   elm_image_file_set(img, item->path, NULL);
    elm_image_no_scale_set(img, EINA_TRUE);
    elm_object_content_set(scroll, img);
    evas_object_show(img);
@@ -137,37 +160,39 @@ _edi_mainview_content_image_create(const char *path, Evas_Object *parent)
 }
 
 static Evas_Object *
-_edi_mainview_content_create(const char *path, const char *type, Evas_Object *parent)
+_edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 {
-   if (!strcmp(type, "text"))
+   if (!strcmp(item->editortype, "text"))
      {
-        return edi_editor_add(parent, path);
+        return edi_editor_add(parent, item);
      }
-   else if (!strcmp(type, "image"))
+   else if (!strcmp(item->editortype, "image"))
      {
-        return _edi_mainview_content_image_create(path, parent);
+        return _edi_mainview_content_image_create(item, parent);
      }
 
    return NULL;
 }
 
 static void
-_edi_mainview_item_tab_add(Edi_Path_Options *options)
+_edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 {
    Evas_Object *content;
    Elm_Object_Item *it, *tab;
    Edi_Mainview_Item *item;
 
-   content = _edi_mainview_content_create(options->path, options->type, nf);
+   item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
+   content = _edi_mainview_content_create(item, nf);
    if (options->line)
       edi_mainview_goto(options->line);
 
    it = elm_naviframe_item_simple_push(nf, content);
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename(options->path), _promote, it);
+   item->view = it;
+   item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
 
-   item = _edi_mainview_item_add(options->path, tab, it, NULL);
    elm_object_item_data_set(it, item);
 }
 
@@ -197,7 +222,7 @@ _edi_mainview_win_title_get(const char *path)
 }
 
 static void
-_edi_mainview_item_win_add(Edi_Path_Options *options)
+_edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 {
    Evas_Object *win, *content;
    Edi_Mainview_Item *item;
@@ -207,10 +232,10 @@ _edi_mainview_item_win_add(Edi_Path_Options *options)
 
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_mainview_win_exit, NULL);
-   item = _edi_mainview_item_add(options->path, NULL, NULL, win);
+   item = _edi_mainview_item_add(options, mime, NULL, NULL, win);
    evas_object_data_set(win, "edi_mainview_item", item);
 
-   content = _edi_mainview_content_create(options->path, options->type, win);
+   content = _edi_mainview_content_create(item, win);
    elm_win_resize_object_add(win, content);
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
@@ -275,8 +300,6 @@ _edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *opt
    evas_object_smart_callback_add(cancel, "clicked",
                                        _edi_mainview_choose_type_close_cb, NULL);
 
-   // popup show should be called after adding all the contents and the buttons
-   // of popup to set the focus into popup's contents correctly.
    evas_object_show(popup);
 }
 
@@ -303,7 +326,7 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
         return;
      }
 
-   _edi_mainview_item_tab_add(options);
+   _edi_mainview_item_tab_add(options, mime);
 }
 
 static void
@@ -329,7 +352,7 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
         return;
      }
 
-   _edi_mainview_item_win_add(options);
+   _edi_mainview_item_win_add(options, mime);
 }
 
 EAPI void
@@ -370,7 +393,7 @@ edi_mainview_open(Edi_Path_Options *options)
      }
    else
      {
-        _edi_mainview_item_tab_add(options);
+        _edi_mainview_item_tab_add(options, NULL);
      }
 }
 
@@ -416,7 +439,7 @@ edi_mainview_open_window(Edi_Path_Options *options)
      }
    else
      {
-        _edi_mainview_item_win_add(options);
+        _edi_mainview_item_win_add(options, NULL);
      }
 }
 
@@ -440,7 +463,7 @@ edi_mainview_new_window()
 {
    Edi_Mainview_Item *item;
 
-   item = elm_object_item_data_get(elm_naviframe_top_item_get(nf));
+   item = edi_mainview_item_current_get();
    if (!item)
      return;
 
@@ -450,17 +473,17 @@ edi_mainview_new_window()
 EAPI void
 edi_mainview_close()
 {
-   Edi_Mainview_Item *it;
+   Edi_Mainview_Item *item;
 
-   it = elm_object_item_data_get(elm_naviframe_top_item_get(nf));
-   if (!it)
+   item = edi_mainview_item_current_get();
+   if (!item)
      return;
 
    elm_naviframe_item_pop(nf);
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
-   _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
-   eina_stringshare_del(it->path);
-   free(it);
+   _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
+   eina_stringshare_del(item->path);
+   free(item);
 }
 
 EAPI void
