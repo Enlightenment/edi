@@ -1,12 +1,10 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 skeletondir = $(datadir)/$(PACKAGE)/
-skeleton_DATA = skeleton/README
+skeleton_DATA = 
 
 install-data-hook:
-## removing the temporary README that is used for a git submodule check
-	rm -f $(skeletondir)/README
-	cp -rv skeleton $(skeletondir)
+	tar -xf skeleton.tar.gz -C $(skeletondir)
 
 uninstall-local:
 	rm -rf $(skeletondir)/skeleton
