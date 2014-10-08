@@ -46,6 +46,30 @@ AC_ARG_WITH([tests],
    [build_tests=${withval}],
    [build_tests=auto])
 
+
+HAVE_LIBCLANG=0
+
+AC_ARG_ENABLE(libclang,
+      [  --disable-libclang	Disable use of libclang.],,)
+
+build_clang="no"
+if test "$enable_libclang" != "no"; then
+  AC_CHECK_HEADERS("clang-c/Index.h")
+  if test "$ac_cv_header_clang_c_Index_h" = "yes"; then
+    AC_CHECK_LIB(clang, clang_Cursor_getArgument)
+    if test "$ac_cv_lib_clang_clang_Cursor_getArgument" = "yes"; then
+      HAVE_LIBCLANG=1;
+      MORE_LIBS="$MORE_LIBS -lclang"
+      build_clang="yes"
+    fi
+  fi 
+  if test "$HAVE_LIBCLANG" = "0"; then
+    AC_MSG_WARN([Could not find a usable libclang. Please install libclang to enable syntax highlighting features.])
+  fi
+fi
+
+AC_SUBST(HAVE_LIBCLANG)
+
 EFL_TESTS([${build_tests}])
 
 # doxygen program for documentation building
@@ -90,6 +114,7 @@ echo
 echo "Compilation..............: make (or gmake)"
 echo "  CFLAGS.................: $CFLAGS"
 echo "  edje_cc................: ${edje_cc}"
+echo "  clang..................: ${build_clang}"
 echo
 echo "Building documentation...: ${build_doc}"
 echo "Building tests...........: ${have_tests}"

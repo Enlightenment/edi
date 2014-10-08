@@ -9,11 +9,30 @@
 
 #include "edi_editor.h"
 
+#define CLANG_DEBUG 0
+#if CLANG_DEBUG
+#include "clang_debug.h"
+#endif
+
 #include "mainview/edi_mainview.h"
 
 #include "edi_private.h"
 
 #define EDITOR_FONT "DEFAULT='font=Monospace font_size=12'"
+
+#define Edi_Color const char *
+
+typedef struct
+{
+   unsigned int line;
+   unsigned int col;
+} Edi_Location;
+
+typedef struct
+{
+   Edi_Location start;
+   Edi_Location end;
+} Edi_Range;
 
 static void
 _update_lines(Edi_Editor *editor);
@@ -236,6 +255,244 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
 }
 
+static void
+_edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
+{
+   Evas_Object *textblock;
+   printf("Setting color %s for range(%d:%d, %d:%d)\n", color, range.start.line, range.start.col, range.end.line, range.end.col);
+
+   textblock = elm_entry_textblock_get(editor->entry);
+// TODO actually set some styling on our textblock
+}
+
+#if HAVE_LIBCLANG
+static void
+_clang_load_highlighting(const char *path, Edi_Editor *editor)
+{
+   CXToken *tokens = NULL;
+   unsigned int n = 0;
+   unsigned int i = 0;
+   CXCursor *cursors = NULL;
+
+     {
+        CXFile cfile = clang_getFile(editor->tx_unit, path);
+        int tgridw = 0, tgridh = 0;
+        evas_object_textblock_size_native_get(elm_entry_textblock_get(editor->entry), &tgridw, &tgridh);
+
+#if 0
+        /* FIXME: Should be used, I don't know why tokenize doesn't work in mid
+         * comment cases and etc. */
+        int range_start, range_end;
+        range_start = editor->offset;
+        range_end = editor->offset + tgridh;
+        CXSourceRange range = clang_getRange(clang_getLocation(editor->tx_unit, cfile, range_start, 1), clang_getLocation(editor->tx_unit, cfile, range_end, tgridw));
+#else
+        CXSourceRange range = clang_getRange(
+              clang_getLocationForOffset(editor->tx_unit, cfile, 0),
+              clang_getLocationForOffset(editor->tx_unit, cfile, eina_file_size_get(eina_file_open(path, EINA_FALSE))));
+#endif
+        clang_tokenize(editor->tx_unit, range, &tokens, &n);
+        /* FIXME: We should use annotate tokens and then use a lot more
+         * color classes. I don't know why it's broken ATM... :( */
+        cursors = (CXCursor *) malloc(n * sizeof(CXCursor));
+        clang_annotateTokens(editor->tx_unit, tokens, n, cursors);
+     }
+
+   for (i = 0 ; i < n ; i++)
+     {
+        Edi_Range range;
+        Edi_Color color = "";
+//EDI_COLOR_FOREGROUND_DEFAULT;
+
+        CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, tokens[i]);
+        clang_getSpellingLocation(clang_getRangeStart(tkrange), NULL,
+              &range.start.line, &range.start.col, NULL);
+        clang_getSpellingLocation(clang_getRangeEnd(tkrange), NULL,
+              &range.end.line, &range.end.col, NULL);
+        /* FIXME: Should probably do something fancier, this is only a limited
+         * number of types. */
+        switch (clang_getTokenKind(tokens[i]))
+          {
+             case CXToken_Punctuation:
+             case CXToken_Identifier:
+                switch (cursors[i].kind)
+                  {
+                   case CXCursor_DeclRefExpr:
+                      /* Handle different ref kinds */
+//                      color = EDI_COLOR_FOREGROUND_REF;
+                      break;
+                   case CXCursor_MacroDefinition:
+//                      color = EDI_COLOR_FOREGROUND_MACRO_DEFINITION;
+                      break;
+                   case CXCursor_InclusionDirective:
+                   case CXCursor_PreprocessingDirective:
+//                      color = EDI_COLOR_FOREGROUND_PREPROCESSING_DIRECTIVE;
+                      break;
+                   case CXCursor_TypeRef:
+//                      color = EDI_COLOR_FOREGROUND_USER_TYPE;
+                      break;
+                   case CXCursor_MacroExpansion:
+//                      color = EDI_COLOR_FOREGROUND_MACRO_EXPANSION;
+                      break;
+                   default:
+//                      color = EDI_COLOR_FOREGROUND_DEFAULT;
+                      break;
+                  }
+                break;
+             case CXToken_Keyword:
+                switch (cursors[i].kind)
+                  {
+                   case CXCursor_PreprocessingDirective:
+//                      color = EDI_COLOR_FOREGROUND_PREPROCESSING_DIRECTIVE;
+                      break;
+                   case CXCursor_CaseStmt:
+                   case CXCursor_DefaultStmt:
+                   case CXCursor_IfStmt:
+                   case CXCursor_SwitchStmt:
+                   case CXCursor_WhileStmt:
+                   case CXCursor_DoStmt:
+                   case CXCursor_ForStmt:
+                   case CXCursor_GotoStmt:
+                   case CXCursor_IndirectGotoStmt:
+                   case CXCursor_ContinueStmt:
+                   case CXCursor_BreakStmt:
+                   case CXCursor_ReturnStmt:
+                   case CXCursor_AsmStmt:
+                   case CXCursor_ObjCAtTryStmt:
+                   case CXCursor_ObjCAtCatchStmt:
+                   case CXCursor_ObjCAtFinallyStmt:
+                   case CXCursor_ObjCAtThrowStmt:
+                   case CXCursor_ObjCAtSynchronizedStmt:
+                   case CXCursor_ObjCAutoreleasePoolStmt:
+                   case CXCursor_ObjCForCollectionStmt:
+                   case CXCursor_CXXCatchStmt:
+                   case CXCursor_CXXTryStmt:
+                   case CXCursor_CXXForRangeStmt:
+                   case CXCursor_SEHTryStmt:
+                   case CXCursor_SEHExceptStmt:
+                   case CXCursor_SEHFinallyStmt:
+color = "stmt";
+//                      color = EDI_COLOR_FOREGROUND_KEYWORD_STMT;
+                      break;
+                   default:
+color = "keyword";
+//                      color = EDI_COLOR_FOREGROUND_KEYWORD;
+                      break;
+                  }
+                break;
+             case CXToken_Literal:
+color = "literal";
+//                color = EDI_COLOR_FOREGROUND_LITERAL;
+                break;
+             case CXToken_Comment:
+color = "comment";
+//                color = EDI_COLOR_FOREGROUND_COMMENT;
+                break;
+          }
+
+        _edi_range_color_set(editor, range, color);
+
+#if CLANG_DEBUG
+        const char *kind = NULL;
+        switch (clang_getTokenKind(tokens[i])) {
+           case CXToken_Punctuation: kind = "Punctuation"; break;
+           case CXToken_Keyword: kind = "Keyword"; break;
+           case CXToken_Identifier: kind = "Identifier"; break;
+           case CXToken_Literal: kind = "Literal"; break;
+           case CXToken_Comment: kind = "Comment"; break;
+        }
+
+        printf("%s ", kind);
+        PrintToken(editor->tx_unit, tokens[i]);
+
+        if (!clang_isInvalid(cursors[i].kind)) {
+             printf(" ");
+             PrintCursor(cursors[i]);
+        }
+
+        printf("\n");
+#endif
+     }
+
+   free(cursors);
+   clang_disposeTokens(editor->tx_unit, tokens, n);
+}
+
+static void
+_clang_load_errors(const char *path, Edi_Editor *editor)
+{
+   unsigned n = clang_getNumDiagnostics(editor->tx_unit);
+   unsigned i = 0;
+
+   for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
+     {
+        CXDiagnostic diag = clang_getDiagnostic(editor->tx_unit, i);
+        Edi_Range range;
+
+        clang_getSpellingLocation(clang_getDiagnosticLocation(diag), NULL, &range.start.line, &range.start.col, NULL);
+        range.end = range.start;
+
+        /* FIXME: Also handle ranges and fix suggestions. */
+
+        Edi_Color color = "";
+// EDI_COLOR_BACKGROUND_DEFAULT;
+
+        switch (clang_getDiagnosticSeverity(diag))
+          {
+           case CXDiagnostic_Ignored:
+//              color = EDI_COLOR_BACKGROUND_SEVIRITY_IGNORED;
+              break;
+           case CXDiagnostic_Note:
+//              color = EDI_COLOR_BACKGROUND_SEVIRITY_NOTE;
+              break;
+           case CXDiagnostic_Warning:
+//              color = EDI_COLOR_BACKGROUND_SEVIRITY_WARNING;
+              break;
+           case CXDiagnostic_Error:
+//              color = EDI_COLOR_BACKGROUND_SEVIRITY_ERROR;
+              break;
+           case CXDiagnostic_Fatal:
+//              color = EDI_COLOR_BACKGROUND_SEVIRITY_FATAL;
+              break;
+          }
+
+        _edi_range_color_set(editor, range, color);
+
+#if CLANG_DEBUG
+        CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
+        printf("DEBUG: Diag:%s\n", clang_getCString(str));
+        clang_disposeString(str);
+#endif
+
+        clang_disposeDiagnostic(diag);
+     }
+}
+
+static void
+_edi_clang_setup(const char *path, Edi_Editor *editor)
+{
+   /* Clang */
+   /* FIXME: index should probably be global. */
+   const char const *clang_argv[] = {"-I/usr/lib/clang/3.1/include/", "-Wall", "-Wextra"};
+   int clang_argc = sizeof(clang_argv) / sizeof(*clang_argv);
+
+   editor->idx = clang_createIndex(0, 0);
+
+   /* FIXME: Possibly activate more options? */
+   editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
+
+   _clang_load_errors(path, editor);
+   _clang_load_highlighting(path, editor);
+}
+
+static void
+_edi_clang_dispose(Edi_Editor *editor)
+{
+   clang_disposeTranslationUnit(editor->tx_unit);
+   clang_disposeIndex(editor->idx);
+}
+#endif
+
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
@@ -316,5 +573,10 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
    evas_object_data_set(vbox, "editor", editor);
    _update_lines(editor);
+
+#if HAVE_LIBCLANG
+   _edi_clang_setup(item->path, editor);
+#endif
+
    return vbox;
 }

@@ -3,6 +3,10 @@
 
 #include <Evas.h>
 
+#if HAVE_LIBCLANG
+#include <clang-c/Index.h>
+#endif
+
 #include "mainview/edi_mainview_item.h"
 
 #ifdef __cplusplus
@@ -40,6 +44,12 @@ struct _Edi_Editor
    Edi_Editor_Search *search;
 
    /* Add new members here. */
+
+#if HAVE_LIBCLANG
+   /* Clang */
+   CXIndex idx;
+   CXTranslationUnit tx_unit;
+#endif
 };
 
 /**
