@@ -22,6 +22,23 @@
 
 #define Edi_Color const char *
 
+static Edi_Color EDI_COLOR_FOREGROUND = "+ color=#ffffff";
+static Edi_Color EDI_COLOR_COMMENT = "+ color=#00B000";
+static Edi_Color EDI_COLOR_STRING = "+ color=#ff3a35";
+static Edi_Color EDI_COLOR_NUMBER = "+ color=#D4D42A font_weight=Bold";
+static Edi_Color EDI_COLOR_BRACE = "+ color=#656565";
+static Edi_Color EDI_COLOR_TYPE = "+ color=#3399ff";
+static Edi_Color EDI_COLOR_CLASS = "+ color=#72AAD4 font_weight=Bold";
+static Edi_Color EDI_COLOR_FUNCTION = "+ color=#72AAD4 font_weight=Bold";
+static Edi_Color EDI_COLOR_PARAM = "+ color=#ffffff";
+static Edi_Color EDI_COLOR_KEYWORD = "+ color=#ff9900 font_weight=Bold";
+static Edi_Color EDI_COLOR_PREPROCESSOR = "+ color=#3399ff font_weight=Bold";
+
+static Edi_Color EDI_COLOR_BACKGROUND = "+ backing_color=#000000";
+static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "+ backing_color=#000000";
+static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "+ backing_color=#ff9900";
+static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "+ backing_color=#ff9900";
+
 typedef struct
 {
    unsigned int line;
@@ -259,10 +276,22 @@ static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
 {
    Evas_Object *textblock;
-   printf("Setting color %s for range(%d:%d, %d:%d)\n", color, range.start.line, range.start.col, range.end.line, range.end.col);
+   Evas_Textblock_Cursor *cur;
 
    textblock = elm_entry_textblock_get(editor->entry);
-// TODO actually set some styling on our textblock
+   cur = evas_object_textblock_cursor_new(textblock);
+
+   evas_textblock_cursor_line_set(cur, range.start.line - 1);
+   evas_textblock_cursor_pos_set(cur, evas_textblock_cursor_pos_get(cur) + range.start.col - 1);
+   evas_textblock_cursor_format_prepend(cur, color);
+   evas_textblock_cursor_free(cur);
+
+   cur = evas_object_textblock_cursor_new(textblock);
+   evas_textblock_cursor_line_set(cur, range.end.line - 1);
+   evas_textblock_cursor_pos_set(cur, evas_textblock_cursor_pos_get(cur) + range.end.col - 1);
+   evas_textblock_cursor_format_prepend(cur, "+ color=#ffffff");
+
+   evas_textblock_cursor_free(cur);
 }
 
 #if HAVE_LIBCLANG
@@ -301,8 +330,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
    for (i = 0 ; i < n ; i++)
      {
         Edi_Range range;
-        Edi_Color color = "";
-//EDI_COLOR_FOREGROUND_DEFAULT;
+        Edi_Color color = EDI_COLOR_FOREGROUND;
 
         CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, tokens[i]);
         clang_getSpellingLocation(clang_getRangeStart(tkrange), NULL,
@@ -314,28 +342,33 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
         switch (clang_getTokenKind(tokens[i]))
           {
              case CXToken_Punctuation:
+                color = EDI_COLOR_BRACE;
+                break;
              case CXToken_Identifier:
+                if (cursors[i].kind < CXCursor_FirstRef)
+                  {
+                      color = EDI_COLOR_CLASS;
+                      break;
+                  }
                 switch (cursors[i].kind)
                   {
                    case CXCursor_DeclRefExpr:
                       /* Handle different ref kinds */
-//                      color = EDI_COLOR_FOREGROUND_REF;
+                      color = EDI_COLOR_FUNCTION;
                       break;
                    case CXCursor_MacroDefinition:
-//                      color = EDI_COLOR_FOREGROUND_MACRO_DEFINITION;
-                      break;
                    case CXCursor_InclusionDirective:
                    case CXCursor_PreprocessingDirective:
-//                      color = EDI_COLOR_FOREGROUND_PREPROCESSING_DIRECTIVE;
+                      color = EDI_COLOR_PREPROCESSOR;
                       break;
                    case CXCursor_TypeRef:
-//                      color = EDI_COLOR_FOREGROUND_USER_TYPE;
+                      color = EDI_COLOR_TYPE;
                       break;
                    case CXCursor_MacroExpansion:
-//                      color = EDI_COLOR_FOREGROUND_MACRO_EXPANSION;
+                      color = EDI_COLOR_PREPROCESSOR;//_MACRO_EXPANSION;
                       break;
                    default:
-//                      color = EDI_COLOR_FOREGROUND_DEFAULT;
+                      color = EDI_COLOR_FOREGROUND;
                       break;
                   }
                 break;
@@ -343,7 +376,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
                 switch (cursors[i].kind)
                   {
                    case CXCursor_PreprocessingDirective:
-//                      color = EDI_COLOR_FOREGROUND_PREPROCESSING_DIRECTIVE;
+                      color = EDI_COLOR_PREPROCESSOR;
                       break;
                    case CXCursor_CaseStmt:
                    case CXCursor_DefaultStmt:
@@ -371,22 +404,18 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
                    case CXCursor_SEHTryStmt:
                    case CXCursor_SEHExceptStmt:
                    case CXCursor_SEHFinallyStmt:
-color = "stmt";
-//                      color = EDI_COLOR_FOREGROUND_KEYWORD_STMT;
+//                      color = EDI_COLOR_KEYWORD_STMT;
                       break;
                    default:
-color = "keyword";
-//                      color = EDI_COLOR_FOREGROUND_KEYWORD;
+                      color = EDI_COLOR_KEYWORD;
                       break;
                   }
                 break;
              case CXToken_Literal:
-color = "literal";
-//                color = EDI_COLOR_FOREGROUND_LITERAL;
+                color = EDI_COLOR_NUMBER;
                 break;
              case CXToken_Comment:
-color = "comment";
-//                color = EDI_COLOR_FOREGROUND_COMMENT;
+                color = EDI_COLOR_COMMENT;
                 break;
           }
 
@@ -434,19 +463,18 @@ _clang_load_errors(const char *path, Edi_Editor *editor)
 
         /* FIXME: Also handle ranges and fix suggestions. */
 
-        Edi_Color color = "";
-// EDI_COLOR_BACKGROUND_DEFAULT;
+        Edi_Color color = EDI_COLOR_BACKGROUND;
 
         switch (clang_getDiagnosticSeverity(diag))
           {
            case CXDiagnostic_Ignored:
-//              color = EDI_COLOR_BACKGROUND_SEVIRITY_IGNORED;
+              color = EDI_COLOR_SEVIRITY_IGNORED;
               break;
            case CXDiagnostic_Note:
-//              color = EDI_COLOR_BACKGROUND_SEVIRITY_NOTE;
+              color = EDI_COLOR_SEVIRITY_NOTE;
               break;
            case CXDiagnostic_Warning:
-//              color = EDI_COLOR_BACKGROUND_SEVIRITY_WARNING;
+              color = EDI_COLOR_SEVIRITY_WARNING;
               break;
            case CXDiagnostic_Error:
 //              color = EDI_COLOR_BACKGROUND_SEVIRITY_ERROR;

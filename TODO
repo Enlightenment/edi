@@ -7,12 +7,12 @@ This project is in heavy development, we are currenty working towards the
 * Search / replace in project / directory
 * Creation of new projects from name input and skeleton project files
 * Automatic code indenting / formatting
-* Syntax highlighting - from elm_code project (cedric and TAsn)
-* Code folding
+* Integrate elm_code project (cedric and TAsn)
+  - Code folding
+  - Code expansion (nested display of function call body)
 * Integrated console
 * notepad, emacs and vim and editing modes
 * Documentation finding
-* Code expansion (nested display of function call body)
 * Compilation error message integrated in the flow of code
 * Cross reference for c, c++ and some scripting language
 
