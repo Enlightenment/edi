@@ -23,7 +23,7 @@
 #define Edi_Color const char *
 
 static Edi_Color EDI_COLOR_FOREGROUND = "+ color=#ffffff";
-static Edi_Color EDI_COLOR_COMMENT = "+ color=#00B000";
+static Edi_Color EDI_COLOR_COMMENT = "+ color=#3399ff";
 static Edi_Color EDI_COLOR_STRING = "+ color=#ff3a35";
 static Edi_Color EDI_COLOR_NUMBER = "+ color=#D4D42A font_weight=Bold";
 static Edi_Color EDI_COLOR_BRACE = "+ color=#656565";
@@ -32,7 +32,7 @@ static Edi_Color EDI_COLOR_CLASS = "+ color=#72AAD4 font_weight=Bold";
 static Edi_Color EDI_COLOR_FUNCTION = "+ color=#72AAD4 font_weight=Bold";
 static Edi_Color EDI_COLOR_PARAM = "+ color=#ffffff";
 static Edi_Color EDI_COLOR_KEYWORD = "+ color=#ff9900 font_weight=Bold";
-static Edi_Color EDI_COLOR_PREPROCESSOR = "+ color=#3399ff font_weight=Bold";
+static Edi_Color EDI_COLOR_PREPROCESSOR = "+ color=#00B000 font_weight=Bold";
 
 static Edi_Color EDI_COLOR_BACKGROUND = "+ backing_color=#000000";
 static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "+ backing_color=#000000";
@@ -342,7 +342,12 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
         switch (clang_getTokenKind(tokens[i]))
           {
              case CXToken_Punctuation:
-                color = EDI_COLOR_BRACE;
+                if (i < n - 1 &&
+                    (clang_getTokenKind(tokens[i + 1]) == CXToken_Identifier && (cursors[i + 1].kind == CXCursor_MacroDefinition ||
+                    cursors[i + 1].kind == CXCursor_InclusionDirective || cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
+                  color = EDI_COLOR_PREPROCESSOR;
+                else
+                  color = EDI_COLOR_BRACE;
                 break;
              case CXToken_Identifier:
                 if (cursors[i].kind < CXCursor_FirstRef)
