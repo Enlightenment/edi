@@ -68,6 +68,16 @@ static void _edi_consolepanel_parse_directory(const char *line)
      }
 }
 
+static void _edi_consolepanel_scroll_to_bottom()
+{
+   Evas_Object *scroller;
+   Evas_Coord x, y, w, h;
+
+   scroller = elm_object_parent_widget_get(_console_box);
+   evas_object_geometry_get(_console_box, &x, &y, &w, &h);
+   elm_scroller_region_show(scroller, x, h - 10, w, 10);
+}
+
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    Evas_Object *txt, *icon, *box;
@@ -142,6 +152,7 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
    evas_object_show(box);
 
    elm_box_pack_end(_console_box, box);
+   _edi_consolepanel_scroll_to_bottom();
 }
 
 void edi_consolepanel_append_line(const char *line)
@@ -190,7 +201,6 @@ void edi_consolepanel_add(Evas_Object *parent)
    Evas_Object *scroll, *vbx;
 
    scroll = elm_scroller_add(parent);
-   elm_scroller_gravity_set(scroll, 0.0, 0.0);
    evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(scroll);
