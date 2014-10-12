@@ -5,10 +5,9 @@ This project is in heavy development, we are currenty working towards the
 * Redo changes that have been undone
 * Add a menu for easier access to some features
 * Search / replace in project / directory
-* Creation of new projects from name input and skeleton project files
-* Automatic code indenting / formatting
 * Integrate elm_code project (cedric and TAsn)
   - Code folding
+  - Automatic code indenting / formatting
   - Code expansion (nested display of function call body)
 * Integrated console
 * notepad, emacs and vim and editing modes
