@@ -51,6 +51,10 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
+#if HAVE_LIBCLANG
+Evas_Textblock_Cursor *_format_cursor;
+#endif
+
 static void
 _update_lines(Edi_Editor *editor);
 
@@ -272,29 +276,19 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
 }
 
+#if HAVE_LIBCLANG
 static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
 {
-   Evas_Object *textblock;
-   Evas_Textblock_Cursor *cur;
+   evas_textblock_cursor_line_set(_format_cursor, range.start.line - 1);
+   evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.start.col - 1);
+   evas_textblock_cursor_format_prepend(_format_cursor, color);
 
-   textblock = elm_entry_textblock_get(editor->entry);
-   cur = evas_object_textblock_cursor_new(textblock);
-
-   evas_textblock_cursor_line_set(cur, range.start.line - 1);
-   evas_textblock_cursor_pos_set(cur, evas_textblock_cursor_pos_get(cur) + range.start.col - 1);
-   evas_textblock_cursor_format_prepend(cur, color);
-   evas_textblock_cursor_free(cur);
-
-   cur = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_line_set(cur, range.end.line - 1);
-   evas_textblock_cursor_pos_set(cur, evas_textblock_cursor_pos_get(cur) + range.end.col - 1);
-   evas_textblock_cursor_format_prepend(cur, "+ color=#ffffff");
-
-   evas_textblock_cursor_free(cur);
+   evas_textblock_cursor_line_set(_format_cursor, range.end.line - 1);
+   evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.end.col - 1);
+   evas_textblock_cursor_format_append(_format_cursor, EDI_COLOR_FOREGROUND);
 }
 
-#if HAVE_LIBCLANG
 static void
 _clang_load_highlighting(const char *path, Edi_Editor *editor)
 {
@@ -342,7 +336,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
         switch (clang_getTokenKind(tokens[i]))
           {
              case CXToken_Punctuation:
-                if (i < n - 1 &&
+                if (i < n - 1 && range.start.col == 1 &&
                     (clang_getTokenKind(tokens[i + 1]) == CXToken_Identifier && (cursors[i + 1].kind == CXCursor_MacroDefinition ||
                     cursors[i + 1].kind == CXCursor_InclusionDirective || cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
                   color = EDI_COLOR_PREPROCESSOR;
@@ -504,6 +498,8 @@ _clang_load_errors(const char *path, Edi_Editor *editor)
 static void
 _edi_clang_setup(const char *path, Edi_Editor *editor)
 {
+   Evas_Object *textblock;
+
    /* Clang */
    /* FIXME: index should probably be global. */
    const char const *clang_argv[] = {"-I/usr/lib/clang/3.1/include/", "-Wall", "-Wextra"};
@@ -514,8 +510,11 @@ _edi_clang_setup(const char *path, Edi_Editor *editor)
    /* FIXME: Possibly activate more options? */
    editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
+   textblock = elm_entry_textblock_get(editor->entry);
+   _format_cursor = evas_object_textblock_cursor_new(textblock);
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
+   evas_textblock_cursor_free(_format_cursor);
 }
 
 static void
