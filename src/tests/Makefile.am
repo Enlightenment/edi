@@ -5,7 +5,6 @@ check_PROGRAMS = edi_suite
 
 edi_suite_SOURCES = \
 edi_test_path.c \
-edi_test_console.c \
 edi_suite.c
 
 edi_suite_CPPFLAGS = -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/bin/ \
