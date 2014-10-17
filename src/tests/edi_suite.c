@@ -14,7 +14,6 @@ static const struct {
    void (*build)(TCase *tc);
 } tests[] = {
   { "basic", edi_test_basic },
-  { "console", edi_test_console },
   { "path", edi_test_path }
 };
 
