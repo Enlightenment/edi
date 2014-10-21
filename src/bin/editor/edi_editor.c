@@ -22,22 +22,22 @@
 
 #define Edi_Color const char *
 
-static Edi_Color EDI_COLOR_FOREGROUND = "+ color=#ffffff";
-static Edi_Color EDI_COLOR_COMMENT = "+ color=#3399ff";
-static Edi_Color EDI_COLOR_STRING = "+ color=#ff3a35";
-static Edi_Color EDI_COLOR_NUMBER = "+ color=#D4D42A font_weight=Bold";
-static Edi_Color EDI_COLOR_BRACE = "+ color=#656565";
-static Edi_Color EDI_COLOR_TYPE = "+ color=#3399ff";
-static Edi_Color EDI_COLOR_CLASS = "+ color=#72AAD4 font_weight=Bold";
-static Edi_Color EDI_COLOR_FUNCTION = "+ color=#72AAD4 font_weight=Bold";
-static Edi_Color EDI_COLOR_PARAM = "+ color=#ffffff";
-static Edi_Color EDI_COLOR_KEYWORD = "+ color=#ff9900 font_weight=Bold";
-static Edi_Color EDI_COLOR_PREPROCESSOR = "+ color=#00B000";
+static Edi_Color EDI_COLOR_FOREGROUND = "<color=#ffffff>";
+static Edi_Color EDI_COLOR_COMMENT = "<color=#3399ff>";
+static Edi_Color EDI_COLOR_STRING = "<color=#ff3a35>";
+static Edi_Color EDI_COLOR_NUMBER = "<color=#D4D42A>";// font_weight=Bold";
+static Edi_Color EDI_COLOR_BRACE = "<color=#656565>";
+static Edi_Color EDI_COLOR_TYPE = "<color=#3399ff>";
+static Edi_Color EDI_COLOR_CLASS = "<color=#72AAD4>";// font_weight=Bold";
+static Edi_Color EDI_COLOR_FUNCTION = "<color=#72AAD4>";// font_weight=Bold";
+static Edi_Color EDI_COLOR_PARAM = "<color=#ffffff>";
+static Edi_Color EDI_COLOR_KEYWORD = "<color=#ff9900>";// font_weight=Bold";
+static Edi_Color EDI_COLOR_PREPROCESSOR = "<color=#00B000>";
 
-static Edi_Color EDI_COLOR_BACKGROUND = "+ backing_color=#000000";
-static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "+ backing_color=#000000";
-static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "+ backing_color=#ff9900";
-static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "+ backing_color=#ff9900";
+static Edi_Color EDI_COLOR_BACKGROUND = "+<backing_color=#000000>";
+static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
+static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
+static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
 
 typedef struct
 {
@@ -280,19 +280,13 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
 {
-   char *format;
-   format = strdup(color);
-
    evas_textblock_cursor_line_set(_format_cursor, range.start.line - 1);
    evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.start.col - 1);
-   evas_textblock_cursor_format_prepend(_format_cursor, format);
+   evas_textblock_cursor_format_prepend(_format_cursor, color);
 
-   format[0] = '-';
    evas_textblock_cursor_line_set(_format_cursor, range.end.line - 1);
    evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.end.col - 1);
-   evas_textblock_cursor_format_append(_format_cursor, format);
-
-   free(format);
+   evas_textblock_cursor_format_append(_format_cursor, "</color>");
 }
 
 static void
