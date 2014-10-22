@@ -2,6 +2,10 @@
 # include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "Edi.h"
 
 #include "edi_private.h"
@@ -58,13 +62,36 @@ edi_shutdown(void)
    return _edi_init;
 }
 
-EAPI void
+static Eina_Bool
+_edi_path_isdir(const char *path)
+{
+    struct stat buf;
+
+    if (!path)
+      return EINA_FALSE;
+
+    stat(path, &buf);
+    return S_ISDIR(buf.st_mode);
+}
+
+EAPI Eina_Bool
 edi_project_set(const char *path)
 {
+   char *real = NULL;
+
+   real = realpath(real, NULL);
+   if (!_edi_path_isdir(path))
+     {
+        free(real);
+        return EINA_FALSE;
+     }
+
    if (_edi_project_path)
      eina_stringshare_del(_edi_project_path);
 
    _edi_project_path = eina_stringshare_add(path);
+   free(real);
+   return EINA_TRUE;
 }
 
 EAPI const char *

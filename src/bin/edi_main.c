@@ -386,7 +386,11 @@ edi_open(const char *path)
    Evas_Object *win, *vbx, *content, *tb;
    const char *winname;
 
-   edi_project_set(path);
+   if (!edi_project_set(path))
+     {
+        fprintf(stderr, "Project path must be a directory\n");
+        return NULL;
+     }
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -481,7 +485,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    if (args < argc)
      {
-        project_path = realpath(argv[args], NULL);
+        project_path = argv[args];
      }
 
    elm_app_info_set(elm_main, "edi", "images/edi.png");

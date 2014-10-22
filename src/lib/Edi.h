@@ -2,6 +2,7 @@
 # define EDI_H_
 
 #include <Elementary.h>
+#include <Eina.h>
 
 #ifdef EAPI
 # undef EAPI
@@ -98,12 +99,15 @@ EAPI int edi_shutdown(void);
  * @{
  *
  * Set the current edi project that is loaded.
+ * Any directory is deemed a valid project.
  *
  * @param path The path to the current project being loaded.
+ * @return EINA_TRUE if the path represented a valid project,
+ *   EINA_FALSE otherwise
  *
  * @ingroup Main
  */
-EAPI void edi_project_set(const char *path);
+EAPI Eina_Bool edi_project_set(const char *path);
 
 /**
  * Get the current edi project that is loaded.
