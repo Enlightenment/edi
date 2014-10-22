@@ -34,7 +34,7 @@ static Edi_Color EDI_COLOR_FUNCTION = "<color=#72AAD4>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_KEYWORD = "<color=#ff9900>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_PREPROCESSOR = "<color=#00B000>";
 
-static Edi_Color EDI_COLOR_BACKGROUND = "+<backing_color=#000000>";
+static Edi_Color EDI_COLOR_BACKGROUND = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
 static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
