@@ -188,7 +188,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 
    it = elm_naviframe_item_simple_push(nf, content);
    elm_naviframe_item_style_set(it, "overlap");
-   tab = elm_toolbar_item_append(tb, NULL, basename(options->path), _promote, it);
+   tab = elm_toolbar_item_append(tb, NULL, basename((char*)options->path), _promote, it);
    item->view = it;
    item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
@@ -214,7 +214,7 @@ _edi_mainview_win_title_get(const char *path)
 {
    char *winname, *filename;
 
-   filename = basename(path);
+   filename = basename((char*)path);
    winname = malloc((8 + strlen(filename)) * sizeof(char));
    snprintf(winname, 8 + strlen(filename), "Edi :: %s", filename);
 
@@ -552,7 +552,7 @@ edi_mainview_goto(int line)
    Evas_Object *content;
    Elm_Object_Item *it;
    Edi_Editor *editor;
-   Evas_Object *tb;
+   Evas_Object *_tb;
    Evas_Textblock_Cursor *mcur;
    Evas_Coord x, y, w, h;
 
@@ -562,8 +562,8 @@ edi_mainview_goto(int line)
    if (!content || line <= 0)
      return;
 
-   tb = elm_entry_textblock_get(editor->entry);
-   mcur = evas_object_textblock_cursor_get(tb);
+   _tb = elm_entry_textblock_get(editor->entry);
+   mcur = evas_object_textblock_cursor_get(_tb);
 
    evas_textblock_cursor_line_set(mcur, line-1);
    elm_entry_cursor_geometry_get(editor->entry, &x, &y, &w, &h);

@@ -130,7 +130,7 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
 }
 
 static void
-_edi_welcome_project_new_create_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    const char *path, *name, *user, *email, *url;
    char script[PATH_MAX], fullpath[PATH_MAX];
