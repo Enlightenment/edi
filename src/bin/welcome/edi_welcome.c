@@ -8,6 +8,7 @@
 #include "edi_private.h"
 
 #include <stdlib.h>
+#include <sys/wait.h>
 
 #define _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH 4
 
@@ -151,7 +152,7 @@ _edi_welcome_project_new_create_cb(void *data, Evas_Object *obj EINA_UNUSED, voi
         execlp(script, script, fullpath, name, user, email, url, NULL);
         exit(0);
      }
-   wait(pid);
+   waitpid(pid, NULL, 0);
    _edi_welcome_project_open(fullpath);
 }
 
