@@ -24,17 +24,17 @@
 
 static Edi_Color EDI_COLOR_FOREGROUND = "<color=#ffffff>";
 static Edi_Color EDI_COLOR_COMMENT = "<color=#3399ff>";
-static Edi_Color EDI_COLOR_STRING = "<color=#ff3a35>";
+//static Edi_Color EDI_COLOR_STRING = "<color=#ff5a35>";
 static Edi_Color EDI_COLOR_NUMBER = "<color=#D4D42A>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_BRACE = "<color=#656565>";
 static Edi_Color EDI_COLOR_TYPE = "<color=#3399ff>";
 static Edi_Color EDI_COLOR_CLASS = "<color=#72AAD4>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_FUNCTION = "<color=#72AAD4>";// font_weight=Bold";
-static Edi_Color EDI_COLOR_PARAM = "<color=#ffffff>";
+//static Edi_Color EDI_COLOR_PARAM = "<color=#ffffff>";
 static Edi_Color EDI_COLOR_KEYWORD = "<color=#ff9900>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_PREPROCESSOR = "<color=#00B000>";
 
-static Edi_Color EDI_COLOR_BACKGROUND = "+<backing_color=#000000>";
+static Edi_Color EDI_COLOR_BACKGROUND = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
 static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
@@ -278,7 +278,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
 #if HAVE_LIBCLANG
 static void
-_edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
+_edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color color)
 {
    evas_textblock_cursor_line_set(_format_cursor, range.start.line - 1);
    evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.start.col - 1);
@@ -447,7 +447,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
 }
 
 static void
-_clang_load_errors(const char *path, Edi_Editor *editor)
+_clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
 {
    unsigned n = clang_getNumDiagnostics(editor->tx_unit);
    unsigned i = 0;
@@ -496,9 +496,12 @@ _clang_load_errors(const char *path, Edi_Editor *editor)
 }
 
 static void
-_edi_clang_setup(const char *path, Edi_Editor *editor)
+_edi_clang_setup(Edi_Editor *editor)
 {
    Evas_Object *textblock;
+   const char *path;
+
+   elm_entry_file_get(editor->entry, &path, NULL);
 
    /* Clang */
    /* FIXME: index should probably be global. */
@@ -517,13 +520,26 @@ _edi_clang_setup(const char *path, Edi_Editor *editor)
    evas_textblock_cursor_free(_format_cursor);
 }
 
+/*
 static void
 _edi_clang_dispose(Edi_Editor *editor)
 {
    clang_disposeTranslationUnit(editor->tx_unit);
    clang_disposeIndex(editor->idx);
 }
+*/
 #endif
+
+static void
+_text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSED)
+{
+   Edi_Editor *editor = (Edi_Editor *) data;
+
+#if HAVE_LIBCLANG
+   _edi_clang_setup(editor);
+#endif
+
+}
 
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -573,12 +589,6 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_entry_scrollable_set(txt, EINA_TRUE);
    elm_entry_line_wrap_set(txt, EINA_FALSE);
    elm_entry_text_style_user_push(txt, EDITOR_FONT);
-   elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
-   elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
-   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(txt);
-   elm_box_pack_end(box, txt);
 
    editor = calloc(1, sizeof(*editor));
    editor->entry = txt;
@@ -588,6 +598,16 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_smart_callback_add(txt, "changed,user", _changed_cb, editor);
    evas_object_smart_callback_add(txt, "scroll", _scroll_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
+   evas_object_smart_callback_add(txt, "text,set,done", _text_set_done, editor);
+
+   elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
+
+   elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
+   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(txt);
+   elm_box_pack_end(box, txt);
+
 
    edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);
@@ -605,10 +625,6 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
    evas_object_data_set(vbox, "editor", editor);
    _update_lines(editor);
-
-#if HAVE_LIBCLANG
-   _edi_clang_setup(item->path, editor);
-#endif
 
    return vbox;
 }

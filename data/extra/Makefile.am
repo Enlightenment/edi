@@ -4,7 +4,7 @@ skeletondir = $(datadir)/$(PACKAGE)/
 skeleton_DATA = 
 
 install-data-hook:
-	tar -xf skeleton.tar.gz -C $(skeletondir)
+	tar -xf $(srcdir)/skeleton.tar.gz -C $(skeletondir)
 
 uninstall-local:
 	rm -rf $(skeletondir)/skeleton
