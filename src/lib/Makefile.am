@@ -10,7 +10,10 @@ AM_CPPFLAGS = \
 
 lib_LTLIBRARIES = libedi.la
 
-includes_HEADERS = Edi.h
+includes_HEADERS = \
+edi_builder.h \
+edi_path.h \
+Edi.h
 includesdir = $(includedir)/edi-@VMAJ@
 
 libedi_la_SOURCES = \
