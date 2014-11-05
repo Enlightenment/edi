@@ -103,6 +103,7 @@ src/lib/Makefile
 src/tests/Makefile
 elm_code/Makefile
 elm_code/lib/Makefile
+elm_code/bin/Makefile
 elm_code/tests/Makefile
 doc/edi.1
 ])
