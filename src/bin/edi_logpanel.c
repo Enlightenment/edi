@@ -21,7 +21,8 @@ void print_cb(const Eina_Log_Domain *domain,
               EINA_UNUSED void *data,
               va_list args)
 {
-   unsigned int printed, buffer_len = 512;
+   Elm_Code_Line *code_line;
+   unsigned int printed, line_count, buffer_len = 512;
    char buffer [buffer_len];
 
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
@@ -29,12 +30,13 @@ void print_cb(const Eina_Log_Domain *domain,
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
 
    elm_code_file_line_append(_elm_code->file, buffer);
-/*
    if (level <= EINA_LOG_LEVEL_ERR)
-     evas_object_color_set(txt, 255, 63, 63, 255);
-   else
-     evas_object_color_set(txt, 255, 255, 255, 255);
-*/
+     {
+        line_count = elm_code_file_lines_get(_elm_code->file);
+        code_line = elm_code_file_line_get(_elm_code->file, line_count);
+
+        code_line->status = ELM_CODE_STATUS_TYPE_ERROR;
+     }
 }
 
 void edi_logpanel_add(Evas_Object *parent)
