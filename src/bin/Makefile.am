@@ -8,7 +8,7 @@ AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -I$(top_srcdir)/src/bin/ \
 -I$(top_srcdir)/elm_code/lib \
 -I$(top_builddir)/src/lib/ \
--I$(top_srcdir)/src/lib/ \
+-DEFL_BETA_API_SUPPORT \
 @EFL_CFLAGS@
 
 edi_SOURCES = \
