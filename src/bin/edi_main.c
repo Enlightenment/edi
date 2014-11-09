@@ -303,10 +303,10 @@ _tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
    evas_object_show(popup);
 }
 
-static void
-_tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+static Eina_Bool
+_edi_build_prep(Evas_Object *button)
 {
-   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(button), EINA_FALSE);
 
    edi_consolepanel_clear();
    edi_consolepanel_show();
@@ -314,11 +314,38 @@ _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
    if (!edi_builder_can_build())
      {
         edi_consolepanel_append_error_line("Cowardly refusing to build unknown project type.");
+        return EINA_FALSE;
      }
-   else
-     {
-        edi_builder_build();
-     }
+
+   return EINA_TRUE;
+}
+
+static void
+_tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   if (_edi_build_prep(obj))
+     edi_builder_build();
+}
+
+static void
+_tb_test_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   if (_edi_build_prep(obj))
+     edi_builder_test();
+}
+/*
+static void
+_tb_run_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   if (_edi_build_prep(obj))
+     edi_builder_run();
+}
+*/
+static void
+_tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   if (_edi_build_prep(obj))
+     edi_builder_clean();
 }
 
 static Evas_Object *
@@ -357,6 +384,9 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "emblem-default", "Test", _tb_test_cb, NULL);
+//   tb_it = elm_toolbar_item_append(tb, "player-play", "Run", _tb_run_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
 
    evas_object_show(tb);
    return tb;
