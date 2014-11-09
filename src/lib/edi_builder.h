@@ -45,6 +45,26 @@ EAPI void
 edi_builder_build(void);
 
 /**
+ * Run a test build for the current project.
+ *
+ * @see edi_builder_can_build().
+ *
+ * @ingroup Builder
+ */
+EAPI void
+edi_builder_test(void);
+
+/**
+ * Run a clean for the current project.
+ *
+ * @see edi_builder_can_build().
+ *
+ * @ingroup Builder
+ */
+EAPI void
+edi_builder_clean(void);
+
+/**
  * @}
  */
 

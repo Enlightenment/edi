@@ -40,7 +40,7 @@ _exe_del(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 
 static const Ecore_Getopt optdesc = {
   "edi_build",
-  "%prog [options]",
+  "%prog [options] [build-type]",
   PACKAGE_VERSION,
   COPYRIGHT,
   "BSD with advertisement clause",
@@ -59,7 +59,7 @@ EAPI_MAIN int
 main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 {
    int args;
-   char path[PATH_MAX];
+   char path[PATH_MAX], *build_type = NULL;
    Eina_Bool quit_option = EINA_FALSE;
 
    Ecore_Getopt_Value values[] = {
@@ -102,11 +102,26 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
         goto exit;
      }
 
+   if (args < argc)
+     build_type = argv[args];
+   if (!build_type)
+     build_type = "build";
+
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_del, NULL); 
 
-   edi_builder_build();
+   if (!strncmp("clean", build_type, 5))
+     edi_builder_clean();
+   else if (!strncmp("test", build_type, 4))
+     edi_builder_test();
+   else if (!strncmp("build", build_type, 5))
+     edi_builder_build();
+   else
+     {
+        fprintf(stderr, "Unrecognised build type - try build, test or clean.\n");
+        goto end;
+     }
    ecore_main_loop_begin();
 
    end:
