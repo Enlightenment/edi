@@ -411,16 +411,18 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
 }
 
 EAPI Evas_Object *
-edi_open(const char *path)
+edi_open(const char *inputpath)
 {
    Evas_Object *win, *vbx, *content, *tb;
    const char *winname;
+   char *path;
 
-   if (!edi_project_set(path))
+   if (!edi_project_set(inputpath))
      {
         fprintf(stderr, "Project path must be a directory\n");
         return NULL;
      }
+   path = realpath(inputpath, NULL);
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -451,6 +453,7 @@ edi_open(const char *path)
    evas_object_resize(win, 560 * elm_config_scale_get(), 420 * elm_config_scale_get());
    evas_object_show(win);
 
+   free(path);
    return win;
 }
 
