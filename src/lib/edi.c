@@ -79,7 +79,7 @@ edi_project_set(const char *path)
 {
    char *real = NULL;
 
-   real = realpath(real, NULL);
+   real = realpath(path, NULL);
    if (!_edi_path_isdir(path))
      {
         free(real);
@@ -89,7 +89,7 @@ edi_project_set(const char *path)
    if (_edi_project_path)
      eina_stringshare_del(_edi_project_path);
 
-   _edi_project_path = eina_stringshare_add(path);
+   _edi_project_path = eina_stringshare_add(real);
    free(real);
    return EINA_TRUE;
 }
