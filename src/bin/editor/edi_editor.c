@@ -24,7 +24,7 @@
 
 static Edi_Color EDI_COLOR_FOREGROUND = "<color=#ffffff>";
 static Edi_Color EDI_COLOR_COMMENT = "<color=#3399ff>";
-//static Edi_Color EDI_COLOR_STRING = "<color=#ff5a35>";
+static Edi_Color EDI_COLOR_STRING = "<color=#ff5a35>";
 static Edi_Color EDI_COLOR_NUMBER = "<color=#D4D42A>";// font_weight=Bold";
 static Edi_Color EDI_COLOR_BRACE = "<color=#656565>";
 static Edi_Color EDI_COLOR_TYPE = "<color=#3399ff>";
@@ -411,7 +411,10 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
                   }
                 break;
              case CXToken_Literal:
-                color = EDI_COLOR_NUMBER;
+                if (cursors[i].kind == CXCursor_StringLiteral || cursors[i].kind == CXCursor_CharacterLiteral)
+                  color = EDI_COLOR_STRING;
+                else
+                  color = EDI_COLOR_NUMBER;
                 break;
              case CXToken_Comment:
                 color = EDI_COLOR_COMMENT;
