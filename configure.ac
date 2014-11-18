@@ -34,6 +34,7 @@ PKG_CHECK_MODULES([EFL],
  evas >= 1.8.0
  ecore >= 1.8.0
  edje >= 1.8.0
+ eo >= 1.8.0
  elementary >= 1.8.0
  eio >= 1.8.0
 ])
@@ -101,6 +102,10 @@ src/Makefile
 src/bin/Makefile
 src/lib/Makefile
 src/tests/Makefile
+elm_code/Makefile
+elm_code/lib/Makefile
+elm_code/bin/Makefile
+elm_code/tests/Makefile
 doc/edi.1
 ])
 AC_OUTPUT

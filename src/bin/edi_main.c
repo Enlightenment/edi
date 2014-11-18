@@ -23,7 +23,7 @@
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
-static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel;
+static Evas_Object *_edi_filepanel, *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel;
 static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
 
 static void
@@ -58,6 +58,11 @@ void edi_consolepanel_show()
    elm_panel_hidden_set(_edi_consolepanel, EINA_FALSE);
 }
 
+void edi_testpanel_show()
+{
+   elm_panel_hidden_set(_edi_testpanel, EINA_FALSE);
+}
+
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
@@ -69,6 +74,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    _edi_filepanel = elm_panel_add(win);
    _edi_logpanel = elm_panel_add(win);
    _edi_consolepanel = elm_panel_add(win);
+   _edi_testpanel = elm_panel_add(win);
 
    // add main content
    content_out = elm_box_add(win);
@@ -119,6 +125,7 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    elm_toolbar_item_append(tb, NULL, "Logs", _edi_toggle_panel, _edi_logpanel);
    elm_toolbar_item_append(tb, NULL, "Console", _edi_toggle_panel, _edi_consolepanel);
+   elm_toolbar_item_append(tb, NULL, "Tests", _edi_toggle_panel, _edi_testpanel);
 
    elm_panel_orient_set(_edi_logpanel, ELM_PANEL_ORIENT_BOTTOM);
    evas_object_size_hint_weight_set(_edi_logpanel, EVAS_HINT_EXPAND, 0.15);
@@ -141,6 +148,17 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_consolepanel_add(_edi_consolepanel);
    elm_table_pack(panes, _edi_consolepanel, 0, 4, 6, 1);
    evas_object_show(_edi_consolepanel);
+
+   elm_panel_orient_set(_edi_testpanel, ELM_PANEL_ORIENT_BOTTOM);
+   evas_object_size_hint_weight_set(_edi_testpanel, EVAS_HINT_EXPAND, 0.15);
+   evas_object_size_hint_align_set(_edi_testpanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(_edi_testpanel);
+
+   elm_panel_hidden_set(_edi_testpanel, EINA_FALSE);
+   elm_panel_hidden_set(_edi_testpanel, EINA_TRUE);
+   edi_testpanel_add(_edi_testpanel);
+   elm_table_pack(panes, _edi_testpanel, 0, 4, 6, 1);
+   evas_object_show(_edi_testpanel);
 
    evas_object_show(panes);
    return panes;
@@ -304,12 +322,15 @@ _tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static Eina_Bool
-_edi_build_prep(Evas_Object *button)
+_edi_build_prep(Evas_Object *button, Eina_Bool test)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(button), EINA_FALSE);
 
    edi_consolepanel_clear();
-   edi_consolepanel_show();
+   if (test)
+     edi_testpanel_show();
+   else
+     edi_consolepanel_show();
 
    if (!edi_builder_can_build())
      {
@@ -323,28 +344,28 @@ _edi_build_prep(Evas_Object *button)
 static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj))
+   if (_edi_build_prep(obj, EINA_FALSE))
      edi_builder_build();
 }
 
 static void
 _tb_test_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj))
+   if (_edi_build_prep(obj, EINA_TRUE))
      edi_builder_test();
 }
 /*
 static void
 _tb_run_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj))
+   if (_edi_build_prep(obj, EINA_FALSE))
      edi_builder_run();
 }
 */
 static void
 _tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj))
+   if (_edi_build_prep(obj, EINA_FALSE))
      edi_builder_clean();
 }
 

@@ -6,6 +6,7 @@
 
 #include <Eina.h>
 #include <Ecore.h>
+#include <Elm_Code.h>
 #include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include <regex.h>
@@ -17,6 +18,13 @@
 
 static Evas_Object *_console_box;
 static const char *_current_dir = NULL;
+
+static int _edi_test_count;
+static int _edi_test_pass;
+static int _edi_test_fail;
+
+static Elm_Code *_edi_test_code;
+static void _edi_test_line_callback(const char *content);
 
 static const char *_edi_consolepanel_icon_for_line(const char *line)
 {
@@ -153,6 +161,8 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 
    elm_box_pack_end(_console_box, box);
    _edi_consolepanel_scroll_to_bottom();
+
+   _edi_test_line_callback(line);
 }
 
 void edi_consolepanel_append_line(const char *line)
@@ -168,6 +178,11 @@ void edi_consolepanel_append_error_line(const char *line)
 void edi_consolepanel_clear()
 {
    elm_box_clear(_console_box);
+
+   elm_code_file_clear(_edi_test_code->file);
+   _edi_test_count = 0;
+   _edi_test_pass = 0;
+   _edi_test_fail = 0;
 }
 
 static Eina_Bool
@@ -196,6 +211,87 @@ _exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
    return ECORE_CALLBACK_RENEW;
 }
 
+static void _edi_test_append(const char *content, Elm_Code_Status_Type type)
+{
+   elm_code_file_line_append(_edi_test_code->file, content);
+   elm_code_file_line_status_set(_edi_test_code->file, elm_code_file_lines_get(_edi_test_code->file), type);
+}
+
+static void _edi_test_line_parse_suite(const char *path)
+{
+   Eina_File *file;
+   Eina_File_Line *line;
+   Eina_Iterator *it;
+   char logfile[PATH_MAX], *tmp;
+   int pathlength;
+   Elm_Code_Status_Type status;
+
+   pathlength = strlen(path);
+   snprintf(logfile, pathlength + 4 + 1, "%s.log", path);
+
+   file = eina_file_open(logfile, EINA_FALSE);
+
+   it = eina_file_map_lines(file);
+   EINA_ITERATOR_FOREACH(it, line)
+     {
+        status = ELM_CODE_STATUS_TYPE_DEFAULT;
+        tmp = malloc(line->length + 1);
+        strncpy(tmp, line->start, line->length);
+        tmp[line->length] = 0;
+
+        if (strstr(tmp, ":P:"))
+           status = ELM_CODE_STATUS_TYPE_PASSED;
+        else if (strstr(tmp, ":F:"))
+           status = ELM_CODE_STATUS_TYPE_FAILED;
+
+        _edi_test_append(tmp, status);
+        free(tmp);
+     }
+   eina_iterator_free(it);
+}
+
+static void _edi_test_line_parse_suite_pass_line(const char *line)
+{
+   _edi_test_line_parse_suite(line);
+   _edi_test_append("Suite passed", ELM_CODE_STATUS_TYPE_DEFAULT);
+}
+
+static void _edi_test_line_parse_suite_fail_line(const char *line)
+{
+   _edi_test_line_parse_suite(line);
+   _edi_test_append("Suite failed", ELM_CODE_STATUS_TYPE_DEFAULT);
+}
+
+static void _edi_test_line_parse_summary_line(const char *line)
+{
+   _edi_test_append(line, ELM_CODE_STATUS_TYPE_DEFAULT);
+}
+
+static void _edi_test_line_callback(const char *content)
+{
+   if (!content)
+     return;
+
+   if (content[0] == '#')
+     {
+        _edi_test_line_parse_summary_line(content + 2);
+        return;
+     }
+
+   if (!strncmp(content, "PASS:", 5))
+     {
+        _edi_test_count++;
+        _edi_test_pass++;
+        _edi_test_line_parse_suite_pass_line(content + 6);
+     }
+   else if (!strncmp(content, "FAIL:", 5))
+     {
+        _edi_test_count++;
+        _edi_test_fail++;
+        _edi_test_line_parse_suite_fail_line(content + 6);
+     }
+}
+
 void edi_consolepanel_add(Evas_Object *parent)
 {
    Evas_Object *scroll, *vbx;
@@ -217,3 +313,22 @@ void edi_consolepanel_add(Evas_Object *parent)
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
 }
+
+void edi_testpanel_add(Evas_Object *parent)
+{
+   Elm_Code *code;
+   Evas_Object *widget;
+
+   code = elm_code_create();
+   _edi_test_code = code;
+   elm_code_file_new(code);
+
+   widget = elm_code_widget_add(parent, code);
+
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
+
+   elm_object_content_set(parent, widget);
+}
+

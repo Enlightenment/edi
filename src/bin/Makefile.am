@@ -6,8 +6,9 @@ bin_PROGRAMS = edi edi_build
 AM_CPPFLAGS = -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -I$(top_builddir)/src/bin/ \
 -I$(top_srcdir)/src/bin/ \
+-I$(top_srcdir)/elm_code/lib \
 -I$(top_builddir)/src/lib/ \
--I$(top_srcdir)/src/lib/ \
+-DEFL_BETA_API_SUPPORT \
 @EFL_CFLAGS@
 
 edi_SOURCES = \
@@ -21,7 +22,7 @@ mainview/edi_mainview_item.c \
 mainview/edi_mainview.c \
 edi_main.c
 
-edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la
+edi_LDADD = @EFL_LIBS@ $(top_builddir)/elm_code/lib/libelm_code.la $(top_builddir)/src/lib/libedi.la
 
 edi_build_SOURCES = \
 edi_build_main.c

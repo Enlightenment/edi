@@ -3,12 +3,14 @@
 #endif
 
 #include <Eina.h>
+#include <Elm_Code.h>
 
 #include "edi_logpanel.h"
 
 #include "edi_private.h"
 
-static Evas_Object *_info_box;
+static Evas_Object *_info_widget;
+static Elm_Code *_elm_code;
 
 void print_cb(const Eina_Log_Domain *domain,
               Eina_Log_Level level,
@@ -19,47 +21,39 @@ void print_cb(const Eina_Log_Domain *domain,
               EINA_UNUSED void *data,
               va_list args)
 {
-   Evas_Object *txt;
-   unsigned int printed, buffer_len = 512;
+   unsigned int printed, line_count, buffer_len = 512;
    char buffer [buffer_len];
 
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
 
-   txt = elm_label_add(_info_box);
+   elm_code_file_line_append(_elm_code->file, buffer);
    if (level <= EINA_LOG_LEVEL_ERR)
-     evas_object_color_set(txt, 255, 63, 63, 255);
-   else
-     evas_object_color_set(txt, 255, 255, 255, 255);
+     {
+        line_count = elm_code_file_lines_get(_elm_code->file);
 
-   elm_object_text_set(txt, buffer);
-   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, 0.1);
-   evas_object_size_hint_align_set(txt, 0.0, EVAS_HINT_FILL);
-   evas_object_show(txt);
-
-   elm_box_pack_end(_info_box, txt);
+        elm_code_file_line_status_set(_elm_code->file, line_count, ELM_CODE_STATUS_TYPE_ERROR);
+     }
 }
 
 void edi_logpanel_add(Evas_Object *parent)
 {
-   Evas_Object *scroll, *vbx;
+   Evas_Object *widget;
+   Elm_Code *code;
 
-   scroll = elm_scroller_add(parent);
-   elm_scroller_gravity_set(scroll, 0.0, 0.0);
-   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(scroll);
+   code = elm_code_create();
+   elm_code_file_new(code);
+   widget = elm_code_widget_add(parent, code);
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
 
-   vbx = elm_box_add(parent);
-   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_show(vbx);
-   elm_object_content_set(scroll, vbx);
-
-   _info_box = vbx;
+   _elm_code = code;
+   _info_widget = widget;
 
    eina_log_print_cb_set(print_cb, NULL);
    eina_log_color_disable_set(EINA_TRUE);
 
-   elm_object_content_set(parent, scroll);
+   elm_object_content_set(parent, widget);
 }

@@ -29,7 +29,7 @@ MAINTAINERCLEANFILES = \
 	$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz \
 	$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.bz2
 
-SUBDIRS = data doc packaging po src
+SUBDIRS = data doc packaging po elm_code src
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -73,7 +73,7 @@ endif
 
 if EFL_HAVE_TESTS
 
-TESTS = src/tests/edi_suite
+TESTS = elm_code/tests/elm_code_suite src/tests/edi_suite
 
 lcov-check:
 if EFL_HAVE_LCOV
