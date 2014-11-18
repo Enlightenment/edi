@@ -38,6 +38,10 @@ EAPI void edi_consolepanel_add(Evas_Object *parent);
  */
 EAPI void edi_consolepanel_show();
 
+EAPI void edi_testpanel_add(Evas_Object *parent);
+
+EAPI void edi_testpanel_show();
+
 /**
  * @}
  */
