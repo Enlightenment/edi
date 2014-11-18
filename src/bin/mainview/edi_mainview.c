@@ -559,7 +559,7 @@ edi_mainview_goto(int line)
    it = elm_naviframe_top_item_get(nf);
    content = elm_object_item_content_get(it);
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
-   if (!content || line <= 0)
+   if (!content || !editor || line <= 0)
      return;
 
    _tb = elm_entry_textblock_get(editor->entry);
