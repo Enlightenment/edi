@@ -28,7 +28,7 @@ void print_cb(const Eina_Log_Domain *domain,
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
 
-   elm_code_file_line_append(_elm_code->file, buffer);
+   elm_code_file_line_append(_elm_code->file, buffer, strlen(buffer));
    if (level <= EINA_LOG_LEVEL_ERR)
      {
         line_count = elm_code_file_lines_get(_elm_code->file);
