@@ -6,6 +6,7 @@
 
 #include <Eina.h>
 #include <Eio.h>
+#include <Elm_Code.h>
 
 #include "mainview/edi_mainview_item.h"
 #include "mainview/edi_mainview.h"
@@ -160,6 +161,19 @@ _edi_mainview_content_image_create(Edi_Mainview_Item *item, Evas_Object *parent)
 }
 
 static Evas_Object *
+_edi_mainview_content_diff_create(Edi_Mainview_Item *item, Evas_Object *parent)
+{
+   Elm_Code *code;
+   Evas_Object *diff;
+
+   code = elm_code_create();
+   elm_code_file_open(code, item->path);
+   diff = elm_code_diff_widget_add(parent, code);
+
+   return diff;
+}
+
+static Evas_Object *
 _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 {
    if (!strcmp(item->editortype, "text"))
@@ -169,6 +183,10 @@ _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
    else if (!strcmp(item->editortype, "image"))
      {
         return _edi_mainview_content_image_create(item, parent);
+     }
+   else if (!strcmp(item->editortype, "diff"))
+     {
+        return _edi_mainview_content_diff_create(item, parent);
      }
 
    return NULL;
@@ -320,6 +338,8 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
      options->type = "text"; // TODO make a code view
    else if (!strncasecmp(mime, "image/", 6))
      options->type = "image";
+   else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))
+     options->type = "diff";
    else
      {
         _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_tab_cb);
