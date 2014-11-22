@@ -133,9 +133,11 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    filepane = elm_panes_add(win);
    evas_object_size_hint_weight_set(filepane, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   logpane = elm_panes_add(filepane);
+   evas_object_size_hint_align_set(filepane, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   logpane = elm_panes_add(win);
    elm_panes_horizontal_set(logpane, EINA_TRUE);
    evas_object_size_hint_weight_set(logpane, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(logpane, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    _edi_filepanel = elm_box_add(win);
    _edi_logpanel = elm_box_add(win);
@@ -145,7 +147,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    // add main content
    content_out = elm_box_add(win);
    elm_box_horizontal_set(content_out, EINA_FALSE);
-   evas_object_size_hint_weight_set(content_out, 0.8, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(content_out, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content_out, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    content_in = elm_box_add(content_out);
@@ -166,13 +168,13 @@ edi_content_setup(Evas_Object *win, const char *path)
    elm_box_pack_end(content_in, button);
    evas_object_show(button);
 
-   elm_box_pack_end(content_out, content_in);
    edi_mainview_add(content_in, win);
    evas_object_show(content_in);
+   elm_object_part_content_set(filepane, "right", content_in);
+   elm_box_pack_end(content_out, filepane);
 
-   elm_object_part_content_set(filepane, "right", content_out);
-   elm_object_part_content_set(logpane, "top", filepane);
-   evas_object_show(logpane);
+   elm_object_part_content_set(logpane, "top", content_out);
+   evas_object_show(filepane);
    _edi_leftpanes = filepane;
 
    // add file list
