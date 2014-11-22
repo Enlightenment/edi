@@ -211,10 +211,29 @@ _exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
    return ECORE_CALLBACK_RENEW;
 }
 
-static void _edi_test_append(const char *content, Elm_Code_Status_Type type)
+static void _edi_test_append(const char *content, int length, Elm_Code_Status_Type type)
 {
-   elm_code_file_line_append(_edi_test_code->file, content);
+   elm_code_file_line_append(_edi_test_code->file, content, length);
    elm_code_file_line_status_set(_edi_test_code->file, elm_code_file_lines_get(_edi_test_code->file), type);
+}
+
+static  Eina_Bool _edi_test_line_contains(const char *start, unsigned int length, const char *needle)
+{
+   unsigned int needlelen, c;
+   char *ptr;
+
+   ptr = (char *) start;
+   needlelen = strlen(needle);
+
+   for (c = 0; c < length - strlen(needle); c++)
+     {
+        if (!strncmp(ptr, needle, needlelen))
+           return EINA_TRUE;
+
+        ptr++;
+     }
+
+   return EINA_FALSE;
 }
 
 static void _edi_test_line_parse_suite(const char *path)
@@ -222,7 +241,7 @@ static void _edi_test_line_parse_suite(const char *path)
    Eina_File *file;
    Eina_File_Line *line;
    Eina_Iterator *it;
-   char logfile[PATH_MAX], *tmp;
+   char logfile[PATH_MAX];
    int pathlength;
    Elm_Code_Status_Type status;
 
@@ -235,36 +254,33 @@ static void _edi_test_line_parse_suite(const char *path)
    EINA_ITERATOR_FOREACH(it, line)
      {
         status = ELM_CODE_STATUS_TYPE_DEFAULT;
-        tmp = malloc(line->length + 1);
-        strncpy(tmp, line->start, line->length);
-        tmp[line->length] = 0;
 
-        if (strstr(tmp, ":P:"))
+        if (_edi_test_line_contains(line->start, line->length, ":P:"))
            status = ELM_CODE_STATUS_TYPE_PASSED;
-        else if (strstr(tmp, ":F:"))
+        else if (_edi_test_line_contains(line->start, line->length, ":F:"))
            status = ELM_CODE_STATUS_TYPE_FAILED;
 
-        _edi_test_append(tmp, status);
-        free(tmp);
+        _edi_test_append(line->start, line->length, status);
      }
    eina_iterator_free(it);
+   eina_file_close(file);
 }
 
 static void _edi_test_line_parse_suite_pass_line(const char *line)
 {
    _edi_test_line_parse_suite(line);
-   _edi_test_append("Suite passed", ELM_CODE_STATUS_TYPE_DEFAULT);
+   _edi_test_append("Suite passed", 13, ELM_CODE_STATUS_TYPE_DEFAULT);
 }
 
 static void _edi_test_line_parse_suite_fail_line(const char *line)
 {
    _edi_test_line_parse_suite(line);
-   _edi_test_append("Suite failed", ELM_CODE_STATUS_TYPE_DEFAULT);
+   _edi_test_append("Suite failed", 13, ELM_CODE_STATUS_TYPE_DEFAULT);
 }
 
 static void _edi_test_line_parse_summary_line(const char *line)
 {
-   _edi_test_append(line, ELM_CODE_STATUS_TYPE_DEFAULT);
+   _edi_test_append(line, strlen(line), ELM_CODE_STATUS_TYPE_DEFAULT);
 }
 
 static void _edi_test_line_callback(const char *content)
