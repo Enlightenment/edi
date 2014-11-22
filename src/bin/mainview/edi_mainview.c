@@ -169,6 +169,7 @@ _edi_mainview_content_diff_create(Edi_Mainview_Item *item, Evas_Object *parent)
    code = elm_code_create();
    elm_code_file_open(code, item->path);
    diff = elm_code_diff_widget_add(parent, code);
+   elm_code_diff_widget_font_size_set(diff, 12);
 
    return diff;
 }
