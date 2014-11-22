@@ -324,7 +324,7 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    _console_box = vbx;
 
-   elm_object_content_set(parent, scroll);
+   elm_box_pack_end(parent, scroll);
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
@@ -345,6 +345,6 @@ void edi_testpanel_add(Evas_Object *parent)
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
 
-   elm_object_content_set(parent, widget);
+   elm_box_pack_end(parent, widget);
 }
 
