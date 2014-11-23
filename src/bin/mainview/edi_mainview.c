@@ -169,6 +169,7 @@ _edi_mainview_content_diff_create(Edi_Mainview_Item *item, Evas_Object *parent)
    code = elm_code_create();
    elm_code_file_open(code, item->path);
    diff = elm_code_diff_widget_add(parent, code);
+   elm_code_diff_widget_font_size_set(diff, 12);
 
    return diff;
 }
@@ -366,6 +367,8 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
      options->type = "text"; // TODO make a code view
    else if (!strncasecmp(mime, "image/", 6))
      options->type = "image";
+   else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))
+     options->type = "diff";
    else
      {
         _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_win_cb);
