@@ -66,7 +66,7 @@ static void _edi_consolepanel_parse_directory(const char *line)
 {
    const char *pos;
 
-   pos = strstr(line, "Entering directory '");
+   pos = strstr(line, "Entering directory `");
    if (pos) 
      {
         if (_current_dir)
