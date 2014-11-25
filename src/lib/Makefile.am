@@ -6,7 +6,7 @@ AM_CPPFLAGS = \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 @EFL_CFLAGS@ \
--DEFL_EFL_BUILD
+-DEFL_EDI_BUILD
 
 lib_LTLIBRARIES = libedi.la
 
@@ -21,4 +21,4 @@ edi_path.c \
 edi_builder.c \
 edi.c
 libedi_la_LIBADD = @EFL_LIBS@ -lm
-libedi_la_LDFLAGS = @EFL_LTLIBRARY_FLAGS@
+libedi_la_LDFLAGS = -no-undefined @EFL_LTLIBRARY_FLAGS@
