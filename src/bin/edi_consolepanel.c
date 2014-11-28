@@ -337,7 +337,6 @@ void edi_testpanel_add(Evas_Object *parent)
 
    code = elm_code_create();
    _edi_test_code = code;
-   elm_code_file_new(code);
 
    widget = elm_code_widget_add(parent, code);
    elm_code_widget_font_size_set(widget, 12);

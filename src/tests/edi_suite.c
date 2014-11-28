@@ -14,7 +14,8 @@ static const struct {
    void (*build)(TCase *tc);
 } tests[] = {
   { "basic", edi_test_basic },
-  { "path", edi_test_path }
+  { "path", edi_test_path },
+  { "content_provider", edi_test_content_provider }
 };
 
 START_TEST(edi_initialization)

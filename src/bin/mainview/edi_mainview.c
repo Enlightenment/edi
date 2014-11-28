@@ -12,6 +12,7 @@
 #include "mainview/edi_mainview.h"
 
 #include "editor/edi_editor.h"
+#include "edi_content_provider.h"
 
 #include "edi_private.h"
 
@@ -143,54 +144,15 @@ _edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item
 }
 
 static Evas_Object *
-_edi_mainview_content_image_create(Edi_Mainview_Item *item, Evas_Object *parent)
-{
-   Evas_Object *img, *scroll;
-
-   scroll = elm_scroller_add(parent);
-   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(scroll);
-   img = elm_image_add(scroll);
-   elm_image_file_set(img, item->path, NULL);
-   elm_image_no_scale_set(img, EINA_TRUE);
-   elm_object_content_set(scroll, img);
-   evas_object_show(img);
-
-   return scroll;
-}
-
-static Evas_Object *
-_edi_mainview_content_diff_create(Edi_Mainview_Item *item, Evas_Object *parent)
-{
-   Elm_Code *code;
-   Evas_Object *diff;
-
-   code = elm_code_create();
-   elm_code_file_open(code, item->path);
-   diff = elm_code_diff_widget_add(parent, code);
-   elm_code_diff_widget_font_size_set(diff, 12);
-
-   return diff;
-}
-
-static Evas_Object *
 _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 {
-   if (!strcmp(item->editortype, "text"))
-     {
-        return edi_editor_add(parent, item);
-     }
-   else if (!strcmp(item->editortype, "image"))
-     {
-        return _edi_mainview_content_image_create(item, parent);
-     }
-   else if (!strcmp(item->editortype, "diff"))
-     {
-        return _edi_mainview_content_diff_create(item, parent);
-     }
+   Edi_Content_Provider *provider;
 
-   return NULL;
+   provider = edi_content_provider_for_id_get(item->editortype);
+   if (!provider)
+     return NULL;
+
+   return provider->content_ui_add(parent, item);
 }
 
 static void
@@ -326,6 +288,7 @@ static void
 _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
    Edi_Path_Options *options;
+   Edi_Content_Provider *provider;
    const char *mime;
 
    options = data;
@@ -333,20 +296,14 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
      return;
 
    mime = efreet_mime_type_get(options->path);
-   if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
-     options->type = "text";
-   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
-     options->type = "text"; // TODO make a code view
-   else if (!strncasecmp(mime, "image/", 6))
-     options->type = "image";
-   else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))
-     options->type = "diff";
-   else
+   provider = edi_content_provider_for_mime_get(mime);
+   if (!provider)
      {
         _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_tab_cb);
         return;
      }
 
+   options->type = provider->id;
    _edi_mainview_item_tab_add(options, mime);
 }
 
@@ -354,6 +311,7 @@ static void
 _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
 {
    Edi_Path_Options *options;
+   Edi_Content_Provider *provider;
    const char *mime;
 
    options = data;
@@ -361,20 +319,14 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
      return;
 
    mime = efreet_mime_type_get(options->path);
-   if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
-     options->type = "text";
-   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
-     options->type = "text"; // TODO make a code view
-   else if (!strncasecmp(mime, "image/", 6))
-     options->type = "image";
-   else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))
-     options->type = "diff";
-   else
+   provider = edi_content_provider_for_mime_get(mime);
+   if (!provider)
      {
         _edi_mainview_choose_type(nf, options, _edi_mainview_choose_type_win_cb);
         return;
      }
 
+   options->type = provider->id;
    _edi_mainview_item_win_add(options, mime);
 }
 
