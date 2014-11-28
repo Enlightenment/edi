@@ -43,7 +43,6 @@ void edi_logpanel_add(Evas_Object *parent)
    Elm_Code *code;
 
    code = elm_code_create();
-   elm_code_file_new(code);
    widget = elm_code_widget_add(parent, code);
    elm_code_widget_font_size_set(widget, 12);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
