@@ -59,7 +59,8 @@ edi_mainview_item_prev()
      {
         if (it && it->view == current)
           {
-             edi_mainview_item_select(prev);
+             if (prev)
+               edi_mainview_item_select(prev);
              return;
           }
 
