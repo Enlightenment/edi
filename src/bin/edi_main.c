@@ -82,6 +82,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 
    panel = (Evas_Object *) data;
    item = (Elm_Object_Item *) event_info;
+
    if (obj)
      elm_object_focus_set(obj, EINA_FALSE);
 
@@ -95,7 +96,6 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
         elm_panes_content_right_size_set(_edi_bottompanes, 0.0);
 
         _edi_selected_bottompanel = NULL;
-        elm_toolbar_item_selected_set(item, EINA_FALSE);
      }
    else
      {
@@ -112,7 +112,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
         _edi_selected_bottompanel = item;
         elm_toolbar_item_selected_set(item, EINA_TRUE);
      }
-   elm_toolbar_select_mode_set(obj, ELM_OBJECT_SELECT_MODE_ALWAYS);
+   elm_toolbar_item_selected_set(item, EINA_FALSE);
 }
 
 void edi_consolepanel_show()
