@@ -21,6 +21,15 @@
 
 #include "edi_private.h"
 
+typedef struct _Edi_Panel_Slide_Effect
+{
+   double max;
+   Evas_Object *content;
+
+   Eina_Bool expand;
+   Eina_Bool left;
+} Edi_Panel_Slide_Effect;
+
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_leftpanes, *_edi_bottompanes;
@@ -51,6 +60,68 @@ _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 }
 
 static void
+_edi_slide_panel(Elm_Transit_Effect *effect, Elm_Transit *transit, double progress)
+{
+   Edi_Panel_Slide_Effect *slide;
+   Evas_Object *obj;
+   double weight;
+   const Eina_List *item;
+   const Eina_List *objs;
+
+   if (!effect) return;
+   slide = (Edi_Panel_Slide_Effect *)effect;
+   objs = elm_transit_objects_get(transit);
+
+   if (slide->expand)
+     weight = progress * slide->max;
+   else
+     weight = (1 - progress) * slide->max;
+
+   if (slide->left)
+     EINA_LIST_FOREACH(objs, item, obj)
+        elm_panes_content_left_size_set(obj, weight);
+   else
+     EINA_LIST_FOREACH(objs, item, obj)
+        elm_panes_content_right_size_set(obj, weight);
+}
+
+static void
+_edi_slide_panel_free(Elm_Transit_Effect *effect, Elm_Transit *transit EINA_UNUSED)
+{
+   Edi_Panel_Slide_Effect *slide;
+
+   slide = (Edi_Panel_Slide_Effect *) effect;
+   if (!slide->expand)
+     evas_object_hide(slide->content);
+   free(slide);
+}
+
+static void
+_edi_slide_panel_new(Evas_Object *panel, Evas_Object *content, double max,
+                     Eina_Bool expand, Eina_Bool left)
+{
+   Edi_Panel_Slide_Effect *slide;
+   Elm_Transit *trans;
+
+   slide = malloc(sizeof(Edi_Panel_Slide_Effect));
+   slide->max = max;
+   slide->content = content;
+   slide->expand = expand;
+   slide->left = left;
+
+   if (slide->expand)
+     evas_object_show(slide->content);
+
+   /* Adding Transit */
+   trans = elm_transit_add();
+   elm_transit_tween_mode_set(trans, ELM_TRANSIT_TWEEN_MODE_DECELERATE);
+   elm_transit_object_add(trans, panel);
+   elm_transit_effect_add(trans, _edi_slide_panel, slide, _edi_slide_panel_free);
+   elm_transit_duration_set(trans, 0.5);
+   elm_transit_go(trans);
+}
+
+static void
 _edi_toggle_file_panel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *panel;
@@ -61,15 +132,13 @@ _edi_toggle_file_panel(void *data, Evas_Object *obj EINA_UNUSED, void *event_inf
 
    if (size == 0.0)
      {
-        evas_object_show(panel);
         elm_icon_standard_set(_edi_filepanel_icon, "stock_left");
-        elm_panes_content_left_size_set(_edi_leftpanes, 0.25);
+        _edi_slide_panel_new(_edi_leftpanes, panel, 0.25, EINA_TRUE, EINA_TRUE);
      }
    else
      {
         elm_icon_standard_set(_edi_filepanel_icon, "stock_right");
-        elm_panes_content_left_size_set(_edi_leftpanes, 0.0);
-        evas_object_hide(panel);
+        _edi_slide_panel_new(_edi_leftpanes, panel, 0.25, EINA_FALSE, EINA_TRUE);
      }
 }
 
@@ -86,31 +155,33 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
    if (obj)
      elm_object_focus_set(obj, EINA_FALSE);
 
-   evas_object_hide(_edi_logpanel);
-   evas_object_hide(_edi_consolepanel);
-   evas_object_hide(_edi_testpanel);
+   if (panel != _edi_logpanel)
+     evas_object_hide(_edi_logpanel);
+   if (panel != _edi_consolepanel)
+     evas_object_hide(_edi_consolepanel);
+   if (panel != _edi_testpanel)
+     evas_object_hide(_edi_testpanel);
 
    if (item == _edi_selected_bottompanel)
      {
         elm_toolbar_item_icon_set(item, "stock_up");
-        elm_panes_content_right_size_set(_edi_bottompanes, 0.0);
 
+        _edi_slide_panel_new(_edi_bottompanes, panel, 0.2, EINA_FALSE, EINA_FALSE);
         _edi_selected_bottompanel = NULL;
      }
    else
      {
         if (_edi_selected_bottompanel)
           elm_toolbar_item_icon_set(_edi_selected_bottompanel, "stock_up");
-
         elm_toolbar_item_icon_set(item, "stock_down");
-        evas_object_show(panel);
 
         size = elm_panes_content_right_size_get(_edi_bottompanes);
         if (size == 0.0)
-          elm_panes_content_right_size_set(_edi_bottompanes, 0.2);
+          _edi_slide_panel_new(_edi_bottompanes, panel, 0.2, EINA_TRUE, EINA_FALSE);
+        else
+          evas_object_show(panel);
 
         _edi_selected_bottompanel = item;
-        elm_toolbar_item_selected_set(item, EINA_TRUE);
      }
    elm_toolbar_item_selected_set(item, EINA_FALSE);
 }
