@@ -117,12 +117,14 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 
 void edi_consolepanel_show()
 {
-   elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
+   if (_edi_selected_bottompanel != _edi_consolepanel_item)
+     elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
 }
 
 void edi_testpanel_show()
 {
-   elm_toolbar_item_selected_set(_edi_testpanel_item, EINA_TRUE);
+   if (_edi_selected_bottompanel != _edi_testpanel_item)
+     elm_toolbar_item_selected_set(_edi_testpanel_item, EINA_TRUE);
 }
 
 static Evas_Object *
