@@ -113,11 +113,19 @@ _edi_editor_search_hide(Edi_Editor *editor)
    Edi_Editor_Search *search;
 
    search = editor->search;
-   if (search && eina_list_data_find(elm_box_children_get(search->parent), search->widget))
+   if (!search)
+     return;
+
+   if (eina_list_data_find(elm_box_children_get(search->parent), search->widget))
      {
         evas_object_hide(search->widget);
         elm_box_unpack(search->parent, search->widget);
      }
+
+   if (search->current_search)
+     evas_textblock_cursor_free(search->current_search);
+   search->current_search = NULL;
+   elm_entry_select_none(editor->entry);
 }
 
 EAPI void
@@ -131,10 +139,12 @@ edi_editor_search(Edi_Editor *editor)
         evas_object_show(search->widget);
         elm_box_pack_end(search->parent, search->widget);
      }
+
+   elm_object_focus_set(search->entry, EINA_TRUE);
 }
 
 static void
-_search_clicked(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_search_clicked(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Editor *editor;
    Edi_Editor_Search *search;
@@ -151,6 +161,33 @@ _cancel_clicked(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_
 {
    _edi_editor_search_hide((Edi_Editor *)data);
 }
+
+static void
+_search_key_up_cb(void *data , Evas *e EINA_UNUSED, Evas_Object *obj,
+                  void *event_info)
+{
+   Edi_Editor *editor;
+   Edi_Editor_Search *search;
+   Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *)event_info;
+   const char *str;
+
+   editor = (Edi_Editor *)data;
+   search = editor->search;
+
+   str = elm_object_text_get(obj);
+
+   if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
+     _search_clicked(data, NULL, NULL);
+   else if (!strcmp(ev->key, "Escape"))
+     _cancel_clicked(data, NULL, NULL);
+   else
+     {
+        if (search->current_search)
+          evas_textblock_cursor_free(search->current_search);
+        search->current_search = NULL;
+     }
+}
+
 
 EAPI void
 edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
@@ -178,6 +215,8 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(box, entry);
    evas_object_show(entry);
+
+   evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_UP, _search_key_up_cb, editor);
 
    btn = elm_button_add(box);
    elm_object_text_set(btn, "Search");
