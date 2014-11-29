@@ -140,15 +140,22 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 }
 
 static void
-_smart_cb_key_down(void *data, Evas *e EINA_UNUSED,
+_smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
                    Evas_Object *obj EINA_UNUSED, void *event)
 {
+   Edi_Mainview_Item *item;
+   Edi_Editor *editor;
+   Evas_Object *content;
    Eina_Bool ctrl, alt, shift;
    Evas_Event_Key_Down *ev = event;
 
    ctrl = evas_key_modifier_is_set(ev->modifiers, "Control");
    alt = evas_key_modifier_is_set(ev->modifiers, "Alt");
    shift = evas_key_modifier_is_set(ev->modifiers, "Shift");
+
+   item = edi_mainview_item_current_get();
+   content = elm_object_item_content_get(item->view);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if ((!alt) && (ctrl) && (!shift))
      {
@@ -170,7 +177,7 @@ _smart_cb_key_down(void *data, Evas *e EINA_UNUSED,
           }
         else if (!strcmp(ev->key, "z"))
           {
-             _undo_cb(data, obj, event);
+             _undo_cb(editor, obj, event);
           }
      }
 }
