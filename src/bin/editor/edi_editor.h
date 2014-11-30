@@ -49,6 +49,7 @@ struct _Edi_Editor
    /* Clang */
    CXIndex idx;
    CXTranslationUnit tx_unit;
+   Evas_Textblock_Cursor *format_cursor;
 #endif
 };
 

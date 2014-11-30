@@ -51,10 +51,6 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
-#if HAVE_LIBCLANG
-Evas_Textblock_Cursor *_format_cursor;
-#endif
-
 static void
 _update_lines(Edi_Editor *editor);
 
@@ -293,13 +289,13 @@ _edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color 
 {
    ecore_thread_main_loop_begin();
 
-   evas_textblock_cursor_line_set(_format_cursor, range.start.line - 1);
-   evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.start.col - 1);
-   evas_textblock_cursor_format_prepend(_format_cursor, color);
+   evas_textblock_cursor_line_set(editor->format_cursor, range.start.line - 1);
+   evas_textblock_cursor_pos_set(editor->format_cursor, evas_textblock_cursor_pos_get(editor->format_cursor) + range.start.col - 1);
+   evas_textblock_cursor_format_prepend(editor->format_cursor, color);
 
-   evas_textblock_cursor_line_set(_format_cursor, range.end.line - 1);
-   evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.end.col - 1);
-   evas_textblock_cursor_format_append(_format_cursor, "</color>");
+   evas_textblock_cursor_line_set(editor->format_cursor, range.end.line - 1);
+   evas_textblock_cursor_pos_set(editor->format_cursor, evas_textblock_cursor_pos_get(editor->format_cursor) + range.end.col - 1);
+   evas_textblock_cursor_format_append(editor->format_cursor, "</color>");
 
    ecore_thread_main_loop_end();
 }
@@ -534,10 +530,10 @@ _edi_clang_setup(void *data)
    editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
    textblock = elm_entry_textblock_get(editor->entry);
-   _format_cursor = evas_object_textblock_cursor_new(textblock);
+   editor->format_cursor = evas_object_textblock_cursor_new(textblock);
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
-   evas_textblock_cursor_free(_format_cursor);
+   evas_textblock_cursor_free(editor->format_cursor);
 
    return NULL;
 }
