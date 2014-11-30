@@ -59,6 +59,9 @@ static void
 _update_lines(Edi_Editor *editor);
 
 static void
+_update_highlight(Edi_Editor *editor);
+
+static void
 _undo_do(Edi_Editor *editor, Elm_Entry_Change_Info *inf)
 {
    if (inf->insert)
@@ -170,6 +173,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
         else if (!strcmp(ev->key, "s"))
           {
              edi_mainview_save();
+             _update_highlight(editor);
           }
         else if (!strcmp(ev->key, "f"))
           {
@@ -287,6 +291,8 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 static void
 _edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color color)
 {
+   ecore_thread_main_loop_begin();
+
    evas_textblock_cursor_line_set(_format_cursor, range.start.line - 1);
    evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.start.col - 1);
    evas_textblock_cursor_format_prepend(_format_cursor, color);
@@ -294,6 +300,8 @@ _edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color 
    evas_textblock_cursor_line_set(_format_cursor, range.end.line - 1);
    evas_textblock_cursor_pos_set(_format_cursor, evas_textblock_cursor_pos_get(_format_cursor) + range.end.col - 1);
    evas_textblock_cursor_format_append(_format_cursor, "</color>");
+
+   ecore_thread_main_loop_end();
 }
 
 static void
@@ -505,12 +513,14 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
      }
 }
 
-static void
-_edi_clang_setup(Edi_Editor *editor)
+static void *
+_edi_clang_setup(void *data)
 {
+   Edi_Editor *editor;
    Evas_Object *textblock;
    const char *path;
 
+   editor = (Edi_Editor *)data;
    elm_entry_file_get(editor->entry, &path, NULL);
 
    /* Clang */
@@ -528,6 +538,8 @@ _edi_clang_setup(Edi_Editor *editor)
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
    evas_textblock_cursor_free(_format_cursor);
+
+   return NULL;
 }
 
 /*
@@ -541,14 +553,26 @@ _edi_clang_dispose(Edi_Editor *editor)
 #endif
 
 static void
+_update_highlight(Edi_Editor *editor)
+{
+#if HAVE_LIBCLANG
+   pthread_attr_t attr;
+   pthread_t thread_id;
+
+   if (pthread_attr_init(&attr) != 0)
+     perror("pthread_attr_init");
+   if (pthread_create(&thread_id, &attr, _edi_clang_setup, editor) != 0)
+     perror("pthread_create");
+#endif
+}
+
+static void
 _text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSED)
 {
    Edi_Editor *editor = (Edi_Editor *) data;
 
-#if HAVE_LIBCLANG
-   _edi_clang_setup(editor);
-#endif
-
+   _update_lines(editor);
+   _update_highlight(editor);
 }
 
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
@@ -634,7 +658,6 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    (void)!evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
 
    evas_object_data_set(vbox, "editor", editor);
-   _update_lines(editor);
 
    return vbox;
 }
