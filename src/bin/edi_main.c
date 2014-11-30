@@ -64,7 +64,7 @@ _edi_slide_panel(Elm_Transit_Effect *effect, Elm_Transit *transit, double progre
 {
    Edi_Panel_Slide_Effect *slide;
    Evas_Object *obj;
-   double weight;
+   double position, weight;
    const Eina_List *item;
    const Eina_List *objs;
 
@@ -72,10 +72,15 @@ _edi_slide_panel(Elm_Transit_Effect *effect, Elm_Transit *transit, double progre
    slide = (Edi_Panel_Slide_Effect *)effect;
    objs = elm_transit_objects_get(transit);
 
+   if (slide->left)
+     position = elm_panes_content_left_size_get(eina_list_nth(objs, 0));
+   else
+     position = elm_panes_content_right_size_get(eina_list_nth(objs, 0));
+
    if (slide->expand)
      weight = progress * slide->max;
    else
-     weight = (1 - progress) * slide->max;
+     weight = (1 - progress) * position;
 
    if (slide->left)
      EINA_LIST_FOREACH(objs, item, obj)
@@ -114,10 +119,10 @@ _edi_slide_panel_new(Evas_Object *panel, Evas_Object *content, double max,
 
    /* Adding Transit */
    trans = elm_transit_add();
-   elm_transit_tween_mode_set(trans, ELM_TRANSIT_TWEEN_MODE_DECELERATE);
+   elm_transit_tween_mode_set(trans, ELM_TRANSIT_TWEEN_MODE_SINUSOIDAL);
    elm_transit_object_add(trans, panel);
    elm_transit_effect_add(trans, _edi_slide_panel, slide, _edi_slide_panel_free);
-   elm_transit_duration_set(trans, 0.5);
+   elm_transit_duration_set(trans, 0.33);
    elm_transit_go(trans);
 }
 
