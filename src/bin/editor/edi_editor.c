@@ -310,21 +310,11 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
 
      {
         CXFile cfile = clang_getFile(editor->tx_unit, path);
-        int tgridw = 0, tgridh = 0;
-        evas_object_textblock_size_native_get(elm_entry_textblock_get(editor->entry), &tgridw, &tgridh);
 
-#if 0
-        /* FIXME: Should be used, I don't know why tokenize doesn't work in mid
-         * comment cases and etc. */
-        int range_start, range_end;
-        range_start = editor->offset;
-        range_end = editor->offset + tgridh;
-        CXSourceRange range = clang_getRange(clang_getLocation(editor->tx_unit, cfile, range_start, 1), clang_getLocation(editor->tx_unit, cfile, range_end, tgridw));
-#else
         CXSourceRange range = clang_getRange(
               clang_getLocationForOffset(editor->tx_unit, cfile, 0),
               clang_getLocationForOffset(editor->tx_unit, cfile, eina_file_size_get(eina_file_open(path, EINA_FALSE))));
-#endif
+
         clang_tokenize(editor->tx_unit, range, &tokens, &n);
         /* FIXME: We should use annotate tokens and then use a lot more
          * color classes. I don't know why it's broken ATM... :( */
