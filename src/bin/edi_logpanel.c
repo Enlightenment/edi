@@ -6,6 +6,7 @@
 #include <Elm_Code.h>
 
 #include "edi_logpanel.h"
+#include "edi_config.h"
 
 #include "edi_private.h"
 
@@ -44,7 +45,7 @@ void edi_logpanel_add(Evas_Object *parent)
 
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
-   elm_code_widget_font_size_set(widget, 12);
+   elm_code_widget_font_size_set(widget, _edi_cfg->font.size);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);

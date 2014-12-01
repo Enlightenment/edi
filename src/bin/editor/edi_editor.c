@@ -15,10 +15,9 @@
 #endif
 
 #include "mainview/edi_mainview.h"
+#include "edi_config.h"
 
 #include "edi_private.h"
-
-#define EDITOR_FONT "DEFAULT='font=Monospace font_size=12'"
 
 #define Edi_Color const char *
 
@@ -39,6 +38,8 @@ static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
 static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
 
+static char *_default_font;
+
 typedef struct
 {
    unsigned int line;
@@ -56,6 +57,21 @@ _update_lines(Edi_Editor *editor);
 
 static void
 _update_highlight(Edi_Editor *editor);
+
+static const char *
+_edi_editor_font_get()
+{
+   char *format;
+
+   if (_default_font)
+     return _default_font;
+
+   format = "DEFAULT='font=Monospace font_size=%d'";
+
+   _default_font = malloc(sizeof(char) * (strlen(format) + 4));
+   snprintf(_default_font, strlen(format) + 4, format, _edi_cfg->font.size);
+   return _default_font;
+}
 
 static void
 _undo_do(Edi_Editor *editor, Elm_Entry_Change_Info *inf)
@@ -596,7 +612,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_scroller_policy_set(lines, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_entry_editable_set(lines, EINA_FALSE);
 
-   elm_entry_text_style_user_push(lines, EDITOR_FONT);
+   elm_entry_text_style_user_push(lines, _edi_editor_font_get());
    evas_object_color_set(lines, 127, 127, 127, 255);
 
    evas_object_size_hint_weight_set(lines, 0.052, EVAS_HINT_EXPAND);
@@ -608,7 +624,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_entry_editable_set(txt, EINA_TRUE);
    elm_entry_scrollable_set(txt, EINA_TRUE);
    elm_entry_line_wrap_set(txt, EINA_FALSE);
-   elm_entry_text_style_user_push(txt, EDITOR_FONT);
+   elm_entry_text_style_user_push(txt, _edi_editor_font_get());
 
    editor = calloc(1, sizeof(*editor));
    editor->entry = txt;

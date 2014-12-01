@@ -1,6 +1,8 @@
 #ifndef EDI_PRIVATE_H_
 # define EDI_PRIVATE_H_
 
+#include <Evas.h>
+
 extern int _edi_lib_log_dom;
 
 #ifdef CRIT

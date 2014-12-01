@@ -13,6 +13,7 @@
 #include "gettext.h"
 
 #include "Edi.h"
+#include "edi_config.h"
 #include "edi_filepanel.h"
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
@@ -628,6 +629,8 @@ edi_open(const char *inputpath)
    evas_object_resize(win, 560 * elm_config_scale_get(), 420 * elm_config_scale_get());
    evas_object_show(win);
 
+   _edi_config_project_add(path);
+
    free(path);
    return win;
 }
@@ -678,6 +681,9 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    textdomain(PACKAGE);
 #endif
 
+   if (!_edi_config_init())
+     goto config_error;
+
    edi_init();
 
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
@@ -709,8 +715,11 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    elm_run();
 
  end:
-   edi_shutdown();
    elm_shutdown();
+   edi_shutdown();
+
+ config_error:
+   _edi_config_shutdown();
 
    return 0;
 }

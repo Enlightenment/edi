@@ -5,6 +5,8 @@
 #include <Elementary.h>
 
 #include "edi_welcome.h"
+#include "edi_config.h"
+
 #include "edi_private.h"
 
 #include <stdlib.h>
@@ -200,6 +202,47 @@ _edi_welcome_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EIN
    edi_close();
 }
 
+static void
+_project_list_clicked(void *data, Evas_Object *li EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   _edi_welcome_project_open((const char *)data);
+}
+
+static void
+_edi_welcome_add_recent_projects(Evas_Object *box)
+{
+   Evas_Object *list, *label;
+   Eina_List *listitem;
+   Edi_Config_Project *project;
+   char *display, *format;
+   int displen;
+
+   list = elm_list_add(box);
+   evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   EINA_LIST_FOREACH(_edi_cfg->projects, listitem, project)
+     {
+        format = "<align=right><color=#999><i>(%s)</i></color></align>";
+        displen = strlen(project->path) + strlen(format) - 1;
+        display = malloc(sizeof(char) * displen);
+        snprintf(display, displen, format, project->path);
+
+        label = elm_label_add(box);
+        elm_object_text_set(label, display);
+        evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        evas_object_show(label);
+
+        elm_list_item_append(list, project->name, NULL, label, _project_list_clicked, project->path);
+
+        free(display);
+     }
+   elm_box_pack_end(box, list);
+   evas_object_show(list);
+}
+
 Evas_Object *edi_welcome_show()
 {
    Evas_Object *win, *hbx, *box, *button, *label, *image, *naviframe;
@@ -232,10 +275,12 @@ Evas_Object *edi_welcome_show()
 
    label = elm_label_add(box);
    elm_object_text_set(label, "Recent Projects:");
-   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, label);
    evas_object_show(label);
+
+   _edi_welcome_add_recent_projects(box);
 
    button = elm_button_add(box);
    elm_object_text_set(button, "Open Existing Project");
@@ -265,7 +310,7 @@ Evas_Object *edi_welcome_show()
    elm_box_pack_end(box, button);
    evas_object_show(button);
 
-   evas_object_resize(win, 320 * elm_config_scale_get(), 180 * elm_config_scale_get());
+   evas_object_resize(win, 480 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
 
    item = elm_naviframe_item_push(naviframe,
