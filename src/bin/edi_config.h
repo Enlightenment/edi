@@ -28,6 +28,9 @@ struct _Edi_Config
    struct 
      {
         Eina_Bool translucent;
+        int width, height, bottomtab;
+        double leftsize, bottomsize;
+        Eina_Bool leftopen, bottomopen;
      } gui;
 
    Eina_List *projects;

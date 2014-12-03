@@ -60,6 +60,52 @@ _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
      edi_mainview_open(options);
 }
 
+static Evas_Object *
+_edi_panel_tab_for_index(int index)
+{
+   if (index == 1)
+     return _edi_consolepanel;
+   if (index == 2)
+     return _edi_testpanel;
+
+   return _edi_logpanel;
+}
+
+static void
+_edi_panel_size_save(Eina_Bool left)
+{
+   double size;
+   Eina_Bool open;
+
+   if (left)
+     size = elm_panes_content_left_size_get(_edi_leftpanes);
+   else
+     size = elm_panes_content_right_size_get(_edi_bottompanes);
+   open = (size != 0.0);
+
+   if (left)
+     {
+        _edi_cfg->gui.leftopen = open;
+        if (open)
+          _edi_cfg->gui.leftsize = size;
+     }
+   else
+     {
+        _edi_cfg->gui.bottomopen = open;
+        if (open)
+          _edi_cfg->gui.bottomsize = size;
+     }
+
+   _edi_config_save();
+}
+
+static void
+_edi_panel_save_tab(int index)
+{
+   _edi_cfg->gui.bottomtab = index;
+   _edi_config_save();
+}
+
 static void
 _edi_slide_panel(Elm_Transit_Effect *effect, Elm_Transit *transit, double progress)
 {
@@ -100,6 +146,8 @@ _edi_slide_panel_free(Elm_Transit_Effect *effect, Elm_Transit *transit EINA_UNUS
    if (!slide->expand)
      evas_object_hide(slide->content);
    free(slide);
+
+   _edi_panel_size_save(slide->left);
 }
 
 static void
@@ -139,40 +187,39 @@ _edi_toggle_file_panel(void *data, Evas_Object *obj EINA_UNUSED, void *event_inf
    if (size == 0.0)
      {
         elm_icon_standard_set(_edi_filepanel_icon, "stock_left");
-        _edi_slide_panel_new(_edi_leftpanes, panel, 0.25, EINA_TRUE, EINA_TRUE);
+        _edi_slide_panel_new(_edi_leftpanes, panel, _edi_cfg->gui.leftsize, EINA_TRUE, EINA_TRUE);
      }
    else
      {
         elm_icon_standard_set(_edi_filepanel_icon, "stock_right");
-        _edi_slide_panel_new(_edi_leftpanes, panel, 0.25, EINA_FALSE, EINA_TRUE);
+        _edi_slide_panel_new(_edi_leftpanes, panel, _edi_cfg->gui.leftsize, EINA_FALSE, EINA_TRUE);
      }
 }
 
 static void
 _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 {
+   int index, c;
    double size;
    Elm_Object_Item *item;
    Evas_Object *panel;
 
-   panel = (Evas_Object *) data;
+   index = atoi((char *) data);
+   panel = _edi_panel_tab_for_index(index);
    item = (Elm_Object_Item *) event_info;
 
    if (obj)
      elm_object_focus_set(obj, EINA_FALSE);
 
-   if (panel != _edi_logpanel)
-     evas_object_hide(_edi_logpanel);
-   if (panel != _edi_consolepanel)
-     evas_object_hide(_edi_consolepanel);
-   if (panel != _edi_testpanel)
-     evas_object_hide(_edi_testpanel);
+   for (c = 0; c <= 2; c++)
+     if (c != index)
+       evas_object_hide(_edi_panel_tab_for_index(c));
 
    if (item == _edi_selected_bottompanel)
      {
         elm_toolbar_item_icon_set(item, "stock_up");
 
-        _edi_slide_panel_new(_edi_bottompanes, panel, 0.2, EINA_FALSE, EINA_FALSE);
+        _edi_slide_panel_new(_edi_bottompanes, panel, _edi_cfg->gui.bottomsize, EINA_FALSE, EINA_FALSE);
         _edi_selected_bottompanel = NULL;
      }
    else
@@ -183,22 +230,32 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 
         size = elm_panes_content_right_size_get(_edi_bottompanes);
         if (size == 0.0)
-          _edi_slide_panel_new(_edi_bottompanes, panel, 0.2, EINA_TRUE, EINA_FALSE);
+          _edi_slide_panel_new(_edi_bottompanes, panel, _edi_cfg->gui.bottomsize, EINA_TRUE, EINA_FALSE);
         else
           evas_object_show(panel);
 
         _edi_selected_bottompanel = item;
      }
    elm_toolbar_item_selected_set(item, EINA_FALSE);
+   _edi_panel_save_tab(index);
 }
 
-void edi_consolepanel_show()
+static void
+_edi_panel_dragged_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   _edi_panel_size_save(data == _edi_filepanel);
+}
+
+void
+edi_consolepanel_show()
 {
    if (_edi_selected_bottompanel != _edi_consolepanel_item)
      elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
 }
 
-void edi_testpanel_show()
+void
+edi_testpanel_show()
 {
    if (_edi_selected_bottompanel != _edi_testpanel_item)
      elm_toolbar_item_selected_set(_edi_testpanel_item, EINA_TRUE);
@@ -235,7 +292,10 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_align_set(content_in, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    icon = elm_icon_add(content_in);
-   elm_icon_standard_set(icon, "stock_left");
+   if (_edi_cfg->gui.leftopen)
+     elm_icon_standard_set(icon, "stock_left");
+   else
+     elm_icon_standard_set(icon, "stock_right");
    button = elm_button_add(content_in);
    elm_object_part_content_set(button, "icon", icon);
    elm_object_focus_allow_set(button, EINA_FALSE);
@@ -259,7 +319,11 @@ edi_content_setup(Evas_Object *win, const char *path)
    // add file list
    evas_object_size_hint_weight_set(_edi_filepanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(_edi_filepanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_panes_content_left_size_set(filepane, 0.25);
+   if (_edi_cfg->gui.leftopen)
+     elm_panes_content_left_size_set(filepane, _edi_cfg->gui.leftsize);
+   else
+     elm_panes_content_left_size_set(filepane, 0.0);
+   evas_object_smart_callback_add(filepane, "unpress", _edi_panel_dragged_cb, _edi_filepanel);
 
    edi_filepanel_add(_edi_filepanel, win, path, _edi_file_open_cb);
    elm_object_part_content_set(filepane, "left", _edi_filepanel);
@@ -280,39 +344,57 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_show(tb);
 
    _edi_logpanel_item = elm_toolbar_item_append(tb, "stock_up", "Logs",
-                                                _edi_toggle_panel, _edi_logpanel);
+                                                _edi_toggle_panel, "0");
    _edi_consolepanel_item = elm_toolbar_item_append(tb, "stock_up", "Console",
-                                                    _edi_toggle_panel, _edi_consolepanel);
+                                                    _edi_toggle_panel, "1");
    _edi_testpanel_item = elm_toolbar_item_append(tb, "stock_up", "Tests",
-                                                 _edi_toggle_panel, _edi_testpanel);
+                                                 _edi_toggle_panel, "2");
 
    // add lower panel panes
    logpanels = elm_table_add(logpane);
    evas_object_size_hint_weight_set(_edi_logpanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(_edi_logpanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(_edi_logpanel);
 
    edi_logpanel_add(_edi_logpanel);
    elm_table_pack(logpanels, _edi_logpanel, 0, 0, 1, 1);
-   evas_object_hide(_edi_logpanel);
 
    evas_object_size_hint_weight_set(_edi_consolepanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(_edi_consolepanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(_edi_consolepanel);
 
    edi_consolepanel_add(_edi_consolepanel);
    elm_table_pack(logpanels, _edi_consolepanel, 0, 0, 1, 1);
-   evas_object_hide(_edi_consolepanel);
 
    evas_object_size_hint_weight_set(_edi_testpanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(_edi_testpanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(_edi_testpanel);
 
    edi_testpanel_add(_edi_testpanel);
    elm_table_pack(logpanels, _edi_testpanel, 0, 0, 1, 1);
    elm_object_part_content_set(logpane, "bottom", logpanels);
-   elm_panes_content_right_size_set(logpane, 0.0);
-   evas_object_hide(_edi_testpanel);
+   if (_edi_cfg->gui.bottomopen)
+     {
+        elm_panes_content_right_size_set(logpane, _edi_cfg->gui.bottomsize);
+        if (_edi_cfg->gui.bottomtab == 1)
+        {
+          elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
+_edi_selected_bottompanel = _edi_consolepanel_item;
+}
+        else if (_edi_cfg->gui.bottomtab == 2)
+{
+          elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
+_edi_selected_bottompanel = _edi_testpanel_item;
+}
+        else
+{
+          elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
+_edi_selected_bottompanel = _edi_logpanel_item;
+}
+     }
+   else
+     elm_panes_content_right_size_set(logpane, 0.0);
+   if (_edi_cfg->gui.bottomopen)
+     evas_object_show(_edi_panel_tab_for_index(_edi_cfg->gui.bottomtab));
+   evas_object_smart_callback_add(logpane, "unpress", _edi_panel_dragged_cb, NULL);
+
    evas_object_show(logpane);
    _edi_bottompanes = logpane;
 
@@ -586,6 +668,21 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
    edi_close();
 }
 
+static void
+_edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
+                           void *event_info EINA_UNUSED)
+{
+   int w, h;
+
+   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+   w /= elm_config_scale_get();
+   h /= elm_config_scale_get();
+
+   _edi_cfg->gui.width = w + 1;
+   _edi_cfg->gui.height = h + 1;
+   _edi_config_save();
+}
+
 EAPI Evas_Object *
 edi_open(const char *inputpath)
 {
@@ -611,6 +708,7 @@ edi_open(const char *inputpath)
    _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
+   evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
 
    vbx = elm_box_add(win);
    evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -626,7 +724,8 @@ edi_open(const char *inputpath)
    elm_box_pack_end(vbx, content);
 
    ERR("Loaded project at %s", path);
-   evas_object_resize(win, 560 * elm_config_scale_get(), 420 * elm_config_scale_get());
+   evas_object_resize(win, _edi_cfg->gui.width * elm_config_scale_get(),
+                      _edi_cfg->gui.height * elm_config_scale_get());
    evas_object_show(win);
 
    _edi_config_project_add(path);

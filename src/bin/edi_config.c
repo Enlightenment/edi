@@ -162,6 +162,13 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, version, EET_T_INT);
    EDI_CONFIG_VAL(D, T, font.size, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.translucent, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.width, EET_T_INT);
+   EDI_CONFIG_VAL(D, T, gui.height, EET_T_INT);
+   EDI_CONFIG_VAL(D, T, gui.leftsize, EET_T_DOUBLE);
+   EDI_CONFIG_VAL(D, T, gui.leftopen, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.bottomsize, EET_T_DOUBLE);
+   EDI_CONFIG_VAL(D, T, gui.bottomopen, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.bottomtab, EET_T_INT);
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
 
    _edi_config_load();
@@ -223,11 +230,22 @@ _edi_config_load(void)
 
    _edi_cfg->font.size = 12;
    _edi_cfg->gui.translucent = EINA_TRUE;
+   _edi_cfg->gui.width = 560;
+   _edi_cfg->gui.height = 420;
+   _edi_cfg->gui.leftsize = 0.25;
+   _edi_cfg->gui.leftopen = EINA_TRUE;
+   _edi_cfg->gui.bottomsize = 0.2;
+   _edi_cfg->gui.bottomopen = EINA_FALSE;
+   _edi_cfg->gui.bottomtab = 0;
    _edi_cfg->projects = NULL;
    IFCFGEND;
 
    /* limit config values so they are sane */
    EDI_CONFIG_LIMIT(_edi_cfg->font.size, 8, 96);
+   EDI_CONFIG_LIMIT(_edi_cfg->gui.width, 150, 10000);
+   EDI_CONFIG_LIMIT(_edi_cfg->gui.height, 100, 8000);
+   EDI_CONFIG_LIMIT(_edi_cfg->gui.leftsize, 0.0, 1.0);
+   EDI_CONFIG_LIMIT(_edi_cfg->gui.bottomsize, 0.0, 1.0);
 
    _edi_cfg->version = EDI_CONFIG_FILE_VERSION;
 
