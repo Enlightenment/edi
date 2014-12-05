@@ -58,6 +58,9 @@ _update_lines(Edi_Editor *editor);
 static void
 _update_highlight(Edi_Editor *editor);
 
+static void
+_reset_highlight(Edi_Editor *editor);
+
 static const char *
 _edi_editor_font_get()
 {
@@ -185,7 +188,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
         else if (!strcmp(ev->key, "s"))
           {
              edi_mainview_save();
-             _update_highlight(editor);
+             _reset_highlight(editor);
           }
         else if (!strcmp(ev->key, "f"))
           {
@@ -240,6 +243,16 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
    elm_scroller_region_get(editor->entry, NULL, &y, NULL, NULL);
    elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
    elm_scroller_region_show(editor->lines, 0, y, 10, h);
+
+   _update_highlight(editor);
+}
+
+static void
+_resize_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor = data;
+
+   _update_highlight(editor);
 }
 
 static void
@@ -303,70 +316,91 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 static void
 _edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color color)
 {
+   Evas_Textblock *textblock;
+   Evas_Textblock_Cursor *cursor;
+
    ecore_thread_main_loop_begin();
 
-   evas_textblock_cursor_line_set(editor->format_cursor, range.start.line - 1);
-   evas_textblock_cursor_pos_set(editor->format_cursor, evas_textblock_cursor_pos_get(editor->format_cursor) + range.start.col - 1);
-   evas_textblock_cursor_format_prepend(editor->format_cursor, color);
+   if (!((Evas_Coord)range.start.line > editor->format_end || (Evas_Coord)range.end.line < editor->format_start))
+     {
+   textblock = elm_entry_textblock_get(editor->entry);
+   cursor = evas_object_textblock_cursor_new(textblock);
+   evas_textblock_cursor_line_set(cursor, range.start.line - 1);
+   evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.start.col - 1);
+   evas_textblock_cursor_format_prepend(cursor, color);
 
-   evas_textblock_cursor_line_set(editor->format_cursor, range.end.line - 1);
-   evas_textblock_cursor_pos_set(editor->format_cursor, evas_textblock_cursor_pos_get(editor->format_cursor) + range.end.col - 1);
-   evas_textblock_cursor_format_append(editor->format_cursor, "</color>");
+   evas_textblock_cursor_line_set(cursor, range.end.line - 1);
+   evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.end.col - 1);
+   evas_textblock_cursor_format_append(cursor, "</color>");
 
+   evas_textblock_cursor_free(cursor);
+     }
    ecore_thread_main_loop_end();
 }
 
 static void
 _clang_load_highlighting(const char *path, Edi_Editor *editor)
 {
-   CXToken *tokens = NULL;
-   unsigned int n = 0;
-   unsigned int i = 0;
-   CXCursor *cursors = NULL;
-
-     {
         CXFile cfile = clang_getFile(editor->tx_unit, path);
 
         CXSourceRange range = clang_getRange(
               clang_getLocationForOffset(editor->tx_unit, cfile, 0),
               clang_getLocationForOffset(editor->tx_unit, cfile, eina_file_size_get(eina_file_open(path, EINA_FALSE))));
 
-        clang_tokenize(editor->tx_unit, range, &tokens, &n);
+        clang_tokenize(editor->tx_unit, range, &editor->tokens, &editor->token_count);
         /* FIXME: We should use annotate tokens and then use a lot more
          * color classes. I don't know why it's broken ATM... :( */
-        cursors = (CXCursor *) malloc(n * sizeof(CXCursor));
-        clang_annotateTokens(editor->tx_unit, tokens, n, cursors);
-     }
+        editor->cursors = (CXCursor *) malloc(editor->token_count * sizeof(CXCursor));
+        clang_annotateTokens(editor->tx_unit, editor->tokens, editor->token_count, editor->cursors);
+}
 
-   for (i = 0 ; i < n ; i++)
+static void
+_clang_remove_highlighting(Edi_Editor *editor)
+{
+   Eina_List *formats;
+
+// TODO remove the formats on the lines we're updating
+//   formats = evas_textblock_cursor_range_formats_get(begin, limit);
+
+}
+
+static void *
+_clang_show_highlighting(void *data)
+{
+   Edi_Editor *editor;
+   unsigned int i = 0;
+
+   editor = (Edi_Editor *)data;
+   _clang_remove_highlighting(editor);
+   for (i = 0 ; i < editor->token_count ; i++)
      {
         Edi_Range range;
         Edi_Color color = EDI_COLOR_FOREGROUND;
 
-        CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, tokens[i]);
+        CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, editor->tokens[i]);
         clang_getSpellingLocation(clang_getRangeStart(tkrange), NULL,
               &range.start.line, &range.start.col, NULL);
         clang_getSpellingLocation(clang_getRangeEnd(tkrange), NULL,
               &range.end.line, &range.end.col, NULL);
         /* FIXME: Should probably do something fancier, this is only a limited
          * number of types. */
-        switch (clang_getTokenKind(tokens[i]))
+        switch (clang_getTokenKind(editor->tokens[i]))
           {
              case CXToken_Punctuation:
-                if (i < n - 1 && range.start.col == 1 &&
-                    (clang_getTokenKind(tokens[i + 1]) == CXToken_Identifier && (cursors[i + 1].kind == CXCursor_MacroDefinition ||
-                    cursors[i + 1].kind == CXCursor_InclusionDirective || cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
+                if (i < editor->token_count - 1 && range.start.col == 1 &&
+                    (clang_getTokenKind(editor->tokens[i + 1]) == CXToken_Identifier && (editor->cursors[i + 1].kind == CXCursor_MacroDefinition ||
+                    editor->cursors[i + 1].kind == CXCursor_InclusionDirective || editor->cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
                   color = EDI_COLOR_PREPROCESSOR;
                 else
                   color = EDI_COLOR_BRACE;
                 break;
              case CXToken_Identifier:
-                if (cursors[i].kind < CXCursor_FirstRef)
+                if (editor->cursors[i].kind < CXCursor_FirstRef)
                   {
                       color = EDI_COLOR_CLASS;
                       break;
                   }
-                switch (cursors[i].kind)
+                switch (editor->cursors[i].kind)
                   {
                    case CXCursor_DeclRefExpr:
                       /* Handle different ref kinds */
@@ -389,7 +423,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
                   }
                 break;
              case CXToken_Keyword:
-                switch (cursors[i].kind)
+                switch (editor->cursors[i].kind)
                   {
                    case CXCursor_PreprocessingDirective:
                       color = EDI_COLOR_PREPROCESSOR;
@@ -428,7 +462,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
                   }
                 break;
              case CXToken_Literal:
-                if (cursors[i].kind == CXCursor_StringLiteral || cursors[i].kind == CXCursor_CharacterLiteral)
+                if (editor->cursors[i].kind == CXCursor_StringLiteral || editor->cursors[i].kind == CXCursor_CharacterLiteral)
                   color = EDI_COLOR_STRING;
                 else
                   color = EDI_COLOR_NUMBER;
@@ -442,7 +476,7 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
 
 #if CLANG_DEBUG
         const char *kind = NULL;
-        switch (clang_getTokenKind(tokens[i])) {
+        switch (clang_getTokenKind(editor->tokens[i])) {
            case CXToken_Punctuation: kind = "Punctuation"; break;
            case CXToken_Keyword: kind = "Keyword"; break;
            case CXToken_Identifier: kind = "Identifier"; break;
@@ -451,19 +485,22 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
         }
 
         printf("%s ", kind);
-        PrintToken(editor->tx_unit, tokens[i]);
+        PrintToken(editor->tx_unit, editor->tokens[i]);
 
-        if (!clang_isInvalid(cursors[i].kind)) {
+        if (!clang_isInvalid(editor->cursors[i].kind)) {
              printf(" ");
-             PrintCursor(cursors[i]);
+             PrintCursor(editor->cursors[i]);
         }
 
         printf("\n");
 #endif
      }
 
-   free(cursors);
-   clang_disposeTokens(editor->tx_unit, tokens, n);
+// TODO clear these when we reset next time
+//   free(editor->cursors);
+//   clang_disposeTokens(editor->tx_unit, editor->tokens, editor->token_count);
+
+   return NULL;
 }
 
 static void
@@ -515,11 +552,24 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
      }
 }
 
+static Eina_Bool
+_edi_clang_render(void *data)
+{
+   pthread_attr_t attr;
+   pthread_t thread_id;
+
+   if (pthread_attr_init(&attr) != 0)
+     perror("pthread_attr_init");
+   if (pthread_create(&thread_id, &attr, _clang_show_highlighting, data) != 0)
+     perror("pthread_create");
+
+   return ECORE_CALLBACK_CANCEL;
+}
+
 static void *
 _edi_clang_setup(void *data)
 {
    Edi_Editor *editor;
-   Evas_Object *textblock;
    const char *path;
 
    editor = (Edi_Editor *)data;
@@ -535,16 +585,16 @@ _edi_clang_setup(void *data)
    /* FIXME: Possibly activate more options? */
    editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
-   textblock = elm_entry_textblock_get(editor->entry);
-   editor->format_cursor = evas_object_textblock_cursor_new(textblock);
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
-   evas_textblock_cursor_free(editor->format_cursor);
+
+   _edi_clang_render(editor);
 
    return NULL;
 }
 
 /*
+TODO - USE ME!
 static void
 _edi_clang_dispose(Edi_Editor *editor)
 {
@@ -555,8 +605,28 @@ _edi_clang_dispose(Edi_Editor *editor)
 #endif
 
 static void
-_update_highlight(Edi_Editor *editor)
+_update_highlight_window(Edi_Editor *editor)
 {
+   Evas_Object *textblock;
+   Evas_Textblock_Cursor *begin, *limit;
+
+   textblock = elm_entry_textblock_get(editor->entry);
+
+   begin = evas_object_textblock_cursor_new(textblock);
+   limit = evas_object_textblock_cursor_new(textblock);
+   evas_textblock_cursor_visible_range_get(begin, limit);
+
+   editor->format_start = evas_textblock_cursor_line_geometry_get(begin, NULL, NULL, NULL, NULL);
+   editor->format_end = evas_textblock_cursor_line_geometry_get(limit, NULL, NULL, NULL, NULL);
+   evas_textblock_cursor_free(begin);
+   evas_textblock_cursor_free(limit);
+}
+
+static void
+_reset_highlight(Edi_Editor *editor)
+{
+   _update_highlight_window(editor);
+
 #if HAVE_LIBCLANG
    pthread_attr_t attr;
    pthread_t thread_id;
@@ -569,12 +639,25 @@ _update_highlight(Edi_Editor *editor)
 }
 
 static void
+_update_highlight(Edi_Editor *editor)
+{
+   _update_highlight_window(editor);
+
+#if HAVE_LIBCLANG
+   if (editor->delay_highlight)
+     ecore_timer_del(editor->delay_highlight);
+
+   editor->delay_highlight = ecore_timer_add(0.25, _edi_clang_render, editor);
+#endif
+}
+
+static void
 _text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSED)
 {
    Edi_Editor *editor = (Edi_Editor *) data;
 
    _update_lines(editor);
-   _update_highlight(editor);
+   _reset_highlight(editor);
 }
 
 EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
@@ -633,6 +716,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(txt, "changed,user", _changed_cb, editor);
    evas_object_smart_callback_add(txt, "scroll", _scroll_cb, editor);
+   evas_object_smart_callback_add(txt, "resize", _resize_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
    evas_object_smart_callback_add(txt, "text,set,done", _text_set_done, editor);
 

@@ -119,7 +119,7 @@ echo
 echo "Compilation..............: make (or gmake)"
 echo "  CFLAGS.................: $CFLAGS"
 echo "  edje_cc................: ${edje_cc}"
-echo "  clang..................: ${build_clang}"
+echo "  highlighting (libclang): ${build_clang}"
 echo
 echo "Building documentation...: ${build_doc}"
 echo "Building tests...........: ${have_tests}"
