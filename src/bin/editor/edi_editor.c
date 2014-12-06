@@ -240,6 +240,7 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
    Edi_Editor *editor = data;
    Evas_Coord y, h;
 
+// TODO ignore y scrolls - just return;
    elm_scroller_region_get(editor->entry, NULL, &y, NULL, NULL);
    elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
    elm_scroller_region_show(editor->lines, 0, y, 10, h);
@@ -313,8 +314,43 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 }
 
 #if HAVE_LIBCLANG
+// TODO on any refresh heck mtime - then re-run clang if changed - it should be fast enough now...
 static void
-_edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color color)
+_clang_remove_highlighting(Edi_Editor *editor)
+{
+   Eina_List *formats;
+   Evas_Object *textblock;
+   Evas_Textblock_Cursor *start, *end;
+   Evas_Object_Textblock_Node_Format *format;
+   unsigned int i;
+
+   ecore_thread_main_loop_begin();
+   textblock = elm_entry_textblock_get(editor->entry);
+   start = evas_object_textblock_cursor_new(textblock);
+   end = evas_object_textblock_cursor_new(textblock);
+
+   evas_textblock_cursor_visible_range_get(start, end);
+
+   i = 0;
+   formats = evas_textblock_cursor_range_formats_get(start, end);
+   while (eina_list_count(formats) > i)
+     {
+        format = eina_list_nth(formats, i);
+
+        if (!strncmp("+ color", evas_textblock_node_format_text_get(format), 7))
+          evas_textblock_node_format_remove_pair(textblock, format);
+        else
+          i++;
+
+        formats = evas_textblock_cursor_range_formats_get(start, end);
+     }
+   evas_textblock_cursor_free(start);
+   evas_textblock_cursor_free(end);
+   ecore_thread_main_loop_end();
+}
+
+static void
+_edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
 {
    Evas_Textblock *textblock;
    Evas_Textblock_Cursor *cursor;
@@ -323,17 +359,17 @@ _edi_range_color_set(Edi_Editor *editor EINA_UNUSED, Edi_Range range, Edi_Color 
 
    if (!((Evas_Coord)range.start.line > editor->format_end || (Evas_Coord)range.end.line < editor->format_start))
      {
-   textblock = elm_entry_textblock_get(editor->entry);
-   cursor = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_line_set(cursor, range.start.line - 1);
-   evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.start.col - 1);
-   evas_textblock_cursor_format_prepend(cursor, color);
+        textblock = elm_entry_textblock_get(editor->entry);
+        cursor = evas_object_textblock_cursor_new(textblock);
+        evas_textblock_cursor_line_set(cursor, range.start.line - 1);
+        evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.start.col - 1);
+        evas_textblock_cursor_format_prepend(cursor, color);
 
-   evas_textblock_cursor_line_set(cursor, range.end.line - 1);
-   evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.end.col - 1);
-   evas_textblock_cursor_format_append(cursor, "</color>");
+        evas_textblock_cursor_line_set(cursor, range.end.line - 1);
+        evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.end.col - 1);
+        evas_textblock_cursor_format_append(cursor, "</color>");
 
-   evas_textblock_cursor_free(cursor);
+        evas_textblock_cursor_free(cursor);
      }
    ecore_thread_main_loop_end();
 }
@@ -352,16 +388,6 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
          * color classes. I don't know why it's broken ATM... :( */
         editor->cursors = (CXCursor *) malloc(editor->token_count * sizeof(CXCursor));
         clang_annotateTokens(editor->tx_unit, editor->tokens, editor->token_count, editor->cursors);
-}
-
-static void
-_clang_remove_highlighting(Edi_Editor *editor)
-{
-   Eina_List *formats;
-
-// TODO remove the formats on the lines we're updating
-//   formats = evas_textblock_cursor_range_formats_get(begin, limit);
-
 }
 
 static void *
@@ -585,6 +611,7 @@ _edi_clang_setup(void *data)
    /* FIXME: Possibly activate more options? */
    editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
+   _clang_remove_highlighting(editor);
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
 
