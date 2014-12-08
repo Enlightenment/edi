@@ -374,20 +374,20 @@ edi_content_setup(Evas_Object *win, const char *path)
      {
         elm_panes_content_right_size_set(logpane, _edi_cfg->gui.bottomsize);
         if (_edi_cfg->gui.bottomtab == 1)
-        {
-          elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_consolepanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_consolepanel_item;
+          }
         else if (_edi_cfg->gui.bottomtab == 2)
-{
-          elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_testpanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_testpanel_item;
+          }
         else
-{
-          elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_logpanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_logpanel_item;
+          }
      }
    else
      elm_panes_content_right_size_set(logpane, 0.0);
