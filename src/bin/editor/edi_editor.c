@@ -316,7 +316,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 #if HAVE_LIBCLANG
 // TODO on any refresh heck mtime - then re-run clang if changed - it should be fast enough now...
 static void
-_clang_remove_highlighting(Edi_Editor *editor)
+_edi_line_color_remove(Edi_Editor *editor, unsigned int line)
 {
    Eina_List *formats;
    Evas_Object *textblock;
@@ -324,12 +324,13 @@ _clang_remove_highlighting(Edi_Editor *editor)
    Evas_Object_Textblock_Node_Format *format;
    unsigned int i;
 
-   ecore_thread_main_loop_begin();
    textblock = elm_entry_textblock_get(editor->entry);
    start = evas_object_textblock_cursor_new(textblock);
+   evas_textblock_cursor_line_set(start, line);
+   evas_textblock_cursor_pos_set(start, evas_textblock_cursor_pos_get(start));
    end = evas_object_textblock_cursor_new(textblock);
-
-   evas_textblock_cursor_visible_range_get(start, end);
+   evas_textblock_cursor_line_set(end, line);
+   evas_textblock_cursor_pos_set(end, evas_textblock_cursor_pos_get(end) - 1);
 
    i = 0;
    formats = evas_textblock_cursor_range_formats_get(start, end);
@@ -344,9 +345,9 @@ _clang_remove_highlighting(Edi_Editor *editor)
 
         formats = evas_textblock_cursor_range_formats_get(start, end);
      }
+
    evas_textblock_cursor_free(start);
    evas_textblock_cursor_free(end);
-   ecore_thread_main_loop_end();
 }
 
 static void
@@ -360,6 +361,14 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
    if (!((Evas_Coord)range.start.line > editor->format_end || (Evas_Coord)range.end.line < editor->format_start))
      {
         textblock = elm_entry_textblock_get(editor->entry);
+
+        if (editor->format_line == -1)
+          editor->format_line = range.start.line - 1;
+        while (editor->format_line < (int) range.end.line)
+          {
+             _edi_line_color_remove(editor, ++editor->format_line);
+          }
+
         cursor = evas_object_textblock_cursor_new(textblock);
         evas_textblock_cursor_line_set(cursor, range.start.line - 1);
         evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.start.col - 1);
@@ -367,7 +376,7 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
 
         evas_textblock_cursor_line_set(cursor, range.end.line - 1);
         evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.end.col - 1);
-        evas_textblock_cursor_format_append(cursor, "</color>");
+        evas_textblock_cursor_format_prepend(cursor, "</color>");
 
         evas_textblock_cursor_free(cursor);
      }
@@ -397,7 +406,7 @@ _clang_show_highlighting(void *data)
    unsigned int i = 0;
 
    editor = (Edi_Editor *)data;
-   _clang_remove_highlighting(editor);
+   editor->format_line = -1;
    for (i = 0 ; i < editor->token_count ; i++)
      {
         Edi_Range range;
@@ -611,7 +620,6 @@ _edi_clang_setup(void *data)
    /* FIXME: Possibly activate more options? */
    editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
-   _clang_remove_highlighting(editor);
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
 
