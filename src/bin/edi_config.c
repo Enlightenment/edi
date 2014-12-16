@@ -216,7 +216,7 @@ _edi_config_load(void)
 
    if (!_edi_cfg) 
      {
-        _edi_cfg = malloc(sizeof(Edi_Config));
+        _edi_cfg = calloc(1, sizeof(Edi_Config));
         save = EINA_TRUE;
      }
 
