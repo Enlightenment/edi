@@ -40,6 +40,7 @@ static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
 static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
+int _edi_log_dom = -1;
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
@@ -740,6 +741,26 @@ edi_close()
    elm_exit();
 }
 
+static Eina_Bool
+_edi_log_init()
+{
+   _edi_log_dom = eina_log_domain_register("edi", EINA_COLOR_GREEN);
+   if (_edi_log_dom < 0)
+     {
+        EINA_LOG_ERR("Edi can not create its log domain.");
+        return EINA_FALSE;
+     }
+
+   return EINA_TRUE;
+}
+
+static void
+_edi_log_shutdown()
+{
+   eina_log_domain_unregister(_edi_log_dom);
+   _edi_log_dom = -1;
+}
+
 static const Ecore_Getopt optdesc = {
   "edi",
   "%prog [options] [project-dir]",
@@ -784,6 +805,8 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      goto config_error;
 
    edi_init();
+   if (!_edi_log_init())
+     goto end;
 
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
@@ -814,6 +837,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    elm_run();
 
  end:
+   _edi_log_shutdown();
    elm_shutdown();
    edi_shutdown();
 
