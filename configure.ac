@@ -73,7 +73,7 @@ AC_SUBST(HAVE_LIBCLANG)
 
 # if cross compiling, disable NLS support.
 # It's not worth the trouble, at least for now.
-if "${host}" != "${target}"; then
+if test "x$cross_compiling" = xyes; then
   enable_nls=no
 fi
 
