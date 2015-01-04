@@ -71,6 +71,12 @@ fi
 
 AC_SUBST(HAVE_LIBCLANG)
 
+# if cross compiling, disable NLS support.
+# It's not worth the trouble, at least for now.
+if test "${build}" != "${host}" -o "${build}" != "${target}" -o "${host}" != "${target}"; then
+  enable_nls=no
+fi
+
 EFL_TESTS([${build_tests}])
 
 # doxygen program for documentation building
