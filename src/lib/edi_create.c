@@ -2,9 +2,6 @@
 # include "config.h"
 #endif
 
-#include <stdlib.h>
-#include <sys/wait.h>
-
 #include "Edi.h"
 
 #include "edi_private.h"
