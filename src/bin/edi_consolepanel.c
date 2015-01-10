@@ -20,7 +20,7 @@
 static Evas_Object *_console_box;
 static const char *_current_dir = NULL;
 
-static uint _edi_strlen_current_dir;
+static unsigned int _edi_strlen_current_dir;
 static int _edi_test_count;
 static int _edi_test_pass;
 static int _edi_test_fail;
@@ -168,17 +168,17 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
    _edi_test_line_callback(line);
 }
 
-void edi_consolepanel_append_line(const char *line)
+EAPI void edi_consolepanel_append_line(const char *line)
 {
    _edi_consolepanel_append_line_type(line, EINA_FALSE);
 }
 
-void edi_consolepanel_append_error_line(const char *line)
+EAPI void edi_consolepanel_append_error_line(const char *line)
 {
    _edi_consolepanel_append_line_type(line, EINA_TRUE);
 }
 
-void edi_consolepanel_clear()
+EAPI void edi_consolepanel_clear()
 {
    elm_box_clear(_console_box);
 
@@ -311,7 +311,7 @@ static void _edi_test_line_callback(const char *content)
      }
 }
 
-void edi_consolepanel_add(Evas_Object *parent)
+EAPI void edi_consolepanel_add(Evas_Object *parent)
 {
    Evas_Object *scroll, *vbx;
 
@@ -333,7 +333,7 @@ void edi_consolepanel_add(Evas_Object *parent)
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
 }
 
-void edi_testpanel_add(Evas_Object *parent)
+EAPI void edi_testpanel_add(Evas_Object *parent)
 {
    Elm_Code *code;
    Evas_Object *widget;

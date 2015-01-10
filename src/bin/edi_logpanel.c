@@ -13,7 +13,7 @@
 static Evas_Object *_info_widget;
 static Elm_Code *_elm_code;
 
-void print_cb(const Eina_Log_Domain *domain,
+static void _print_cb(const Eina_Log_Domain *domain,
               Eina_Log_Level level,
               const char *file,
               const char *fnc,
@@ -38,7 +38,7 @@ void print_cb(const Eina_Log_Domain *domain,
      }
 }
 
-void edi_logpanel_add(Evas_Object *parent)
+EAPI void edi_logpanel_add(Evas_Object *parent)
 {
    Evas_Object *widget;
    Elm_Code *code;
@@ -53,7 +53,7 @@ void edi_logpanel_add(Evas_Object *parent)
    _elm_code = code;
    _info_widget = widget;
 
-   eina_log_print_cb_set(print_cb, NULL);
+   eina_log_print_cb_set(_print_cb, NULL);
    eina_log_color_disable_set(EINA_TRUE);
 
    elm_box_pack_end(parent, widget);

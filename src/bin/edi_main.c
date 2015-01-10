@@ -282,14 +282,14 @@ _edi_panel_dragged_cb(void *data, Evas_Object *obj EINA_UNUSED,
    _edi_panel_size_save(data == _edi_filepanel);
 }
 
-void
+EAPI void
 edi_consolepanel_show()
 {
    if (_edi_selected_bottompanel != _edi_consolepanel_item)
      elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
 }
 
-void
+EAPI void
 edi_testpanel_show()
 {
    if (_edi_selected_bottompanel != _edi_testpanel_item)

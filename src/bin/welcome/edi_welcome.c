@@ -68,7 +68,7 @@ _edi_message_open(const char *message)
 }
 
 static void
-_edi_welcome_project_open(const char *path, const uint _edi_creating)
+_edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
 {
    edi_project_set(path);
 
@@ -299,7 +299,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    evas_object_show(list);
 }
 
-Evas_Object *edi_welcome_show()
+EAPI Evas_Object *edi_welcome_show()
 {
    Evas_Object *win, *hbx, *box, *button, *label, *image, *naviframe;
    Elm_Object_Item *item;
