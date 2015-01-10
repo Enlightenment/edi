@@ -29,18 +29,18 @@ extern "C" {
  *
  * @ingroup UI
  */
-EAPI void edi_consolepanel_add(Evas_Object *parent);
+void edi_consolepanel_add(Evas_Object *parent);
 
 /**
  * Show the Edi consolepanel - animating on to screen if required.
  *
  * @ingroup UI
  */
-EAPI void edi_consolepanel_show();
+void edi_consolepanel_show();
 
-EAPI void edi_testpanel_add(Evas_Object *parent);
+void edi_testpanel_add(Evas_Object *parent);
 
-EAPI void edi_testpanel_show();
+void edi_testpanel_show();
 
 /**
  * @}
@@ -61,7 +61,7 @@ EAPI void edi_testpanel_show();
  *
  * @ingroup Console
  */
-EAPI void edi_consolepanel_append_line(const char *line);
+void edi_consolepanel_append_line(const char *line);
 
 /**
  * Append a new error line to the console.
@@ -70,14 +70,14 @@ EAPI void edi_consolepanel_append_line(const char *line);
  *
  * @ingroup Console
  */
-EAPI void edi_consolepanel_append_error_line(const char *line);
+void edi_consolepanel_append_error_line(const char *line);
 
 /**
  * Clear all lines from the console.
  *
  * @ingroup Console
  */
-EAPI void edi_consolepanel_clear();
+void edi_consolepanel_clear();
 
 /**
  * @}

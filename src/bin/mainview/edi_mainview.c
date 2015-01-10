@@ -26,7 +26,7 @@ static void
 dummy()
 {}
 
-EAPI Edi_Mainview_Item *
+Edi_Mainview_Item *
 edi_mainview_item_current_get()
 {
    Eina_List *item;
@@ -46,7 +46,7 @@ edi_mainview_item_current_get()
    return NULL;
 }
 
-EAPI void
+void
 edi_mainview_item_prev()
 {
    Eina_List *item;
@@ -68,7 +68,7 @@ edi_mainview_item_prev()
      }
 }
 
-EAPI void
+void
 edi_mainview_item_next()
 {
    Eina_List *item;
@@ -91,7 +91,7 @@ edi_mainview_item_next()
      }
 }
 
-EAPI void
+void
 edi_mainview_item_select(Edi_Mainview_Item *item)
 {
    if (item->win)
@@ -331,7 +331,7 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    _edi_mainview_item_win_add(options, mime);
 }
 
-EAPI void
+void
 edi_mainview_open_path(const char *path)
 {
    Edi_Path_Options *options;
@@ -349,7 +349,7 @@ edi_mainview_open_path(const char *path)
    eio_file_direct_stat(path, _edi_mainview_tab_stat_done, dummy, options);
 }
 
-EAPI void
+void
 edi_mainview_open(Edi_Path_Options *options)
 {
    Edi_Mainview_Item *it;
@@ -373,7 +373,7 @@ edi_mainview_open(Edi_Path_Options *options)
      }
 }
 
-EAPI void
+void
 edi_mainview_open_window_path(const char *path)
 {
    Edi_Path_Options *options;
@@ -394,7 +394,7 @@ edi_mainview_open_window_path(const char *path)
    eio_file_direct_stat(path, _edi_mainview_win_stat_done, dummy, options);
 }
 
-EAPI void
+void
 edi_mainview_open_window(Edi_Path_Options *options)
 {
    Edi_Mainview_Item *it;
@@ -419,7 +419,7 @@ edi_mainview_open_window(Edi_Path_Options *options)
      }
 }
 
-EAPI void
+void
 edi_mainview_save()
 {
    Evas_Object *content;
@@ -434,7 +434,7 @@ edi_mainview_save()
      elm_entry_file_save(editor->entry);
 }
 
-EAPI void
+void
 edi_mainview_new_window()
 {
    Edi_Mainview_Item *item;
@@ -446,7 +446,7 @@ edi_mainview_new_window()
    edi_mainview_open_window_path(item->path);
 }
 
-EAPI void
+void
 edi_mainview_close()
 {
    Edi_Mainview_Item *item;
@@ -462,7 +462,7 @@ edi_mainview_close()
    free(item);
 }
 
-EAPI void
+void
 edi_mainview_cut()
 {
    Evas_Object *content;
@@ -477,7 +477,7 @@ edi_mainview_cut()
      elm_entry_selection_cut(editor->entry);
 }
 
-EAPI void
+void
 edi_mainview_copy()
 {
    Evas_Object *content;
@@ -492,7 +492,7 @@ edi_mainview_copy()
      elm_entry_selection_copy(editor->entry);
 }
 
-EAPI void
+void
 edi_mainview_paste()
 {
    Evas_Object *content;
@@ -507,7 +507,7 @@ edi_mainview_paste()
      elm_entry_selection_paste(editor->entry);
 }
 
-EAPI void
+void
 edi_mainview_search()
 {
    Evas_Object *content;
@@ -522,7 +522,7 @@ edi_mainview_search()
      _edi_editor_search(editor);
 }
 
-EAPI void
+void
 edi_mainview_goto(int line)
 {
    Evas_Object *content;
@@ -549,7 +549,7 @@ edi_mainview_goto(int line)
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
-EAPI void
+void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
    Evas_Object *box, *txt;

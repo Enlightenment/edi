@@ -187,7 +187,7 @@ _edi_editor_search_hide(Edi_Editor *editor)
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
-EAPI void
+void
 _edi_editor_search(Edi_Editor *editor)
 {
    Edi_Editor_Search *search;
@@ -269,7 +269,7 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
      }
 }
 
-EAPI void
+void
 _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
    Evas_Object *entry, *lbl, *btn, *box, *big_box;

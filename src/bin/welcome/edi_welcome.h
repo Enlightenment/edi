@@ -28,7 +28,7 @@ extern "C" {
  * @return The welcome window that is created
  * * @ingroup UI
  */
-EAPI Evas_Object *edi_welcome_show();
+Evas_Object *edi_welcome_show();
 
 /**
  * @}

@@ -35,7 +35,7 @@ extern "C" {
  *
  * @ingroup UI
  */
-EAPI void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
+void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
 
 /**
  * @}
@@ -58,7 +58,7 @@ EAPI void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_path(const char *path);
+void edi_mainview_open_path(const char *path);
 
 /**
  * Open the file described in the provided options - path and location etc.
@@ -67,7 +67,7 @@ EAPI void edi_mainview_open_path(const char *path);
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open(Edi_Path_Options *options);
+void edi_mainview_open(Edi_Path_Options *options);
 
 /**
  * Open the file at path for editing in a new window using the type specified.
@@ -78,7 +78,7 @@ EAPI void edi_mainview_open(Edi_Path_Options *options);
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_window_path(const char *path);
+void edi_mainview_open_window_path(const char *path);
 
 /**
  * Open the file described in the provided options in a new window - path and location etc.
@@ -87,7 +87,7 @@ EAPI void edi_mainview_open_window_path(const char *path);
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_open_window(Edi_Path_Options *options);
+void edi_mainview_open_window(Edi_Path_Options *options);
 
 
 /**
@@ -95,49 +95,49 @@ EAPI void edi_mainview_open_window(Edi_Path_Options *options);
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_save();
+void edi_mainview_save();
 
 /**
  * Move the current tab to a new window.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_new_window();
+void edi_mainview_new_window();
 
 /**
  * Close the current file.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_close();
+void edi_mainview_close();
 
 /**
  * Cut the current selection into the clipboard.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_cut();
+void edi_mainview_cut();
 
 /**
  * Copy the current selection into the clipboard.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_copy();
+void edi_mainview_copy();
 
 /**
  * Paste the current clipboard contents at the current cursor position.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_paste();
+void edi_mainview_paste();
 
 /**
  * Search the current view's contents.
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_search();
+void edi_mainview_search();
 
 /**
  * Go to a requested line in the current view's contents.
@@ -146,7 +146,7 @@ EAPI void edi_mainview_search();
  *
  * @ingroup Content
  */
-EAPI void edi_mainview_goto(int line);
+void edi_mainview_goto(int line);
 
 /**
  * @}
@@ -161,7 +161,7 @@ EAPI void edi_mainview_goto(int line);
  *
  */
 
-EAPI Edi_Mainview_Item *edi_mainview_item_current_get();
+Edi_Mainview_Item *edi_mainview_item_current_get();
 
 /**
  * Select the passed item in the mainview UI.
@@ -171,7 +171,7 @@ EAPI Edi_Mainview_Item *edi_mainview_item_current_get();
  *
  * @ingroup Tabs
  */
-EAPI void edi_mainview_item_select(Edi_Mainview_Item *item);
+void edi_mainview_item_select(Edi_Mainview_Item *item);
 
 /**
  * Select the previous open tab.
@@ -179,7 +179,7 @@ EAPI void edi_mainview_item_select(Edi_Mainview_Item *item);
  *
  * @ingroup Tabs
  */
-EAPI void edi_mainview_item_prev();
+void edi_mainview_item_prev();
 
 /**
  * Select the next open tab.
@@ -187,7 +187,7 @@ EAPI void edi_mainview_item_prev();
  *
  * @ingroup Tabs
  */
-EAPI void edi_mainview_item_next();
+void edi_mainview_item_next();
 
 /**
  * @}

@@ -38,7 +38,7 @@ static void _print_cb(const Eina_Log_Domain *domain,
      }
 }
 
-EAPI void edi_logpanel_add(Evas_Object *parent)
+void edi_logpanel_add(Evas_Object *parent)
 {
    Elm_Code_Widget *widget;
    Elm_Code *code;

@@ -75,7 +75,7 @@ struct _Edi_Editor
  *
  * @ingroup Editor
  */
-EAPI Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
+Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
 
 /**
  * @}
@@ -95,7 +95,7 @@ EAPI Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
  *
  * @ingroup Widgets
  */
-EAPI void _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
+void _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
 
 /**
  * Start a search in the specified editor.
@@ -104,7 +104,7 @@ EAPI void _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
  *
  * @ingroup Widgets
  */
-EAPI void _edi_editor_search(Edi_Editor *editor);
+void _edi_editor_search(Edi_Editor *editor);
 
 /**
  * @}

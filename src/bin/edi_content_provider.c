@@ -54,7 +54,7 @@ static Edi_Content_Provider _edi_content_provider_registry[] =
    {NULL, EINA_FALSE, EINA_FALSE, NULL}
 };
 
-EAPI Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
+Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 {
    char *id;
 
@@ -73,7 +73,7 @@ EAPI Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
    return edi_content_provider_for_id_get(id);
 }
 
-EAPI Edi_Content_Provider *edi_content_provider_for_id_get(const char *id)
+Edi_Content_Provider *edi_content_provider_for_id_get(const char *id)
 {
    Edi_Content_Provider *provider;
 
