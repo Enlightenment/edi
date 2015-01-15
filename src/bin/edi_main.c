@@ -39,13 +39,47 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
+static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup,*_edi_message_popup;
 int _edi_log_dom = -1;
+
+static void
+_edi_on_close_message(void *data,
+                     Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   evas_object_del(data);
+   evas_object_del(_edi_message_popup);
+}
+
+static void
+_edi_message_open(const char *message)
+{
+   Evas_Object *popup, *button;
+
+   popup = elm_popup_add(_edi_main_win);
+   _edi_message_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+                           message);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "Ok");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                 _edi_on_close_message, NULL);
+
+   evas_object_show(popup);
+}
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 {
    Edi_Path_Options *options;
+
+   if (path == NULL)
+     {
+        _edi_message_open("Please choose a file from the list");
+        return;
+     }
 
    options = edi_path_options_create(path);
    options->type = type;
