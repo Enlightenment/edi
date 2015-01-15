@@ -20,6 +20,7 @@
 static Evas_Object *_console_box;
 static const char *_current_dir = NULL;
 
+static uint _edi_strlen_current_dir;
 static int _edi_test_count;
 static int _edi_test_pass;
 static int _edi_test_fail;
@@ -73,7 +74,8 @@ static void _edi_consolepanel_parse_directory(const char *line)
         if (_current_dir)
           eina_stringshare_del(_current_dir);
 
-        _current_dir = eina_stringshare_add_length(pos + 20, strlen(pos) - 21);
+        _edi_strlen_current_dir = strlen(pos) - 21;
+        _current_dir = eina_stringshare_add_length(pos + 20, _edi_strlen_current_dir);
      }
 }
 
@@ -115,7 +117,7 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
         snprintf(buf, strlen(line) + 8, "<b>%s</b>%s/n", file, pos);
         elm_object_text_set(txt, buf);
 
-        length = strlen(_current_dir) + strlen(file) + 2;
+        length = _edi_strlen_current_dir + strlen(file) + 2;
         path = malloc(sizeof(char) * length);
         snprintf(path, length, "%s/%s\n", _current_dir, file);
 
