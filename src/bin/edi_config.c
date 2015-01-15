@@ -279,3 +279,21 @@ _edi_config_project_add(const char *path)
    _edi_cfg->projects = eina_list_prepend(_edi_cfg->projects, project);
    _edi_config_save();
 }
+
+void
+_edi_config_project_remove(const char *path)
+{
+   Edi_Config_Project *project;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_cfg->projects, list, next, project)
+     {
+        if (!strncmp(project->path, path, strlen(project->path)))
+	  {
+	     break;
+	  }
+     }
+
+   _edi_cfg->projects = eina_list_remove(_edi_cfg->projects, project);
+   _edi_config_save();
+}

@@ -44,6 +44,7 @@ void _edi_config_load(void);
 void _edi_config_save(void);
 
 void _edi_config_project_add(const char *path);
+void _edi_config_project_remove(const char *path);
 
 #ifdef __cplusplus
 }
