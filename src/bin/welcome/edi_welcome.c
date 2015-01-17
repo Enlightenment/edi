@@ -9,21 +9,79 @@
 
 #include "edi_private.h"
 
-#include <stdlib.h>
-#include <sys/wait.h>
-
 #define _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH 4
 
 static Evas_Object *_welcome_window;
+static Evas_Object *_edi_new_popup;
+static Evas_Object *_edi_welcome_list;
+static Evas_Object *_edi_project_box;
 static Evas_Object *_create_inputs[5];
 
-static void
-_edi_welcome_project_open(const char *path)
-{
-   evas_object_del(_welcome_window);
+static Evas_Object *_edi_create_button, *_edi_open_button;
 
+static const char *_edi_message_path;
+
+static void _edi_welcome_add_recent_projects(Evas_Object *);
+
+static void
+_edi_on_close_message(void *data,
+                       Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   evas_object_del(data);
+   evas_object_del(_edi_new_popup);
+}
+
+static void
+_edi_on_delete_message(void *data,
+                       Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   _edi_config_project_remove(_edi_message_path);
+
+   evas_object_del(_edi_welcome_list);
+   _edi_welcome_add_recent_projects(_edi_project_box);
+   evas_object_del(data);
+   evas_object_del(_edi_new_popup);
+}
+
+static void
+_edi_message_open(const char *message)
+{
+   Evas_Object *popup, *button;
+
+   popup = elm_popup_add(_welcome_window);
+   _edi_new_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+			    message);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "Ok");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+				  _edi_on_close_message, NULL);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "Delete");
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+				  _edi_on_delete_message, NULL);
+
+   evas_object_show(popup);
+}
+
+static void
+_edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
+{
    edi_project_set(path);
-   edi_open(edi_project_get());
+
+   if ((edi_open(edi_project_get()) == NULL) && !_edi_creating)
+     {
+       _edi_message_path = path;
+       _edi_message_open("Apparently that project directory doesn't exist");
+     }
+   else
+     evas_object_del(_welcome_window);
 }
 
 static void
@@ -35,7 +93,7 @@ _edi_welcome_project_chosen_cb(void *data,
 
    if (event_info)
      {
-        _edi_welcome_project_open((const char*)event_info);
+        _edi_welcome_project_open((const char*)event_info, EINA_FALSE);
      }
 }
 
@@ -43,12 +101,17 @@ static void
 _edi_welcome_choose_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    evas_object_del(data);
+   elm_object_disabled_set(_edi_open_button, EINA_FALSE);
+   elm_object_disabled_set(_edi_create_button, EINA_FALSE);
 }
 
 static void
 _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *win, *fs;
+
+   elm_object_disabled_set(_edi_open_button, EINA_TRUE);
+   elm_object_disabled_set(_edi_create_button, EINA_TRUE);
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -132,10 +195,22 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
 }
 
 static void
+_edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
+{
+   if (!success)
+     {
+        ERR("Unable to create project at path %s", path);
+
+        return;
+     }
+
+   _edi_welcome_project_open(path, EINA_TRUE);
+}
+
+static void
 _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    const char *path, *name, *user, *email, *url;
-   char script[PATH_MAX], fullpath[PATH_MAX];
 
    path = elm_fileselector_path_get(_create_inputs[0]);
    name = elm_object_text_get(_create_inputs[1]);
@@ -143,19 +218,7 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    user = elm_object_text_get(_create_inputs[3]);
    email = elm_object_text_get(_create_inputs[4]);
 
-   snprintf(script, sizeof(script), "%s/skeleton/eflprj", elm_app_data_dir_get());
-   snprintf(fullpath, sizeof(fullpath), "%s/%s", path, name);
-   int pid = fork();
-
-   if (pid == 0)
-     {
-        printf("Creating project \"%s\" at path %s for %s<%s>\n", name, fullpath, user, email);
-
-        execlp(script, script, fullpath, name, user, email, url, NULL);
-        exit(0);
-     }
-   waitpid(pid, NULL, 0);
-   _edi_welcome_project_open(fullpath);
+   edi_create_project(path, name, url, user, email, _edi_welcome_project_new_create_done_cb);
 }
 
 static void
@@ -206,7 +269,7 @@ static void
 _project_list_clicked(void *data, Evas_Object *li EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   _edi_welcome_project_open((const char *)data);
+   _edi_welcome_project_open((const char *)data, EINA_FALSE);
 }
 
 static void
@@ -219,6 +282,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    int displen;
 
    list = elm_list_add(box);
+   _edi_welcome_list = list;
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -243,7 +307,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    evas_object_show(list);
 }
 
-Evas_Object *edi_welcome_show()
+EAPI Evas_Object *edi_welcome_show()
 {
    Evas_Object *win, *hbx, *box, *button, *label, *image, *naviframe;
    Elm_Object_Item *item;
@@ -280,14 +344,8 @@ Evas_Object *edi_welcome_show()
    elm_box_pack_end(box, label);
    evas_object_show(label);
 
+   _edi_project_box = box;
    _edi_welcome_add_recent_projects(box);
-
-   button = elm_button_add(box);
-   elm_object_text_set(button, "Open Existing Project");
-   evas_object_smart_callback_add(button, "clicked",
-                                       _edi_welcome_project_choose_cb, NULL);
-   elm_box_pack_end(box, button);
-   evas_object_show(button);
 
    /* New project area */
    box = elm_box_add(hbx);
@@ -303,7 +361,17 @@ Evas_Object *edi_welcome_show()
    evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, image);
    evas_object_show(image);
+
    button = elm_button_add(box);
+   _edi_open_button = button;
+   elm_object_text_set(button, "Open Existing Project");
+   evas_object_smart_callback_add(button, "clicked",
+                                       _edi_welcome_project_choose_cb, NULL);
+   elm_box_pack_end(box, button);
+   evas_object_show(button);
+
+   button = elm_button_add(box);
+   _edi_create_button = button;
    elm_object_text_set(button, "Create New Project");
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_welcome_project_new_cb, naviframe);

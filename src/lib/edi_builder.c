@@ -3,7 +3,6 @@
 #endif
 
 #include "Edi.h"
-#include "edi_builder.h"
 
 #include "edi_private.h"
 

@@ -39,12 +39,47 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup;
+static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup,*_edi_message_popup;
+int _edi_log_dom = -1;
+
+static void
+_edi_on_close_message(void *data,
+                     Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   evas_object_del(data);
+   evas_object_del(_edi_message_popup);
+}
+
+static void
+_edi_message_open(const char *message)
+{
+   Evas_Object *popup, *button;
+
+   popup = elm_popup_add(_edi_main_win);
+   _edi_message_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+                           message);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "Ok");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                 _edi_on_close_message, NULL);
+
+   evas_object_show(popup);
+}
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 {
    Edi_Path_Options *options;
+
+   if (path == NULL)
+     {
+        _edi_message_open("Please choose a file from the list");
+        return;
+     }
 
    options = edi_path_options_create(path);
    options->type = type;
@@ -247,14 +282,14 @@ _edi_panel_dragged_cb(void *data, Evas_Object *obj EINA_UNUSED,
    _edi_panel_size_save(data == _edi_filepanel);
 }
 
-void
+EAPI void
 edi_consolepanel_show()
 {
    if (_edi_selected_bottompanel != _edi_consolepanel_item)
      elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
 }
 
-void
+EAPI void
 edi_testpanel_show()
 {
    if (_edi_selected_bottompanel != _edi_testpanel_item)
@@ -374,20 +409,20 @@ edi_content_setup(Evas_Object *win, const char *path)
      {
         elm_panes_content_right_size_set(logpane, _edi_cfg->gui.bottomsize);
         if (_edi_cfg->gui.bottomtab == 1)
-        {
-          elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_consolepanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_consolepanel_item;
+          }
         else if (_edi_cfg->gui.bottomtab == 2)
-{
-          elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_testpanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_testpanel_item;
+          }
         else
-{
-          elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
-_edi_selected_bottompanel = _edi_logpanel_item;
-}
+          {
+             elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_logpanel_item;
+          }
      }
    else
      elm_panes_content_right_size_set(logpane, 0.0);
@@ -740,6 +775,26 @@ edi_close()
    elm_exit();
 }
 
+static Eina_Bool
+_edi_log_init()
+{
+   _edi_log_dom = eina_log_domain_register("edi", EINA_COLOR_GREEN);
+   if (_edi_log_dom < 0)
+     {
+        EINA_LOG_ERR("Edi can not create its log domain.");
+        return EINA_FALSE;
+     }
+
+   return EINA_TRUE;
+}
+
+static void
+_edi_log_shutdown()
+{
+   eina_log_domain_unregister(_edi_log_dom);
+   _edi_log_dom = -1;
+}
+
 static const Ecore_Getopt optdesc = {
   "edi",
   "%prog [options] [project-dir]",
@@ -784,6 +839,8 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      goto config_error;
 
    edi_init();
+   if (!_edi_log_init())
+     goto end;
 
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
@@ -814,6 +871,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    elm_run();
 
  end:
+   _edi_log_shutdown();
    elm_shutdown();
    edi_shutdown();
 

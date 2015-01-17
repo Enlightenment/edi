@@ -12,6 +12,9 @@ MAINTAINERCLEANFILES = \
 	install-sh \
 	ltmain.sh \
 	missing \
+	m4/intl.m4 \
+	m4/intldir.m4 \
+	m4/intlmacosx.m4 \
 	m4/libtool.m4 \
 	m4/ltoptions.m4 \
 	m4/ltsugar.m4 \

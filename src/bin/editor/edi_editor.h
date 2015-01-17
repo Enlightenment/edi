@@ -55,7 +55,7 @@ struct _Edi_Editor
 #endif
 
    Ecore_Timer *delay_highlight;
-   int format_start, format_end;
+   int format_start, format_end, format_line;
 };
 
 /**

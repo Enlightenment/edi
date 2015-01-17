@@ -216,7 +216,7 @@ _edi_config_load(void)
 
    if (!_edi_cfg) 
      {
-        _edi_cfg = malloc(sizeof(Edi_Config));
+        _edi_cfg = calloc(1, sizeof(Edi_Config));
         save = EINA_TRUE;
      }
 
@@ -277,5 +277,23 @@ _edi_config_project_add(const char *path)
    project->path = eina_stringshare_add(path);
    project->name = eina_stringshare_add(basename((char*) path));
    _edi_cfg->projects = eina_list_prepend(_edi_cfg->projects, project);
+   _edi_config_save();
+}
+
+void
+_edi_config_project_remove(const char *path)
+{
+   Edi_Config_Project *project;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_cfg->projects, list, next, project)
+     {
+        if (!strncmp(project->path, path, strlen(project->path)))
+	  {
+	     break;
+	  }
+     }
+
+   _edi_cfg->projects = eina_list_remove(_edi_cfg->projects, project);
    _edi_config_save();
 }
