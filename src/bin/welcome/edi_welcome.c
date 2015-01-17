@@ -9,9 +9,6 @@
 
 #include "edi_private.h"
 
-#include <stdlib.h>
-#include <sys/wait.h>
-
 #define _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH 4
 
 static Evas_Object *_welcome_window;
@@ -190,10 +187,22 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
 }
 
 static void
+_edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
+{
+   if (!success)
+     {
+        ERR("Unable to create project at path %s", path);
+
+        return;
+     }
+
+   _edi_welcome_project_open(path, EINA_TRUE);
+}
+
+static void
 _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    const char *path, *name, *user, *email, *url;
-   char script[PATH_MAX], fullpath[PATH_MAX];
 
    path = elm_fileselector_path_get(_create_inputs[0]);
    name = elm_object_text_get(_create_inputs[1]);
@@ -201,19 +210,7 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    user = elm_object_text_get(_create_inputs[3]);
    email = elm_object_text_get(_create_inputs[4]);
 
-   snprintf(script, sizeof(script), "%s/skeleton/eflprj", elm_app_data_dir_get());
-   snprintf(fullpath, sizeof(fullpath), "%s/%s", path, name);
-   int pid = fork();
-
-   if (pid == 0)
-     {
-        printf("Creating project \"%s\" at path %s for %s<%s>\n", name, fullpath, user, email);
-
-        execlp(script, script, fullpath, name, user, email, url, NULL);
-        exit(0);
-     }
-   waitpid(pid, NULL, 0);
-   _edi_welcome_project_open(fullpath, EINA_TRUE);
+   edi_create_project(path, name, url, user, email, _edi_welcome_project_new_create_done_cb);
 }
 
 static void
