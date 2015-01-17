@@ -16,6 +16,9 @@ static Evas_Object *_edi_new_popup;
 static Evas_Object *_edi_welcome_list;
 static Evas_Object *_edi_project_box;
 static Evas_Object *_create_inputs[5];
+
+static Evas_Object *_edi_create_button, *_edi_open_button;
+
 static const char *_edi_message_path;
 
 static void _edi_welcome_add_recent_projects(Evas_Object *);
@@ -98,12 +101,17 @@ static void
 _edi_welcome_choose_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    evas_object_del(data);
+   elm_object_disabled_set(_edi_open_button, EINA_FALSE);
+   elm_object_disabled_set(_edi_create_button, EINA_FALSE);
 }
 
 static void
 _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *win, *fs;
+
+   elm_object_disabled_set(_edi_open_button, EINA_TRUE);
+   elm_object_disabled_set(_edi_create_button, EINA_TRUE);
 
    elm_need_ethumb();
    elm_need_efreet();
@@ -355,6 +363,7 @@ EAPI Evas_Object *edi_welcome_show()
    evas_object_show(image);
 
    button = elm_button_add(box);
+   _edi_open_button = button;
    elm_object_text_set(button, "Open Existing Project");
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_welcome_project_choose_cb, NULL);
@@ -362,6 +371,7 @@ EAPI Evas_Object *edi_welcome_show()
    evas_object_show(button);
 
    button = elm_button_add(box);
+   _edi_create_button = button;
    elm_object_text_set(button, "Create New Project");
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_welcome_project_new_cb, naviframe);
