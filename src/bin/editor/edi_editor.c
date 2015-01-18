@@ -695,7 +695,7 @@ _text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSE
    _reset_highlight(editor);
 }
 
-EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
+EAPI Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
@@ -764,7 +764,7 @@ EAPI Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_box_pack_end(box, txt);
 
 
-   edi_editor_search_add(searchbar, editor);
+   _edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(txt);

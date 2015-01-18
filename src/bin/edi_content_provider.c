@@ -47,7 +47,7 @@ _edi_content_provider_diff_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
 static Edi_Content_Provider _edi_content_provider_registry[] =
 {
-   {"text", EINA_TRUE, EINA_TRUE, edi_editor_add},
+   {"text", EINA_TRUE, EINA_TRUE, _edi_editor_add},
    {"image", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
    {"diff", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
 

@@ -670,7 +670,7 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   tb_it = elm_toolbar_item_append(tb, "find", "Find", _tb_search_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "find", "Find & Replace", _tb_search_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "go-jump", "Goto Line", _tb_goto_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
