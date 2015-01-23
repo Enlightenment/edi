@@ -60,7 +60,8 @@ EAPI Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 
    if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
      id = "text";
-   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
+   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc")
+            || !strcasecmp(mime, "text/x-modelica"))
      id = "text"; // TODO make a code view
    else if (!strncasecmp(mime, "image/", 6))
      id = "image";
