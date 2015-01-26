@@ -336,15 +336,15 @@ EAPI void edi_consolepanel_add(Evas_Object *parent)
 EAPI void edi_testpanel_add(Evas_Object *parent)
 {
    Elm_Code *code;
-   Elm_Code_Widget2 *widget;
+   Elm_Code_Widget *widget;
 
    code = elm_code_create();
    _edi_test_code = code;
 
-   widget = eo_add(ELM_CODE_WIDGET2_CLASS, parent);
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
    eo_do(widget,
-         elm_code_widget2_code_set(code);
-         elm_code_widget2_font_size_set(_edi_cfg->font.size));
+         elm_code_widget_code_set(code);
+         elm_code_widget_font_size_set(_edi_cfg->font.size));
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
