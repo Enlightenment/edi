@@ -12,6 +12,7 @@
 #include "gettext.h"
 
 #include <Elm_Code.h>
+#include "elm_code_widget.eo.h"
 
 #include "elm_code_test_private.h"
 
@@ -47,12 +48,15 @@ static Evas_Object *
 _elm_code_test_welcome_setup(Evas_Object *parent)
 {
    Elm_Code *code;
-   Evas_Object *widget;
+   Elm_Code_Widget *widget;
 
    code = elm_code_create();
-   widget = elm_code_widget_add(parent, code);
-   elm_code_widget_font_size_set(widget, 14);
-   eo_do(widget,eo_event_callback_add(&ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _elm_code_test_line_cb, code));
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
+   eo_do(widget,
+         elm_code_widget_code_set(code);
+         elm_code_widget_font_size_set(14);
+         elm_code_widget_editable_set(EINA_TRUE);
+         eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _elm_code_test_line_cb, code));
 
    _append_line(code->file, "Hello World, Elm Code!");
    elm_code_file_line_token_add(code->file, 1, 14, 21, ELM_CODE_TOKEN_TYPE_COMMENT);
@@ -88,8 +92,7 @@ _elm_code_test_diff_setup(Evas_Object *parent)
 static Evas_Object *
 elm_code_test_win_setup(void)
 {
-   Evas_Object *win;
-   Evas_Object *vbox;
+   Evas_Object *win,*vbox;
 
    win = elm_win_util_standard_add("main", "Elm_Code Test");
    if (!win) return NULL;
@@ -100,15 +103,11 @@ elm_code_test_win_setup(void)
    elm_box_homogeneous_set(vbox, EINA_TRUE);
    evas_object_show(vbox);
 
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
-   evas_object_smart_callback_add(win, "delete,request", _elm_code_test_win_del, NULL);
-
    elm_box_pack_end(vbox, _elm_code_test_welcome_setup(vbox));
-
    elm_box_pack_end(vbox, _elm_code_test_diff_setup(vbox));
-
    elm_win_resize_object_add(win, vbox);
 
+   evas_object_smart_callback_add(win, "delete,request", _elm_code_test_win_del, NULL);
    evas_object_resize(win, 380 * elm_config_scale_get(), 240 * elm_config_scale_get());
    evas_object_show(win);
 

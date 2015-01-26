@@ -84,6 +84,14 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 # Check edje_cc
 EFL_WITH_BIN([edje], [edje-cc], [edje_cc])
+EFL_WITH_BIN([eolian], [eolian-gen], [eolian_gen])
+# Force the helper to try external eolian generators
+AM_CONDITIONAL([HAVE_EOLIAN_GEN], [true])
+
+# Needs to be moved into a macro, and also, needs a way to automatically fetch
+# from all the dependencies using the Requires.
+DEPS_EOLIAN_FLAGS=`${PKG_CONFIG} --variable=eolian_flags eo evas edje ecore efl`
+AC_SUBST([DEPS_EOLIAN_FLAGS])
 
 # Checks for library functions.
 AC_CHECK_FUNCS([setlocale])
@@ -126,6 +134,8 @@ echo "Compilation..............: make (or gmake)"
 echo "  CFLAGS.................: $CFLAGS"
 echo "  edje_cc................: ${edje_cc}"
 echo "  highlighting (libclang): ${build_clang}"
+echo
+echo "eolian_gen...............: ${eolian_gen}"
 echo
 echo "Building documentation...: ${build_doc}"
 echo "Building tests...........: ${have_tests}"
