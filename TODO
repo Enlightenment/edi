@@ -1,11 +1,12 @@
 This project is in heavy development, we are currenty working towards the
 "Code aware editor" phase, the following work is still to be done:
 
-* Replace in file
+* Tidy test panel output - summarise run and click to show test
+
 * Redo changes that have been undone
 * Add a menu for easier access to some features
 * Search / replace in project / directory
-* Integrate elm_code project (cedric and TAsn)
+* Integrate elm_code project (cedric, ajwillia-ms and TAsn)
   - Code folding
   - Automatic code indenting / formatting
   - Code expansion (nested display of function call body)
