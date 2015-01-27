@@ -46,13 +46,16 @@ static void
 _item_menu_xdgopen_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   int pid = fork();
+   char *cmd;
+   int cmdlen;
+   const char *format = "xdg-open \"%s\"";
 
-   if (pid == 0)
-     {
-        execlp("/usr/bin/xdg-open", "xdg-open", _menu_cb_path, NULL);
-        exit(0);
-     }
+   cmdlen = strlen(format) + strlen(_menu_cb_path) - 1;
+   cmd = malloc(sizeof(char) * cmdlen);
+   snprintf(cmd, cmdlen, format, _menu_cb_path);
+
+   ecore_exe_run(cmd, NULL);
+   free(cmd);
 }
 
 static void
