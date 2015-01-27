@@ -447,7 +447,7 @@ _tb_new_create_cb(void *data,
    path = edi_project_file_path_get(name);
 
    fclose(fopen(path, "w"));
-   edi_mainview_open_path(path);
+   edi_mainview_open_path(eina_stringshare_add(path));
 
    evas_object_del(_edi_new_popup);
    free((char*)path);

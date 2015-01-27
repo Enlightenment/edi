@@ -58,6 +58,9 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 {
    char *id;
 
+   if (!mime)
+     return NULL;
+
    if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
      id = "text";
    else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc")
