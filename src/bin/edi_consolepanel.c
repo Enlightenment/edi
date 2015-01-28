@@ -17,7 +17,6 @@
 
 #include "edi_private.h"
 
-static Evas_Object *_console_box;
 static const char *_current_dir = NULL;
 
 static unsigned int _edi_strlen_current_dir;
@@ -25,22 +24,11 @@ static int _edi_test_count;
 static int _edi_test_pass;
 static int _edi_test_fail;
 
-static Elm_Code *_edi_test_code;
+static Elm_Code *_edi_test_code, *_edi_console_code;
 static void _edi_test_line_callback(const char *content);
 
-static const char *_edi_consolepanel_icon_for_line(const char *line)
-{
-   if (strstr(line, " error:") != NULL)
-     return "error";
-   if (strstr(line, " warning:") != NULL)
-     return "important";
-   if (strstr(line, " info:") != NULL || strstr(line, " note:") != NULL)
-     return "info";
-
-   return NULL;
-}
-
-static Eina_Bool _startswith_location(const char *line)
+static Eina_Bool
+_edi_consolepanel_startswith_location(const char *line)
 {
    regex_t regex;
    int ret;
@@ -52,16 +40,22 @@ static Eina_Bool _startswith_location(const char *line)
    return ret;
 }
 
-static void _edi_consolepanel_clicked_cb(void *data, Evas *e EINA_UNUSED,
-                 Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+static char *
+_edi_consolepanel_extract_location(const char *line)
 {
-   Edi_Path_Options *options;
+   char *path;
+   const char *pos;
+   int file_len, length;
 
-   if (strstr(data, edi_project_get()) != data)
-     return;
+   pos = strstr(line, " ");
+   file_len = strlen(line) - strlen(pos);
 
-   options = edi_path_options_create(data);
-   edi_mainview_open(options);
+   length = _edi_strlen_current_dir + file_len + 2;
+   path = malloc(sizeof(char) * length);
+   snprintf(path, _edi_strlen_current_dir + 2, "%s/", _current_dir);
+   snprintf(path + _edi_strlen_current_dir + 1, file_len + 1, "%s", line);
+
+   return path;
 }
 
 static void _edi_consolepanel_parse_directory(const char *line)
@@ -79,91 +73,47 @@ static void _edi_consolepanel_parse_directory(const char *line)
      }
 }
 
-static void _edi_consolepanel_scroll_to_bottom()
+static Eina_Bool
+_edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
+                             const Eo_Event_Description *desc EINA_UNUSED, void *event_info)
 {
-   Evas_Object *scroller;
-   Evas_Coord x, y, w, h;
+   Edi_Path_Options *options;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   const char *content;
+   char *path, *terminated;
+   int length;
 
-   scroller = elm_object_parent_widget_get(_console_box);
-   evas_object_geometry_get(_console_box, &x, &y, &w, &h);
-   elm_scroller_region_show(scroller, x, h - 10, w, 10);
+   code = (Elm_Code *)data;
+   line = (Elm_Code_Line *)event_info;
+
+   content = elm_code_file_line_content_get(code->file, line->number, &length);
+
+   terminated = malloc(sizeof(char) * (length + 1));
+   snprintf(terminated, length, content);
+
+   if (_edi_consolepanel_startswith_location(terminated))
+     {
+        path = _edi_consolepanel_extract_location(terminated);
+        if (strstr(path, edi_project_get()) == path)
+          {
+             options = edi_path_options_create(path);
+             edi_mainview_open(options);
+          }
+     }
+
+   free(terminated);
+   return EINA_TRUE;
 }
 
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
-   Evas_Object *txt, *icon, *box;
-   char *buf, *path;
-   const char *pos, *file, *type = NULL, *cursor = NULL;
-   int length;
+   _edi_consolepanel_parse_directory(line);
 
-   txt = elm_label_add(_console_box);
-
+   elm_code_file_line_append(_edi_console_code->file, line, strlen(line));
    if (err)
-     evas_object_color_set(txt, 255, 63, 63, 255);
-   else
-     evas_object_color_set(txt, 255, 255, 255, 255);
-
-   if (_startswith_location(line))
-     {
-        cursor = ELM_CURSOR_HAND1;
-        elm_object_cursor_set(txt, cursor);
-        elm_object_cursor_theme_search_enabled_set(txt, EINA_TRUE);
-
-        pos = strstr(line, " ");
-        length = strlen(line) - strlen(pos);
-        file = eina_stringshare_add_length(line, length);
-
-        buf = malloc(sizeof(char) * (strlen(line) + 8));
-        snprintf(buf, strlen(line) + 8, "<b>%s</b>%s/n", file, pos);
-        elm_object_text_set(txt, buf);
-
-        length = _edi_strlen_current_dir + strlen(file) + 2;
-        path = malloc(sizeof(char) * length);
-        snprintf(path, length, "%s/%s\n", _current_dir, file);
-
-        evas_object_event_callback_add(txt, EVAS_CALLBACK_MOUSE_DOWN,
-                                       _edi_consolepanel_clicked_cb, eina_stringshare_add(path));
-
-        free(path);
-        free(buf);
-     }
-   else
-     {
-        _edi_consolepanel_parse_directory(line);
-        elm_object_text_set(txt, line);
-     }
-
-   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(txt, 0.0, EVAS_HINT_FILL);
-   evas_object_show(txt);
-
-   if (err)
-     type = _edi_consolepanel_icon_for_line(line);
-
-   icon = elm_icon_add(_console_box);
-   evas_object_size_hint_min_set(icon, 14, 14);
-   evas_object_size_hint_max_set(icon, 14, 14);
-   if (type)
-     {
-        elm_icon_standard_set(icon, type);
-        if (cursor)
-          {
-             elm_object_cursor_set(icon, cursor);
-             elm_object_cursor_theme_search_enabled_set(icon, EINA_TRUE);
-          }
-     }
-   evas_object_show(icon);
-
-   box = elm_box_add(_console_box);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_horizontal_set(box, EINA_TRUE);
-   elm_box_pack_end(box, icon);
-   elm_box_pack_end(box, txt);
-   evas_object_show(box);
-
-   elm_box_pack_end(_console_box, box);
-   _edi_consolepanel_scroll_to_bottom();
+     elm_code_file_line_status_set(_edi_console_code->file, elm_code_file_lines_get(_edi_console_code->file),
+                                   ELM_CODE_STATUS_TYPE_ERROR);
 
    _edi_test_line_callback(line);
 }
@@ -180,7 +130,7 @@ void edi_consolepanel_append_error_line(const char *line)
 
 void edi_consolepanel_clear()
 {
-   elm_box_clear(_console_box);
+   elm_code_file_clear(_edi_console_code->file);
 
    elm_code_file_clear(_edi_test_code->file);
    _edi_test_count = 0;
@@ -313,21 +263,24 @@ static void _edi_test_line_callback(const char *content)
 
 void edi_consolepanel_add(Evas_Object *parent)
 {
-   Evas_Object *scroll, *vbx;
+   Elm_Code *code;
+   Elm_Code_Widget *widget;
 
-   scroll = elm_scroller_add(parent);
-   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(scroll);
+   code = elm_code_create();
+   _edi_console_code = code;
 
-   vbx = elm_box_add(parent);
-   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_show(vbx);
-   elm_object_content_set(scroll, vbx);
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
+   eo_do(widget,
+         elm_code_widget_code_set(code),
+         elm_code_widget_font_size_set(_edi_cfg->font.size),
+         elm_code_widget_gravity_set(0.0, 1.0),
+         eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code));
 
-   _console_box = vbx;
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
 
-   elm_box_pack_end(parent, scroll);
+   elm_box_pack_end(parent, widget);
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
