@@ -343,8 +343,9 @@ void edi_testpanel_add(Evas_Object *parent)
 
    widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
    eo_do(widget,
-         elm_code_widget_code_set(code);
-         elm_code_widget_font_size_set(_edi_cfg->font.size));
+         elm_code_widget_code_set(code),
+         elm_code_widget_font_size_set(_edi_cfg->font.size),
+         elm_code_widget_gravity_set(0.0, 1.0));
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
