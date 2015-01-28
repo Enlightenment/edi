@@ -168,17 +168,17 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
    _edi_test_line_callback(line);
 }
 
-EAPI void edi_consolepanel_append_line(const char *line)
+void edi_consolepanel_append_line(const char *line)
 {
    _edi_consolepanel_append_line_type(line, EINA_FALSE);
 }
 
-EAPI void edi_consolepanel_append_error_line(const char *line)
+void edi_consolepanel_append_error_line(const char *line)
 {
    _edi_consolepanel_append_line_type(line, EINA_TRUE);
 }
 
-EAPI void edi_consolepanel_clear()
+void edi_consolepanel_clear()
 {
    elm_box_clear(_console_box);
 
@@ -311,7 +311,7 @@ static void _edi_test_line_callback(const char *content)
      }
 }
 
-EAPI void edi_consolepanel_add(Evas_Object *parent)
+void edi_consolepanel_add(Evas_Object *parent)
 {
    Evas_Object *scroll, *vbx;
 
@@ -333,7 +333,7 @@ EAPI void edi_consolepanel_add(Evas_Object *parent)
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
 }
 
-EAPI void edi_testpanel_add(Evas_Object *parent)
+void edi_testpanel_add(Evas_Object *parent)
 {
    Elm_Code *code;
    Elm_Code_Widget *widget;

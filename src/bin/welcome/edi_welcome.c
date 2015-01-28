@@ -307,7 +307,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    evas_object_show(list);
 }
 
-EAPI Evas_Object *edi_welcome_show()
+Evas_Object *edi_welcome_show()
 {
    Evas_Object *win, *hbx, *box, *button, *label, *image, *naviframe;
    Elm_Object_Item *item;

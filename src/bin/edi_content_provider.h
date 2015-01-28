@@ -43,7 +43,7 @@ typedef struct _Edi_Content_Provider
  *
  * @ingroup Lookup
  */
-EAPI Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime);
+Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime);
 
 /**
  * Look up a content provider based on a provider id.
@@ -55,7 +55,7 @@ EAPI Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime);
  *
  * @ingroup Lookup
  */
-EAPI Edi_Content_Provider *edi_content_provider_for_id_get(const char *id);
+Edi_Content_Provider *edi_content_provider_for_id_get(const char *id);
 
 /**
  * @}

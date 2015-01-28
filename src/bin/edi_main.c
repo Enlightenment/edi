@@ -282,14 +282,14 @@ _edi_panel_dragged_cb(void *data, Evas_Object *obj EINA_UNUSED,
    _edi_panel_size_save(data == _edi_filepanel);
 }
 
-EAPI void
+void
 edi_consolepanel_show()
 {
    if (_edi_selected_bottompanel != _edi_consolepanel_item)
      elm_toolbar_item_selected_set(_edi_consolepanel_item, EINA_TRUE);
 }
 
-EAPI void
+void
 edi_testpanel_show()
 {
    if (_edi_selected_bottompanel != _edi_testpanel_item)
@@ -447,7 +447,7 @@ _tb_new_create_cb(void *data,
    path = edi_project_file_path_get(name);
 
    fclose(fopen(path, "w"));
-   edi_mainview_open_path(path);
+   edi_mainview_open_path(eina_stringshare_add(path));
 
    evas_object_del(_edi_new_popup);
    free((char*)path);
@@ -718,7 +718,7 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_config_save();
 }
 
-EAPI Evas_Object *
+Evas_Object *
 edi_open(const char *inputpath)
 {
    Evas_Object *win, *vbx, *content, *tb;
@@ -769,7 +769,7 @@ edi_open(const char *inputpath)
    return win;
 }
 
-EAPI void
+void
 edi_close()
 {
    elm_exit();
