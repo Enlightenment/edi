@@ -162,6 +162,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    Evas_Object *content;
    Elm_Object_Item *it, *tab;
    Edi_Mainview_Item *item;
+   Edi_Editor *editor;
 
    item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
    content = _edi_mainview_content_create(item, nf);
@@ -174,6 +175,11 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    item->view = it;
    item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
+
+   // Set focus on the newly opening window so that one can just start typing
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   if (editor)
+     elm_object_focus_set(editor->entry, EINA_TRUE);
 
    elm_object_item_data_set(it, item);
 }
@@ -208,6 +214,7 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 {
    Evas_Object *win, *content;
    Edi_Mainview_Item *item;
+   Edi_Editor *editor;
 
    win = elm_win_util_standard_add("mainview", _edi_mainview_win_title_get(options->path));
    if (!win) return;
@@ -219,6 +226,11 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 
    content = _edi_mainview_content_create(item, win);
    elm_win_resize_object_add(win, content);
+
+   // Set focus on the newly opening window so that one can just start typing
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   if (editor)
+     elm_object_focus_set(editor->entry, EINA_TRUE);
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
