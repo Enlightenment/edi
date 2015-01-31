@@ -239,13 +239,18 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
 {
    Edi_Editor *editor = data;
    Evas_Coord y, h;
+   static Evas_Coord _edi_global_y;
 
-// TODO ignore y scrolls - just return;
    elm_scroller_region_get(editor->entry, NULL, &y, NULL, NULL);
    elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
    elm_scroller_region_show(editor->lines, 0, y, 10, h);
 
-   _update_highlight(editor);
+   // Don't update highlighting on y scroll, only h
+   if (_edi_global_y != y)
+     {
+        _update_highlight(editor);
+	_edi_global_y = y;
+     }
 }
 
 static void
