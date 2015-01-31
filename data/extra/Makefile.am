@@ -1,12 +1,13 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 skeletondir = $(datadir)/$(PACKAGE)/
-skeleton_DATA = 
+skeleton_DATA =
 
 install-data-hook:
-	tar -xf $(srcdir)/skeleton.tar.gz -C $(skeletondir)
+	cp -r skeleton $(skeletondir)
 
 uninstall-local:
 	rm -rf $(skeletondir)/skeleton
+
 
 EXTRA_DIST = $(skeleton_DATA)
