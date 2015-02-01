@@ -20,6 +20,7 @@ static Evas_Object *_create_inputs[5];
 static Evas_Object *_edi_create_button, *_edi_open_button;
 
 static const char *_edi_message_path;
+Eina_Bool _edi_list_item_x_clicked = EINA_FALSE;
 
 static void _edi_welcome_add_recent_projects(Evas_Object *);
 
@@ -269,13 +270,34 @@ static void
 _project_list_clicked(void *data, Evas_Object *li EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   _edi_welcome_project_open((const char *)data, EINA_FALSE);
+   if (_edi_list_item_x_clicked == EINA_TRUE)
+     {
+        fprintf(stderr, "%s\n", (const char *)data);
+
+        _edi_config_project_remove((const char *)data);
+        evas_object_del(_edi_welcome_list);
+        _edi_welcome_add_recent_projects(_edi_project_box);
+        evas_object_del(data);
+
+        _edi_list_item_x_clicked = EINA_FALSE;
+     }
+   else
+     _edi_welcome_project_open((const char *)data, EINA_FALSE);
+}
+
+static void
+_edi_x_in_list_clicked(void *data EINA_UNUSED,
+                       Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   _edi_list_item_x_clicked = EINA_TRUE;
+   return;
 }
 
 static void
 _edi_welcome_add_recent_projects(Evas_Object *box)
 {
-   Evas_Object *list, *label;
+   Evas_Object *list, *label, *ic, *icon_button;
    Eina_List *listitem;
    Edi_Config_Project *project;
    char *display, *format;
@@ -293,16 +315,25 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
         display = malloc(sizeof(char) * displen);
         snprintf(display, displen, format, project->path);
 
+        // Add a 'close' icon that can be clicked to remove a project directory
+        icon_button = elm_button_add(box);
+        ic = elm_icon_add(icon_button);
+        elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_THEME_FDO);
+        elm_icon_standard_set(ic, "close");
+        elm_image_resizable_set(ic, EINA_FALSE, EINA_FALSE);
+        evas_object_smart_callback_priority_add(ic, "clicked", EVAS_CALLBACK_PRIORITY_BEFORE, _edi_x_in_list_clicked, box);
+
         label = elm_label_add(box);
         elm_object_text_set(label, display);
         evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
         evas_object_show(label);
 
-        elm_list_item_append(list, project->name, NULL, label, _project_list_clicked, project->path);
+        elm_list_item_append(list, project->name, ic, label, _project_list_clicked, project->path);
 
         free(display);
      }
+
    elm_box_pack_end(box, list);
    evas_object_show(list);
 }
