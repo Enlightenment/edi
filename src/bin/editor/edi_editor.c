@@ -172,6 +172,10 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    shift = evas_key_modifier_is_set(ev->modifiers, "Shift");
 
    item = edi_mainview_item_current_get();
+
+   if (!item)
+     return;
+
    content = elm_object_item_content_get(item->view);
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
