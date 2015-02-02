@@ -2,6 +2,9 @@
 # include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <pwd.h>
+
 #include <Elementary.h>
 
 #include "edi_welcome.h"
@@ -222,7 +225,30 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    user = elm_object_text_get(_create_inputs[3]);
    email = elm_object_text_get(_create_inputs[4]);
 
-   edi_create_project(path, name, url, user, email, _edi_welcome_project_new_create_done_cb);
+   edi_create_efl_project(path, name, url, user, email, _edi_welcome_project_new_create_done_cb);
+}
+
+static int
+_edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
+{
+    struct passwd *p;
+    size_t n;
+
+    errno = 0;
+    p = getpwnam(username);
+    if (p == NULL && errno == 0)
+        return 0;
+    if (p == NULL)
+        return -1;
+
+    n = strcspn(p->pw_gecos, ",");
+    if (max == 0 || n <= 0)
+        return 0;
+    if (n > max - 1)
+        n = max - 1;
+    memcpy(fullname, p->pw_gecos, n);
+    fullname[n] = '\0';
+    return 1;
 }
 
 static void
@@ -231,17 +257,23 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *content, *button, *naviframe = data;
    Elm_Object_Item *item;
    int row = 0;
+   char fullname[1024];
+   char *username;
 
    content = elm_table_add(naviframe);
    elm_table_homogeneous_set(content, EINA_TRUE);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(content);
 
+   username = getenv("USER");
    _edi_welcome_project_new_directory_row_add("Parent Path", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project Name", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project URL", NULL, row++, content);
-   _edi_welcome_project_new_input_row_add("Username", getenv("USER"), row++, content);
-   _edi_welcome_project_new_input_row_add("Email", NULL, row++, content);
+   if (_edi_welcome_user_fullname_get(username, fullname, 1024) > 0)
+      _edi_welcome_project_new_input_row_add("Creator Name", fullname, row++, content);
+   else
+      _edi_welcome_project_new_input_row_add("Creator Name", username, row++, content);
+   _edi_welcome_project_new_input_row_add("Creator Email", NULL, row++, content);
 
    button = elm_button_add(content);
    elm_object_text_set(button, "Create");

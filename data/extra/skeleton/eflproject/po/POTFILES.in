@@ -1,0 +1,2 @@
+src/bin/${edi_name}_main.c
+src/bin/${edi_name}_private.h

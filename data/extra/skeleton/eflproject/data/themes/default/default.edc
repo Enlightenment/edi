@@ -1,0 +1,21 @@
+images.image: "enlightenment.png" COMP;
+
+collections {
+   sounds {
+      sample {
+         name: "bell" LOSSY 64;
+         source: "bell.wav";
+      }
+   }
+
+   group {
+      name: "test";
+      parts {
+      	 part { name: "main"; type: IMAGE;
+	    description {
+	       image.normal: "enlightenment.png";
+	    }
+	 }
+      }
+   }
+}
