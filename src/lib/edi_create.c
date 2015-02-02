@@ -65,6 +65,7 @@ _edi_create_filter_file(Edi_Create *create, const char *path)
    const char *template;
    int length;
 
+   create->filters++;
 // TODO speed this up - pre-cache this filter!
    template = "sed -i \"s|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|ig;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|$%s|g;s|\\${Edi_Year}|%d|g\" %s";
    length = strlen(template) + (strlen(create->name) * 3)  + strlen(create->user) + strlen(create->email) + strlen(create->url) + strlen(path) + 4 - 16 + 1;
@@ -86,7 +87,8 @@ _edi_create_filter_file(Edi_Create *create, const char *path)
    free((void *) path);
 }
 
-static void _edi_create_free_data()
+static void
+_edi_create_free_data()
 {
    Edi_Create *create;
 
@@ -102,6 +104,12 @@ static void _edi_create_free_data()
    free(create);
 }
 
+static void
+_edi_create_done_cb(void *data EINA_UNUSED, Eio_File *file EINA_UNUSED)
+{
+   // we're using the filter processes to determine when we're done
+}
+
 static Eina_Bool
 _edi_create_project_done(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
@@ -114,6 +122,28 @@ _edi_create_project_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
 
    _edi_create_free_data();
    return ECORE_CALLBACK_DONE; // or ECORE_CALLBACK_PASS_ON
+}
+
+static Eina_Bool
+_edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Edi_Create *create;
+   Ecore_Event_Handler *handler;
+
+   create = (Edi_Create *)data;
+
+   if (--create->filters > 0)
+     return ECORE_CALLBACK_PASS_ON;
+
+   ecore_event_handler_del(create->handler);
+
+   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_project_done, data);
+   create->handler = handler;
+
+   chdir(create->path);
+   ecore_exe_run("git init && git add .", data);
+
+   return ECORE_CALLBACK_PASS_ON;
 }
 
 static void
@@ -162,22 +192,6 @@ _edi_create_notify_cb(void *d, Eio_File *handler EINA_UNUSED, const Eio_Progress
 }
 
 static void
-_edi_create_done_cb(void *d, Eio_File *file EINA_UNUSED)
-{
-   Edi_Create *data;
-   Ecore_Event_Handler *handler;
-
-   data = (Edi_Create *) d;
-
-   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_project_done, data); 
-   data->handler = handler;
-
-   chdir(data->path);
-   ecore_exe_run("git init && git add .", data);
-}
-
-
-static void
 _edi_create_error_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED, int error)
 
 {
@@ -191,6 +205,7 @@ edi_create_efl_project(const char *parentdir, const char *name, const char *url,
 {
    char source[PATH_MAX], dest[PATH_MAX];
    Edi_Create *data;
+   Ecore_Event_Handler *handler;
 
    snprintf(source, sizeof(source), "%s/skeleton/eflproject", elm_app_data_dir_get());
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
@@ -206,6 +221,10 @@ edi_create_efl_project(const char *parentdir, const char *name, const char *url,
    data->email = strdup(email);
    data->callback = func;
    _edi_create_data = data;
+
+   data->filters = 0;
+   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_filter_file_done, data);
+   data->handler = handler;
 
    eio_dir_copy(source, dest, NULL, _edi_create_notify_cb, _edi_create_done_cb,
                 _edi_create_error_cb, data);

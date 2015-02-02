@@ -21,6 +21,8 @@ typedef struct _Edi_Create
 
    Edi_Create_Cb callback;
    Ecore_Event_Handler *handler;
+
+   int filters;
 } Edi_Create;
 
 /**
