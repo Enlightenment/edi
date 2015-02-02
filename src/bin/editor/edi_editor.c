@@ -249,7 +249,7 @@ _scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSE
    elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
    elm_scroller_region_show(editor->lines, 0, y, 10, h);
 
-   // Don't update highlighting on y scroll, only h
+   // Don't update highlighting on h scroll, only y
    if (_edi_global_y != y)
      {
         _update_highlight(editor);
