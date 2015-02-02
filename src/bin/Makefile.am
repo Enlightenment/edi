@@ -4,6 +4,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 bin_PROGRAMS = edi edi_build
 
 AM_CPPFLAGS = \
+-DPACKAGE_BIN_DIR=\"$(bindir)\" \
+-DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -DLOCALEDIR=\"$(datadir)/locale\" \
 -I$(top_srcdir)/src/bin/ \
