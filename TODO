@@ -1,9 +1,6 @@
 This project is in heavy development, we are currenty working towards the
 "Code aware editor" phase, the following work is still to be done:
 
-* Tidy test panel output - summarise run and click to show test
-* Better skeleton template generation (including year)
-
 * Redo changes that have been undone
 * Add a menu for easier access to some features
 * Search / replace in project / directory
