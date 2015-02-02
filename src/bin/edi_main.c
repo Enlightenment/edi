@@ -652,6 +652,7 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_align_set(tb, 0.0);
+   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
    elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
 
