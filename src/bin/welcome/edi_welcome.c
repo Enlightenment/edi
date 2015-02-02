@@ -20,7 +20,7 @@ static Evas_Object *_create_inputs[5];
 static Evas_Object *_edi_create_button, *_edi_open_button;
 
 static const char *_edi_message_path;
-Eina_Bool _edi_list_item_x_clicked = EINA_FALSE;
+Eina_Bool _edi_list_item_delete_clicked = EINA_FALSE;
 
 static void _edi_welcome_add_recent_projects(Evas_Object *);
 
@@ -47,7 +47,7 @@ _edi_on_delete_message(void *data,
 }
 
 static void
-_edi_message_open(const char *message)
+_edi_message_open(const char *message, Eina_Bool deletable)
 {
    Evas_Object *popup, *button;
 
@@ -62,11 +62,14 @@ _edi_message_open(const char *message)
    evas_object_smart_callback_add(button, "clicked",
 				  _edi_on_close_message, NULL);
 
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "Delete");
-   elm_object_part_content_set(popup, "button2", button);
-   evas_object_smart_callback_add(button, "clicked",
+   if (deletable)
+     {
+        button = elm_button_add(popup);
+        elm_object_text_set(button, "Delete");
+        elm_object_part_content_set(popup, "button2", button);
+        evas_object_smart_callback_add(button, "clicked",
 				  _edi_on_delete_message, NULL);
+     }
 
    evas_object_show(popup);
 }
@@ -79,7 +82,7 @@ _edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
    if ((edi_open(edi_project_get()) == NULL) && !_edi_creating)
      {
        _edi_message_path = path;
-       _edi_message_open("Apparently that project directory doesn't exist");
+       _edi_message_open("Apparently that project directory doesn't exist", EINA_TRUE);
      }
    else
      evas_object_del(_welcome_window);
@@ -270,27 +273,25 @@ static void
 _project_list_clicked(void *data, Evas_Object *li EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   if (_edi_list_item_x_clicked == EINA_TRUE)
+   if (_edi_list_item_delete_clicked == EINA_TRUE)
      {
-        fprintf(stderr, "%s\n", (const char *)data);
-
         _edi_config_project_remove((const char *)data);
         evas_object_del(_edi_welcome_list);
         _edi_welcome_add_recent_projects(_edi_project_box);
         evas_object_del(data);
 
-        _edi_list_item_x_clicked = EINA_FALSE;
+        _edi_list_item_delete_clicked = EINA_FALSE;
      }
    else
      _edi_welcome_project_open((const char *)data, EINA_FALSE);
 }
 
 static void
-_edi_x_in_list_clicked(void *data EINA_UNUSED,
+_edi_welcome_project_list_delete_clicked(void *data EINA_UNUSED,
                        Evas_Object *obj EINA_UNUSED,
                        void *event_info EINA_UNUSED)
 {
-   _edi_list_item_x_clicked = EINA_TRUE;
+   _edi_list_item_delete_clicked = EINA_TRUE;
    return;
 }
 
@@ -321,7 +322,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
         elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_THEME_FDO);
         elm_icon_standard_set(ic, "close");
         elm_image_resizable_set(ic, EINA_FALSE, EINA_FALSE);
-        evas_object_smart_callback_priority_add(ic, "clicked", EVAS_CALLBACK_PRIORITY_BEFORE, _edi_x_in_list_clicked, box);
+        evas_object_smart_callback_priority_add(ic, "clicked", EVAS_CALLBACK_PRIORITY_BEFORE, _edi_welcome_project_list_delete_clicked, box);
 
         label = elm_label_add(box);
         elm_object_text_set(label, display);
