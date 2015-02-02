@@ -8,12 +8,12 @@
         |-----handy-ruler------------------------------------------------------|
 ${edi_name}: ${edi_name}
 ${edi_name}:
-${edi_name}: ${EDI_NAME} is an example of application written using the Enlightenment
+${edi_name}: ${Edi_Name} is an example of application written using the Enlightenment
 ${edi_name}: Foundation Libraries.
 ${edi_name}: 
 ${edi_name}: It requires elementary.
 ${edi_name}:
-${edi_name}: ${edi_name} was written by ${EDI_USER} <${EDI_EMAIL}>
-${edi_name}: website: <http://${EDI_WWW}/>
+${edi_name}: ${edi_name} was written by ${Edi_User} <${Edi_Email}>
+${edi_name}: website: <http://${Edi_Url}/>
 ${edi_name}:
 ${edi_name}:

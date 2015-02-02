@@ -4,7 +4,7 @@ pkgver=1.8.99.8967.a1cfce6
 pkgrel=1
 pkgdesc="Enlightenment toolkit ${edi_name} - GIT development snapshot"
 arch=('i686' 'x86_64' 'arm')
-url="http://${EDI_WWW}"
+url="http://${Edi_Url}"
 license=('WTFPL')
 makedepends=('doxygen' 'imagemagick' 'git')
 depends=('elementary-git')
@@ -49,7 +49,7 @@ package_${edi_name}-git() {
 }
 
 package_${edi_name}_doc-git() {
-  pkgdesc="Documentation for ${EDI_NAME}"
+  pkgdesc="Documentation for ${Edi_Name}"
   arch=('any')
   unset depends optdepends
 

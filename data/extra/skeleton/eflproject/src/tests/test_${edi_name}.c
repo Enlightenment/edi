@@ -5,9 +5,9 @@
 #include <Ecore_Getopt.h>
 #include <check.h>
 
-#include "${EDI_NAME}.h"
+#include "${Edi_Name}.h"
 
-#define COPYRIGHT "Copyright © ${EDI_YEAR} ${EDI_USER} <${EDI_EMAIL}> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © ${Edi_Year} ${Edi_User} <${Edi_Email}> and various contributors (see AUTHORS)."
 
 static void ${edi_name}_test_basic(TCase *tc);
 
@@ -96,7 +96,7 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 	goto end;
      }
 
-   s = suite_create("${EDI_NAME}");
+   s = suite_create("${Edi_Name}");
 
    for (i = 0; i < sizeof (tests) / sizeof (tests[0]); i++)
      {

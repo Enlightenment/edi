@@ -3,6 +3,7 @@
 
 #include <Elementary.h>
 #include <Eina.h>
+#include <Eio.h>
 
 #ifdef EAPI
 # undef EAPI

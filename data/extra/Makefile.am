@@ -9,5 +9,4 @@ install-data-hook:
 uninstall-local:
 	rm -rf $(skeletondir)/skeleton
 
-
 EXTRA_DIST = $(skeleton_DATA)

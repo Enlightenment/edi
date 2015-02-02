@@ -35,7 +35,7 @@ extern "C" {
 
 /**
  * @file
- * @brief These routines are used for ${EDI_NAME} library interaction.
+ * @brief These routines are used for ${Edi_Name} library interaction.
  */
 
 /**
@@ -47,20 +47,20 @@ extern "C" {
  * Functions of obligatory usage, handling proper initialization
  * and shutdown routines.
  *
- * Before the usage of any other function, ${EDI_NAME} should be properly
- * initialized with @ref ${edi_name}_init() and the last call to ${EDI_NAME}'s
+ * Before the usage of any other function, ${Edi_Name} should be properly
+ * initialized with @ref ${edi_name}_init() and the last call to ${Edi_Name}'s
  * functions should be @ref ${edi_name}_shutdown(), so everything will
  * be correctly freed.
  *
- * ${EDI_NAME} logs everything with Eina Log, using the "${edi_name}" log domain.
+ * ${Edi_Name} logs everything with Eina Log, using the "${edi_name}" log domain.
  *
  */
 
 /**
- * Initialize ${EDI_NAME}.
+ * Initialize ${Edi_Name}.
  *
- * Initializes ${EDI_NAME}, its dependencies and modules. Should be the first
- * function of ${EDI_NAME} to be called.
+ * Initializes ${Edi_Name}, its dependencies and modules. Should be the first
+ * function of ${Edi_Name} to be called.
  *
  * @return The init counter value.
  *
@@ -71,12 +71,12 @@ extern "C" {
 EAPI int ${edi_name}_init(void);
 
 /**
- * Shutdown ${EDI_NAME}
+ * Shutdown ${Edi_Name}
  *
- * Shutdown ${EDI_NAME}. If init count reaches 0, all the internal structures will
- * be freed. Any ${EDI_NAME} library call after this point will leads to an error.
+ * Shutdown ${Edi_Name}. If init count reaches 0, all the internal structures will
+ * be freed. Any ${Edi_Name} library call after this point will leads to an error.
  *
- * @return ${EDI_NAME}'s init counter value.
+ * @return ${Edi_Name}'s init counter value.
  *
  * @see ${edi_name}_init().
  *

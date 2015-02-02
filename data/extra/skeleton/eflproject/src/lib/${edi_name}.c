@@ -2,7 +2,7 @@
 # include "config.h"
 #endif
 
-#include "${EDI_NAME}.h"
+#include "${Edi_Name}.h"
 
 #include "${edi_name}_private.h"
 
@@ -20,7 +20,7 @@ ${edi_name}_init(void)
    _${edi_name}_lib_log_dom = eina_log_domain_register("${edi_name}", EINA_COLOR_CYAN);
    if (_${edi_name}_lib_log_dom < 0)
      {
-	EINA_LOG_ERR("${EDI_NAME} can not create its log domain.");
+	EINA_LOG_ERR("${Edi_Name} can not create its log domain.");
 	goto shutdown_eina;
      }
 

@@ -11,11 +11,11 @@
 
 #include "gettext.h"
 
-#include "${EDI_NAME}.h"
+#include "${Edi_Name}.h"
 
 #include "${edi_name}_private.h"
 
-#define COPYRIGHT "Copyright © ${EDI_YEAR} ${EDI_USER} <${EDI_EMAIL}> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © ${Edi_Year} ${Edi_User} <${Edi_Email}> and various contributors (see AUTHORS)."
 
 static void
 _${edi_name}_win_del(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
@@ -29,7 +29,7 @@ ${edi_name}_win_setup(void)
    Evas_Object *win;
    Evas_Object *label;
 
-   win = elm_win_util_standard_add("main", "${EDI_NAME}");
+   win = elm_win_util_standard_add("main", "${Edi_Name}");
    if (!win) return NULL;
 
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);

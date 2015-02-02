@@ -40,7 +40,7 @@ _exe_del(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 
 static const Ecore_Getopt optdesc = {
   "edi_build",
-  "%prog [options] [build-type]",
+  "%prog [options] [build|clean|create|test]",
   PACKAGE_VERSION,
   COPYRIGHT,
   "BSD with advertisement clause",
@@ -117,9 +117,12 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      edi_builder_test();
    else if (!strncmp("build", build_type, 5))
      edi_builder_build();
+   else if (!strncmp("create", build_type, 6))
+fprintf(stderr, "cannot yet make projects on command line");
+//     edi_create_efl_project(...);
    else
      {
-        fprintf(stderr, "Unrecognised build type - try build, test or clean.\n");
+        fprintf(stderr, "Unrecognised build type - try build, clean, create or test.\n");
         goto end;
      }
    ecore_main_loop_begin();
