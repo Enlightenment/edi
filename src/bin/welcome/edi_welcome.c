@@ -340,29 +340,31 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    _edi_welcome_list = list;
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_list_mode_set(list, ELM_LIST_LIMIT);
 
    EINA_LIST_FOREACH(_edi_cfg->projects, listitem, project)
      {
-        format = "<align=right><color=#999><i>(%s)</i></color></align>";
+        format = "<align=right><color=#ffffff><b>%s:   </b></color></align>";
         displen = strlen(project->path) + strlen(format) - 1;
         display = malloc(sizeof(char) * displen);
-        snprintf(display, displen, format, project->path);
+        snprintf(display, displen, format, project->name);
 
-        // Add a 'close' icon that can be clicked to remove a project directory
+        // Add an 'edit-delete' icon that can be clicked to remove a project directory
         icon_button = elm_button_add(box);
         ic = elm_icon_add(icon_button);
         elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_THEME_FDO);
-        elm_icon_standard_set(ic, "close");
+        elm_icon_standard_set(ic, "edit-delete");
         elm_image_resizable_set(ic, EINA_FALSE, EINA_FALSE);
         evas_object_smart_callback_priority_add(ic, "clicked", EVAS_CALLBACK_PRIORITY_BEFORE, _edi_welcome_project_list_delete_clicked, box);
 
         label = elm_label_add(box);
         elm_object_text_set(label, display);
+        evas_object_color_set(label, 255, 255, 255, 255);
         evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
         evas_object_show(label);
 
-        elm_list_item_append(list, project->name, ic, label, _project_list_clicked, project->path);
+        elm_list_item_append(list, project->path, label, ic, _project_list_clicked, project->path);
 
         free(display);
      }
