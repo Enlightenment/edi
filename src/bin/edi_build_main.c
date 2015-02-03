@@ -17,6 +17,8 @@
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
+static int _exit_code;
+
 static Eina_Bool
 _exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
@@ -55,8 +57,31 @@ static const Ecore_Getopt optdesc = {
   }
 };
 
+static void
+_edi_build_create_done_cb(const char *path, Eina_Bool success)
+{
+   if (success)
+     fprintf(stdout, "Project created at path %s\n", path);
+   else
+     {
+        fprintf(stderr, "Unable to create project at path %s\n", path);
+        _exit_code = EXIT_FAILURE;
+     }
+
+   ecore_main_loop_quit();
+   elm_shutdown();
+}
+
+static void
+_edi_build_create_start(int argc, int arg0, char **argv)
+{
+   elm_init(argc, argv);
+   edi_create_efl_project(argv[arg0+1], argv[arg0+2], argv[arg0+3], argv[arg0+4], argv[arg0+5],
+                          _edi_build_create_done_cb);
+}
+
 EAPI_MAIN int
-main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
+main(int argc, char **argv)
 {
    int args;
    char path[PATH_MAX], *build_type = NULL;
@@ -77,6 +102,7 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    textdomain(PACKAGE);
 #endif
 
+   _exit_code = EXIT_SUCCESS;
    if (!ecore_init())
      goto exit;
    edi_init();
@@ -107,6 +133,21 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    if (!build_type)
      build_type = "build";
 
+   if (!strncmp("create", build_type, 6))
+     {
+        if (argc - args != 6)
+          {
+             fprintf(stderr, "create requires 5 additional parameters:\n");
+             fprintf(stderr, "  parent_path, project_name, project_url, creator_name, creator_email\n");
+             goto end;
+          }
+
+        _edi_build_create_start(argc, args, argv);
+
+        ecore_main_loop_begin();
+        goto end;
+     }
+
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_del, NULL); 
@@ -117,9 +158,6 @@ main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      edi_builder_test();
    else if (!strncmp("build", build_type, 5))
      edi_builder_build();
-   else if (!strncmp("create", build_type, 6))
-fprintf(stderr, "cannot yet make projects on command line");
-//     edi_create_efl_project(...);
    else
      {
         fprintf(stderr, "Unrecognised build type - try build, clean, create or test.\n");
@@ -130,7 +168,7 @@ fprintf(stderr, "cannot yet make projects on command line");
    end:
    edi_shutdown();
    ecore_shutdown();
-   return EXIT_SUCCESS;
+   return _exit_code;
 
    exit:
    return EXIT_FAILURE;

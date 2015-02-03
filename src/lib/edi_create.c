@@ -192,10 +192,14 @@ _edi_create_notify_cb(void *d, Eio_File *handler EINA_UNUSED, const Eio_Progress
 }
 
 static void
-_edi_create_error_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED, int error)
-
+_edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 {
+   Edi_Create *create;
+
+   create = (Edi_Create *) data;
    fprintf(stderr, "copy error: [%s]\n", strerror(error));
+   create->callback(create->path, EINA_FALSE);
+
    _edi_create_free_data();
 }
 
@@ -203,14 +207,16 @@ EAPI void
 edi_create_efl_project(const char *parentdir, const char *name, const char *url,
                    const char *user, const char *email, Edi_Create_Cb func)
 {
-   char source[PATH_MAX], dest[PATH_MAX];
+   char *source;
+   char dest[PATH_MAX];
    Edi_Create *data;
    Ecore_Event_Handler *handler;
 
-   snprintf(source, sizeof(source), "%s/skeleton/eflproject", elm_app_data_dir_get());
+   source = PACKAGE_DATA_DIR "/skeleton/eflproject";
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);
+   DBG("Extracting project files from %s\n", source);
 
    data = calloc(1, sizeof(Edi_Create));
    data->path = strdup(dest);
