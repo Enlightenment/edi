@@ -11,6 +11,7 @@ edi_builder_can_build(void)
 {
    return edi_project_file_exists("Makefile") ||
           edi_project_file_exists("configure") ||
+          edi_project_file_exists("CMakeLists.txt") ||
           edi_project_file_exists("autogen.sh");
 }
 
@@ -31,6 +32,15 @@ _edi_builder_build_configure(void)
 }
 
 EAPI void
+_edi_builder_build_cmake(void)
+{
+   chdir(edi_project_get());
+   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && make && cd ..",
+                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+}
+
+EAPI void
 _edi_builder_build_autogen(void)
 {
    chdir(edi_project_get());
@@ -45,6 +55,8 @@ edi_builder_build(void)
      _edi_builder_build_make();
    else if (edi_project_file_exists("configure"))
      _edi_builder_build_configure();
+   else if (edi_project_file_exists("CMakeLists.txt"))
+     _edi_builder_build_cmake();
    else if (edi_project_file_exists("autogen.sh"))
      _edi_builder_build_autogen();
 }
