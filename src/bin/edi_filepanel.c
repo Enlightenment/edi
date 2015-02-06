@@ -66,6 +66,13 @@ _item_menu_open_as_text_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_open_as_code_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                           void *event_info EINA_UNUSED)
+{
+   _open_cb(_menu_cb_path, "code", EINA_FALSE);
+}
+
+static void
 _item_menu_open_as_image_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                             void *event_info EINA_UNUSED)
 {
@@ -95,6 +102,7 @@ _item_menu_create(Evas_Object *win)
                                _item_menu_xdgopen_cb, NULL);
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "txt", "text", _item_menu_open_as_text_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "text-x-csrc", "code", _item_menu_open_as_code_cb, NULL);
    elm_menu_item_add(menu, menu_it, "image", "image", _item_menu_open_as_image_cb, NULL);
 }
 

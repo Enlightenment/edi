@@ -669,6 +669,9 @@ _update_highlight_window(Edi_Editor *editor)
 static void
 _reset_highlight(Edi_Editor *editor)
 {
+   if (!editor->show_highlight)
+     return;
+
    _update_highlight_window(editor);
 
 #if HAVE_LIBCLANG
@@ -685,6 +688,9 @@ _reset_highlight(Edi_Editor *editor)
 static void
 _update_highlight(Edi_Editor *editor)
 {
+   if (!editor->show_highlight)
+     return;
+
    _update_highlight_window(editor);
 
 #if HAVE_LIBCLANG
@@ -756,6 +762,7 @@ Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    editor = calloc(1, sizeof(*editor));
    editor->entry = txt;
    editor->lines = lines;
+   editor->show_highlight = !strcmp(item->editortype, "code");
    evas_object_event_callback_add(txt, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(txt, "changed,user", _changed_cb, editor);
@@ -771,7 +778,6 @@ Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
    elm_box_pack_end(box, txt);
-
 
    _edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);

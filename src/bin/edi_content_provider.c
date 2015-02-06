@@ -48,6 +48,7 @@ _edi_content_provider_diff_add(Evas_Object *parent, Edi_Mainview_Item *item)
 static Edi_Content_Provider _edi_content_provider_registry[] =
 {
    {"text", EINA_TRUE, EINA_TRUE, _edi_editor_add},
+   {"code", EINA_TRUE, EINA_TRUE, _edi_editor_add},
    {"image", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
    {"diff", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
 
@@ -65,9 +66,9 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
      id = "text";
    else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc")
             || !strcasecmp(mime, "text/x-modelica"))
-     id = "text"; // TODO make a code view
+     id = "code";
    else if (!strcasecmp(mime, "text/x-c++src") || !strcasecmp(mime, "text/x-c++hdr"))
-     id = "text";
+     id = "code";
    else if (!strncasecmp(mime, "image/", 6))
      id = "image";
    else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))

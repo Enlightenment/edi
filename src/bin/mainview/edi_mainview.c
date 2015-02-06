@@ -284,6 +284,9 @@ _edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *opt
    elm_icon_standard_set(icon, "txt");
    elm_popup_item_append(popup, "text", icon, cb, "text");
    icon = elm_icon_add(popup);
+   elm_icon_standard_set(icon, "text-x-csrc");
+   elm_popup_item_append(popup, "code", icon, cb, "code");
+   icon = elm_icon_add(popup);
    elm_icon_standard_set(icon, "image");
    elm_popup_item_append(popup, "image", icon, cb, "image");
 

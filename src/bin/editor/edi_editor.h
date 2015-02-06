@@ -56,6 +56,7 @@ struct _Edi_Editor
 
    Ecore_Timer *delay_highlight;
    int format_start, format_end, format_line;
+   Eina_Bool show_highlight;
 };
 
 /**
