@@ -90,7 +90,7 @@ AM_CONDITIONAL([HAVE_EOLIAN_GEN], [true])
 
 # Needs to be moved into a macro, and also, needs a way to automatically fetch
 # from all the dependencies using the Requires.
-DEPS_EOLIAN_FLAGS=`${PKG_CONFIG} --variable=eolian_flags eo evas edje ecore efl`
+DEPS_EOLIAN_FLAGS=`${PKG_CONFIG} --variable=eolian_flags eo evas efl elementary`
 AC_SUBST([DEPS_EOLIAN_FLAGS])
 
 # Checks for library functions.

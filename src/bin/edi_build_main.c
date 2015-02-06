@@ -9,8 +9,6 @@
 #include <Ecore_Getopt.h>
 #include <Eio.h>
 
-#include "gettext.h"
-
 #include "Edi.h"
 
 #include "edi_private.h"

@@ -18,6 +18,7 @@ Edi.h
 includesdir = $(includedir)/edi-@VMAJ@
 
 libedi_la_SOURCES = \
+edi_private.h \
 edi_builder.c \
 edi_create.c \
 edi_path.c \

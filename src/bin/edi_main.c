@@ -10,8 +10,6 @@
 #include <Elementary.h>
 #include <Eio.h>
 
-#include "gettext.h"
-
 #include "Edi.h"
 #include "edi_config.h"
 #include "edi_filepanel.h"

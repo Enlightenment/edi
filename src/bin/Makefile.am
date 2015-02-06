@@ -8,11 +8,23 @@ AM_CPPFLAGS = \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -DLOCALEDIR=\"$(datadir)/locale\" \
--I$(top_srcdir)/src/bin/ \
+-I$(top_srcdir)/src/lib \
+-I$(top_srcdir)/src/bin \
 -I$(top_srcdir)/elm_code/lib \
--I$(top_builddir)/src/lib/ \
+-I$(top_builddir)/src/lib \
 -DEFL_BETA_API_SUPPORT \
 @EFL_CFLAGS@
+
+noinst_HEADERS = \
+edi_config.h \
+editor/edi_editor.h \
+edi_content_provider.h \
+welcome/edi_welcome.h \
+edi_filepanel.h \
+edi_logpanel.h \
+edi_consolepanel.h \
+mainview/edi_mainview_item.h \
+mainview/edi_mainview.h
 
 edi_SOURCES = \
 edi_config.c \
