@@ -15,6 +15,7 @@
 #include "edi_content_provider.h"
 
 #include "edi_private.h"
+#include "edi_config.h"
 
 static Evas_Object *nf, *tb, *_main_win;
 static Evas_Object *_edi_mainview_choose_popup;
@@ -244,6 +245,7 @@ _edi_mainview_choose_type_tab_cb(void *data,
    evas_object_del(_edi_mainview_choose_popup);
 
    _edi_mainview_choose_options->type = (const char *) data;
+   _edi_config_mime_add(efreet_mime_type_get(_edi_mainview_choose_options->path), _edi_mainview_choose_options->type);
    edi_mainview_open(_edi_mainview_choose_options);
 }
 
@@ -255,6 +257,7 @@ _edi_mainview_choose_type_win_cb(void *data,
    evas_object_del(_edi_mainview_choose_popup);
 
    _edi_mainview_choose_options->type = (const char *) data;
+   _edi_config_mime_add(efreet_mime_type_get(_edi_mainview_choose_options->path), _edi_mainview_choose_options->type);
    edi_mainview_open_window(_edi_mainview_choose_options);
 
 }
