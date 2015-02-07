@@ -95,11 +95,15 @@ _edi_create_free_data()
    create = _edi_create_data;
    _edi_create_data = NULL;
 
+   if (create->temp && ecore_file_exists(create->temp))
+     ecore_file_recursive_rm(create->temp);
+
    free(create->url);
    free(create->user);
    free(create->email);
    free(create->name);
    free(create->path);
+   free(create->temp);
 
    free(create);
 }
@@ -155,7 +159,7 @@ _edi_create_move_done_cb(void *data, Eio_File *file EINA_UNUSED)
 static void
 _edi_create_move_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 {
-   fprintf(stderr, "move error for %s: [%s]\n", (char *) data, strerror(error));
+   ERR("move error for %s: [%s]\n", (char *) data, strerror(error));
 
    // This matches the filtered path copy created in the copy callback
    free(data);
@@ -197,22 +201,46 @@ _edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
    Edi_Create *create;
 
    create = (Edi_Create *) data;
-   fprintf(stderr, "copy error: [%s]\n", strerror(error));
+   ERR("copy error: [%s]\n", strerror(error));
    create->callback(create->path, EINA_FALSE);
 
    _edi_create_free_data();
+}
+
+static Eina_Bool
+_edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Edi_Create *create;
+   Ecore_Event_Handler *handler;
+   char tmpinner[PATH_MAX];
+
+   create = (Edi_Create *)data;
+   snprintf(tmpinner, sizeof(tmpinner), "%s/eflproject", create->temp);
+
+   ecore_event_handler_del(create->handler);
+
+   create->filters = 0;
+   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_filter_file_done, data);
+   create->handler = handler;
+
+   eio_dir_copy(tmpinner, create->path, NULL, _edi_create_notify_cb, _edi_create_done_cb,
+                _edi_create_error_cb, data);
+
+   return ECORE_CALLBACK_DONE;
 }
 
 EAPI void
 edi_create_efl_project(const char *parentdir, const char *name, const char *url,
                    const char *user, const char *email, Edi_Create_Cb func)
 {
-   char *source;
-   char dest[PATH_MAX];
+   char *source, *cmd, *extract;
+   char tmp[PATH_MAX], dest[PATH_MAX];
    Edi_Create *data;
    Ecore_Event_Handler *handler;
 
-   source = PACKAGE_DATA_DIR "/skeleton/eflproject";
+   source = PACKAGE_DATA_DIR "/skeleton/eflproject.tar.gz";
+   extract = "tar zxf %s -C %s";
+   snprintf(tmp, sizeof(tmp), "/tmp/edi_%s", name);
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);
@@ -228,12 +256,21 @@ edi_create_efl_project(const char *parentdir, const char *name, const char *url,
    data->callback = func;
    _edi_create_data = data;
 
-   data->filters = 0;
-   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_filter_file_done, data);
+   if (!ecore_file_mkpath(tmp) || !ecore_file_mkpath(dest))
+     {
+        ERR("Failed to create path %s\n", dest);
+        _edi_create_free_data();
+        return;
+     }
+
+   cmd = malloc(sizeof(char) * (strlen(extract) + strlen(source) + strlen(tmp) + 1));
+   sprintf(cmd, extract, source, tmp);
+
+   data->temp = strdup(tmp);
+   handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_extract_done, data);
    data->handler = handler;
 
-   eio_dir_copy(source, dest, NULL, _edi_create_notify_cb, _edi_create_done_cb,
-                _edi_create_error_cb, data);
+   ecore_exe_run(cmd, data);
+   free(cmd);
 }
-
 

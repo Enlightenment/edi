@@ -108,6 +108,7 @@ data/desktop/edi.desktop
 data/themes/Makefile
 data/themes/default/Makefile
 data/extra/Makefile
+data/extra/skeleton/Makefile
 doc/Makefile
 packaging/Makefile
 packaging/pkgbuild/Makefile

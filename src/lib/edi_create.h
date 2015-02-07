@@ -16,7 +16,7 @@ typedef void (*Edi_Create_Cb)(const char *path, Eina_Bool success);
 
 typedef struct _Edi_Create
 {
-   char *path, *name;
+   char *path, *temp, *name;
    char *url, *user, *email;
 
    Edi_Create_Cb callback;
