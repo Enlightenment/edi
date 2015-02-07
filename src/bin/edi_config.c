@@ -43,6 +43,7 @@ typedef Eet_Data_Descriptor Edi_Config_DD;
 /* local variables */
 static Edi_Config_DD *_edi_cfg_edd = NULL;
 static Edi_Config_DD *_edi_cfg_proj_edd = NULL;
+static Edi_Config_DD *_edi_cfg_mime_edd = NULL;
 
 /* external variables */
 Edi_Config *_edi_cfg = NULL;
@@ -75,12 +76,20 @@ static void
 _edi_config_cb_free(void)
 {
    Edi_Config_Project *proj;
+   Edi_Config_Mime_Associations *mimes;
 
    EINA_LIST_FREE(_edi_cfg->projects, proj)
      {
         if (proj->name) eina_stringshare_del(proj->name);
         if (proj->path) eina_stringshare_del(proj->path);
         free(proj);
+     }
+
+   EINA_LIST_FREE(_edi_cfg->mime_assocs, mimes)
+     {
+        if (mimes->id) eina_stringshare_del(mimes->id);
+        if (mimes->mime) eina_stringshare_del(mimes->mime);
+        free(mimes);
      }
 
    free(_edi_cfg);
@@ -154,6 +163,14 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, name, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
 
+   _edi_cfg_mime_edd = EDI_CONFIG_DD_NEW("Config_Mime", Edi_Config_Mime_Associations);
+   #undef T
+   #undef D
+   #define T Edi_Config_Mime_Associations
+   #define D _edi_cfg_mime_edd
+   EDI_CONFIG_VAL(D, T, id, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, mime, EET_T_STRING);
+
    _edi_cfg_edd = EDI_CONFIG_DD_NEW("Config", Edi_Config);
    #undef T
    #undef D
@@ -170,6 +187,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.bottomopen, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.bottomtab, EET_T_INT);
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
+   EDI_CONFIG_LIST(D, T, mime_assocs, _edi_cfg_mime_edd);
 
    _edi_config_load();
 
@@ -182,6 +200,7 @@ _edi_config_shutdown(void)
    _edi_config_cb_free();
 
    EDI_CONFIG_DD_FREE(_edi_cfg_proj_edd);
+   EDI_CONFIG_DD_FREE(_edi_cfg_mime_edd);
    EDI_CONFIG_DD_FREE(_edi_cfg_edd);
 
    efreet_shutdown();
@@ -238,6 +257,7 @@ _edi_config_load(void)
    _edi_cfg->gui.bottomopen = EINA_FALSE;
    _edi_cfg->gui.bottomtab = 0;
    _edi_cfg->projects = NULL;
+   _edi_cfg->mime_assocs = NULL;
    IFCFGEND;
 
    /* limit config values so they are sane */
@@ -296,4 +316,32 @@ _edi_config_project_remove(const char *path)
 
    _edi_cfg->projects = eina_list_remove(_edi_cfg->projects, project);
    _edi_config_save();
+}
+
+void
+_edi_config_mime_add(const char *mime, const char *id)
+{
+   Edi_Config_Mime_Associations *mime_assoc;
+
+   mime_assoc = malloc(sizeof(*mime_assoc));
+   mime_assoc->id = eina_stringshare_add(id);
+   mime_assoc->mime = eina_stringshare_add(mime);
+   _edi_cfg->mime_assocs = eina_list_prepend(_edi_cfg->mime_assocs, mime_assoc);
+   _edi_config_save();
+}
+
+const char*
+_edi_config_mime_search(const char *mime)
+{
+   Edi_Config_Mime_Associations *mime_assoc;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_cfg->mime_assocs, list, next, mime_assoc)
+     {
+        if (!strncmp(mime_assoc->mime, mime, strlen(mime_assoc->mime)))
+	  {
+	     return mime_assoc->id;
+	  }
+     }
+   return "";
 }
