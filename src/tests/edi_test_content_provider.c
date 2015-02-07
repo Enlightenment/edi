@@ -7,10 +7,18 @@
 #include "edi_suite.h"
 
 // Add some no-op methods here so linking works without having to import the whole UI!
-EAPI Evas_Object *_edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
+EAPI Evas_Object *
+_edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
 {
    return NULL;
 }
+
+const char *
+_edi_config_mime_search(const char *mime EINA_UNUSED)
+{
+   return NULL;
+}
+// end no-ops
 
 START_TEST (edi_test_content_provider_id_lookup)
 {

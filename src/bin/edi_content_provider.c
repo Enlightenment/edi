@@ -8,8 +8,9 @@
 #include "edi_content_provider.h"
 #include "editor/edi_editor.h"
 
-#include "edi_private.h"
 #include "edi_config.h"
+
+#include "edi_private.h"
 
 // TODO move out to edi_content.c ot similar just like the editor type
 // (and the Evas include)
@@ -58,7 +59,7 @@ static Edi_Content_Provider _edi_content_provider_registry[] =
 
 Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 {
-   char *id = NULL;
+   const char *id = NULL;
 
    if (!mime)
      return NULL;
@@ -76,8 +77,9 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
      id = "diff";
    else
      {
-       id = (char *)_edi_config_mime_search(mime);
-        if (!strcasecmp(id, ""))
+        id = _edi_config_mime_search(mime);
+
+        if (!id)
           return NULL;
      }
 

@@ -76,7 +76,7 @@ static void
 _edi_config_cb_free(void)
 {
    Edi_Config_Project *proj;
-   Edi_Config_Mime_Associations *mimes;
+   Edi_Config_Mime_Association *mime;
 
    EINA_LIST_FREE(_edi_cfg->projects, proj)
      {
@@ -85,11 +85,11 @@ _edi_config_cb_free(void)
         free(proj);
      }
 
-   EINA_LIST_FREE(_edi_cfg->mime_assocs, mimes)
+   EINA_LIST_FREE(_edi_cfg->mime_assocs, mime)
      {
-        if (mimes->id) eina_stringshare_del(mimes->id);
-        if (mimes->mime) eina_stringshare_del(mimes->mime);
-        free(mimes);
+        if (mime->id) eina_stringshare_del(mime->id);
+        if (mime->mime) eina_stringshare_del(mime->mime);
+        free(mime);
      }
 
    free(_edi_cfg);
@@ -163,10 +163,10 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, name, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
 
-   _edi_cfg_mime_edd = EDI_CONFIG_DD_NEW("Config_Mime", Edi_Config_Mime_Associations);
+   _edi_cfg_mime_edd = EDI_CONFIG_DD_NEW("Config_Mime", Edi_Config_Mime_Association);
    #undef T
    #undef D
-   #define T Edi_Config_Mime_Associations
+   #define T Edi_Config_Mime_Association
    #define D _edi_cfg_mime_edd
    EDI_CONFIG_VAL(D, T, id, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, mime, EET_T_STRING);
@@ -321,7 +321,7 @@ _edi_config_project_remove(const char *path)
 void
 _edi_config_mime_add(const char *mime, const char *id)
 {
-   Edi_Config_Mime_Associations *mime_assoc;
+   Edi_Config_Mime_Association *mime_assoc;
 
    mime_assoc = malloc(sizeof(*mime_assoc));
    mime_assoc->id = eina_stringshare_add(id);
@@ -330,18 +330,18 @@ _edi_config_mime_add(const char *mime, const char *id)
    _edi_config_save();
 }
 
-const char*
+const char *
 _edi_config_mime_search(const char *mime)
 {
-   Edi_Config_Mime_Associations *mime_assoc;
+   Edi_Config_Mime_Association *mime_assoc;
    Eina_List *list, *next;
 
    EINA_LIST_FOREACH_SAFE(_edi_cfg->mime_assocs, list, next, mime_assoc)
      {
         if (!strncmp(mime_assoc->mime, mime, strlen(mime_assoc->mime)))
-	  {
-	     return mime_assoc->id;
-	  }
+          {
+             return mime_assoc->id;
+          }
      }
-   return "";
+   return NULL;
 }

@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 typedef struct _Edi_Config_Project Edi_Config_Project;
-typedef struct _Edi_Config_Mime_Associations Edi_Config_Mime_Associations;
+typedef struct _Edi_Config_Mime_Association Edi_Config_Mime_Association;
 typedef struct _Edi_Config Edi_Config;
 
 struct _Edi_Config_Project
@@ -17,7 +17,7 @@ struct _Edi_Config_Project
    const char *path;
 };
 
-struct _Edi_Config_Mime_Associations
+struct _Edi_Config_Mime_Association
 {
    const char *id;
    const char *mime;
