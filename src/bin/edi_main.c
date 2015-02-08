@@ -16,7 +16,7 @@
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "mainview/edi_mainview.h"
-#include "welcome/edi_welcome.h"
+#include "screens/edi_screens.h"
 
 #include "edi_private.h"
 
@@ -639,6 +639,12 @@ _tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
      edi_builder_clean();
 }
 
+static void
+_tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_about_show();
+}
+
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
@@ -679,6 +685,11 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "emblem-default", "Test", _tb_test_cb, NULL);
 //   tb_it = elm_toolbar_item_append(tb, "player-play", "Run", _tb_run_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   tb_it = elm_toolbar_item_append(tb, "help-about", "About", _tb_about_cb, NULL);
 
    evas_object_show(tb);
    return tb;

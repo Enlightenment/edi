@@ -7,7 +7,7 @@
 
 #include <Elementary.h>
 
-#include "edi_welcome.h"
+#include "edi_screens.h"
 #include "edi_config.h"
 
 #include "edi_private.h"

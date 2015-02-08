@@ -7,6 +7,7 @@ AM_CPPFLAGS = \
 -DPACKAGE_BIN_DIR=\"$(bindir)\" \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
+-DPACKAGE_DOC_DIR=\"$(docdir)\" \
 -DLOCALEDIR=\"$(datadir)/locale\" \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/bin \
@@ -19,7 +20,7 @@ noinst_HEADERS = \
 edi_config.h \
 editor/edi_editor.h \
 edi_content_provider.h \
-welcome/edi_welcome.h \
+screens/edi_screens.h \
 edi_filepanel.h \
 edi_logpanel.h \
 edi_consolepanel.h \
@@ -31,7 +32,8 @@ edi_config.c \
 editor/edi_editor_search.c \
 editor/edi_editor.c \
 edi_content_provider.c \
-welcome/edi_welcome.c \
+screens/edi_welcome.c \
+screens/edi_about.c \
 edi_filepanel.c \
 edi_logpanel.c \
 edi_consolepanel.c \

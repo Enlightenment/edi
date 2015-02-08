@@ -11,12 +11,12 @@ extern "C" {
 
 /**
  * @file
- * @brief These routines control the intro wizard for Edi.
+ * @brief These routines control the intro wizard and other supporting UI for Edi.
  */
 
 /**
  * @brief UI management functions.
- * @defgroup UI Initialisation and management of the welcome UI
+ * @defgroup UI Initialisation and management of the supporting Edi screens
  *
  * @{
  *
@@ -29,6 +29,15 @@ extern "C" {
  * * @ingroup UI
  */
 Evas_Object *edi_welcome_show();
+
+
+/**
+ * Initialize a new Edi about window and display it.
+ *
+ * @return The about window that is created
+ * * @ingroup UI
+ */
+Evas_Object *edi_about_show();
 
 /**
  * @}
