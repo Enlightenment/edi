@@ -42,6 +42,8 @@ struct _Edi_Editor
    /* Private */
    Evas_Object *lines;
    Edi_Editor_Search *search;
+   Eina_Bool modified;
+   Ecore_Timer *save_timer;
 
    /* Add new members here. */
 
@@ -76,7 +78,7 @@ struct _Edi_Editor
  *
  * @ingroup Editor
  */
-Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
+Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
 
 /**
  * @}
@@ -96,7 +98,7 @@ Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
  *
  * @ingroup Widgets
  */
-void _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
+void edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
 
 /**
  * Start a search in the specified editor.
@@ -105,7 +107,16 @@ void _edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor);
  *
  * @ingroup Widgets
  */
-void _edi_editor_search(Edi_Editor *editor);
+void edi_editor_search(Edi_Editor *editor);
+
+/**
+ * Save the content of the specified editor.
+ *
+ * @param editor the text editor instance to save.
+ *
+ * @ingroup Widgets
+ */
+void edi_editor_save(Edi_Editor *editor);
 
 /**
  * @}

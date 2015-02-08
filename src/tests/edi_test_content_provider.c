@@ -8,7 +8,7 @@
 
 // Add some no-op methods here so linking works without having to import the whole UI!
 EAPI Evas_Object *
-_edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
+edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
 {
    return NULL;
 }

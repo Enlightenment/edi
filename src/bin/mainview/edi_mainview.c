@@ -549,7 +549,7 @@ edi_mainview_search()
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if (editor)
-     _edi_editor_search(editor);
+     edi_editor_search(editor);
 }
 
 void

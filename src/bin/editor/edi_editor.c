@@ -61,6 +61,30 @@ _update_highlight(Edi_Editor *editor);
 static void
 _reset_highlight(Edi_Editor *editor);
 
+void
+edi_editor_save(Edi_Editor *editor)
+{
+   edi_mainview_save();
+   _reset_highlight(editor);
+
+   editor->modified = EINA_FALSE;
+
+   ecore_timer_del(editor->save_timer);
+   editor->save_timer = NULL;
+}
+
+static Eina_Bool
+_edi_editor_autosave_cb(void *data)
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)data;
+
+   edi_editor_save(editor);
+   return ECORE_CALLBACK_CANCEL;
+}
+
+
 static const char *
 _edi_editor_font_get()
 {
@@ -154,6 +178,13 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
      }
 
    editor->undo_stack = eina_list_prepend(editor->undo_stack, change);
+   editor->modified = EINA_TRUE;
+
+   if (editor->save_timer)
+     ecore_timer_reset(editor->save_timer);
+   else
+     editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
+
    _update_lines(editor);
 }
 
@@ -191,8 +222,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
         else if (!strcmp(ev->key, "s"))
           {
-             edi_mainview_save();
-             _reset_highlight(editor);
+             edi_editor_save(editor);
           }
         else if (!strcmp(ev->key, "f"))
           {
@@ -710,7 +740,8 @@ _text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSE
    _reset_highlight(editor);
 }
 
-Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
+Evas_Object *
+edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
@@ -773,13 +804,13 @@ Evas_Object *_edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
    elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
 
-   elm_entry_autosave_set(txt, EDI_CONTENT_AUTOSAVE);
+   elm_entry_autosave_set(txt, EINA_FALSE);
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
    elm_box_pack_end(box, txt);
 
-   _edi_editor_search_add(searchbar, editor);
+   edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(txt);

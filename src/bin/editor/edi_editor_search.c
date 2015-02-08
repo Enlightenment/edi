@@ -188,7 +188,7 @@ _edi_editor_search_hide(Edi_Editor *editor)
 }
 
 void
-_edi_editor_search(Edi_Editor *editor)
+edi_editor_search(Edi_Editor *editor)
 {
    Edi_Editor_Search *search;
 
@@ -270,7 +270,7 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
 }
 
 void
-_edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
+edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
    Evas_Object *entry, *lbl, *btn, *box, *big_box;
    Evas_Object *replace_entry, *replace_lbl, *replace_btn, *replace_box;
