@@ -95,7 +95,7 @@ _edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
    content = elm_code_file_line_content_get(code->file, line->number, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));
-   snprintf(terminated, length, content);
+   snprintf(terminated, length, "%s", content);
 
    if (_edi_consolepanel_startswith_location(terminated))
      {

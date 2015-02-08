@@ -21,9 +21,9 @@ _edi_create_filter_variable(const char *text, const char *variable, const char *
    copylen = pos - text;
    ret = malloc(sizeof(char) * (strlen(text) + strlen(value) - strlen(variable) + 1));
 
-   snprintf(ret, copylen + 1, text);
-   snprintf(ret + copylen, strlen(value) + 1, value);
-   snprintf(ret + copylen + strlen(value), strlen(text) - copylen - strlen(variable) + 1, text + copylen + strlen(variable));
+   snprintf(ret, copylen + 1, "%s", text);
+   snprintf(ret + copylen, strlen(value) + 1, "%s", value);
+   snprintf(ret + copylen + strlen(value), strlen(text) - copylen - strlen(variable) + 1, "%s", text + copylen + strlen(variable));
 
    return ret;
 }

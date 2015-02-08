@@ -621,7 +621,7 @@ _edi_clang_setup(void *data)
 
    /* Clang */
    /* FIXME: index should probably be global. */
-   const char const *clang_argv[] = {"-I/usr/lib/clang/3.1/include/", "-Wall", "-Wextra"};
+   const char *clang_argv[] = {"-I/usr/lib/clang/3.1/include/", "-Wall", "-Wextra"};
    int clang_argc = sizeof(clang_argv) / sizeof(*clang_argv);
 
    editor->idx = clang_createIndex(0, 0);
