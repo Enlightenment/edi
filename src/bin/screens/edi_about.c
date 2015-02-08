@@ -136,6 +136,17 @@ Evas_Object *edi_about_show()
    elm_box_pack_end(buttonbox, button);
    evas_object_show(button);
 
+   space = elm_box_add(box);
+   evas_object_size_hint_min_set(space, 20 * elm_config_scale_get(), 0.0);
+   elm_box_pack_end(buttonbox, space);
+   evas_object_show(space);
+
+   button = elm_button_add(box);
+   elm_object_text_set(button, "Donate Now");
+   evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
+                                  "https://www.bountysource.com/teams/edi-ide");
+   elm_box_pack_end(buttonbox, button);
+   evas_object_show(button);
 
    evas_object_resize(table, 360 * elm_config_scale_get(), 220 * elm_config_scale_get());
    evas_object_resize(win, 360 * elm_config_scale_get(), 220 * elm_config_scale_get());
