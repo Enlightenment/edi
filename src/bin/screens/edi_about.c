@@ -29,16 +29,18 @@ _edi_about_url_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EIN
    free(cmd);
 }
 
-Evas_Object *edi_about_show()
+Evas_Object *
+edi_about_show(Evas_Object *mainwin)
 {
    Evas_Object *win, *vbox, *box, *table, *bg;
    Evas_Object *text, *title, *authors, *buttonbox, *button, *space;
    int alpha, r, g, b;
    char buf[PATH_MAX];
 
-   win = elm_win_util_standard_add("about", "About Edi");
+   win = elm_win_add(mainwin, "about", ELM_WIN_DIALOG_BASIC);
    if (!win) return NULL;
 
+   elm_win_title_set(win, "About Edi");
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_about_exit, win);
 
@@ -117,6 +119,11 @@ Evas_Object *edi_about_show()
    elm_box_pack_end(box, buttonbox);
    evas_object_show(buttonbox);
 
+   space = elm_box_add(box);
+   evas_object_size_hint_min_set(space, 0, 14 * elm_config_scale_get());
+   elm_box_pack_end(box, space);
+   evas_object_show(space);
+
    button = elm_button_add(box);
    elm_object_text_set(button, "Visit Website");
    evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
@@ -125,7 +132,7 @@ Evas_Object *edi_about_show()
    evas_object_show(button);
 
    space = elm_box_add(box);
-   evas_object_size_hint_min_set(space, 20 * elm_config_scale_get(), 0.0);
+   evas_object_size_hint_min_set(space, 20 * elm_config_scale_get(), 0);
    elm_box_pack_end(buttonbox, space);
    evas_object_show(space);
 
@@ -137,7 +144,7 @@ Evas_Object *edi_about_show()
    evas_object_show(button);
 
    space = elm_box_add(box);
-   evas_object_size_hint_min_set(space, 20 * elm_config_scale_get(), 0.0);
+   evas_object_size_hint_min_set(space, 20 * elm_config_scale_get(), 0);
    elm_box_pack_end(buttonbox, space);
    evas_object_show(space);
 
@@ -148,7 +155,6 @@ Evas_Object *edi_about_show()
    elm_box_pack_end(buttonbox, button);
    evas_object_show(button);
 
-   evas_object_resize(table, 360 * elm_config_scale_get(), 220 * elm_config_scale_get());
    evas_object_resize(win, 360 * elm_config_scale_get(), 220 * elm_config_scale_get());
    evas_object_show(win);
 

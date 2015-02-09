@@ -37,7 +37,7 @@ Evas_Object *edi_welcome_show();
  * @return The about window that is created
  * * @ingroup UI
  */
-Evas_Object *edi_about_show();
+Evas_Object *edi_about_show(Evas_Object *mainwin);
 
 /**
  * @}

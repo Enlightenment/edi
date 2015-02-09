@@ -642,7 +642,7 @@ _tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
 static void
 _tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   edi_about_show();
+   edi_about_show(_edi_main_win);
 }
 
 static Evas_Object *
