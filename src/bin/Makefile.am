@@ -42,7 +42,7 @@ mainview/edi_mainview.c \
 edi_main.c \
 edi_private.h
 
-edi_LDADD = @EFL_LIBS@ $(top_builddir)/elm_code/lib/libelm_code.la $(top_builddir)/src/lib/libedi.la
+edi_LDADD = @EFL_LIBS@ $(top_builddir)/elm_code/lib/libelm_code.la $(top_builddir)/src/lib/libedi.la $(LTLIBINTL)
 
 edi_build_SOURCES = \
 edi_build_main.c
