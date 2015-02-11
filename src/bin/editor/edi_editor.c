@@ -740,6 +740,16 @@ _text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSE
    _reset_highlight(editor);
 }
 
+static void
+_unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)data;
+
+   edi_editor_save(editor);
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -801,6 +811,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_smart_callback_add(txt, "resize", _resize_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
    evas_object_smart_callback_add(txt, "text,set,done", _text_set_done, editor);
+   evas_object_smart_callback_add(txt, "unfocused", _unfocused_cb, editor);
 
    elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
 
