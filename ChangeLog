@@ -1,12 +1,44 @@
-2014-06-07  ajwillia.ms (Andy Williams)
+2015-02-11 ajwillia.ms (Andy Williams)
+
+	* Make sure clang syntax loading follows auto saves
+
+2015-02-08 ajwillia.ms (Andy Williams)
+
+	* Add an about window to credit our contributors
+
+2015-02-07 wilsonk (Kelly Wilson)
+
+	* Remember file types when we open-as in the editor
+
+2014-11-22 ajwillia.ms (Andy Williams)
+
+	* Add a diff rendering component to edi
+
+2014-11-09 ajwillia.ms (Andy Williams)
+
+	* Add build and test functions to toolbar
+
+2014-10-09 ajwillia.ms (Andy Williams)
+
+	* Add clang syntax highlighting
+
+2014-09-28 ajwillia.ms (Andy Williams)
+
+	* Add the ability to create a new project from our welcome screen
+
+2014-07-29 ajwillia.ms (Andy Williams)
+
+	* Add a welcome screen to choose recently opened projects
+
+2014-06-07 ajwillia.ms (Andy Williams)
 
 	* Add line numbers to the text editpr
 
-2014-05-15  ajwillia.ms (Andy Williams)
+2014-05-15 ajwillia.ms (Andy Williams)
 
 	* Add basic undo support
 
-2014-04-27  ajwillia.ms (Andy Williams)
+2014-04-27 ajwillia.ms (Andy Williams)
 
 	* Add simple build functions
 	* Create an edi_build binary for command line building
