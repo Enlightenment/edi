@@ -66,9 +66,9 @@ po/stamp-po
 /src/tests/test-suite.log
 /src/tests/check-results.xml
 
-/elm_code/bin/elm_code_test
+/elm_code/src/bin/elm_code_test
 
-/elm_code/tests/elm_code_suite
-/elm_code/tests/elm_code_suite.*
-/elm_code/tests/test-suite.log
-/elm_code/tests/check-results.xml
+/elm_code/src/tests/elm_code_suite
+/elm_code/src/tests/elm_code_suite.*
+/elm_code/src/tests/test-suite.log
+/elm_code/src/tests/check-results.xml

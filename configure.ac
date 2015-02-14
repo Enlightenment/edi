@@ -118,9 +118,13 @@ src/bin/Makefile
 src/lib/Makefile
 src/tests/Makefile
 elm_code/Makefile
-elm_code/lib/Makefile
-elm_code/bin/Makefile
-elm_code/tests/Makefile
+elm_code/data/Makefile
+elm_code/data/themes/Makefile
+elm_code/data/themes/default/Makefile
+elm_code/src/Makefile
+elm_code/src/lib/Makefile
+elm_code/src/bin/Makefile
+elm_code/src/tests/Makefile
 doc/edi.1
 ])
 AC_OUTPUT

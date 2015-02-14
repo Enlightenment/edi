@@ -76,7 +76,7 @@ endif
 
 if EFL_HAVE_TESTS
 
-TESTS = elm_code/tests/elm_code_suite src/tests/edi_suite
+TESTS = elm_code/src/tests/elm_code_suite src/tests/edi_suite
 
 lcov-check:
 if EFL_HAVE_LCOV
