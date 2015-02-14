@@ -4,6 +4,10 @@
 
 #define BUFFER_SIZE 1024
 
+#define _EDI_CONSOLE_ERROR "err"
+#define _EDI_SUITE_FAILED "failed"
+#define _EDI_SUITE_PASSED "passed"
+
 #include <Eina.h>
 #include <Ecore.h>
 #include <Elm_Code.h>
@@ -92,7 +96,7 @@ _edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
    code = (Elm_Code *)data;
    line = (Elm_Code_Line *)event_info;
 
-   content = elm_code_file_line_content_get(code->file, line->number, &length);
+   content = elm_code_line_content_get(line, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));
    snprintf(terminated, length, "%s", content);
@@ -115,14 +119,25 @@ _edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
    return EINA_TRUE;
 }
 
+static Eina_Bool
+_edi_consolepanel_line_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
+                          const Eo_Event_Description *desc EINA_UNUSED, void *event_info)
+{
+   Elm_Code_Line *line;
+
+   line = (Elm_Code_Line *)event_info;
+
+   if (line->data)
+     line->status = ELM_CODE_STATUS_TYPE_ERROR;
+
+   return EO_CALLBACK_CONTINUE;
+}
+
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    _edi_consolepanel_parse_directory(line);
 
-   elm_code_file_line_append(_edi_console_code->file, line, strlen(line));
-   if (err)
-     elm_code_file_line_status_set(_edi_console_code->file, elm_code_file_lines_get(_edi_console_code->file),
-                                   ELM_CODE_STATUS_TYPE_ERROR);
+   elm_code_file_line_append(_edi_console_code->file, line, strlen(line), err ? _EDI_CONSOLE_ERROR : NULL);
 
    _edi_test_line_callback(line);
 }
@@ -172,13 +187,6 @@ _exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 }
 
 static void
-_edi_test_append(const char *content, int length, Elm_Code_Status_Type type)
-{
-   elm_code_file_line_append(_edi_test_code->file, content, length);
-   elm_code_file_line_status_set(_edi_test_code->file, elm_code_file_lines_get(_edi_test_code->file), type);
-}
-
-static void
 _edi_test_output_suite(int count, int pass, int fail)
 {
    char *line;
@@ -193,7 +201,7 @@ _edi_test_output_suite(int count, int pass, int fail)
      percent = (int) ((pass / (double) count) * 100);
 
    snprintf(line, linemax, format, pass, percent, fail);
-   _edi_test_append(line, strlen(line), (fail > 0) ? ELM_CODE_STATUS_TYPE_FAILED : ELM_CODE_STATUS_TYPE_PASSED);
+   elm_code_file_line_append(_edi_test_code->file, line, strlen(line), (fail > 0) ? _EDI_SUITE_FAILED : _EDI_SUITE_PASSED);
    free(line);
 }
 
@@ -248,12 +256,12 @@ _edi_test_line_parse_suite(const char *path)
           {
              _edi_test_count++;
              _edi_test_fail++;
-             _edi_test_append(line->start, line->length, ELM_CODE_STATUS_TYPE_FAILED);
+             elm_code_file_line_append(_edi_test_code->file, line->start, line->length, _EDI_SUITE_FAILED);
           }
         else if (_edi_test_line_contains(line->start, line->length, "Running"))
           {
              _edi_test_count = _edi_test_pass = _edi_test_fail = 0;
-             _edi_test_append(line->start, line->length, ELM_CODE_STATUS_TYPE_DEFAULT);
+             elm_code_file_line_append(_edi_test_code->file, line->start, line->length, NULL);
           }
      }
    eina_iterator_free(it);
@@ -263,6 +271,25 @@ _edi_test_line_parse_suite(const char *path)
      {
         _edi_test_output_suite(_edi_test_count, _edi_test_pass, _edi_test_fail);
      }
+}
+
+static Eina_Bool
+_edi_testpanel_line_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
+                       const Eo_Event_Description *desc EINA_UNUSED, void *event_info)
+{
+   Elm_Code_Line *line;
+
+   line = (Elm_Code_Line *)event_info;
+
+   if (!line->data)
+     return EO_CALLBACK_CONTINUE;
+
+   if (!strcmp(_EDI_SUITE_PASSED, line->data))
+     line->status = ELM_CODE_STATUS_TYPE_PASSED;
+   else if (!strcmp(_EDI_SUITE_FAILED, line->data))
+     line->status = ELM_CODE_STATUS_TYPE_FAILED;
+
+   return EO_CALLBACK_CONTINUE;
 }
 
 static void _edi_test_line_callback(const char *content)
@@ -298,6 +325,7 @@ void edi_consolepanel_add(Evas_Object *parent)
          elm_code_widget_code_set(code),
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
+         eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL),
          eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code));
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -323,6 +351,7 @@ void edi_testpanel_add(Evas_Object *parent)
          elm_code_widget_code_set(code),
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
+         eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL),
          eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code));
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
