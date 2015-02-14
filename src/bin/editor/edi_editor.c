@@ -64,6 +64,10 @@ _reset_highlight(Edi_Editor *editor);
 void
 edi_editor_save(Edi_Editor *editor)
 {
+   if (!editor->modified)
+     return;
+
+   editor->save_time = time(NULL);
    edi_mainview_save();
    _reset_highlight(editor);
 
@@ -701,7 +705,10 @@ _reset_highlight(Edi_Editor *editor)
 {
    if (!editor->show_highlight)
      return;
+   if (editor->highlight_time != 0 && editor->save_time <= editor->highlight_time)
+     return;
 
+   editor->highlight_time = time(NULL);
    _update_highlight_window(editor);
 
 #if HAVE_LIBCLANG

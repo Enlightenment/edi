@@ -1,11 +1,12 @@
-#ifndef _UI_H
-#define _UI_H
-
-#include <Evas.h>
+#ifndef _EDI_EDITOR_H
+#define _EDI_EDITOR_H
 
 #if HAVE_LIBCLANG
 #include <clang-c/Index.h>
 #endif
+#include <time.h>
+
+#include <Evas.h>
 
 #include "mainview/edi_mainview_item.h"
 
@@ -45,8 +46,6 @@ struct _Edi_Editor
    Eina_Bool modified;
    Ecore_Timer *save_timer;
 
-   /* Add new members here. */
-
 #if HAVE_LIBCLANG
    /* Clang */
    CXIndex idx;
@@ -59,6 +58,10 @@ struct _Edi_Editor
    Ecore_Timer *delay_highlight;
    int format_start, format_end, format_line;
    Eina_Bool show_highlight;
+
+   time_t save_time, highlight_time;
+
+   /* Add new members here. */
 };
 
 /**
