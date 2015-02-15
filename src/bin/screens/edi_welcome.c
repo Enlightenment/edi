@@ -233,27 +233,37 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
 static int
 _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 {
-    struct passwd *p;
-    size_t n;
+   struct passwd *p;
+   char *pos;
+   unsigned int n;
 
-    if (!username)
-      return 0;
+   if (!username)
+     return -1;
 
-    errno = 0;
-    p = getpwnam(username);
-    if (p == NULL && errno == 0)
-        return 0;
-    if (p == NULL)
-        return -1;
+   errno = 0;
+   p = getpwnam(username);
+   if (p == NULL || max == 0)
+     {
+        if (errno == 0)
+          return 0;
+        else
+          return -1;
+     }
 
-    n = strcspn(p->pw_gecos, ",");
-    if (max == 0 || n <= 0)
-        return 0;
-    if (n > max - 1)
-        n = max - 1;
-    memcpy(fullname, p->pw_gecos, n);
-    fullname[n] = '\0';
-    return 1;
+   pos = strchr(p->pw_gecos, ',');
+   if (!pos)
+     n = strlen(p->pw_gecos);
+   else
+     n = pos - p->pw_gecos;
+
+   if (n == 0)
+     return 0;
+   if (n > max - 1)
+     n = max - 1;
+
+   memcpy(fullname, p->pw_gecos, n);
+   fullname[n] = '\0';
+   return 1;
 }
 
 static void
