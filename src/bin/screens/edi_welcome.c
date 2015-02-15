@@ -236,6 +236,9 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
     struct passwd *p;
     size_t n;
 
+    if (!username)
+      return 0;
+
     errno = 0;
     p = getpwnam(username);
     if (p == NULL && errno == 0)
