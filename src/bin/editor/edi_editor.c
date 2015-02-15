@@ -19,6 +19,8 @@
 
 #include "edi_private.h"
 
+#if HAVE_LIBCLANG
+
 #define Edi_Color const char *
 
 static Edi_Color EDI_COLOR_FOREGROUND = "<color=#ffffff>";
@@ -37,6 +39,8 @@ static Edi_Color EDI_COLOR_BACKGROUND = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
 static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
 static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
+
+#endif
 
 static char *_default_font;
 
@@ -552,7 +556,7 @@ _clang_show_highlighting(void *data)
 
         _edi_range_color_set(editor, range, color);
 
-#if CLANG_DEBUG
+# if CLANG_DEBUG
         const char *kind = NULL;
         switch (clang_getTokenKind(editor->tokens[i])) {
            case CXToken_Punctuation: kind = "Punctuation"; break;
@@ -571,7 +575,7 @@ _clang_show_highlighting(void *data)
         }
 
         printf("\n");
-#endif
+# endif
      }
 
 // TODO clear these when we reset next time
@@ -620,11 +624,11 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
 
         _edi_range_color_set(editor, range, color);
 
-#if CLANG_DEBUG
+# if CLANG_DEBUG
         CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
         printf("DEBUG: Diag:%s\n", clang_getCString(str));
         clang_disposeString(str);
-#endif
+# endif
 
         clang_disposeDiagnostic(diag);
      }
