@@ -97,6 +97,8 @@ _edi_welcome_project_chosen_cb(void *data,
                        void *event_info)
 {
    evas_object_del(data);
+   elm_object_disabled_set(_edi_open_button, EINA_FALSE);
+   elm_object_disabled_set(_edi_create_button, EINA_FALSE);
 
    if (event_info)
      {
