@@ -40,7 +40,7 @@ edi_about_show(Evas_Object *mainwin)
    win = elm_win_add(mainwin, "about", ELM_WIN_DIALOG_BASIC);
    if (!win) return NULL;
 
-   elm_win_title_set(win, "About Edi");
+   elm_win_title_set(win, "About Edi (" VERSION ")");
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_about_exit, win);
 

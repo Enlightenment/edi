@@ -341,25 +341,45 @@ _populate(Evas_Object *obj,
    else
      lreq->selected = NULL;
 
-   /* TODO: sub directory should be monitored for expand mode */
-   //sd->monitor = eio_monitor_add(path);
+   /* TODO: keep track of monitors so they can be cleaned */
+   //sd->monitor =
+   eio_monitor_add(path);
    //sd->current = 
    eio_file_stat_ls(path, _ls_filter_cb, _ls_main_cb,
                                   _ls_done_cb, _ls_error_cb, lreq);
+}
+
+
+void _file_listing_updated(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   const char *dir;
+
+   dir = (const char *)data;
+   DBG("File created in %s\n", dir);
+
+   elm_genlist_clear(list);
+   _populate(list, dir, NULL, NULL);
 }
 
 void
 edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
                   const char *path, edi_filepanel_item_clicked_cb cb)
 {
+   const char *sharedpath;
+
    list = elm_genlist_add(parent);
    evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
 
+   sharedpath = eina_stringshare_add(path);
    evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
                                   _item_clicked_cb, NULL);
+   ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
+   ecore_event_handler_add(EIO_MONITOR_FILE_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
+   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
+   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
 
    evas_object_smart_callback_add(list, "expand,request", _on_list_expand_req, parent);
    evas_object_smart_callback_add(list, "contract,request", _on_list_contract_req, parent);
