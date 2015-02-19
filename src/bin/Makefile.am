@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 -DPACKAGE_DOC_DIR=\"$(docdir)\" \
+-DVERSION=\"$(PACKAGE_VERSION)\" \
 -DLOCALEDIR=\"$(datadir)/locale\" \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/bin \
