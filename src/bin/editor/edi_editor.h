@@ -41,7 +41,6 @@ struct _Edi_Editor
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */
-   Evas_Object *lines;
    Edi_Editor_Search *search;
    Eina_Bool modified;
    Ecore_Timer *save_timer;

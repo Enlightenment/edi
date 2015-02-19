@@ -6,6 +6,7 @@
 
 #include <Eina.h>
 #include <Elementary.h>
+#include <Elm_Code.h>
 
 #include "edi_editor.h"
 
@@ -42,8 +43,6 @@ static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
 
 #endif
 
-static char *_default_font;
-
 typedef struct
 {
    unsigned int line;
@@ -55,9 +54,6 @@ typedef struct
    Edi_Location start;
    Edi_Location end;
 } Edi_Range;
-
-static void
-_update_lines(Edi_Editor *editor);
 
 static void
 _update_highlight(Edi_Editor *editor);
@@ -90,22 +86,6 @@ _edi_editor_autosave_cb(void *data)
 
    edi_editor_save(editor);
    return ECORE_CALLBACK_CANCEL;
-}
-
-
-static const char *
-_edi_editor_font_get()
-{
-   char *format;
-
-   if (_default_font)
-     return _default_font;
-
-   format = "DEFAULT='font=Monospace font_size=%d'";
-
-   _default_font = malloc(sizeof(char) * (strlen(format) + 4));
-   snprintf(_default_font, strlen(format) + 4, format, _edi_cfg->font.size);
-   return _default_font;
 }
 
 static void
@@ -192,8 +172,6 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
      ecore_timer_reset(editor->save_timer);
    else
      editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
-
-   _update_lines(editor);
 }
 
 static void
@@ -241,66 +219,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
              _undo_cb(editor, obj, event);
           }
      }
-}
-
-static int
-_get_lines_in_textblock(Evas_Object *textblock)
-{
-   int lines;
-   Evas_Textblock_Cursor *cursor;
-
-   cursor = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_paragraph_last(cursor);
-   lines = evas_textblock_cursor_geometry_get(cursor, NULL, NULL, NULL, NULL, NULL, EVAS_TEXTBLOCK_CURSOR_BEFORE);
-
-   evas_textblock_cursor_free(cursor);
-   return lines + 1;
-}
-
-static void
-_update_lines(Edi_Editor *editor)
-{
-   Eina_Strbuf *content;
-   int lines, i;
-
-   lines = _get_lines_in_textblock(elm_entry_textblock_get(editor->entry));
-
-   content = eina_strbuf_new();
-   eina_strbuf_append(content, "<align=right>");
-   for (i = 1; i <= lines; i++)
-     {
-        eina_strbuf_append_printf(content, "%d<br>", i);
-     }
-   eina_strbuf_append(content, "<br><br></align>");
-   elm_object_text_set(editor->lines, eina_strbuf_string_get(content));
-   eina_strbuf_free(content);
-}
-
-static void
-_scroll_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   Edi_Editor *editor = data;
-   Evas_Coord y, h;
-   static Evas_Coord _edi_global_y;
-
-   elm_scroller_region_get(editor->entry, NULL, &y, NULL, NULL);
-   elm_scroller_region_get(editor->lines, NULL, NULL, NULL, &h);
-   elm_scroller_region_show(editor->lines, 0, y, 10, h);
-
-   // Don't update highlighting on h scroll, only y
-   if (_edi_global_y != y)
-     {
-        _update_highlight(editor);
-	_edi_global_y = y;
-     }
-}
-
-static void
-_resize_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   Edi_Editor *editor = data;
-
-   _update_highlight(editor);
 }
 
 static void
@@ -743,15 +661,6 @@ _update_highlight(Edi_Editor *editor)
 }
 
 static void
-_text_set_done(void *data, Evas_Object *obj EINA_UNUSED, void *source EINA_UNUSED)
-{
-   Edi_Editor *editor = (Edi_Editor *) data;
-
-   _update_lines(editor);
-   _reset_highlight(editor);
-}
-
-static void
 _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Editor *editor;
@@ -764,9 +673,12 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
-   Evas_Object *txt, *lines, *vbox, *box, *searchbar, *statusbar;
+   Evas_Object *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
    Evas *e;
+
+   Elm_Code *code;
+   Elm_Code_Widget *widget;
    Edi_Editor *editor;
 
    vbox = elm_box_add(parent);
@@ -792,59 +704,45 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_box_pack_end(vbox, statusbar);
    evas_object_show(statusbar);
 
-   lines = elm_entry_add(box);
-   elm_entry_scrollable_set(lines, EINA_TRUE);
-   elm_scroller_policy_set(lines, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
-   elm_entry_editable_set(lines, EINA_FALSE);
-
-   elm_entry_text_style_user_push(lines, _edi_editor_font_get());
-   evas_object_color_set(lines, 127, 127, 127, 255);
-
-   evas_object_size_hint_weight_set(lines, 0.052, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(lines, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, lines);
-   evas_object_show(lines);
-
-   txt = elm_entry_add(box);
-   elm_entry_editable_set(txt, EINA_TRUE);
-   elm_entry_scrollable_set(txt, EINA_TRUE);
-   elm_entry_line_wrap_set(txt, EINA_FALSE);
-   elm_entry_text_style_user_push(txt, _edi_editor_font_get());
+   code = elm_code_create();
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, vbox);
+   eo_do(widget,
+         elm_code_widget_code_set(code),
+         elm_code_widget_font_size_set(_edi_cfg->font.size),
+         elm_code_widget_editable_set(EINA_TRUE),
+         elm_code_widget_line_numbers_set(EINA_TRUE));
 
    editor = calloc(1, sizeof(*editor));
-   editor->entry = txt;
-   editor->lines = lines;
+   editor->entry = widget;
    editor->show_highlight = !strcmp(item->editortype, "code");
-   evas_object_event_callback_add(txt, EVAS_CALLBACK_KEY_DOWN,
+   evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
+/*
    evas_object_smart_callback_add(txt, "changed,user", _changed_cb, editor);
-   evas_object_smart_callback_add(txt, "scroll", _scroll_cb, editor);
-   evas_object_smart_callback_add(txt, "resize", _resize_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
-   evas_object_smart_callback_add(txt, "text,set,done", _text_set_done, editor);
-   evas_object_smart_callback_add(txt, "unfocused", _unfocused_cb, editor);
+*/
+   evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
-   elm_entry_file_set(txt, item->path, ELM_TEXT_FORMAT_PLAIN_UTF8);
+   elm_code_file_open(code, item->path);
 
-   elm_entry_autosave_set(txt, EINA_FALSE);
-   evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(txt);
-   elm_box_pack_end(box, txt);
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
+   elm_box_pack_end(box, widget);
 
    edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);
 
-   e = evas_object_evas_get(txt);
+   e = evas_object_evas_get(widget);
    ctrl = evas_key_modifier_mask_get(e, "Control");
    alt = evas_key_modifier_mask_get(e, "Alt");
    shift = evas_key_modifier_mask_get(e, "Shift");
 
-   (void)!evas_object_key_grab(txt, "Prior", ctrl, shift | alt, 1);
-   (void)!evas_object_key_grab(txt, "Next", ctrl, shift | alt, 1);
-   (void)!evas_object_key_grab(txt, "s", ctrl, shift | alt, 1);
-   (void)!evas_object_key_grab(txt, "f", ctrl, shift | alt, 1);
-   (void)!evas_object_key_grab(txt, "z", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(widget, "Prior", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(widget, "Next", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(widget, "s", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(widget, "f", ctrl, shift | alt, 1);
+   (void)!evas_object_key_grab(widget, "z", ctrl, shift | alt, 1);
 
    evas_object_data_set(vbox, "editor", editor);
 
