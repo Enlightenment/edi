@@ -222,24 +222,16 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 }
 
 static void
-_edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
+_edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   Elm_Code_Widget *widget;
    char buf[30];
-   int line;
-   int col;
-   Evas_Object *tb;
-   Evas_Textblock_Cursor *cur1, *cur2;
+   unsigned int line;
+   unsigned int col;
 
-   tb = elm_entry_textblock_get(obj);
-
-   cur1 = evas_object_textblock_cursor_get(tb);
-   cur2 = evas_object_textblock_cursor_new(tb);
-   line = evas_textblock_cursor_line_geometry_get(cur1, NULL, NULL, NULL, NULL) + 1;
-   evas_textblock_cursor_copy(cur1, cur2);
-   evas_textblock_cursor_line_char_first(cur2);
-   col = evas_textblock_cursor_pos_get(cur1) -
-      evas_textblock_cursor_pos_get(cur2) + 1;
-   evas_textblock_cursor_free(cur2);
+   widget = (Elm_Code_Widget *)obj;
+   eo_do(widget,
+         elm_code_widget_cursor_position_get(&col, &line));
 
    snprintf(buf, sizeof(buf), "Line:%d, Column:%d", line, col);
    elm_object_text_set((Evas_Object *)data, buf);
