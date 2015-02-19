@@ -1,18 +1,21 @@
-Changes since Edi project started:
-----------------------------------
+=========
+Edi 0.0.1
+=========
 
-pre-1.0 phase 2 "Code aware editor"
-  - Simple build functions
-  - Added a command line builder application
-  - Added line numbers and line goto to the text editor
+Features:
 
+  * Editing and saving text files
+  * Tabbed browsing of open files
+  * Opening editor in a new window
+  * Displaying directory for the project (directory)
+  * link files out to external viewers / editors
+  * No screen waste (toolbar, menu, tab are out of the way of the developer)
+  * info panel with logs and useful output
+  * Create new file
 
-pre-1.0 phase 1 "Basic text editing"
-  - Editing and saving text files
-  - Tabbed browsing of open files
-  - Opening editor in a new window
-  - Displaying directory for the project (directory)
-  - link files out to eternal viewers / editors
-  - No screen waste (toolbar, menu, tab are out of the way of the developer)
-  - info panel with logs and useful output
-  - Create new file
+  * Simple build functions
+  * Search  & replace in file
+  * Line numbers & go to line
+  * Creation of new projects from name input and skeleton project files
+  * Syntax highlighting
+  * Diff rendering
