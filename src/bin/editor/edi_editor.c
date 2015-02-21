@@ -274,6 +274,26 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
 }
 
 static void
+_edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Type status)
+{
+   Elm_Code *code;
+   Elm_Code_Line *line;
+
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   line = elm_code_file_line_get(code->file, number);
+
+   ecore_thread_main_loop_begin();
+
+   elm_code_line_status_set(line, status);
+
+   eo_do(editor->entry,
+         elm_code_widget_line_refresh(line));
+
+   ecore_thread_main_loop_end();
+}
+
+static void
 _clang_load_highlighting(const char *path, Edi_Editor *editor)
 {
         CXFile cfile = clang_getFile(editor->tx_unit, path);
@@ -433,13 +453,12 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
         CXDiagnostic diag = clang_getDiagnostic(editor->tx_unit, i);
-        Edi_Range range;
+        unsigned int line;
 
-        clang_getSpellingLocation(clang_getDiagnosticLocation(diag), NULL, &range.start.line, &range.start.col, NULL);
-        range.end = range.start;
+        // the parameter after line would be a caret position but we're just highlighting for now
+        clang_getSpellingLocation(clang_getDiagnosticLocation(diag), NULL, &line, NULL, NULL);
 
         /* FIXME: Also handle ranges and fix suggestions. */
-
         Elm_Code_Status_Type status = ELM_CODE_STATUS_TYPE_DEFAULT;
 
         switch (clang_getDiagnosticSeverity(diag))
@@ -461,7 +480,7 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
               break;
           }
 
-//        _edi_range_color_set(editor, range, color);
+        _edi_line_status_set(editor, line, status);
 
 # if CLANG_DEBUG
         CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
