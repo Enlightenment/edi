@@ -33,9 +33,6 @@ typedef struct
 } Edi_Range;
 
 static void
-_update_highlight(Edi_Editor *editor);
-
-static void
 _reset_highlight(Edi_Editor *editor);
 
 void
@@ -253,7 +250,7 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
 {
    Elm_Code *code;
    Elm_Code_Line *line, *extra_line;
-   int number;
+   unsigned int number;
 
    eo_do(editor->entry,
          code = elm_code_widget_code_get());
@@ -293,12 +290,10 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
 }
 
 static void *
-_clang_show_highlighting(void *data)
+_clang_show_highlighting(Edi_Editor *editor)
 {
-   Edi_Editor *editor;
    unsigned int i = 0;
 
-   editor = (Edi_Editor *)data;
    for (i = 0 ; i < editor->token_count ; i++)
      {
         Edi_Range range;
@@ -478,20 +473,6 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
      }
 }
 
-static Eina_Bool
-_edi_clang_render(void *data)
-{
-   pthread_attr_t attr;
-   pthread_t thread_id;
-
-   if (pthread_attr_init(&attr) != 0)
-     perror("pthread_attr_init");
-   if (pthread_create(&thread_id, &attr, _clang_show_highlighting, data) != 0)
-     perror("pthread_create");
-
-   return ECORE_CALLBACK_CANCEL;
-}
-
 static void *
 _edi_clang_setup(void *data)
 {
@@ -516,8 +497,7 @@ _edi_clang_setup(void *data)
 
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
-
-   _edi_clang_render(editor);
+   _clang_show_highlighting(editor);
 
    return NULL;
 }
@@ -538,10 +518,6 @@ _reset_highlight(Edi_Editor *editor)
 {
    if (!editor->show_highlight)
      return;
-   if (editor->highlight_time != 0 && editor->save_time <= editor->highlight_time)
-     return;
-
-   editor->highlight_time = time(NULL);
 
 #if HAVE_LIBCLANG
    pthread_attr_t attr;
@@ -551,20 +527,6 @@ _reset_highlight(Edi_Editor *editor)
      perror("pthread_attr_init");
    if (pthread_create(&thread_id, &attr, _edi_clang_setup, editor) != 0)
      perror("pthread_create");
-#endif
-}
-
-static void
-_update_highlight(Edi_Editor *editor)
-{
-   if (!editor->show_highlight)
-     return;
-
-#if HAVE_LIBCLANG
-   if (editor->delay_highlight)
-     ecore_timer_del(editor->delay_highlight);
-
-   editor->delay_highlight = ecore_timer_add(0.25, _edi_clang_render, editor);
 #endif
 }
 

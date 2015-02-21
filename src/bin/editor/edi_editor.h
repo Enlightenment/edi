@@ -54,10 +54,8 @@ struct _Edi_Editor
    unsigned int token_count;
 #endif
 
-   Ecore_Timer *delay_highlight;
    Eina_Bool show_highlight;
-
-   time_t save_time, highlight_time;
+   time_t save_time;
 
    /* Add new members here. */
 };
