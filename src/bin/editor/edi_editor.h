@@ -55,7 +55,6 @@ struct _Edi_Editor
 #endif
 
    Ecore_Timer *delay_highlight;
-   int format_start, format_end, format_line;
    Eina_Bool show_highlight;
 
    time_t save_time, highlight_time;

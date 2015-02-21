@@ -20,29 +20,6 @@
 
 #include "edi_private.h"
 
-#if HAVE_LIBCLANG
-
-#define Edi_Color const char *
-
-static Edi_Color EDI_COLOR_FOREGROUND = "<color=#ffffff>";
-static Edi_Color EDI_COLOR_COMMENT = "<color=#3399ff>";
-static Edi_Color EDI_COLOR_STRING = "<color=#ff5a35>";
-static Edi_Color EDI_COLOR_NUMBER = "<color=#D4D42A>";// font_weight=Bold";
-static Edi_Color EDI_COLOR_BRACE = "<color=#656565>";
-static Edi_Color EDI_COLOR_TYPE = "<color=#3399ff>";
-static Edi_Color EDI_COLOR_CLASS = "<color=#72AAD4>";// font_weight=Bold";
-static Edi_Color EDI_COLOR_FUNCTION = "<color=#72AAD4>";// font_weight=Bold";
-//static Edi_Color EDI_COLOR_PARAM = "<color=#ffffff>";
-static Edi_Color EDI_COLOR_KEYWORD = "<color=#ff9900>";// font_weight=Bold";
-static Edi_Color EDI_COLOR_PREPROCESSOR = "<color=#00B000>";
-
-static Edi_Color EDI_COLOR_BACKGROUND = "<backing_color=#000000>";
-static Edi_Color EDI_COLOR_SEVIRITY_IGNORED = "<backing_color=#000000>";
-static Edi_Color EDI_COLOR_SEVIRITY_NOTE = "<backing_color=#ff9900>";
-static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
-
-#endif
-
 typedef struct
 {
    unsigned int line;
@@ -271,72 +248,39 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 }
 
 #if HAVE_LIBCLANG
-// TODO on any refresh heck mtime - then re-run clang if changed - it should be fast enough now...
 static void
-_edi_line_color_remove(Edi_Editor *editor, unsigned int line)
+_edi_line_color_remove(Edi_Editor *editor, unsigned int number)
 {
-   Eina_List *formats;
-   Evas_Object *textblock;
-   Evas_Textblock_Cursor *start, *end;
-   Evas_Object_Textblock_Node_Format *format;
-   unsigned int i;
+   Elm_Code *code;
+   Elm_Code_Line *line;
 
-   textblock = elm_entry_textblock_get(editor->entry);
-   start = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_line_set(start, line);
-   evas_textblock_cursor_pos_set(start, evas_textblock_cursor_pos_get(start));
-   end = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_line_set(end, line);
-   evas_textblock_cursor_pos_set(end, evas_textblock_cursor_pos_get(end) - 1);
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   line = elm_code_file_line_get(code->file, number);
 
-   i = 0;
-   formats = evas_textblock_cursor_range_formats_get(start, end);
-   while (eina_list_count(formats) > i)
-     {
-        format = eina_list_nth(formats, i);
+   eina_list_free(line->tokens);
+   line->tokens = NULL;
 
-        if (!strncmp("+ color", evas_textblock_node_format_text_get(format), 7))
-          evas_textblock_node_format_remove_pair(textblock, format);
-        else
-          i++;
-
-        formats = evas_textblock_cursor_range_formats_get(start, end);
-     }
-
-   evas_textblock_cursor_free(start);
-   evas_textblock_cursor_free(end);
+   eo_do(editor->entry,
+         elm_code_widget_line_refresh(line));
 }
 
 static void
-_edi_range_color_set(Edi_Editor *editor, Edi_Range range, Edi_Color color)
+_edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type type)
 {
-   Evas_Textblock *textblock;
-   Evas_Textblock_Cursor *cursor;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   line = elm_code_file_line_get(code->file, range.start.line);
 
    ecore_thread_main_loop_begin();
 
-   if (!((Evas_Coord)range.start.line > editor->format_end || (Evas_Coord)range.end.line < editor->format_start))
-     {
-        textblock = elm_entry_textblock_get(editor->entry);
+   elm_code_line_token_add(line, range.start.col, range.end.col - 1, type);
+   eo_do(editor->entry,
+         elm_code_widget_line_refresh(line));
 
-        if (editor->format_line == -1)
-          editor->format_line = range.start.line - 1;
-        while (editor->format_line < (int) range.end.line)
-          {
-             _edi_line_color_remove(editor, ++editor->format_line);
-          }
-
-        cursor = evas_object_textblock_cursor_new(textblock);
-        evas_textblock_cursor_line_set(cursor, range.start.line - 1);
-        evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.start.col - 1);
-        evas_textblock_cursor_format_prepend(cursor, color);
-
-        evas_textblock_cursor_line_set(cursor, range.end.line - 1);
-        evas_textblock_cursor_pos_set(cursor, evas_textblock_cursor_pos_get(cursor) + range.end.col - 1);
-        evas_textblock_cursor_format_prepend(cursor, "</color>");
-
-        evas_textblock_cursor_free(cursor);
-     }
    ecore_thread_main_loop_end();
 }
 
@@ -363,11 +307,10 @@ _clang_show_highlighting(void *data)
    unsigned int i = 0;
 
    editor = (Edi_Editor *)data;
-   editor->format_line = -1;
    for (i = 0 ; i < editor->token_count ; i++)
      {
         Edi_Range range;
-        Edi_Color color = EDI_COLOR_FOREGROUND;
+        Elm_Code_Token_Type type = ELM_CODE_TOKEN_TYPE_DEFAULT;
 
         CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, editor->tokens[i]);
         clang_getSpellingLocation(clang_getRangeStart(tkrange), NULL,
@@ -382,35 +325,34 @@ _clang_show_highlighting(void *data)
                 if (i < editor->token_count - 1 && range.start.col == 1 &&
                     (clang_getTokenKind(editor->tokens[i + 1]) == CXToken_Identifier && (editor->cursors[i + 1].kind == CXCursor_MacroDefinition ||
                     editor->cursors[i + 1].kind == CXCursor_InclusionDirective || editor->cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
-                  color = EDI_COLOR_PREPROCESSOR;
+                  type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
                 else
-                  color = EDI_COLOR_BRACE;
+                  type = ELM_CODE_TOKEN_TYPE_BRACE;
                 break;
              case CXToken_Identifier:
                 if (editor->cursors[i].kind < CXCursor_FirstRef)
                   {
-                      color = EDI_COLOR_CLASS;
+                      type = ELM_CODE_TOKEN_TYPE_CLASS;
                       break;
                   }
                 switch (editor->cursors[i].kind)
                   {
                    case CXCursor_DeclRefExpr:
                       /* Handle different ref kinds */
-                      color = EDI_COLOR_FUNCTION;
+                      type = ELM_CODE_TOKEN_TYPE_FUNCTION;
                       break;
                    case CXCursor_MacroDefinition:
                    case CXCursor_InclusionDirective:
                    case CXCursor_PreprocessingDirective:
-                      color = EDI_COLOR_PREPROCESSOR;
+                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
                       break;
                    case CXCursor_TypeRef:
-                      color = EDI_COLOR_TYPE;
+                      type = ELM_CODE_TOKEN_TYPE_TYPE;
                       break;
                    case CXCursor_MacroExpansion:
-                      color = EDI_COLOR_PREPROCESSOR;//_MACRO_EXPANSION;
+                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;//_MACRO_EXPANSION;
                       break;
                    default:
-                      color = EDI_COLOR_FOREGROUND;
                       break;
                   }
                 break;
@@ -418,7 +360,7 @@ _clang_show_highlighting(void *data)
                 switch (editor->cursors[i].kind)
                   {
                    case CXCursor_PreprocessingDirective:
-                      color = EDI_COLOR_PREPROCESSOR;
+                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
                       break;
                    case CXCursor_CaseStmt:
                    case CXCursor_DefaultStmt:
@@ -446,25 +388,25 @@ _clang_show_highlighting(void *data)
                    case CXCursor_SEHTryStmt:
                    case CXCursor_SEHExceptStmt:
                    case CXCursor_SEHFinallyStmt:
-//                      color = EDI_COLOR_KEYWORD_STMT;
+//                      type = ELM_CODE_TOKEN_TYPE_KEYWORD_STMT;
                       break;
                    default:
-                      color = EDI_COLOR_KEYWORD;
+                      type = ELM_CODE_TOKEN_TYPE_KEYWORD;
                       break;
                   }
                 break;
              case CXToken_Literal:
                 if (editor->cursors[i].kind == CXCursor_StringLiteral || editor->cursors[i].kind == CXCursor_CharacterLiteral)
-                  color = EDI_COLOR_STRING;
+                  type = ELM_CODE_TOKEN_TYPE_STRING;
                 else
-                  color = EDI_COLOR_NUMBER;
+                  type = ELM_CODE_TOKEN_TYPE_NUMBER;
                 break;
              case CXToken_Comment:
-                color = EDI_COLOR_COMMENT;
+                type = ELM_CODE_TOKEN_TYPE_COMMENT;
                 break;
           }
 
-        _edi_range_color_set(editor, range, color);
+        _edi_range_color_set(editor, range, type);
 
 # if CLANG_DEBUG
         const char *kind = NULL;
@@ -511,28 +453,28 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
 
         /* FIXME: Also handle ranges and fix suggestions. */
 
-        Edi_Color color = EDI_COLOR_BACKGROUND;
+        Elm_Code_Status_Type status = ELM_CODE_STATUS_TYPE_DEFAULT;
 
         switch (clang_getDiagnosticSeverity(diag))
           {
            case CXDiagnostic_Ignored:
-              color = EDI_COLOR_SEVIRITY_IGNORED;
+              status = ELM_CODE_STATUS_TYPE_IGNORED;
               break;
            case CXDiagnostic_Note:
-              color = EDI_COLOR_SEVIRITY_NOTE;
+              status = ELM_CODE_STATUS_TYPE_NOTE;
               break;
            case CXDiagnostic_Warning:
-              color = EDI_COLOR_SEVIRITY_WARNING;
+              status = ELM_CODE_STATUS_TYPE_WARNING;
               break;
            case CXDiagnostic_Error:
-//              color = EDI_COLOR_BACKGROUND_SEVIRITY_ERROR;
+              status = ELM_CODE_STATUS_TYPE_ERROR;
               break;
            case CXDiagnostic_Fatal:
-//              color = EDI_COLOR_BACKGROUND_SEVIRITY_FATAL;
+              status = ELM_CODE_STATUS_TYPE_FATAL;
               break;
           }
 
-        _edi_range_color_set(editor, range, color);
+//        _edi_range_color_set(editor, range, color);
 
 # if CLANG_DEBUG
         CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
@@ -562,10 +504,13 @@ static void *
 _edi_clang_setup(void *data)
 {
    Edi_Editor *editor;
+   Elm_Code *code;
    const char *path;
 
    editor = (Edi_Editor *)data;
-   elm_entry_file_get(editor->entry, &path, NULL);
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   path = elm_code_file_path_get(code->file);
 
    /* Clang */
    /* FIXME: index should probably be global. */
@@ -597,24 +542,6 @@ _edi_clang_dispose(Edi_Editor *editor)
 #endif
 
 static void
-_update_highlight_window(Edi_Editor *editor)
-{
-   Evas_Object *textblock;
-   Evas_Textblock_Cursor *begin, *limit;
-
-   textblock = elm_entry_textblock_get(editor->entry);
-
-   begin = evas_object_textblock_cursor_new(textblock);
-   limit = evas_object_textblock_cursor_new(textblock);
-   evas_textblock_cursor_visible_range_get(begin, limit);
-
-   editor->format_start = evas_textblock_cursor_line_geometry_get(begin, NULL, NULL, NULL, NULL);
-   editor->format_end = evas_textblock_cursor_line_geometry_get(limit, NULL, NULL, NULL, NULL);
-   evas_textblock_cursor_free(begin);
-   evas_textblock_cursor_free(limit);
-}
-
-static void
 _reset_highlight(Edi_Editor *editor)
 {
    if (!editor->show_highlight)
@@ -623,7 +550,6 @@ _reset_highlight(Edi_Editor *editor)
      return;
 
    editor->highlight_time = time(NULL);
-   _update_highlight_window(editor);
 
 #if HAVE_LIBCLANG
    pthread_attr_t attr;
@@ -642,8 +568,6 @@ _update_highlight(Edi_Editor *editor)
    if (!editor->show_highlight)
      return;
 
-   _update_highlight_window(editor);
-
 #if HAVE_LIBCLANG
    if (editor->delay_highlight)
      ecore_timer_del(editor->delay_highlight);
@@ -660,6 +584,18 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
    editor = (Edi_Editor *)data;
 
    edi_editor_save(editor);
+}
+
+static Eina_Bool
+_edi_editor_file_load_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
+                         const Eo_Event_Description *desc EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)data;
+   _reset_highlight(editor);
+
+   return EO_CALLBACK_CONTINUE;
 }
 
 Evas_Object *
@@ -714,6 +650,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 */
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
+
+   eo_do(widget,
+         eo_event_callback_add(&ELM_CODE_EVENT_FILE_LOAD_DONE, _edi_editor_file_load_cb, editor));
 
    elm_code_file_open(code, item->path);
 
