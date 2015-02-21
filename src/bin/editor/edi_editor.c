@@ -249,27 +249,11 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
 #if HAVE_LIBCLANG
 static void
-_edi_line_color_remove(Edi_Editor *editor, unsigned int number)
-{
-   Elm_Code *code;
-   Elm_Code_Line *line;
-
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
-   line = elm_code_file_line_get(code->file, number);
-
-   eina_list_free(line->tokens);
-   line->tokens = NULL;
-
-   eo_do(editor->entry,
-         elm_code_widget_line_refresh(line));
-}
-
-static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type type)
 {
    Elm_Code *code;
-   Elm_Code_Line *line;
+   Elm_Code_Line *line, *extra_line;
+   int number;
 
    eo_do(editor->entry,
          code = elm_code_widget_code_get());
@@ -277,9 +261,17 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
 
    ecore_thread_main_loop_begin();
 
-   elm_code_line_token_add(line, range.start.col, range.end.col - 1, type);
+   elm_code_line_token_add(line, range.start.col, range.end.col - 1,
+                           range.end.line - range.start.line + 1, type);
+
    eo_do(editor->entry,
          elm_code_widget_line_refresh(line));
+   for (number = line->number + 1; number <= range.end.line; number++)
+     {
+        extra_line = elm_code_file_line_get(code->file, number);
+        eo_do(editor->entry,
+              elm_code_widget_line_refresh(extra_line));
+     }
 
    ecore_thread_main_loop_end();
 }
