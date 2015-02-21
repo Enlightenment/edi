@@ -8,6 +8,8 @@
 #include <Eio.h>
 #include <elm_widget_fileselector.h>
 
+#include "Edi.h"
+
 #include "edi_filepanel.h"
 
 #include "edi_private.h"
@@ -341,24 +343,41 @@ _populate(Evas_Object *obj,
    else
      lreq->selected = NULL;
 
+   // FIXME re-enable the monitors once we have a less intrusive manner of refreshing the file tree
    /* TODO: keep track of monitors so they can be cleaned */
-   //sd->monitor =
-   eio_monitor_add(path);
+   //sd->monitor = eio_monitor_add(path);
    //sd->current = 
    eio_file_stat_ls(path, _ls_filter_cb, _ls_main_cb,
                                   _ls_done_cb, _ls_error_cb, lreq);
 }
 
+static void
+_file_listing_reload(const char *dir)
+{
+   elm_genlist_clear(list);
+   _populate(list, dir, NULL, NULL);
+}
 
-void _file_listing_updated(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+static void
+_file_listing_updated(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    const char *dir;
 
    dir = (const char *)data;
    DBG("File created in %s\n", dir);
 
-   elm_genlist_clear(list);
-   _populate(list, dir, NULL, NULL);
+   _file_listing_reload(dir);
+}
+
+void
+_edi_filepanel_reload()
+{
+   char *dir;
+
+   dir = realpath(edi_project_get(), NULL);
+   _file_listing_reload(dir);
+
+   free(dir);
 }
 
 void
