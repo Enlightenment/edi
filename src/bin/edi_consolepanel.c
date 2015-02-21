@@ -83,19 +83,16 @@ static void _edi_consolepanel_parse_directory(const char *line)
 }
 
 static Eina_Bool
-_edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
+_edi_consolepanel_clicked_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
                              const Eo_Event_Description *desc EINA_UNUSED, void *event_info)
 {
    Edi_Path_Options *options;
-   Elm_Code *code;
    Elm_Code_Line *line;
-   const char *content;
+   const char *content, *parentdir;
    char *path, *terminated;
    int length;
 
-   code = (Elm_Code *)data;
    line = (Elm_Code_Line *)event_info;
-
    content = elm_code_line_content_get(line, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));
@@ -103,10 +100,8 @@ _edi_consolepanel_clicked_cb(void *data, Eo *obj EINA_UNUSED,
 
    if (_edi_consolepanel_startswith_location(terminated))
      {
-        if (code == _edi_console_code)
-          path = _edi_consolepanel_extract_location(terminated, _current_dir, _edi_strlen_current_dir);
-        else
-          path = _edi_consolepanel_extract_location(terminated, _current_test_dir, strlen(_current_test_dir));
+        parentdir = (const char *)line->data;
+        path = _edi_consolepanel_extract_location(terminated, parentdir, strlen(parentdir));
 
         if (strstr(path, edi_project_get()) == path)
           {
@@ -137,7 +132,7 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    _edi_consolepanel_parse_directory(line);
 
-   elm_code_file_line_append(_edi_console_code->file, line, strlen(line), err ? _EDI_CONSOLE_ERROR : NULL);
+   elm_code_file_line_append(_edi_console_code->file, line, strlen(line), err ? strdup(_current_dir) : NULL);
 
    _edi_test_line_callback(line);
 }
@@ -256,7 +251,7 @@ _edi_test_line_parse_suite(const char *path)
           {
              _edi_test_count++;
              _edi_test_fail++;
-             elm_code_file_line_append(_edi_test_code->file, line->start, line->length, _EDI_SUITE_FAILED);
+             elm_code_file_line_append(_edi_test_code->file, line->start, line->length, strdup(_current_test_dir));
           }
         else if (_edi_test_line_contains(line->start, line->length, "Running"))
           {
