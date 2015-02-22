@@ -93,7 +93,7 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
    int length;
 
    line = (Elm_Code_Line *)event_info;
-   content = elm_code_line_content_get(line, &length);
+   content = elm_code_line_text_get(line, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));
    snprintf(terminated, length, "%s", content);
