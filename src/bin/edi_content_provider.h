@@ -17,6 +17,7 @@ extern "C" {
 typedef struct _Edi_Content_Provider
 {
    const char *id;
+   const char *icon;
 
    Eina_Bool is_text;
    Eina_Bool is_editable;
