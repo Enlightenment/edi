@@ -283,9 +283,24 @@ _edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
 }
 
 static void
+_edi_mainview_filetype_create(Evas_Object *popup, const char *type, void *cb)
+{
+   Edi_Content_Provider *provider;
+   Evas_Object *icon;
+
+   provider = edi_content_provider_for_id_get(type);
+   if (!provider)
+     return;
+
+   icon = elm_icon_add(popup);
+   elm_icon_standard_set(icon, provider->icon);
+   elm_popup_item_append(popup, type, icon, cb, type);
+}
+
+static void
 _edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *options, void *cb)
 {
-   Evas_Object *popup, *cancel, *icon;
+   Evas_Object *popup, *cancel;
 
    popup = elm_popup_add(_main_win);
    _edi_mainview_choose_popup = popup;
@@ -295,16 +310,9 @@ _edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *opt
    elm_object_part_text_set(popup, "title,text",
                             "Unrecognied file type");
 
-   icon = elm_icon_add(popup);
-   elm_icon_standard_set(icon, "txt");
-   elm_popup_item_append(popup, "text", icon, cb, "text");
-   icon = elm_icon_add(popup);
-   elm_icon_standard_set(icon, "text-x-csrc");
-   elm_popup_item_append(popup, "code", icon, cb, "code");
-   icon = elm_icon_add(popup);
-   elm_icon_standard_set(icon, "image");
-   elm_popup_item_append(popup, "image", icon, cb, "image");
-
+   _edi_mainview_filetype_create(popup, "text", cb);
+   _edi_mainview_filetype_create(popup, "code", cb);
+   _edi_mainview_filetype_create(popup, "image", cb);
 
    cancel = elm_button_add(popup);
    elm_object_text_set(cancel, "cancel");

@@ -11,6 +11,7 @@
 #include "Edi.h"
 
 #include "edi_filepanel.h"
+#include "edi_content_provider.h"
 
 #include "edi_private.h"
 
@@ -90,6 +91,19 @@ _item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_filetype_create(Evas_Object *menu, Elm_Object_Item *parent, const char *type,
+                           Evas_Smart_Cb func)
+{
+   Edi_Content_Provider *provider;
+
+   provider = edi_content_provider_for_id_get(type);
+   if (!provider)
+     return;
+
+   elm_menu_item_add(menu, parent, provider->icon, provider->id, func, NULL);
+}
+
+static void
 _item_menu_create(Evas_Object *win)
 {
    Elm_Object_Item *menu_it;
@@ -103,9 +117,9 @@ _item_menu_create(Evas_Object *win)
    menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
                                _item_menu_xdgopen_cb, NULL);
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "txt", "text", _item_menu_open_as_text_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "text-x-csrc", "code", _item_menu_open_as_code_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "image", "image", _item_menu_open_as_image_cb, NULL);
+   _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb);
+   _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb);
+   _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb);
 }
 
 static void
@@ -139,25 +153,27 @@ _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUS
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
-   if (!strcmp(source, "elm.swallow.icon"))
-     {
-        Evas_Object *ic;
-        const char *iconpath;
+   Evas_Object *ic;
+   Edi_Content_Provider *provider;
+   const char *mime;
 
-        ic = elm_icon_add(obj);
-        // TODO hook into the selected theme somehow (currently owned by E...)
-        iconpath = efreet_mime_type_icon_get(data, "hicolor", 128);
+   if (strcmp(source, "elm.swallow.icon"))
+     return NULL;
 
-        if (iconpath)
-           elm_image_file_set(ic, iconpath, NULL);
-        else
-          elm_icon_standard_set(ic, "file");
+   mime = efreet_mime_type_get((const char *)data);
+   provider = edi_content_provider_for_mime_get(mime);
 
-        evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
-        evas_object_show(ic);
-        return ic;
-     }
-   return NULL;
+   ic = elm_icon_add(obj);
+   elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_FDO_THEME);
+   if (provider)
+     elm_icon_standard_set(ic, provider->icon);
+   else
+     elm_icon_standard_set(ic, "empty");
+
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_show(ic);
+
+   return ic;
 }
 
 static void
@@ -178,17 +194,17 @@ _item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED
 static Evas_Object *
 _content_dir_get(void *data EINA_UNUSED, Evas_Object *obj, const char *source)
 {
-   if (!strcmp(source, "elm.swallow.icon"))
-     {
-        Evas_Object *ic;
+   Evas_Object *ic;
 
-        ic = elm_icon_add(obj);
-        elm_icon_standard_set(ic, "folder");
-        evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
-        evas_object_show(ic);
-        return ic;
-     }
-   return NULL;
+   if (strcmp(source, "elm.swallow.icon"))
+     return NULL;
+
+   ic = elm_icon_add(obj);
+   elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_FDO_THEME);
+   elm_icon_standard_set(ic, "folder");
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_show(ic);
+   return ic;
 }
 
 static Eina_Bool
@@ -387,6 +403,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    const char *sharedpath;
 
    list = elm_genlist_add(parent);
+   elm_genlist_homogeneous_set(list, EINA_TRUE);
    evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);

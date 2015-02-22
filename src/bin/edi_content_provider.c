@@ -49,12 +49,12 @@ _edi_content_provider_diff_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
 static Edi_Content_Provider _edi_content_provider_registry[] =
 {
-   {"text", EINA_TRUE, EINA_TRUE, edi_editor_add},
-   {"code", EINA_TRUE, EINA_TRUE, edi_editor_add},
-   {"image", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
-   {"diff", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
+   {"text", "txt", EINA_TRUE, EINA_TRUE, edi_editor_add},
+   {"code", "text-x-csrc", EINA_TRUE, EINA_TRUE, edi_editor_add},
+   {"image", "image", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
+   {"diff", "text-x-source", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
 
-   {NULL, EINA_FALSE, EINA_FALSE, NULL}
+   {NULL, NULL, EINA_FALSE, EINA_FALSE, NULL}
 };
 
 Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
