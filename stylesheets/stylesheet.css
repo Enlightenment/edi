@@ -507,6 +507,19 @@ aside#sidebar {
   background: transparent url(../images/sidebar-bg.jpg) 0 0 no-repeat;
 }
 
+aside#sidebar h3 {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: #9ddcff;
+  text-indent: 3px;
+}
+aside#sidebar h3 .version {
+  padding-right: 0.3em;
+  color: #474747;
+}
 aside#sidebar p.repo-owner,
 aside#sidebar p.repo-owner a {
   font-weight: bold;
@@ -861,6 +874,12 @@ footer a:hover {
   aside#sidebar a.button {
     display: none;
   }
+  aside#sidebar #release {
+    position: absolute;
+    top: -45pt;
+    right: 0;
+  }
+
   #main-content h1:before,
   #main-content h2:before,
   #main-content h3:before,
