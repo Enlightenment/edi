@@ -611,7 +611,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
          elm_code_widget_code_set(code),
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_editable_set(EINA_TRUE),
-         elm_code_widget_line_numbers_set(EINA_TRUE));
+         elm_code_widget_line_numbers_set(EINA_TRUE),
+         elm_code_widget_line_width_marker_set(80));
 
    editor = calloc(1, sizeof(*editor));
    editor->entry = widget;
