@@ -559,16 +559,13 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
    edi_editor_save(editor);
 }
 
-static Eina_Bool
-_edi_editor_file_load_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
-                         const Eo_Event_Description *desc EINA_UNUSED, void *event_info EINA_UNUSED)
+static void
+_edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
 {
    Edi_Editor *editor;
 
    editor = (Edi_Editor *)data;
    _reset_highlight(editor);
-
-   return EO_CALLBACK_CONTINUE;
 }
 
 Evas_Object *
@@ -625,9 +622,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 */
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
-   eo_do(widget,
-         eo_event_callback_add(&ELM_CODE_EVENT_FILE_LOAD_DONE, _edi_editor_file_load_cb, editor));
-
+   elm_code_parser_add(code, NULL, _edi_editor_parse_file_cb, editor);
    elm_code_file_open(code, item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
