@@ -132,7 +132,8 @@ static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
 {
    _edi_consolepanel_parse_directory(line);
 
-   elm_code_file_line_append(_edi_console_code->file, line, strlen(line), err ? strdup(_current_dir) : NULL);
+   elm_code_file_line_append(_edi_console_code->file, line, strlen(line),
+                             err && _current_dir ? strdup(_current_dir) : NULL);
 
    _edi_test_line_callback(line);
 }
