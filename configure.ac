@@ -5,29 +5,59 @@ AC_PREREQ([2.65])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-
 AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall color-tests])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-AM_PROG_AR
 
-# this will speed up libtool checks
+
+### Additional options to configure
+
+# Check for tests and coverage
+AC_ARG_WITH([tests],
+   [AS_HELP_STRING([--with-tests=none|regular|coverage],
+                   [choose testing method: regular, coverage or none.
+                    @<:@default=auto@:>@])],
+   [build_tests=${withval}],
+   [build_tests=auto])
+
+# clang support
+AC_ARG_ENABLE([libclang],
+   [AS_HELP_STRING([--disable-libclang], [Disable use of libclang. @<:@default=enable@:>@])],
+   [
+    if test "x${enableval}" = "xyes" ; then
+       want_clang="yes"
+    else
+       want_clang="no"
+    fi
+   ],
+   [want_clang="yes"])
+
+
+### Checks for programs
+
 LT_PREREQ([2.2])
 LT_INIT([win32-dll pic-only])
 EFL_INIT
 
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
+
+# if cross compiling, disable NLS support.
+# It's not worth the trouble, at least for now.
+if test "x$cross_compiling" = xyes; then
+  enable_nls=no
+fi
+
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
 AC_PROG_CC
-AM_PROG_CC_C_O
-EFL_ATTRIBUTE_UNUSED
-ELM_QUICKLAUNCH
-EFL_COMPILER_FLAG([-Wall])
-EFL_COMPILER_FLAG([-W])
 
-# Checks for header files.
-EFL_CHECK_PATH_MAX
+PKG_PROG_PKG_CONFIG
 
-# Check for EFL
+EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
+
+
+### Checks for libraries
+
 PKG_CHECK_MODULES([EFL],
 [
  eina >= 1.8.0
@@ -38,49 +68,6 @@ PKG_CHECK_MODULES([EFL],
  elementary >= 1.8.0
  eio >= 1.8.0
 ])
-
-# Check for tests and coverage
-AC_ARG_WITH([tests],
-   [AC_HELP_STRING([--with-tests=none|regular|coverage],
-                   [choose testing method: regular, coverage or none.
-                    @<:@default=none@:>@])],
-   [build_tests=${withval}],
-   [build_tests=auto])
-
-
-HAVE_LIBCLANG=0
-
-AC_ARG_ENABLE(libclang,
-      [  --disable-libclang	Disable use of libclang.],,)
-
-build_clang="no"
-if test "$enable_libclang" != "no"; then
-  AC_CHECK_HEADERS("clang-c/Index.h")
-  if test "$ac_cv_header_clang_c_Index_h" = "yes"; then
-    AC_CHECK_LIB(clang, clang_Cursor_getArgument)
-    if test "$ac_cv_lib_clang_clang_Cursor_getArgument" = "yes"; then
-      HAVE_LIBCLANG=1;
-      MORE_LIBS="$MORE_LIBS -lclang"
-      build_clang="yes"
-    fi
-  fi 
-  if test "$HAVE_LIBCLANG" = "0"; then
-    AC_MSG_WARN([Could not find a usable libclang. Please install libclang to enable syntax highlighting features.])
-  fi
-fi
-
-AC_SUBST(HAVE_LIBCLANG)
-
-# if cross compiling, disable NLS support.
-# It's not worth the trouble, at least for now.
-if test "x$cross_compiling" = xyes; then
-  enable_nls=no
-fi
-
-EFL_TESTS([${build_tests}])
-
-# doxygen program for documentation building
-EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 # Check edje_cc
 EFL_WITH_BIN([edje], [edje-cc], [edje_cc])
@@ -93,11 +80,59 @@ AM_CONDITIONAL([HAVE_EOLIAN_GEN], [true])
 DEPS_EOLIAN_FLAGS=`${PKG_CONFIG} --variable=eolian_flags eo evas efl elementary`
 AC_SUBST([DEPS_EOLIAN_FLAGS])
 
-# Checks for library functions.
+
+### Checks for header files
+
+
+### Checks for types
+
+
+### Checks for structures
+
+
+### Checks for compiler characteristics
+
+AM_PROG_CC_C_O
+
+EFL_CHECK_PATH_MAX
+EFL_COMPILER_FLAG([-Wall])
+EFL_COMPILER_FLAG([-Wextra])
+
+
+### Checks for linker characteristics
+
+
+### Checks for library functions
+
 AC_CHECK_FUNCS([setlocale])
 
-AM_GNU_GETTEXT_VERSION([0.17])
-AM_GNU_GETTEXT([external])
+# this will speed up libtool checks
+
+
+# Checks for header files.
+
+have_clang="no"
+if test "${want_clang}" = "yes"; then
+  AC_CHECK_HEADERS([clang-c/Index.h], [have_clang="yes"], [have_clang="no"])
+fi
+
+EFL_TESTS([${build_tests}])
+
+# Checks for library functions.
+
+if test "${have_clang}" = "yes"; then
+   AC_CHECK_LIB([clang], [clang_Cursor_getArgument],
+      [
+       AC_DEFINE([HAVE_LIBCLANG], [1], [Set to 1 if clang is found])
+       EFL_LIBS="${EFL_LIBS} -lclang"
+      ],
+      [have_clang="no"])
+fi
+
+if test "${have_clang}" = "no"; then
+   AC_MSG_WARN([Could not find a usable libclang. Please install libclang to enable syntax highlighting features.])
+fi
+
 
 AC_CONFIG_FILES([
 Makefile
@@ -136,9 +171,11 @@ echo "$PACKAGE_NAME $PACKAGE_VERSION"
 echo "------------------------------------------------------------------------"
 echo
 echo "Compilation..............: make (or gmake)"
+echo "  CPPFLAGS...............: $CPPFLAGS"
 echo "  CFLAGS.................: $CFLAGS"
+echo "  LDFLAGS................: $LDFLAGS"
 echo "  edje_cc................: ${edje_cc}"
-echo "  highlighting (libclang): ${build_clang}"
+echo "  highlighting (libclang): ${have_clang}"
 echo
 echo "eolian_gen...............: ${eolian_gen}"
 echo
