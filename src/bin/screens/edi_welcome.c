@@ -281,6 +281,8 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    evas_object_show(content);
 
    username = getenv("USER");
+   if (!username)
+     username = getenv("USERNAME");
    _edi_welcome_project_new_directory_row_add("Parent Path", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project Name", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project URL", NULL, row++, content);
