@@ -316,9 +316,9 @@ void edi_consolepanel_add(Evas_Object *parent)
    code = elm_code_create();
    _edi_console_code = code;
 
-   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
+                   elm_code_widget_code_set(code));
    eo_do(widget,
-         elm_code_widget_code_set(code),
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
          eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL),
@@ -342,9 +342,9 @@ void edi_testpanel_add(Evas_Object *parent)
    code = elm_code_create();
    _edi_test_code = code;
 
-   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent);
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
+                   elm_code_widget_code_set(code));
    eo_do(widget,
-         elm_code_widget_code_set(code),
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
          eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL),
