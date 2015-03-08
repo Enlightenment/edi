@@ -569,6 +569,18 @@ _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
    _reset_highlight(editor);
 }
 
+static Eina_Bool
+_edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Elm_Code_Widget *widget;
+
+   widget = (Elm_Code_Widget *) data;
+   eo_do(widget,
+         elm_code_widget_font_size_set(_edi_cfg->font.size));
+
+   return ECORE_CALLBACK_RENEW;
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -647,6 +659,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    (void)!evas_object_key_grab(widget, "z", ctrl, shift | alt, 1);
 
    evas_object_data_set(vbox, "editor", editor);
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
 
    return vbox;
 }
