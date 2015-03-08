@@ -35,6 +35,7 @@ editor/edi_editor.c \
 edi_content_provider.c \
 screens/edi_welcome.c \
 screens/edi_about.c \
+screens/edi_settings.c \
 edi_filepanel.c \
 edi_logpanel.c \
 edi_consolepanel.c \

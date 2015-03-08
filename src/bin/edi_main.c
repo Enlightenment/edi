@@ -650,6 +650,12 @@ _tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
    edi_about_show(_edi_main_win);
 }
 
+static void
+_tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   edi_settings_show(_edi_main_win);
+}
+
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
@@ -712,6 +718,7 @@ edi_toolbar_setup(Evas_Object *win)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(tb, 0.14, 0.0);
 
+   tb_it = elm_toolbar_item_append(tb, "preferences-desktop", "Settings", _tb_settings_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "help-about", "About", _tb_about_cb, NULL);
 
    elm_box_pack_end(box, tb);

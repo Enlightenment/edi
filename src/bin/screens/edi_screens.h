@@ -26,7 +26,8 @@ extern "C" {
  * Initialize a new Edi welcome window and display it.
  *
  * @return The welcome window that is created
- * * @ingroup UI
+ *
+ * @ingroup UI
  */
 Evas_Object *edi_welcome_show();
 
@@ -35,9 +36,19 @@ Evas_Object *edi_welcome_show();
  * Initialize a new Edi about window and display it.
  *
  * @return The about window that is created
- * * @ingroup UI
+ *
+ * @ingroup UI
  */
 Evas_Object *edi_about_show(Evas_Object *mainwin);
+
+/**
+ * Initialize a new Edi settings window and display it.
+ *
+ * @return The settings window that is created
+ *
+ * @ingroup UI
+ */
+Evas_Object *edi_settings_show(Evas_Object *mainwin);
 
 /**
  * @}

@@ -42,8 +42,6 @@ static Edi_Color EDI_COLOR_SEVIRITY_WARNING = "<backing_color=#ff9900>";
 
 #endif
 
-static char *_default_font;
-
 typedef struct
 {
    unsigned int line;
@@ -96,16 +94,14 @@ _edi_editor_autosave_cb(void *data)
 static const char *
 _edi_editor_font_get()
 {
-   char *format;
-
-   if (_default_font)
-     return _default_font;
+   const char *format;
+   char *font;
 
    format = "DEFAULT='font=Monospace font_size=%d'";
 
-   _default_font = malloc(sizeof(char) * (strlen(format) + 4));
-   snprintf(_default_font, strlen(format) + 4, format, _edi_cfg->font.size);
-   return _default_font;
+   font = malloc(sizeof(char) * (strlen(format) + 4));
+   snprintf(font, strlen(format) + 4, format, _edi_cfg->font.size);
+   return font;
 }
 
 static void
@@ -190,7 +186,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 
    if (editor->save_timer)
      ecore_timer_reset(editor->save_timer);
-   else
+   else if (_edi_cfg->autosave)
      editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
 
    _update_lines(editor);
@@ -758,7 +754,8 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 
    editor = (Edi_Editor *)data;
 
-   edi_editor_save(editor);
+   if (_edi_cfg->autosave)
+     edi_editor_save(editor);
 }
 
 Evas_Object *

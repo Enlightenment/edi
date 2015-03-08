@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+extern int EDI_EVENT_CONFIG_CHANGED;
+
 typedef struct _Edi_Config_Project Edi_Config_Project;
 typedef struct _Edi_Config_Mime_Association Edi_Config_Mime_Association;
 typedef struct _Edi_Config Edi_Config;
@@ -39,6 +41,8 @@ struct _Edi_Config
         double leftsize, bottomsize;
         Eina_Bool leftopen, bottomopen;
      } gui;
+
+   Eina_Bool autosave;
 
    Eina_List *projects;
    Eina_List *mime_assocs;
