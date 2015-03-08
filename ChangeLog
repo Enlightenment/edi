@@ -1,3 +1,15 @@
+2015-03-08 ajwillia.ms (Andy Williams)
+
+	* Add a settings screen
+
+2015-02-28 Vincent Torri
+
+	* Fix username lookup for Windows
+
+2015-02-21 ajwillia.ms (Andy Williams)
+
+	* Release 0.0.1
+
 2015-02-11 ajwillia.ms (Andy Williams)
 
 	* Make sure clang syntax loading follows auto saves

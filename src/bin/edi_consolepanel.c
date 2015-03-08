@@ -308,6 +308,27 @@ static void _edi_test_line_callback(const char *content)
      }
 }
 
+static Eina_Bool
+_edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Eina_List *item;
+   Eo *widget;
+
+   EINA_LIST_FOREACH(_edi_console_code->widgets, item, widget)
+     {
+        eo_do(widget,
+              elm_code_widget_font_size_set(_edi_cfg->font.size));
+     }
+
+   EINA_LIST_FOREACH(_edi_test_code->widgets, item, widget)
+     {
+        eo_do(widget,
+              elm_code_widget_font_size_set(_edi_cfg->font.size));
+     }
+
+   return ECORE_CALLBACK_RENEW;
+}
+
 void edi_consolepanel_add(Evas_Object *parent)
 {
    Elm_Code *code;
@@ -332,6 +353,7 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_consolepanel_config_changed, NULL);
 }
 
 void edi_testpanel_add(Evas_Object *parent)

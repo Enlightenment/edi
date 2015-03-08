@@ -144,7 +144,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 
    if (editor->save_timer)
      ecore_timer_reset(editor->save_timer);
-   else
+   else if (_edi_cfg->autosave)
      editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
 }
 
@@ -556,7 +556,8 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 
    editor = (Edi_Editor *)data;
 
-   edi_editor_save(editor);
+   if (_edi_cfg->autosave)
+     edi_editor_save(editor);
 }
 
 static void

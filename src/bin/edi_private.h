@@ -26,7 +26,6 @@ extern int _edi_log_dom;
 #endif
 #define DBG(...) EINA_LOG_DOM_DBG(_edi_log_dom, __VA_ARGS__)
 
-#define EDI_CONTENT_AUTOSAVE EINA_TRUE
 #define EDI_CONTENT_SAVE_TIMEOUT 5
 
 Evas_Object *edi_open(const char *path);

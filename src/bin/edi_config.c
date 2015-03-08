@@ -33,8 +33,8 @@
 # define EDI_CONFIG_HASH(edd, type, member, eddtype) \
    EET_DATA_DESCRIPTOR_ADD_HASH(edd, type, #member, member, eddtype)
 
-#  define EDI_CONFIG_FILE_EPOCH 0x0001
-#  define EDI_CONFIG_FILE_GENERATION 0x000a
+#  define EDI_CONFIG_FILE_EPOCH 0x0002
+#  define EDI_CONFIG_FILE_GENERATION 0x000b
 #  define EDI_CONFIG_FILE_VERSION \
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
@@ -47,6 +47,7 @@ static Edi_Config_DD *_edi_cfg_mime_edd = NULL;
 
 /* external variables */
 Edi_Config *_edi_cfg = NULL;
+int EDI_EVENT_CONFIG_CHANGED;
 
 const char *
 _edi_config_dir_get(void)
@@ -154,6 +155,7 @@ _edi_config_init(void)
 {
    elm_need_efreet();
    if (!efreet_init()) return EINA_FALSE;
+   EDI_EVENT_CONFIG_CHANGED = ecore_event_type_new();
 
    _edi_cfg_proj_edd = EDI_CONFIG_DD_NEW("Config_Project", Edi_Config_Project);
    #undef T
@@ -186,6 +188,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.bottomsize, EET_T_DOUBLE);
    EDI_CONFIG_VAL(D, T, gui.bottomopen, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.bottomtab, EET_T_INT);
+   EDI_CONFIG_VAL(D, T, autosave, EET_T_UCHAR);
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
    EDI_CONFIG_LIST(D, T, mime_assocs, _edi_cfg_mime_edd);
 
@@ -249,13 +252,14 @@ _edi_config_load(void)
 
    _edi_cfg->font.size = 12;
    _edi_cfg->gui.translucent = EINA_TRUE;
-   _edi_cfg->gui.width = 560;
-   _edi_cfg->gui.height = 420;
+   _edi_cfg->gui.width = 640;
+   _edi_cfg->gui.height = 480;
    _edi_cfg->gui.leftsize = 0.25;
    _edi_cfg->gui.leftopen = EINA_TRUE;
    _edi_cfg->gui.bottomsize = 0.2;
    _edi_cfg->gui.bottomopen = EINA_FALSE;
    _edi_cfg->gui.bottomtab = 0;
+   _edi_cfg->autosave = EINA_TRUE;
    _edi_cfg->projects = NULL;
    _edi_cfg->mime_assocs = NULL;
    IFCFGEND;
@@ -276,9 +280,7 @@ void
 _edi_config_save(void)
 {
    if (_edi_config_domain_save(PACKAGE_NAME, _edi_cfg_edd, _edi_cfg))
-     {
-        /* perform any UI updates required */
-     }
+     ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
 }
 
 void

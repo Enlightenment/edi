@@ -46,6 +46,15 @@ _edi_logpanel_line_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
    return EO_CALLBACK_CONTINUE;
 }
 
+static Eina_Bool
+_edi_logpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   eo_do(_info_widget,
+         elm_code_widget_font_size_set(_edi_cfg->font.size));
+
+   return ECORE_CALLBACK_RENEW;
+}
+
 void edi_logpanel_add(Evas_Object *parent)
 {
    Elm_Code_Widget *widget;
@@ -69,4 +78,5 @@ void edi_logpanel_add(Evas_Object *parent)
    eina_log_color_disable_set(EINA_TRUE);
 
    elm_box_pack_end(parent, widget);
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_logpanel_config_changed, NULL);
 }
