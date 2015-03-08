@@ -90,7 +90,7 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
    Elm_Code_Line *line;
    const char *content, *parentdir;
    char *path, *terminated;
-   int length;
+   unsigned int length;
 
    line = (Elm_Code_Line *)event_info;
    content = elm_code_line_text_get(line, &length);
