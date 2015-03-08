@@ -653,10 +653,17 @@ _tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
-   Evas_Object *tb;
+   Evas_Object *box, *tb;
    Elm_Object_Item *tb_it;
 
-   tb = elm_toolbar_add(win);
+   box = elm_box_add(win);
+   elm_box_horizontal_set(box, EINA_TRUE);
+   elm_box_homogeneous_set(box, EINA_FALSE);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, 0.0);
+   evas_object_show(box);
+
+   tb = elm_toolbar_add(box);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
@@ -664,6 +671,7 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
    elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(tb, 0.86, 0.0);
 
    tb_it = elm_toolbar_item_append(tb, "document-new", "New File", _tb_new_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "document-save", "Save", _tb_save_cb, NULL);
@@ -691,13 +699,24 @@ edi_toolbar_setup(Evas_Object *win)
 //   tb_it = elm_toolbar_item_append(tb, "player-play", "Run", _tb_run_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
 
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+   elm_box_pack_end(box, tb);
+   evas_object_show(tb);
+
+   tb = elm_toolbar_add(box);
+   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
+   elm_toolbar_align_set(tb, 1.0);
+   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
+   elm_object_focus_allow_set(tb, EINA_FALSE);
+   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(tb, 0.14, 0.0);
 
    tb_it = elm_toolbar_item_append(tb, "help-about", "About", _tb_about_cb, NULL);
 
+   elm_box_pack_end(box, tb);
    evas_object_show(tb);
-   return tb;
+   return box;
 }
 
 static char *
