@@ -57,24 +57,35 @@ _edi_settings_display_fontsize_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_config_save();
 }
 
+static void
+_edi_settings_display_whitespace_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                    void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *)obj;
+   _edi_cfg->gui.show_whitespace = elm_check_state_get(check);
+   _edi_config_save();
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
-   Evas_Object *box, *hbox, *frame, *label, *spinner;
+   Evas_Object *box, *hbox, *frame, *label, *spinner, *check;
 
    frame = _edi_settings_panel_create(parent, "Display");
    box = elm_object_part_content_get(frame, "default");
 
    hbox = elm_box_add(parent);
    elm_box_horizontal_set(hbox, EINA_TRUE);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.95);
    elm_box_pack_end(box, hbox);
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
    elm_object_text_set(label, "Font size");
-   evas_object_size_hint_align_set(label, 0.0, 0.5);
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
 
@@ -85,12 +96,22 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_spinner_step_set(spinner, 1);
    elm_spinner_wrap_set(spinner, EINA_FALSE);
    elm_spinner_min_max_set(spinner, 8, 48);
-   evas_object_size_hint_align_set(spinner, 0.0, 0.5);
    evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(spinner, 0.0, 0.95);
    evas_object_smart_callback_add(spinner, "changed",
                                   _edi_settings_display_fontsize_cb, NULL);
    elm_box_pack_end(hbox, spinner);
    evas_object_show(spinner);
+
+   check = elm_check_add(box);
+   elm_object_text_set(check, "Display whitespace");
+   elm_check_state_set(check, _edi_cfg->gui.show_whitespace);
+   elm_box_pack_end(box, check);
+   evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(check, 0.0, 0.05);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_display_whitespace_cb, NULL);
+   evas_object_show(check);
 
    return frame;
 }

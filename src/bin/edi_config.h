@@ -40,6 +40,7 @@ struct _Edi_Config
         int width, height, bottomtab;
         double leftsize, bottomsize;
         Eina_Bool leftopen, bottomopen;
+        Eina_Bool show_whitespace;
      } gui;
 
    Eina_Bool autosave;
