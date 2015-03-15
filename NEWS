@@ -1,6 +1,21 @@
 =========
-Edi 0.0.1
+Edi 0.0.2
 =========
+
+Features
+
+  * Add a settings screen to control various display features
+  * Support turning autosave on and off
+
+Bug fixes
+
+  * Fix issues with re-opening closed tabs
+  * Fix crash-on-open for some systems
+  * Fix username lookup for Windows
+
+
+0.0.1
+-----
 
 Features:
 
