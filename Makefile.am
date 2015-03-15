@@ -52,7 +52,6 @@ EXTRA_DIST = \
 	autogen.sh \
 	config.rpath \
 	configure \
-	m4/efl_attribute.m4 \
 	m4/efl_binary.m4 \
 	m4/efl_compiler_flag.m4 \
 	m4/efl_path_max.m4
