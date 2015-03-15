@@ -496,7 +496,7 @@ edi_mainview_close()
    elm_naviframe_item_pop(nf);
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
    _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
-   eina_stringshare_del(item->path);
+
    free(item);
 }
 

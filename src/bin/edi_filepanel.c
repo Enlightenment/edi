@@ -404,6 +404,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
 
    list = elm_genlist_add(parent);
    elm_genlist_homogeneous_set(list, EINA_TRUE);
+   elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_ALWAYS);
    evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
