@@ -1,0 +1,12 @@
+---
+layout: default
+---
+<article>
+  <h3 class="title">{{ page.title }}</h3>
+  <p class="author">
+  {{ page.date | date: "%B %-d, %Y" }}
+  {% if page.author %} - {{ page.author }}{% endif %}
+  </p>
+  <section class="post-content">{{ content }}</section>
+</article>
+

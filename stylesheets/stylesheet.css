@@ -449,7 +449,7 @@ a:hover {
 
 header {
   padding-top: 40px;
-  padding-bottom: 40px;
+  padding-bottom: 20px;
   font-family: 'Architects Daughter', 'Helvetica Neue', Helvetica, Arial, serif;
   background: #2e7bcf url(../images/header-bg.jpg) 0 0 repeat-x;
   border-bottom: solid 1px #275da1;
@@ -495,6 +495,24 @@ header h2 {
 
 #main-content img {
   max-width: 100%;
+}
+
+#nav {
+  padding-top: 10px;
+  font-size: 21px;
+  color: #9ddcff;
+}
+
+#nav .gap {
+	padding: 0 10px;
+}
+#nav a {
+  color: white;
+}
+
+.disabled {
+  font-style: italic;
+  color: lightgray;
 }
 
 aside#sidebar {
