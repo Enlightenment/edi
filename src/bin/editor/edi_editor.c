@@ -127,7 +127,8 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 {
    Elm_Entry_Change_Info *change;
    Edi_Editor *editor = data;
-
+/*
+TODO move this code into elm_code for undo/redo
    change = calloc(1, sizeof(*change));
    memcpy(change, event_info, sizeof(*change));
    if (change->insert)
@@ -140,6 +141,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
      }
 
    editor->undo_stack = eina_list_prepend(editor->undo_stack, change);
+*/
    editor->modified = EINA_TRUE;
 
    if (editor->save_timer)
@@ -641,8 +643,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    editor->show_highlight = !strcmp(item->editortype, "code");
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
+   evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
 /*
-   evas_object_smart_callback_add(txt, "changed,user", _changed_cb, editor);
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 */
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
