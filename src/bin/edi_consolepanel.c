@@ -209,6 +209,8 @@ _edi_test_line_contains(const char *start, unsigned int length, const char *need
 
    ptr = (char *) start;
    needlelen = strlen(needle);
+   if (needlelen > length)
+     return EINA_FALSE;
 
    for (c = 0; c < length - strlen(needle); c++)
      {
@@ -282,7 +284,7 @@ _edi_testpanel_line_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
 
    if (!strcmp(_EDI_SUITE_PASSED, line->data))
      line->status = ELM_CODE_STATUS_TYPE_PASSED;
-   else if (!strcmp(_EDI_SUITE_FAILED, line->data))
+   else
      line->status = ELM_CODE_STATUS_TYPE_FAILED;
 
    return EO_CALLBACK_CONTINUE;
