@@ -463,13 +463,18 @@ edi_mainview_save()
    Evas_Object *content;
    Elm_Object_Item *it;
    Edi_Editor *editor;
+   Elm_Code *code;
 
    it = elm_naviframe_top_item_get(nf);
    content = elm_object_item_content_get(it);
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
-   if (editor)
-     elm_entry_file_save(editor->entry);
+   if (!editor)
+     return;
+
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   elm_code_file_save(code->file);
 }
 
 void
