@@ -571,9 +571,6 @@ edi_mainview_goto(int line)
    Evas_Object *content;
    Elm_Object_Item *it;
    Edi_Editor *editor;
-   Evas_Object *_tb;
-   Evas_Textblock_Cursor *mcur;
-   Evas_Coord x, y, w, h;
 
    it = elm_naviframe_top_item_get(nf);
    content = elm_object_item_content_get(it);
@@ -581,14 +578,8 @@ edi_mainview_goto(int line)
    if (!content || !editor || line <= 0)
      return;
 
-   _tb = elm_entry_textblock_get(editor->entry);
-   mcur = evas_object_textblock_cursor_get(_tb);
-
-   evas_textblock_cursor_line_set(mcur, line-1);
-   elm_entry_cursor_geometry_get(editor->entry, &x, &y, &w, &h);
-   elm_scroller_region_show(editor->entry, x, y, w, h);
-   elm_entry_calc_force(editor->entry);
-
+   eo_do(editor->entry,
+         elm_code_widget_cursor_position_set(1, line));
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
