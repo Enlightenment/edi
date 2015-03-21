@@ -214,24 +214,34 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
 static void
 _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
-   Evas_Object *position, *mime;
+   Evas_Object *position, *mime, *lines;
+   Elm_Code *code;
 
    elm_box_horizontal_set(panel, EINA_TRUE);
 
    mime = elm_label_add(panel);
    if (item->mimetype)
-     {
-        elm_object_text_set(mime, item->mimetype);
-     }
+     elm_object_text_set(mime, item->mimetype);
    else
-     {
-        elm_object_text_set(mime, item->editortype);
-     }
+     elm_object_text_set(mime, item->editortype);
    evas_object_size_hint_align_set(mime, 0.0, 0.5);
-   evas_object_size_hint_weight_set(mime, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_weight_set(mime, 0.1, 0.0);
    elm_box_pack_end(panel, mime);
    evas_object_show(mime);
    elm_object_disabled_set(mime, EINA_TRUE);
+
+   lines = elm_label_add(panel);
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
+     elm_object_text_set(lines, "WIN");
+   else
+     elm_object_text_set(lines, "UNIX");
+   evas_object_size_hint_align_set(lines, 0.0, 0.5);
+   evas_object_size_hint_weight_set(lines, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(panel, lines);
+   evas_object_show(lines);
+   elm_object_disabled_set(lines, EINA_TRUE);
 
    position = elm_label_add(panel);
    evas_object_size_hint_align_set(position, 1.0, 0.5);
