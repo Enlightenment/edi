@@ -12,6 +12,7 @@
 
 #include <Elementary.h>
 #include <Evas.h>
+#include <Elm_Code.h>
 
 #include "edi_editor.h"
 #include "edi_private.h"
@@ -25,7 +26,8 @@ struct _Edi_Editor_Search
    Evas_Object *entry; /**< The search text widget */
    Evas_Object *widget; /**< The search UI panel we wish to show and hide */
    Evas_Object *parent; /**< The parent panel we will insert into */
-   Evas_Textblock_Cursor *current_search; /**< The current search cursor for this session */
+   unsigned int current_search_line; /**< The current search cursor line for this session */
+   unsigned int current_search_col; /**< The current search cursor column for this session */
 
    Eina_Bool term_found;
    Evas_Object *replace_entry; /**< The replace text widget */
@@ -38,12 +40,12 @@ static Eina_Bool
 _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 {
    Eina_Bool try_next = EINA_FALSE;
-   const char *found, *text;
-   char *utf8;
-   const Evas_Object *tb = elm_entry_textblock_get(entry);
-   Evas_Textblock_Cursor *end, *start, *mcur;
-   size_t initial_pos;
-   Evas_Coord x, y, w, h;
+   Eina_List *item;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   const char *text;
+   unsigned int offset, pos_line, pos_col;
+   int found;
 
    text = elm_object_text_get(search->entry);
    if (!text || !*text)
@@ -52,72 +54,56 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         return EINA_FALSE;
      }
 
-   mcur = (Evas_Textblock_Cursor *) evas_object_textblock_cursor_get(tb);
-   if (!search->current_search)
-     {
-        search->current_search = evas_object_textblock_cursor_new(tb);
-     }
-   else if (!evas_textblock_cursor_compare(search->current_search, mcur))
+   eo_do(entry,
+         code = elm_code_widget_code_get(),
+         elm_code_widget_cursor_position_get(&pos_col, &pos_line));
+   if (search->current_search_line == pos_line ||
+       search->current_search_col == pos_col)
      {
         try_next = EINA_TRUE;
      }
 
-   evas_textblock_cursor_paragraph_last(search->current_search);
-   start = mcur;
-   end = search->current_search;
-
-   initial_pos = evas_textblock_cursor_pos_get(start);
-
-   utf8 = evas_textblock_cursor_range_text_get(start, end,
-         EVAS_TEXTBLOCK_TEXT_PLAIN);
-
-   if (!utf8)
+   found = 0;
+   EINA_LIST_FOREACH(code->file->lines, item, line)
      {
-        search->term_found = EINA_FALSE;
-        return EINA_FALSE;
+        if (line->number < pos_line)
+          continue;
+
+        offset = 0;
+        if (line->number == pos_line)
+          offset = pos_col + (try_next ? 1 : 0);
+
+        found = elm_code_line_text_strpos(line, text, offset);
+        if (found == ELM_CODE_TEXT_NOT_FOUND)
+          continue;
+
+        search->current_search_line = line->number;
+// TODO make this unicode
+        search->current_search_col = found + 1;
+        break;
      }
 
-   if (try_next)
+   search->term_found = found != ELM_CODE_TEXT_NOT_FOUND;
+   elm_code_widget_selection_clear(entry);
+   if (!search->term_found)
+     return EINA_FALSE;
+
+/*
+   size_t pos = 0;
+   int idx = 0;
+   while ((utf8 + idx) < found)
      {
-        found = strstr(utf8 + 1, text);
-        if (!found)
-          {
-             found = utf8;
-          }
+        pos++;
+        eina_unicode_utf8_next_get(utf8, &idx);
      }
-   else
-     {
-        found = strstr(utf8, text);
-     }
+*/
+   elm_code_widget_selection_start(entry, search->current_search_line,
+                                        search->current_search_col);
+// TODO make that strlen unicode strlen
+   elm_code_widget_selection_end(entry, search->current_search_line,
+                                 search->current_search_col + strlen(text) - 1);
 
-   search->term_found = !!found;
-   elm_entry_select_none(entry);
-   if (found)
-     {
-        size_t pos = 0;
-        int idx = 0;
-        while ((utf8 + idx) < found)
-          {
-             pos++;
-             eina_unicode_utf8_next_get(utf8, &idx);
-          }
-
-        evas_textblock_cursor_pos_set(mcur, pos + initial_pos + strlen(text));
-        elm_entry_cursor_geometry_get(entry, &w, &h, NULL, NULL);
-        elm_entry_cursor_selection_begin(entry);
-        elm_entry_cursor_pos_set(entry, pos + initial_pos);
-        elm_entry_cursor_selection_end(entry);
-
-        elm_entry_cursor_geometry_get(entry, &x, &y, NULL, NULL);
-        w -= x;
-        h -= y;
-        elm_scroller_region_show(entry, x, y, w, h);
-        evas_textblock_cursor_copy(mcur, search->current_search);
-     }
-
-   free(utf8);
-
-   return !!found;
+   return EINA_TRUE;
 }
 
 static void
@@ -150,11 +136,10 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
    // If we found a matching searched term the go ahead and replace it if appropriate.
    if (search->term_found)
      {
-        if (search->current_search)
+        if (search->current_search_line)
           {
-             elm_entry_entry_insert(editor->entry, elm_object_text_get(search->replace_entry));
-             evas_textblock_cursor_free(search->current_search);
-             search->current_search = NULL;
+//             elm_entry_entry_insert(editor->entry, elm_object_text_get(search->replace_entry));
+             search->current_search_line = 0;
           }
         _edi_search_in_entry(editor->entry, search);
      }
@@ -178,10 +163,8 @@ _edi_editor_search_hide(Edi_Editor *editor)
         elm_box_unpack(search->parent, search->widget);
      }
 
-   if (search->current_search)
-     evas_textblock_cursor_free(search->current_search);
-   search->current_search = NULL;
-   elm_entry_select_none(editor->entry);
+   search->current_search_line = 0;
+   elm_code_widget_selection_clear(editor->entry);
 
    // Re-focus in the editor proper since we are closing the search bar here
    elm_object_focus_set(editor->entry, EINA_TRUE);
@@ -262,11 +245,7 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
    else if (!strcmp(ev->key, "Escape"))
      _edi_cancel_clicked(data, NULL, NULL);
    else
-     {
-        if (search->current_search)
-          evas_textblock_cursor_free(search->current_search);
-        search->current_search = NULL;
-     }
+     search->current_search_line = 0;
 }
 
 void
