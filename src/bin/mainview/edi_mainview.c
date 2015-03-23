@@ -179,13 +179,13 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 
    item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
    content = _edi_mainview_content_create(item, nf);
-   if (options->line)
-      edi_mainview_goto(options->line);
 
    it = elm_naviframe_item_simple_push(nf, content);
+   item->view = it;
+   elm_object_item_data_set(it, item);
+
    elm_naviframe_item_style_set(it, "overlap");
    tab = elm_toolbar_item_append(tb, NULL, basename((char*)options->path), _promote, it);
-   item->view = it;
    item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
 
@@ -194,7 +194,8 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    if (editor)
      elm_object_focus_set(editor->entry, EINA_TRUE);
 
-   elm_object_item_data_set(it, item);
+   if (options->line)
+     edi_mainview_goto(options->line);
 }
 
 static void
