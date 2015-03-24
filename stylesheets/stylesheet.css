@@ -501,6 +501,11 @@ header h2 {
   padding-top: 10px;
   font-size: 21px;
   color: #9ddcff;
+
+  position: absolute;
+  float: right;
+  top: 18pt;
+  right: 0;
 }
 
 #nav .gap {
@@ -876,6 +881,14 @@ footer a:hover {
   header a.button small {
     display: inline;
     font-size: 13px;
+  }
+  #nav {
+    position: relative;
+    float: none;
+    top: 0;
+    height: 20pt;
+
+    font-size: 18px;
   }
   #main-content,
   aside#sidebar {
