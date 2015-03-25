@@ -9,7 +9,7 @@
 
 #include "edi_private.h"
 
-static Elm_Naviframe_Item *_edi_settings_display, *_edi_settings_behaviour;
+static Elm_Object_Item *_edi_settings_display, *_edi_settings_behaviour;
 
 static void
 _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
@@ -20,9 +20,9 @@ _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EI
 static void
 _edi_settings_category_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Elm_Naviframe_Item *item;
+   Elm_Object_Item *item;
 
-   item = (Elm_Naviframe_Item *)data;
+   item = (Elm_Object_Item *)data;
    elm_naviframe_item_promote(item);
 }
 
