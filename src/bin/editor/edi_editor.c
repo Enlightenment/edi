@@ -286,7 +286,8 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
 }
 
 static void
-_edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Type status)
+_edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Type status,
+                     const char *text)
 {
    Elm_Code *code;
    Elm_Code_Line *line;
@@ -298,6 +299,8 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
    ecore_thread_main_loop_begin();
 
    elm_code_line_status_set(line, status);
+   if (text)
+     line->status_text = strdup(text);
 
    eo_do(editor->entry,
          elm_code_widget_line_refresh(line));
@@ -491,14 +494,9 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
               status = ELM_CODE_STATUS_TYPE_FATAL;
               break;
           }
-
-        _edi_line_status_set(editor, line, status);
-
-# if CLANG_DEBUG
-        CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
-        printf("DEBUG: Diag:%s\n", clang_getCString(str));
+        CXString str = clang_getDiagnosticSpelling(diag);
+        _edi_line_status_set(editor, line, status, clang_getCString(str));
         clang_disposeString(str);
-# endif
 
         clang_disposeDiagnostic(diag);
      }
@@ -573,6 +571,18 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 }
 
 static void
+_gutter_clicked_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info)
+{
+   Elm_Code_Line *line;
+
+   line = (Elm_Code_Line *)event_info;
+
+   if (line->status_text)
+     printf("CLANG %s\n", line->status_text);
+}
+
+static void
 _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
 {
    Edi_Editor *editor;
@@ -644,6 +654,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "line,gutter,clicked", _gutter_clicked_cb, editor);
 /*
    evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
 */
