@@ -462,8 +462,13 @@ _clang_show_highlighting(Edi_Editor *editor)
 static void
 _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
 {
+   Elm_Code *code;
    unsigned n = clang_getNumDiagnostics(editor->tx_unit);
    unsigned i = 0;
+
+   eo_do(editor->entry, code = elm_code_widget_code_get());
+   for (i = 1; i <= elm_code_file_lines_get(code->file); i++)
+     _edi_line_status_set(editor, i, ELM_CODE_STATUS_TYPE_DEFAULT, NULL);
 
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
