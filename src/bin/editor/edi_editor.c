@@ -604,6 +604,7 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    widget = (Elm_Code_Widget *) data;
    eo_do(widget,
          elm_code_widget_font_size_set(_edi_cfg->font.size),
+         elm_code_widget_line_width_marker_set(_edi_cfg->gui.width_marker),
          elm_code_widget_show_whitespace_set(_edi_cfg->gui.show_whitespace));
 
    return ECORE_CALLBACK_RENEW;
@@ -650,7 +651,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
          elm_code_widget_font_size_set(_edi_cfg->font.size),
          elm_code_widget_editable_set(EINA_TRUE),
          elm_code_widget_line_numbers_set(EINA_TRUE),
-         elm_code_widget_line_width_marker_set(80),
+         elm_code_widget_line_width_marker_set(_edi_cfg->gui.width_marker),
          elm_code_widget_show_whitespace_set(_edi_cfg->gui.show_whitespace));
 
    editor = calloc(1, sizeof(*editor));
