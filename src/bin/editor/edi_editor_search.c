@@ -71,7 +71,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
         offset = 0;
         if (line->number == pos_line)
-          offset = pos_col + (try_next ? 1 : 0);
+          offset = pos_col - 1 + (try_next ? 1 : 0);
 
         found = elm_code_line_text_strpos(line, text, offset);
         if (found == ELM_CODE_TEXT_NOT_FOUND)
@@ -120,15 +120,19 @@ _edi_replace_entry_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event
    else
      elm_object_disabled_set(replace->replace_btn, EINA_TRUE);
 
-   return;
+   replace->current_search_line = 0;
+   replace->term_found = EINA_FALSE;
 }
 
 static void
 _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
 {
    Edi_Editor *editor;
-   editor = (Edi_Editor *)data;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   const char *replace;
 
+   editor = (Edi_Editor *)data;
    // If there is no search term found to replace, then do a new search first.
    if (search && !search->term_found)
      _edi_search_in_entry(editor->entry, search);
@@ -138,7 +142,14 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
      {
         if (search->current_search_line)
           {
-//             elm_entry_entry_insert(editor->entry, elm_object_text_get(search->replace_entry));
+             eo_do(editor->entry,
+                   code = elm_code_widget_code_get());
+
+             elm_code_widget_selection_delete(editor->entry);
+             replace = elm_object_text_get(search->replace_entry);
+
+             line = elm_code_file_line_get(code->file, search->current_search_line);
+             elm_code_line_text_insert(line, search->current_search_col, replace, strlen(replace));
              search->current_search_line = 0;
           }
         _edi_search_in_entry(editor->entry, search);
@@ -237,7 +248,6 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
    editor = (Edi_Editor *)data;
    search = editor->search;
 
-   search->term_found = EINA_TRUE;
    str = elm_object_text_get(obj);
 
    if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
@@ -245,7 +255,10 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
    else if (!strcmp(ev->key, "Escape"))
      _edi_cancel_clicked(data, NULL, NULL);
    else
-     search->current_search_line = 0;
+     {
+        search->current_search_line = 0;
+        search->term_found = EINA_FALSE;
+     }
 }
 
 void
