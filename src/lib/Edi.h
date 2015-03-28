@@ -1,7 +1,6 @@
 #ifndef EDI_H_
 # define EDI_H_
 
-#include <Elementary.h>
 #include <Eina.h>
 #include <Eio.h>
 

@@ -1,7 +1,7 @@
 #ifndef EDI_BUILDER_H_
 # define EDI_BUILDER_H_
 
-#include <Elementary.h>
+#include <Ecore.h>
 
 #ifdef __cplusplus
 extern "C" {

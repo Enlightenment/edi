@@ -2,6 +2,7 @@
 # define EDI_PRIVATE_H_
 
 #include <Evas.h>
+#include <Elementary.h>
 
 extern int _edi_log_dom;
 
