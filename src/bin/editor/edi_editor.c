@@ -318,13 +318,11 @@ _clang_load_highlighting(const char *path, Edi_Editor *editor)
               clang_getLocationForOffset(editor->tx_unit, cfile, eina_file_size_get(eina_file_open(path, EINA_FALSE))));
 
         clang_tokenize(editor->tx_unit, range, &editor->tokens, &editor->token_count);
-        /* FIXME: We should use annotate tokens and then use a lot more
-         * color classes. I don't know why it's broken ATM... :( */
         editor->cursors = (CXCursor *) malloc(editor->token_count * sizeof(CXCursor));
         clang_annotateTokens(editor->tx_unit, editor->tokens, editor->token_count, editor->cursors);
 }
 
-static void *
+static void
 _clang_show_highlighting(Edi_Editor *editor)
 {
    unsigned int i = 0;
@@ -451,12 +449,13 @@ _clang_show_highlighting(Edi_Editor *editor)
         printf("\n");
 # endif
      }
+   }
 
-// TODO clear these when we reset next time
-//   free(editor->cursors);
-//   clang_disposeTokens(editor->tx_unit, editor->tokens, editor->token_count);
-
-   return NULL;
+static void
+_clang_free_highlighting(Edi_Editor *editor)
+{
+   free(editor->cursors);
+   clang_disposeTokens(editor->tx_unit, editor->tokens, editor->token_count);
 }
 
 static void
@@ -532,6 +531,7 @@ _edi_clang_setup(void *data)
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
    _clang_show_highlighting(editor);
+   _clang_free_highlighting(editor);
 
    return NULL;
 }
