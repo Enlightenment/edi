@@ -518,7 +518,7 @@ edi_mainview_cut()
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if (editor)
-     elm_entry_selection_cut(editor->entry);
+     elm_code_widget_selection_cut(editor->entry);
 }
 
 void
@@ -533,7 +533,7 @@ edi_mainview_copy()
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if (editor)
-     elm_entry_selection_copy(editor->entry);
+     elm_code_widget_selection_copy(editor->entry);
 }
 
 void
@@ -548,7 +548,7 @@ edi_mainview_paste()
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
 
    if (editor)
-     elm_entry_selection_paste(editor->entry);
+     elm_code_widget_selection_paste(editor->entry);
 }
 
 void
