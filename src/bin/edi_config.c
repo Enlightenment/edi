@@ -188,8 +188,9 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.bottomsize, EET_T_DOUBLE);
    EDI_CONFIG_VAL(D, T, gui.bottomopen, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.bottomtab, EET_T_INT);
-   EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.show_whitespace, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
+   EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, autosave, EET_T_UCHAR);
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
    EDI_CONFIG_LIST(D, T, mime_assocs, _edi_cfg_mime_edd);
@@ -268,6 +269,7 @@ _edi_config_load(void)
 
    IFCFG(0x000b);
    _edi_cfg->gui.width_marker = 80;
+   _edi_cfg->gui.tabstop = 8;
    IFCFGEND;
 
    /* limit config values so they are sane */
@@ -276,6 +278,7 @@ _edi_config_load(void)
    EDI_CONFIG_LIMIT(_edi_cfg->gui.height, 100, 8000);
    EDI_CONFIG_LIMIT(_edi_cfg->gui.leftsize, 0.0, 1.0);
    EDI_CONFIG_LIMIT(_edi_cfg->gui.bottomsize, 0.0, 1.0);
+   EDI_CONFIG_LIMIT(_edi_cfg->gui.tabstop, 1, 32);
 
    _edi_cfg->version = EDI_CONFIG_FILE_VERSION;
 

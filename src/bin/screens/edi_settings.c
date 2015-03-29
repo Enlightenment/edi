@@ -79,6 +79,17 @@ _edi_settings_display_widthmarker_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_config_save();
 }
 
+static void
+_edi_settings_display_tabstop_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                     void *event EINA_UNUSED)
+{
+   Evas_Object *spinner;
+
+   spinner = (Evas_Object *)obj;
+   _edi_cfg->gui.tabstop = (int) elm_spinner_value_get(spinner);
+   _edi_config_save();
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
@@ -124,10 +135,10 @@ _edi_settings_display_create(Evas_Object *parent)
                                   _edi_settings_display_whitespace_cb, NULL);
    evas_object_show(check);
 
-   hbox = elm_box_add(parent);
+   hbox = elm_box_add(box);
    elm_box_horizontal_set(hbox, EINA_TRUE);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.5);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.05);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(box, hbox);
    evas_object_show(hbox);
 
@@ -147,6 +158,32 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(spinner, 0.0, 0.95);
    evas_object_smart_callback_add(spinner, "changed",
                                   _edi_settings_display_widthmarker_cb, NULL);
+   elm_box_pack_end(hbox, spinner);
+   evas_object_show(spinner);
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.05);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, "Tabstop");
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   spinner = elm_spinner_add(hbox);
+   elm_spinner_value_set(spinner, _edi_cfg->gui.tabstop);
+   elm_spinner_editable_set(spinner, EINA_TRUE);
+   elm_spinner_step_set(spinner, 1);
+   elm_spinner_wrap_set(spinner, EINA_FALSE);
+   elm_spinner_min_max_set(spinner, 1, 32);
+   evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(spinner, 0.0, 0.95);
+   evas_object_smart_callback_add(spinner, "changed",
+                                  _edi_settings_display_tabstop_cb, NULL);
    elm_box_pack_end(hbox, spinner);
    evas_object_show(spinner);
 

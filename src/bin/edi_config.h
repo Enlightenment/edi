@@ -41,7 +41,7 @@ struct _Edi_Config
         double leftsize, bottomsize;
         Eina_Bool leftopen, bottomopen;
         Eina_Bool show_whitespace;
-        unsigned int width_marker;
+        unsigned int width_marker, tabstop;
      } gui;
 
    Eina_Bool autosave;
