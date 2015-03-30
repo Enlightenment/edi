@@ -1,6 +1,22 @@
-=========
-Edi 0.0.2
-=========
+=======
+Edi 0.1
+=======
+
+Features:
+
+  * Integrated elm_code editor
+    - faster code highlighting
+    - highlighting of error lines
+    - line width indicator in the editor
+    - configurable tab stop width
+
+Bug fixes
+
+  * T2057 Line numbers are not fully visible in new windows
+
+
+0.0.2
+-----
 
 Features
 
