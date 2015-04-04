@@ -68,6 +68,9 @@ po/stamp-po
 
 /elm_code/src/lib/*.eo.h
 /elm_code/src/lib/*.eo.c
+/elm_code/src/lib/widget/*.eo.h
+/elm_code/src/lib/widget/*.eo.c
+
 /elm_code/src/bin/elm_code_test
 
 /elm_code/src/tests/elm_code_suite
