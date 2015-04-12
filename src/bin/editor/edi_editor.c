@@ -10,11 +10,6 @@
 
 #include "edi_editor.h"
 
-#define CLANG_DEBUG 0
-#if CLANG_DEBUG
-#include "clang_debug.h"
-#endif
-
 #include "mainview/edi_mainview.h"
 #include "edi_config.h"
 
@@ -433,29 +428,8 @@ _clang_show_highlighting(Edi_Editor *editor)
           }
 
         _edi_range_color_set(editor, range, type);
-
-# if CLANG_DEBUG
-        const char *kind = NULL;
-        switch (clang_getTokenKind(editor->tokens[i])) {
-           case CXToken_Punctuation: kind = "Punctuation"; break;
-           case CXToken_Keyword: kind = "Keyword"; break;
-           case CXToken_Identifier: kind = "Identifier"; break;
-           case CXToken_Literal: kind = "Literal"; break;
-           case CXToken_Comment: kind = "Comment"; break;
-        }
-
-        printf("%s ", kind);
-        PrintToken(editor->tx_unit, editor->tokens[i]);
-
-        if (!clang_isInvalid(editor->cursors[i].kind)) {
-             printf(" ");
-             PrintCursor(editor->cursors[i]);
-        }
-
-        printf("\n");
-# endif
      }
-   }
+}
 
 static void
 _clang_free_highlighting(Edi_Editor *editor)
