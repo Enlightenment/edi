@@ -295,6 +295,12 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
    eo_do(editor->entry,
          code = elm_code_widget_code_get());
    line = elm_code_file_line_get(code->file, number);
+   if (!line)
+     {
+        if (text)
+          ERR("Status on invalid line %d (\"%s\")", number, text);
+        return;
+     }
 
    ecore_thread_main_loop_begin();
 
