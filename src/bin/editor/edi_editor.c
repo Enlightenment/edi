@@ -450,10 +450,16 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
         CXDiagnostic diag = clang_getDiagnostic(editor->tx_unit, i);
+        CXFile file;
         unsigned int line;
+        CXString path;
 
         // the parameter after line would be a caret position but we're just highlighting for now
-        clang_getSpellingLocation(clang_getDiagnosticLocation(diag), NULL, &line, NULL, NULL);
+        clang_getSpellingLocation(clang_getDiagnosticLocation(diag), &file, &line, NULL, NULL);
+
+        path = clang_getFileName(file);
+        if (strcmp(elm_code_file_path_get(code->file), clang_getCString(path)))
+          continue;
 
         /* FIXME: Also handle ranges and fix suggestions. */
         Elm_Code_Status_Type status = ELM_CODE_STATUS_TYPE_DEFAULT;
