@@ -458,7 +458,7 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
         clang_getSpellingLocation(clang_getDiagnosticLocation(diag), &file, &line, NULL, NULL);
 
         path = clang_getFileName(file);
-        if (strcmp(elm_code_file_path_get(code->file), clang_getCString(path)))
+        if (!clang_getCString(path) || strcmp(elm_code_file_path_get(code->file), clang_getCString(path)))
           continue;
 
         /* FIXME: Also handle ranges and fix suggestions. */
