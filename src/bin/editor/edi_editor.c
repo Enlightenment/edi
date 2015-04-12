@@ -301,7 +301,7 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
 
    elm_code_line_status_set(line, status);
    if (text)
-     line->status_text = strdup(text);
+     elm_code_line_status_text_set(line, text);
 
    eo_do(editor->entry,
          elm_code_widget_line_refresh(line));
@@ -446,8 +446,6 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
    unsigned i = 0;
 
    eo_do(editor->entry, code = elm_code_widget_code_get());
-   for (i = 1; i <= elm_code_file_lines_get(code->file); i++)
-     _edi_line_status_set(editor, i, ELM_CODE_STATUS_TYPE_DEFAULT, NULL);
 
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
@@ -533,8 +531,20 @@ _edi_clang_dispose(Edi_Editor *editor)
 static void
 _reset_highlight(Edi_Editor *editor)
 {
+   Eina_List *item;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+
    if (!editor->show_highlight)
      return;
+
+   eo_do(editor->entry,
+         code = elm_code_widget_code_get());
+   EINA_LIST_FOREACH(code->file->lines, item, line)
+     {
+        elm_code_line_tokens_clear(line);
+        elm_code_line_status_clear(line);
+     }
 
 #if HAVE_LIBCLANG
    pthread_attr_t attr;
