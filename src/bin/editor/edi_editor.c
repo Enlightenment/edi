@@ -491,7 +491,9 @@ _edi_clang_setup(void *data)
 {
    Edi_Editor *editor;
    Elm_Code *code;
-   const char *path;
+   const char *path, *args;
+   char **clang_argv;
+   unsigned int clang_argc;
 
    editor = (Edi_Editor *)data;
    eo_do(editor->entry,
@@ -500,13 +502,14 @@ _edi_clang_setup(void *data)
 
    /* Clang */
    /* FIXME: index should probably be global. */
-   const char *clang_argv[] = {"-I/usr/lib/clang/3.1/include/", "-Wall", "-Wextra"};
-   int clang_argc = sizeof(clang_argv) / sizeof(*clang_argv);
+   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
+   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
 
    editor->idx = clang_createIndex(0, 0);
 
    /* FIXME: Possibly activate more options? */
-   editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, clang_argv, clang_argc, NULL, 0, clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
+   editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, (const char *const *)clang_argv, (int)clang_argc, NULL, 0,
+     clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);

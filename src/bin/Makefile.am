@@ -2,6 +2,8 @@ MAINTAINERCLEANFILES = Makefile.in
 AUTOMAKE_OPTIONS = subdir-objects
 
 bin_PROGRAMS = edi edi_build
+efl_cflags_safe = '@EFL_CFLAGS@'
+clang_include = '$(CLANG_INCLUDE)'
 
 AM_CPPFLAGS = \
 -DPACKAGE_BIN_DIR=\"$(bindir)\" \
@@ -15,6 +17,8 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/elm_code/src/lib \
 -I$(top_builddir)/src/lib \
 -DEFL_BETA_API_SUPPORT \
+-DEFL_CFLAGS=\"$(efl_cflags_safe)\" \
+-DCLANG_INCLUDES=\"-I$(clang_include)\" \
 @EFL_CFLAGS@
 
 noinst_HEADERS = \

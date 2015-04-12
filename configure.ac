@@ -132,7 +132,8 @@ fi
 if test "${have_clang}" = "no"; then
    AC_MSG_WARN([Could not find a usable libclang. Please install libclang to enable syntax highlighting features.])
 fi
-
+CLANG_INCLUDE=`clang -E - -v < /dev/null 2>&1 | grep "^ /usr" | grep clang`
+AC_SUBST([CLANG_INCLUDE])
 
 AC_CONFIG_FILES([
 Makefile
