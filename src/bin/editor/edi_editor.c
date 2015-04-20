@@ -27,9 +27,6 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
-static void
-_reset_highlight(Edi_Editor *editor);
-
 void
 edi_editor_save(Edi_Editor *editor)
 {
@@ -38,10 +35,8 @@ edi_editor_save(Edi_Editor *editor)
 
    editor->save_time = time(NULL);
    edi_mainview_save();
-   _reset_highlight(editor);
 
    editor->modified = EINA_FALSE;
-
    ecore_timer_del(editor->save_timer);
    editor->save_timer = NULL;
 }
@@ -483,7 +478,8 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
               break;
           }
         CXString str = clang_getDiagnosticSpelling(diag);
-        _edi_line_status_set(editor, line, status, clang_getCString(str));
+        if (status != ELM_CODE_STATUS_TYPE_DEFAULT)
+          _edi_line_status_set(editor, line, status, clang_getCString(str));
         clang_disposeString(str);
 
         clang_disposeDiagnostic(diag);
@@ -535,35 +531,6 @@ _edi_clang_dispose(Edi_Editor *editor)
 #endif
 
 static void
-_reset_highlight(Edi_Editor *editor)
-{
-   Eina_List *item;
-   Elm_Code *code;
-   Elm_Code_Line *line;
-
-   if (!editor->show_highlight)
-     return;
-
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
-   EINA_LIST_FOREACH(code->file->lines, item, line)
-     {
-        elm_code_line_tokens_clear(line);
-        elm_code_line_status_clear(line);
-     }
-
-#if HAVE_LIBCLANG
-   pthread_attr_t attr;
-   pthread_t thread_id;
-
-   if (pthread_attr_init(&attr) != 0)
-     perror("pthread_attr_init");
-   if (pthread_create(&thread_id, &attr, _edi_clang_setup, editor) != 0)
-     perror("pthread_create");
-#endif
-}
-
-static void
 _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Editor *editor;
@@ -592,7 +559,16 @@ _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
    Edi_Editor *editor;
 
    editor = (Edi_Editor *)data;
-   _reset_highlight(editor);
+
+#if HAVE_LIBCLANG
+   pthread_attr_t attr;
+   pthread_t thread_id;
+
+   if (pthread_attr_init(&attr) != 0)
+     perror("pthread_attr_init");
+   if (pthread_create(&thread_id, &attr, _edi_clang_setup, editor) != 0)
+     perror("pthread_create");
+#endif
 }
 
 static Eina_Bool
@@ -664,7 +640,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 */
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
-   elm_code_parser_add(code, NULL, _edi_editor_parse_file_cb, editor);
+   elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
+   if (editor->show_highlight)
+     elm_code_parser_add(code, NULL, _edi_editor_parse_file_cb, editor);
    elm_code_file_open(code, item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
