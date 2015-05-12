@@ -97,6 +97,7 @@ AM_PROG_CC_C_O
 EFL_CHECK_PATH_MAX
 EFL_COMPILER_FLAG([-Wall])
 EFL_COMPILER_FLAG([-Wextra])
+EFL_COMPILER_FLAG([-fvisibility=hidden])
 
 
 ### Checks for linker characteristics
