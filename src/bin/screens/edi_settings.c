@@ -224,7 +224,7 @@ _edi_settings_behaviour_create(Evas_Object *parent)
 Evas_Object *
 edi_settings_show(Evas_Object *mainwin)
 {
-   Evas_Object *win, *table, *naviframe, *tb;
+   Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it;
 
    win = elm_win_add(mainwin, "settings", ELM_WIN_DIALOG_BASIC);
@@ -234,7 +234,13 @@ edi_settings_show(Evas_Object *mainwin)
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_settings_exit, win);
 
-   table = elm_table_add(win);
+   bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_win_resize_object_add(win, bg);
+   evas_object_show(bg);
+
+   table = elm_table_add(bg);
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_win_resize_object_add(win, table);
