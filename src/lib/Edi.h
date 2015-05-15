@@ -3,6 +3,8 @@
 
 #include <Eina.h>
 #include <Eio.h>
+#include <Ecore.h>
+#include <Ecore_File.h>
 
 #ifdef EAPI
 # undef EAPI

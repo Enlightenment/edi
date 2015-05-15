@@ -1,9 +1,6 @@
 #ifndef EDI_CREATE_H_
 # define EDI_CREATE_H_
 
-#include <Ecore.h>
-#include <Ecore_File.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
