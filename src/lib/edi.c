@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <Ecore_File.h>
+
 #include "Edi.h"
 
 #include "edi_private.h"

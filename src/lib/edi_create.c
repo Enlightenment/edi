@@ -2,9 +2,24 @@
 # include "config.h"
 #endif
 
+#include <Eio.h>
+#include <Ecore.h>
+#include <Ecore_File.h>
+
 #include "Edi.h"
 
 #include "edi_private.h"
+
+typedef struct _Edi_Create
+{
+   char *path, *temp, *name;
+   char *url, *user, *email;
+
+   Edi_Create_Cb callback;
+   Ecore_Event_Handler *handler;
+
+   int filters;
+} Edi_Create;
 
 static Edi_Create *_edi_create_data;
 

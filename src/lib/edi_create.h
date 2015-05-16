@@ -12,17 +12,6 @@ extern "C" {
 
 typedef void (*Edi_Create_Cb)(const char *path, Eina_Bool success);
 
-typedef struct _Edi_Create
-{
-   char *path, *temp, *name;
-   char *url, *user, *email;
-
-   Edi_Create_Cb callback;
-   Ecore_Event_Handler *handler;
-
-   int filters;
-} Edi_Create;
-
 /**
  * @brief Main builder management
  * @defgroup Creation

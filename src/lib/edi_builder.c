@@ -2,6 +2,9 @@
 # include "config.h"
 #endif
 
+#include <unistd.h>
+#include <Ecore.h>
+
 #include "Edi.h"
 
 #include "edi_private.h"
