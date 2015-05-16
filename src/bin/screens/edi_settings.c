@@ -53,8 +53,8 @@ _edi_settings_display_fontsize_cb(void *data EINA_UNUSED, Evas_Object *obj,
    Evas_Object *spinner;
 
    spinner = (Evas_Object *)obj;
-   _edi_cfg->font.size = (int) elm_spinner_value_get(spinner);
-   _edi_config_save();
+   _edi_project_config->font.size = (int) elm_spinner_value_get(spinner);
+   _edi_project_config_save();
 }
 
 static void
@@ -64,8 +64,8 @@ _edi_settings_display_whitespace_cb(void *data EINA_UNUSED, Evas_Object *obj,
    Evas_Object *check;
 
    check = (Evas_Object *)obj;
-   _edi_cfg->gui.show_whitespace = elm_check_state_get(check);
-   _edi_config_save();
+   _edi_project_config->gui.show_whitespace = elm_check_state_get(check);
+   _edi_project_config_save();
 }
 
 static void
@@ -75,8 +75,8 @@ _edi_settings_display_widthmarker_cb(void *data EINA_UNUSED, Evas_Object *obj,
    Evas_Object *spinner;
 
    spinner = (Evas_Object *)obj;
-   _edi_cfg->gui.width_marker = (int) elm_spinner_value_get(spinner);
-   _edi_config_save();
+   _edi_project_config->gui.width_marker = (int) elm_spinner_value_get(spinner);
+   _edi_project_config_save();
 }
 
 static void
@@ -86,8 +86,8 @@ _edi_settings_display_tabstop_cb(void *data EINA_UNUSED, Evas_Object *obj,
    Evas_Object *spinner;
 
    spinner = (Evas_Object *)obj;
-   _edi_cfg->gui.tabstop = (int) elm_spinner_value_get(spinner);
-   _edi_config_save();
+   _edi_project_config->gui.tabstop = (int) elm_spinner_value_get(spinner);
+   _edi_project_config_save();
 }
 
 static Evas_Object *
@@ -112,7 +112,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(label);
 
    spinner = elm_spinner_add(hbox);
-   elm_spinner_value_set(spinner, _edi_cfg->font.size);
+   elm_spinner_value_set(spinner, _edi_project_config->font.size);
    elm_spinner_editable_set(spinner, EINA_TRUE);
    elm_spinner_label_format_set(spinner, "%1.0fpt");
    elm_spinner_step_set(spinner, 1);
@@ -127,7 +127,7 @@ _edi_settings_display_create(Evas_Object *parent)
 
    check = elm_check_add(box);
    elm_object_text_set(check, "Display whitespace");
-   elm_check_state_set(check, _edi_cfg->gui.show_whitespace);
+   elm_check_state_set(check, _edi_project_config->gui.show_whitespace);
    elm_box_pack_end(box, check);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(check, 0.0, 0.5);
@@ -149,7 +149,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(label);
 
    spinner = elm_spinner_add(hbox);
-   elm_spinner_value_set(spinner, _edi_cfg->gui.width_marker);
+   elm_spinner_value_set(spinner, _edi_project_config->gui.width_marker);
    elm_spinner_editable_set(spinner, EINA_TRUE);
    elm_spinner_step_set(spinner, 1);
    elm_spinner_wrap_set(spinner, EINA_FALSE);
@@ -175,7 +175,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(label);
 
    spinner = elm_spinner_add(hbox);
-   elm_spinner_value_set(spinner, _edi_cfg->gui.tabstop);
+   elm_spinner_value_set(spinner, _edi_project_config->gui.tabstop);
    elm_spinner_editable_set(spinner, EINA_TRUE);
    elm_spinner_step_set(spinner, 1);
    elm_spinner_wrap_set(spinner, EINA_FALSE);
@@ -197,7 +197,7 @@ _edi_settings_behaviour_autosave_cb(void *data EINA_UNUSED, Evas_Object *obj,
    Evas_Object *check;
 
    check = (Evas_Object *)obj;
-   _edi_cfg->autosave = elm_check_state_get(check);
+   _edi_config->autosave = elm_check_state_get(check);
    _edi_config_save();
 }
 
@@ -211,7 +211,7 @@ _edi_settings_behaviour_create(Evas_Object *parent)
 
    check = elm_check_add(box);
    elm_object_text_set(check, "Auto save files");
-   elm_check_state_set(check, _edi_cfg->autosave);
+   elm_check_state_set(check, _edi_config->autosave);
    elm_box_pack_end(box, check);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
    evas_object_smart_callback_add(check, "changed",

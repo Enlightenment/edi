@@ -136,7 +136,7 @@ TODO move this code into elm_code for undo/redo
 
    if (editor->save_timer)
      ecore_timer_reset(editor->save_timer);
-   else if (_edi_cfg->autosave)
+   else if (_edi_config->autosave)
      editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
 }
 
@@ -537,7 +537,7 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 
    editor = (Edi_Editor *)data;
 
-   if (_edi_cfg->autosave)
+   if (_edi_config->autosave)
      edi_editor_save(editor);
 }
 
@@ -578,10 +578,10 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
 
    widget = (Elm_Code_Widget *) data;
    eo_do(widget,
-         elm_code_widget_font_size_set(_edi_cfg->font.size),
-         elm_code_widget_show_whitespace_set(_edi_cfg->gui.show_whitespace),
-         elm_code_widget_line_width_marker_set(_edi_cfg->gui.width_marker),
-         elm_code_widget_tabstop_set(_edi_cfg->gui.tabstop));
+         elm_code_widget_font_size_set(_edi_project_config->font.size),
+         elm_code_widget_show_whitespace_set(_edi_project_config->gui.show_whitespace),
+         elm_code_widget_line_width_marker_set(_edi_project_config->gui.width_marker),
+         elm_code_widget_tabstop_set(_edi_project_config->gui.tabstop));
 
    return ECORE_CALLBACK_RENEW;
 }

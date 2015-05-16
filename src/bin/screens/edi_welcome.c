@@ -353,7 +353,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_list_mode_set(list, ELM_LIST_LIMIT);
 
-   EINA_LIST_FOREACH(_edi_cfg->projects, listitem, project)
+   EINA_LIST_FOREACH(_edi_config->projects, listitem, project)
      {
         format = "<align=right><color=#ffffff><b>%s:   </b></color></align>";
         displen = strlen(project->path) + strlen(format) - 1;

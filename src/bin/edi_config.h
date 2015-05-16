@@ -3,6 +3,8 @@
 
 #include <Eina.h>
 
+#include "Edi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,6 +14,8 @@ extern int EDI_EVENT_CONFIG_CHANGED;
 typedef struct _Edi_Config_Project Edi_Config_Project;
 typedef struct _Edi_Config_Mime_Association Edi_Config_Mime_Association;
 typedef struct _Edi_Config Edi_Config;
+
+typedef struct _Edi_Project_Config Edi_Project_Config;
 
 struct _Edi_Config_Project
 {
@@ -25,7 +29,17 @@ struct _Edi_Config_Mime_Association
    const char *mime;
 };
 
-struct _Edi_Config 
+struct _Edi_Config
+{
+   int version;
+
+   Eina_Bool autosave;
+
+   Eina_List *projects;
+   Eina_List *mime_assocs;
+};
+
+struct _Edi_Project_Config 
 {
    int version;
 
@@ -43,19 +57,17 @@ struct _Edi_Config
         Eina_Bool show_whitespace;
         unsigned int width_marker, tabstop;
      } gui;
-
-   Eina_Bool autosave;
-
-   Eina_List *projects;
-   Eina_List *mime_assocs;
 };
 
-extern Edi_Config *_edi_cfg;
+extern Edi_Config *_edi_config;
+extern Edi_Project_Config *_edi_project_config;
 
 Eina_Bool _edi_config_init(void);
 Eina_Bool _edi_config_shutdown(void);
 void _edi_config_load(void);
 void _edi_config_save(void);
+void _edi_project_config_load();
+void _edi_project_config_save();
 
 void _edi_config_project_add(const char *path);
 void _edi_config_project_remove(const char *path);
