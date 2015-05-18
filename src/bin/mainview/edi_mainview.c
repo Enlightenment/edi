@@ -145,7 +145,7 @@ _edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item
    Edi_Mainview_Item *item;
 
    item = malloc(sizeof(Edi_Mainview_Item));
-   item->path = path->path;
+   item->path = eina_stringshare_add(path->path);
    item->editortype = path->type;
    item->mimetype = mime;
    item->tab = tab;
@@ -425,6 +425,8 @@ edi_mainview_open_window_path(const char *path)
         elm_naviframe_item_pop(nf);
         elm_object_item_del(elm_toolbar_selected_item_get(tb));
         _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+
+        eina_stringshare_del(it->path);
         free(it);
      }
 
@@ -445,6 +447,8 @@ edi_mainview_open_window(Edi_Path_Options *options)
         elm_naviframe_item_pop(nf);
         elm_object_item_del(elm_toolbar_selected_item_get(tb));
         _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
+
+        eina_stringshare_del(it->path);
         free(it);
      }
 
@@ -503,6 +507,7 @@ edi_mainview_close()
    elm_object_item_del(elm_toolbar_selected_item_get(tb));
    _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
 
+   eina_stringshare_del(item->path);
    free(item);
 }
 

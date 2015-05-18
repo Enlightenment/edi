@@ -20,7 +20,7 @@ edi_path_options_create(const char *input)
    pos1 = strstr(path, ":");
    if (pos1)
      {
-        path = eina_stringshare_add_length(path, strlen(path) - strlen(pos1));
+        ret->path = eina_stringshare_add_length(path, strlen(path) - strlen(pos1));
         pos1++;
         pos2 = strstr(pos1, ":");
         if (pos2)
@@ -34,8 +34,9 @@ edi_path_options_create(const char *input)
              line = atoi(pos1);
           }
      }
+   else
+     ret->path = eina_stringshare_add(path);
 
-   ret->path = path;
    ret->line = line;
    ret->character = col;
 
