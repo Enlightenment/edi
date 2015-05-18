@@ -244,6 +244,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.show_whitespace, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
+   EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
 
    EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
 
@@ -444,6 +445,7 @@ _edi_project_config_load()
 
    _edi_project_config->gui.width_marker = 80;
    _edi_project_config->gui.tabstop = 8;
+   _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
 
    _edi_project_config->tabs = NULL;
    IFPCFGEND;

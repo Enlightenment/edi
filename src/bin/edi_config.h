@@ -63,6 +63,8 @@ struct _Edi_Project_Config
         Eina_Bool leftopen, bottomopen;
         Eina_Bool show_whitespace;
         unsigned int width_marker, tabstop;
+
+        Eina_Bool toolbar_hidden;
      } gui;
 
    Eina_List *tabs;

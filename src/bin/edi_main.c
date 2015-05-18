@@ -36,13 +36,13 @@ typedef struct _Edi_Panel_Slide_Effect
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
-static Evas_Object *_edi_leftpanes, *_edi_bottompanes;
+static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel;
 static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_main_win, *_edi_new_popup, *_edi_goto_popup,*_edi_message_popup;
+static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_new_popup, *_edi_goto_popup,*_edi_message_popup;
 int _edi_log_dom = -1;
 
 static void
@@ -760,6 +760,26 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+static void
+_edi_toolbar_set_visible(Eina_Bool visible)
+{
+   elm_box_unpack(_edi_main_box, _edi_toolbar);
+   if (visible)
+     evas_object_show(_edi_toolbar);
+   else
+     evas_object_hide(_edi_toolbar);
+
+   if (visible)
+     elm_box_pack_start(_edi_main_box, _edi_toolbar);
+}
+
+static Eina_Bool
+_edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   return ECORE_CALLBACK_RENEW;
+}
+
 void
 _edi_open_tabs()
 {
@@ -804,12 +824,14 @@ edi_open(const char *inputpath)
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
 
    vbx = elm_box_add(win);
+   _edi_main_box = vbx;
    evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, vbx);
    evas_object_show(vbx);
 
    tb = edi_toolbar_setup(win);
-   elm_box_pack_end(vbx, tb);
+   _edi_toolbar = tb;
+   _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
 
    content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -823,6 +845,7 @@ edi_open(const char *inputpath)
 
    _edi_config_project_add(path);
    _edi_open_tabs();
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_config_changed, NULL);
 
    free(path);
    return win;
