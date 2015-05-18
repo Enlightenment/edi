@@ -466,11 +466,9 @@ _tb_new_cancel_cb(void *data EINA_UNUSED,
 }
 
 static void
-_tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+_edi_file_new()
 {
    Evas_Object *popup, *input, *button;
-
-   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
 
    popup = elm_popup_add(_edi_main_win);
    _edi_new_popup = popup;
@@ -494,6 +492,14 @@ _tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSE
                                        _tb_new_create_cb, input);
 
    evas_object_show(popup);
+}
+
+static void
+_tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+
+   _edi_file_new();
 }
 
 static void
@@ -655,6 +661,51 @@ static void
 _tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    edi_settings_show(_edi_main_win);
+}
+
+static void
+_edi_menu_new_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+          void *event_info EINA_UNUSED)
+{
+   _edi_file_new();
+}
+
+static void
+_edi_menu_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+          void *event_info EINA_UNUSED)
+{
+   edi_mainview_save();
+}
+
+static void
+_edi_menu_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+          void *event_info EINA_UNUSED)
+{
+   edi_settings_show(_edi_main_win);
+}
+
+static void
+_edi_menu_quit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+          void *event_info EINA_UNUSED)
+{
+   elm_exit();
+}
+
+static void
+_edi_menu_setup(Evas_Object *win)
+{
+   Evas_Object *menu;
+   Elm_Object_Item *menu_it;
+
+   menu = elm_win_main_menu_get(win);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "File", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, NULL, "New File", _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, NULL, "Save", _edi_menu_save_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, NULL, "Settings", _edi_menu_settings_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, NULL, "Quit", _edi_menu_quit_cb, NULL);
 }
 
 static Evas_Object *
@@ -832,6 +883,7 @@ edi_open(const char *inputpath)
    tb = edi_toolbar_setup(win);
    _edi_toolbar = tb;
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   _edi_menu_setup(win);
 
    content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
