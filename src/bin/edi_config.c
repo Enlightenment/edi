@@ -359,6 +359,10 @@ _edi_config_project_remove(const char *path)
 
    _edi_config->projects = eina_list_remove(_edi_config->projects, project);
    _edi_config_save();
+
+   eina_stringshare_del(project->path);
+   eina_stringshare_del(project->name);
+   free(project);
 }
 
 void
