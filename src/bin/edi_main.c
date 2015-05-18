@@ -773,7 +773,7 @@ edi_open(const char *inputpath)
         return NULL;
      }
    path = realpath(inputpath, NULL);
-   _edi_project_config_load(edi_project_get());
+   _edi_project_config_load();
 
    elm_need_ethumb();
    elm_need_efreet();
