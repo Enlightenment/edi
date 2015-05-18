@@ -139,7 +139,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
 
    elm_fileselector_expandable_set(fs, EINA_TRUE);
    elm_fileselector_folder_only_set(fs, EINA_TRUE);
-   elm_fileselector_path_set(fs, getenv("HOME"));
+   elm_fileselector_path_set(fs, eina_environment_home_get());
    elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
