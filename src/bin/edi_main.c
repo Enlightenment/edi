@@ -760,6 +760,21 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+void
+_edi_open_tabs()
+{
+   Edi_Project_Config_Tab *tab;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
+     {
+        if (tab->windowed)
+          edi_mainview_open_window_path(tab->path);
+        else
+          edi_mainview_open_path(tab->path);
+     }
+}
+
 Evas_Object *
 edi_open(const char *inputpath)
 {
@@ -807,6 +822,7 @@ edi_open(const char *inputpath)
    evas_object_show(win);
 
    _edi_config_project_add(path);
+   _edi_open_tabs();
 
    free(path);
    return win;

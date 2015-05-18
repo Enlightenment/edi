@@ -52,6 +52,7 @@ static Edi_Config_DD *_edi_cfg_proj_edd = NULL;
 static Edi_Config_DD *_edi_cfg_mime_edd = NULL;
 
 static Edi_Project_Config_DD *_edi_proj_cfg_edd = NULL;
+static Edi_Project_Config_DD *_edi_proj_cfg_tab_edd = NULL;
 
 /* external variables */
 Edi_Config *_edi_config = NULL;
@@ -120,6 +121,14 @@ _edi_config_cb_free(void)
 static void
 _edi_project_config_cb_free(void)
 {
+   Edi_Project_Config_Tab *tab;
+
+   EINA_LIST_FREE(_edi_project_config->tabs, tab)
+     {
+        if (tab->path) eina_stringshare_del(tab->path);
+        free(tab);
+     }
+
    free(_edi_project_config);
    _edi_project_config = NULL;
 }
@@ -209,6 +218,14 @@ _edi_config_init(void)
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
    EDI_CONFIG_LIST(D, T, mime_assocs, _edi_cfg_mime_edd);
 
+   _edi_proj_cfg_tab_edd = EDI_CONFIG_DD_NEW("Project_Config_Tab", Edi_Project_Config_Tab);
+   #undef T
+   #undef D
+   #define T Edi_Project_Config_Tab
+   #define D _edi_proj_cfg_tab_edd
+   EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, windowed, EET_T_UCHAR);
+
    _edi_proj_cfg_edd = EDI_CONFIG_DD_NEW("Project_Config", Edi_Project_Config);
    #undef T
    #undef D
@@ -228,6 +245,8 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
 
+   EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
+
    _edi_config_load();
 
    return EINA_TRUE;
@@ -244,6 +263,7 @@ _edi_config_shutdown(void)
    EDI_CONFIG_DD_FREE(_edi_cfg_edd);
 
    EDI_CONFIG_DD_FREE(_edi_proj_cfg_edd);
+   EDI_CONFIG_DD_FREE(_edi_proj_cfg_tab_edd);
 
    efreet_shutdown();
 
@@ -420,6 +440,8 @@ _edi_project_config_load()
 
    _edi_project_config->gui.width_marker = 80;
    _edi_project_config->gui.tabstop = 8;
+
+   _edi_project_config->tabs = NULL;
    IFPCFGEND;
 
    /* limit config values so they are sane */
@@ -435,10 +457,53 @@ _edi_project_config_load()
    if (save) _edi_project_config_save();
 }
 
+static Eina_Bool
+_edi_project_config_save_no_notify()
+{
+   return _edi_config_domain_save(_edi_project_config_dir_get(), PACKAGE_NAME, _edi_proj_cfg_edd, _edi_project_config);
+}
+
 void 
 _edi_project_config_save()
 {
-   if (_edi_config_domain_save(_edi_project_config_dir_get(), PACKAGE_NAME, _edi_proj_cfg_edd, _edi_project_config))
+   if (_edi_project_config_save_no_notify())
      ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
 }
 
+void
+_edi_project_config_tab_add(const char *path, Eina_Bool windowed)
+{
+   Edi_Project_Config_Tab *tab;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
+     {
+        if (!strncmp(tab->path, path, strlen(tab->path)))
+          _edi_project_config->tabs = eina_list_remove_list(_edi_project_config->tabs, list);
+     }
+
+   tab = malloc(sizeof(*tab));
+   tab->path = eina_stringshare_add(path);
+   tab->windowed = windowed;
+   _edi_project_config->tabs = eina_list_append(_edi_project_config->tabs, tab);
+   _edi_project_config_save_no_notify();
+}
+
+void
+_edi_project_config_tab_remove(const char *path)
+{
+   Edi_Project_Config_Tab *tab;
+   Eina_List *list, *next;
+
+   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
+     {
+        if (!strncmp(tab->path, path, strlen(tab->path)))
+          break;
+     }
+
+   _edi_project_config->tabs = eina_list_remove(_edi_project_config->tabs, tab);
+   _edi_project_config_save_no_notify();
+
+   eina_stringshare_del(tab->path);
+   free(tab);
+}

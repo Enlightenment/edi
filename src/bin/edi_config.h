@@ -16,6 +16,7 @@ typedef struct _Edi_Config_Mime_Association Edi_Config_Mime_Association;
 typedef struct _Edi_Config Edi_Config;
 
 typedef struct _Edi_Project_Config Edi_Project_Config;
+typedef struct _Edi_Project_Config_Tab Edi_Project_Config_Tab;
 
 struct _Edi_Config_Project
 {
@@ -39,6 +40,12 @@ struct _Edi_Config
    Eina_List *mime_assocs;
 };
 
+struct _Edi_Project_Config_Tab
+{
+   const char *path;
+   Eina_Bool windowed;
+};
+
 struct _Edi_Project_Config 
 {
    int version;
@@ -57,23 +64,36 @@ struct _Edi_Project_Config
         Eina_Bool show_whitespace;
         unsigned int width_marker, tabstop;
      } gui;
+
+   Eina_List *tabs;
 };
 
 extern Edi_Config *_edi_config;
 extern Edi_Project_Config *_edi_project_config;
 
+// General configuration management
+
 Eina_Bool _edi_config_init(void);
 Eina_Bool _edi_config_shutdown(void);
+
+// Global configuration handling
+
 void _edi_config_load(void);
 void _edi_config_save(void);
-void _edi_project_config_load();
-void _edi_project_config_save();
 
 void _edi_config_project_add(const char *path);
 void _edi_config_project_remove(const char *path);
 
 void _edi_config_mime_add(const char *mime, const char* id);
 const char* _edi_config_mime_search(const char *mime);
+
+// Project based configuration handling
+
+void _edi_project_config_load(void);
+void _edi_project_config_save(void);
+
+void _edi_project_config_tab_add(const char *path, Eina_Bool windowed);
+void _edi_project_config_tab_remove(const char *path);
 
 #ifdef __cplusplus
 }
