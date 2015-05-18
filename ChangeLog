@@ -1,3 +1,16 @@
+2015-05-18 ajwillia.ms (Andy Williams)
+
+	* Remember open tabs and windows per project
+	* Allow hiding of the toolbar
+
+2015-08-15 ajwillia.ms (Andy Williams)
+
+	* Remember UI settings per-project in <proj>/.edi/
+
+2015-04-20 ajwillia.ms (Andy Williams)
+
+	* Highlight lines containing TODO or FIXME
+
 2015-03-15 ajwillia.ms (Andy Williams)
 
 	* Fix issues with re-opening closed tabs
