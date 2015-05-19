@@ -16,17 +16,7 @@ _edi_about_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_
 static void
 _edi_about_url_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   const char *url, *format;
-   char *cmd;
-
-   url = (const char *)data;
-   format = "xdg-open \"%s\"";
-
-   cmd = malloc(sizeof(char) * (strlen(format) + strlen(url) - 1));
-   sprintf(cmd, format, url);
-   ecore_exe_run(cmd, NULL);
-
-   free(cmd);
+   edi_open_url((const char *)data);
 }
 
 Evas_Object *

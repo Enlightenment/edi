@@ -33,6 +33,8 @@ Evas_Object *edi_open(const char *path);
 
 void edi_close();
 
+void edi_open_url();
+
 // TODO remove this once our filepanel is updating gracefully
 void _edi_filepanel_reload();
 

@@ -909,6 +909,21 @@ edi_close()
    elm_exit();
 }
 
+void
+edi_open_url(const char *url)
+{
+   const char *format;
+   char *cmd;
+
+   format = "xdg-open \"%s\"";
+
+   cmd = malloc(sizeof(char) * (strlen(format) + strlen(url) - 1));
+   sprintf(cmd, format, url);
+   ecore_exe_run(cmd, NULL);
+
+   free(cmd);
+}
+
 static Eina_Bool
 _edi_log_init()
 {
