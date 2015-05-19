@@ -510,13 +510,6 @@ _tb_save_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static void
-_tb_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
-{
-   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
-   edi_mainview_new_window();
-}
-
-static void
 _tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
@@ -573,11 +566,9 @@ _tb_goto_cancel_cb(void *data EINA_UNUSED,
 }
 
 static void
-_tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+_edi_edit_goto()
 {
    Evas_Object *popup, *input, *button;
-
-   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
 
    popup = elm_popup_add(_edi_main_win);
    _edi_goto_popup = popup;
@@ -601,6 +592,14 @@ _tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
                                        _tb_goto_go_cb, input);
 
    evas_object_show(popup);
+}
+
+static void
+_tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+
+   _edi_edit_goto();
 }
 
 static Eina_Bool
@@ -665,30 +664,114 @@ _tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *even
 
 static void
 _edi_menu_new_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-          void *event_info EINA_UNUSED)
+                 void *event_info EINA_UNUSED)
 {
    _edi_file_new();
 }
 
 static void
 _edi_menu_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-          void *event_info EINA_UNUSED)
+                  void *event_info EINA_UNUSED)
 {
    edi_mainview_save();
 }
 
 static void
+_edi_menu_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                         void *event_info EINA_UNUSED)
+{
+   edi_mainview_new_window();
+}
+
+static void
+_edi_menu_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_mainview_close();
+}
+
+static void
 _edi_menu_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-          void *event_info EINA_UNUSED)
+                      void *event_info EINA_UNUSED)
 {
    edi_settings_show(_edi_main_win);
 }
 
 static void
 _edi_menu_quit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-          void *event_info EINA_UNUSED)
+                  void *event_info EINA_UNUSED)
 {
    elm_exit();
+}
+
+static void
+_edi_menu_cut_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                 void *event_info EINA_UNUSED)
+{
+   edi_mainview_cut();
+}
+
+static void
+_edi_menu_copy_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   edi_mainview_copy();
+}
+
+static void
+_edi_menu_paste_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_mainview_paste();
+}
+
+static void
+_edi_menu_find_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   edi_mainview_search();
+}
+
+static void
+_edi_menu_goto_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   _edi_edit_goto();
+}
+
+static void
+_edi_menu_build_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_builder_build();
+}
+
+static void
+_edi_menu_test_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   edi_builder_test();
+}
+
+static void
+_edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_builder_clean();
+}
+
+static void
+_edi_menu_website_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   edi_open_url("http://edi-ide.com");
+}
+
+static void
+_edi_menu_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_about_show(_edi_main_win);
 }
 
 static void
@@ -700,12 +783,32 @@ _edi_menu_setup(Evas_Object *win)
    menu = elm_win_main_menu_get(win);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "File", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, NULL, "New File", _edi_menu_new_cb, NULL);
-   elm_menu_item_add(menu, menu_it, NULL, "Save", _edi_menu_save_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "stock_close", "Close", _edi_menu_close_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, NULL, "Settings", _edi_menu_settings_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "preferences-desktop", "Settings", _edi_menu_settings_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, NULL, "Quit", _edi_menu_quit_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "application-exit", "Quit", _edi_menu_quit_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "Edit", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-cut", "Cut", _edi_menu_cut_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-copy", "Copy", _edi_menu_copy_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-paste", "Paste", _edi_menu_paste_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, "edit-find-replace", "Find & Replace", _edi_menu_find_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "go-jump", "Goto Line ...", _edi_menu_goto_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "dialog-ok", "Test", _edi_menu_test_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "go-home", "Website", _edi_menu_website_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, "help-about", "About", _edi_menu_about_cb, NULL);
 }
 
 static Evas_Object *
@@ -733,8 +836,7 @@ edi_toolbar_setup(Evas_Object *win)
 
    tb_it = elm_toolbar_item_append(tb, "document-new", "New File", _tb_new_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "document-save", "Save", _tb_save_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "window-new", "New window", _tb_open_window_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "window-close", "Close", _tb_close_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "stock_close", "Close", _tb_close_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
@@ -746,14 +848,14 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   tb_it = elm_toolbar_item_append(tb, "find", "Find & Replace", _tb_search_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "edit-find-replace", "Find & Replace", _tb_search_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "go-jump", "Goto Line", _tb_goto_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "emblem-default", "Test", _tb_test_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "dialog-ok", "Test", _tb_test_cb, NULL);
 //   tb_it = elm_toolbar_item_append(tb, "player-play", "Run", _tb_run_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
 
