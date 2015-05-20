@@ -257,7 +257,8 @@ Eina_Bool
 _edi_config_shutdown(void)
 {
    _edi_config_cb_free();
-   _edi_project_config_cb_free();
+   if (_edi_project_config)
+     _edi_project_config_cb_free();
 
    EDI_CONFIG_DD_FREE(_edi_cfg_proj_edd);
    EDI_CONFIG_DD_FREE(_edi_cfg_mime_edd);
