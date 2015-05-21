@@ -7,14 +7,23 @@ and in creating apps based on the EFL suite.
 
 ![EDI Logo](data/desktop/edi.png?raw=true)
 
-Please make sure you have the EFL and Elementary at least 1.8 installed before you build.
+## Requirements
+
+autotools
+EFL & Elementary from git master (>= 1.14.99)
+libclang-dev (or llvm-clang-devel)
+
+## Installation
+
 Using autotools to install this software is the usual:
 
     ./autogen.sh
     make
     sudo make install
 
-After that just launch
+## Usage
+
+After installing just launch
 
     edi
 
