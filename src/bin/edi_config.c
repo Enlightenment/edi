@@ -123,6 +123,9 @@ _edi_project_config_cb_free(void)
 {
    Edi_Project_Config_Tab *tab;
 
+   if (!_edi_project_config)
+     return;
+
    EINA_LIST_FREE(_edi_project_config->tabs, tab)
      {
         if (tab->path) eina_stringshare_del(tab->path);
@@ -257,8 +260,7 @@ Eina_Bool
 _edi_config_shutdown(void)
 {
    _edi_config_cb_free();
-   if (_edi_project_config)
-     _edi_project_config_cb_free();
+   _edi_project_config_cb_free();
 
    EDI_CONFIG_DD_FREE(_edi_cfg_proj_edd);
    EDI_CONFIG_DD_FREE(_edi_cfg_mime_edd);
