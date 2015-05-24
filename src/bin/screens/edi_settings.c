@@ -246,7 +246,7 @@ Evas_Object *
 edi_settings_show(Evas_Object *mainwin)
 {
    Evas_Object *win, *bg, *table, *naviframe, *tb;
-   Elm_Object_Item *tb_it;
+   Elm_Object_Item *tb_it, *default_it;
 
    win = elm_win_add(mainwin, "settings", ELM_WIN_DIALOG_BASIC);
    if (!win) return NULL;
@@ -268,7 +268,7 @@ edi_settings_show(Evas_Object *mainwin)
    evas_object_show(table);
 
    tb = elm_toolbar_add(table);
-   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
+   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_toolbar_align_set(tb, 0.0);
@@ -291,10 +291,16 @@ edi_settings_show(Evas_Object *mainwin)
                                                    _edi_settings_behaviour_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
 
-   tb_it = elm_toolbar_item_append(tb, "preferences-desktop", "Display",
-                                   _edi_settings_category_cb, _edi_settings_display);
-   tb_it = elm_toolbar_item_append(tb, "preferences-other", "Behaviour",
-                                   _edi_settings_category_cb, _edi_settings_behaviour);
+   elm_toolbar_item_append(tb, NULL, "Project", NULL, NULL);
+   default_it = elm_toolbar_item_append(tb, "preferences-desktop", "Display",
+                                        _edi_settings_category_cb, _edi_settings_display);
+
+   tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+   elm_toolbar_item_append(tb, NULL, "Global", NULL, NULL);
+   elm_toolbar_item_append(tb, "preferences-other", "Behaviour",
+                           _edi_settings_category_cb, _edi_settings_behaviour);
+   elm_toolbar_item_selected_set(default_it, EINA_TRUE);
 
    evas_object_show(naviframe);
    evas_object_resize(win, 480 * elm_config_scale_get(), 320 * elm_config_scale_get());
