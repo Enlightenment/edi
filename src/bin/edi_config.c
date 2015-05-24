@@ -38,7 +38,7 @@
 #  define EDI_CONFIG_FILE_VERSION \
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
-#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0001
+#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0002
 #  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0001
 #  define EDI_PROJECT_CONFIG_FILE_VERSION \
    ((EDI_PROJECT_CONFIG_FILE_EPOCH << 16) | EDI_PROJECT_CONFIG_FILE_GENERATION)
@@ -235,6 +235,7 @@ _edi_config_init(void)
    #define T Edi_Project_Config
    #define D _edi_proj_cfg_edd
    EDI_CONFIG_VAL(D, T, version, EET_T_INT);
+   EDI_CONFIG_VAL(D, T, font.name, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, font.size, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.translucent, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.width, EET_T_INT);
@@ -435,8 +436,6 @@ _edi_project_config_load()
 
    /* setup defaults */
    IFPCFG(0x0001);
-
-   _edi_project_config->font.size = 12;
    _edi_project_config->gui.translucent = EINA_TRUE;
    _edi_project_config->gui.width = 640;
    _edi_project_config->gui.height = 480;
@@ -453,8 +452,13 @@ _edi_project_config_load()
    _edi_project_config->tabs = NULL;
    IFPCFGEND;
 
+   IFPCFG(0x0002);
+   _edi_project_config->font.name = "Mono";
+   _edi_project_config->font.size = 12;
+   IFPCFGEND;
+
    /* limit config values so they are sane */
-   EDI_CONFIG_LIMIT(_edi_project_config->font.size, 8, 96);
+   EDI_CONFIG_LIMIT(_edi_project_config->font.size, 6, 96);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.width, 150, 10000);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.height, 100, 8000);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.leftsize, 0.0, 1.0);

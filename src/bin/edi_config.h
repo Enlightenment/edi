@@ -50,8 +50,9 @@ struct _Edi_Project_Config
 {
    int version;
 
-   struct 
+   struct
      {
+        char *name;
         int size;
      } font;
 

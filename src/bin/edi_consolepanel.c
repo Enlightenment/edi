@@ -319,13 +319,13 @@ _edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, v
    EINA_LIST_FOREACH(_edi_console_code->widgets, item, widget)
      {
         eo_do(widget,
-              elm_code_widget_font_size_set(_edi_project_config->font.size));
+              elm_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size));
      }
 
    EINA_LIST_FOREACH(_edi_test_code->widgets, item, widget)
      {
         eo_do(widget,
-              elm_code_widget_font_size_set(_edi_project_config->font.size));
+              elm_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size));
      }
 
    return ECORE_CALLBACK_RENEW;
@@ -342,7 +342,7 @@ void edi_consolepanel_add(Evas_Object *parent)
    widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
                    elm_code_widget_code_set(code));
    eo_do(widget,
-         elm_code_widget_font_size_set(_edi_project_config->font.size),
+         elm_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
          eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL),
          eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code));
@@ -369,7 +369,7 @@ void edi_testpanel_add(Evas_Object *parent)
    widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
                    elm_code_widget_code_set(code));
    eo_do(widget,
-         elm_code_widget_font_size_set(_edi_project_config->font.size),
+         elm_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
          elm_code_widget_gravity_set(0.0, 1.0),
          eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL),
          eo_event_callback_add(ELM_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code));
