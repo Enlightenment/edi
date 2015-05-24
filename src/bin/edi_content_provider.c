@@ -33,6 +33,17 @@ _edi_content_provider_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
    return scroll;
 }
 
+static Eina_Bool
+_edi_content_provider_diff_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Evas_Object *diff;
+
+   diff = (Evas_Object*) data;
+   elm_code_diff_widget_font_set(diff, _edi_project_config->font.name, _edi_project_config->font.size);
+
+   return ECORE_CALLBACK_RENEW;
+}
+
 static Evas_Object *
 _edi_content_provider_diff_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -42,8 +53,9 @@ _edi_content_provider_diff_add(Evas_Object *parent, Edi_Mainview_Item *item)
    code = elm_code_create();
    elm_code_file_open(code, item->path);
    diff = elm_code_diff_widget_add(parent, code);
-   elm_code_diff_widget_font_set(diff, NULL, 12);
+   elm_code_diff_widget_font_set(diff, _edi_project_config->font.name, _edi_project_config->font.size);
 
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_content_provider_diff_config_changed, diff);
    return diff;
 }
 
