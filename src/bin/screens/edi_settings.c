@@ -112,7 +112,7 @@ _edi_settings_display_create(Evas_Object *parent)
    hbox = elm_box_add(parent);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.5);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.95);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 1.0);
    elm_box_pack_end(box, hbox);
    evas_object_show(hbox);
 
@@ -175,7 +175,7 @@ _edi_settings_display_create(Evas_Object *parent)
    hbox = elm_box_add(parent);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.05);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(box, hbox);
    evas_object_show(hbox);
 
@@ -203,7 +203,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_check_state_set(check, _edi_project_config->gui.toolbar_hidden);
    elm_box_pack_end(box, check);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
-   evas_object_size_hint_align_set(check, 0.0, 0.5);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_toolbar_hidden_cb, NULL);
    evas_object_show(check);
