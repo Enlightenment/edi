@@ -40,10 +40,11 @@ edi_about_show(Evas_Object *mainwin)
    elm_win_resize_object_add(win, table);
    evas_object_show(table);
 
-   snprintf(buf, sizeof(buf), "%s/images/welcome.png", elm_app_data_dir_get());
+   snprintf(buf, sizeof(buf), "%s/images/about.png", elm_app_data_dir_get());
    bg = elm_bg_add(win);
    elm_bg_option_set(bg, ELM_BG_OPTION_CENTER);
    elm_bg_file_set(bg, buf, NULL);
+   elm_bg_option_set(bg, ELM_BG_OPTION_SCALE);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, bg, 0, 0, 1, 1);
