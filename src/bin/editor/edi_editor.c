@@ -486,8 +486,8 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
      }
 }
 
-static void *
-_edi_clang_setup(void *data)
+static void
+_edi_clang_setup(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    Edi_Editor *editor;
    Elm_Code *code;
@@ -514,20 +514,19 @@ _edi_clang_setup(void *data)
    _clang_load_errors(path, editor);
    _clang_load_highlighting(path, editor);
    _clang_show_highlighting(editor);
-   _clang_free_highlighting(editor);
-
-   return NULL;
 }
 
-/*
-TODO - USE ME!
 static void
-_edi_clang_dispose(Edi_Editor *editor)
+_edi_clang_dispose(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
+   Edi_Editor *editor = (Edi_Editor *)data;
+
+   _clang_free_highlighting(editor);
    clang_disposeTranslationUnit(editor->tx_unit);
    clang_disposeIndex(editor->idx);
+
+   editor->highlight_thread = NULL;
 }
-*/
 #endif
 
 static void
@@ -559,15 +558,11 @@ _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
    Edi_Editor *editor;
 
    editor = (Edi_Editor *)data;
+   if (editor->highlight_thread)
+     return;
 
 #if HAVE_LIBCLANG
-   pthread_attr_t attr;
-   pthread_t thread_id;
-
-   if (pthread_attr_init(&attr) != 0)
-     perror("pthread_attr_init");
-   if (pthread_create(&thread_id, &attr, _edi_clang_setup, editor) != 0)
-     perror("pthread_create");
+   editor->highlight_thread = ecore_thread_run(_edi_clang_setup, _edi_clang_dispose, NULL, editor);
 #endif
 }
 

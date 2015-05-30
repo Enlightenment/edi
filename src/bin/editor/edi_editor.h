@@ -55,6 +55,7 @@ struct _Edi_Editor
 #endif
 
    Eina_Bool show_highlight;
+   Ecore_Thread *highlight_thread;
    time_t save_time;
 
    /* Add new members here. */
