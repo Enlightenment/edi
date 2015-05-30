@@ -13,6 +13,10 @@ edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNU
    return NULL;
 }
 
+Edi_Config *_edi_config = NULL;
+Edi_Project_Config *_edi_project_config = NULL;
+int EDI_EVENT_CONFIG_CHANGED;
+
 const char *
 _edi_config_mime_search(const char *mime EINA_UNUSED)
 {
