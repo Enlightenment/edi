@@ -38,8 +38,8 @@
 #  define EDI_CONFIG_FILE_VERSION \
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
-#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0002
-#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0001
+#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0001
+#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0002
 #  define EDI_PROJECT_CONFIG_FILE_VERSION \
    ((EDI_PROJECT_CONFIG_FILE_EPOCH << 16) | EDI_PROJECT_CONFIG_FILE_GENERATION)
 
@@ -453,12 +453,12 @@ _edi_project_config_load()
    IFPCFGEND;
 
    IFPCFG(0x0002);
-   _edi_project_config->font.name = "Mono";
+   _edi_project_config->font.name = eina_stringshare_add("Mono");
    _edi_project_config->font.size = 12;
    IFPCFGEND;
 
    /* limit config values so they are sane */
-   EDI_CONFIG_LIMIT(_edi_project_config->font.size, 6, 96);
+   EDI_CONFIG_LIMIT(_edi_project_config->font.size, EDI_FONT_MIN, EDI_FONT_MAX);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.width, 150, 10000);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.height, 100, 8000);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.leftsize, 0.0, 1.0);

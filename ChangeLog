@@ -1,3 +1,7 @@
+2015-05-30 ajwillia.ms (Andy Williams)
+
+	* Added a monospaced font picker to settings
+
 2015-05-26 ajwillia.ms (Andy Williams)
 
 	* Add new icon from raster and update welcome/about image layouts
@@ -19,7 +23,7 @@
 2015-03-15 ajwillia.ms (Andy Williams)
 
 	* Fix issues with re-opening closed tabs
-        * Fix crash-on-open for some systems
+	* Fix crash-on-open for some systems
 
 2015-03-08 ajwillia.ms (Andy Williams)
 

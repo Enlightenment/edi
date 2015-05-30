@@ -29,6 +29,8 @@ extern int _edi_log_dom;
 
 #define EDI_CONTENT_SAVE_TIMEOUT 2
 
+#define FONT_PREVIEW " Evas *dostuff(void) {...}"
+
 Evas_Object *edi_open(const char *path);
 
 void edi_close();

@@ -50,6 +50,8 @@ Evas_Object *edi_about_show(Evas_Object *mainwin);
  */
 Evas_Object *edi_settings_show(Evas_Object *mainwin);
 
+void edi_settings_font_add(Evas_Object *parent);
+
 /**
  * @}
  */

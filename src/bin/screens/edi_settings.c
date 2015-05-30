@@ -4,7 +4,9 @@
 
 #include <Elementary.h>
 #include <Ecore.h>
+#include <Elm_Code.h>
 
+#include "edi_screens.h"
 #include "edi_config.h"
 
 #include "edi_private.h"
@@ -44,17 +46,6 @@ _edi_settings_panel_create(Evas_Object *parent, const char *title)
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    return frame;
-}
-
-static void
-_edi_settings_display_fontsize_cb(void *data EINA_UNUSED, Evas_Object *obj,
-                                  void *event EINA_UNUSED)
-{
-   Evas_Object *spinner;
-
-   spinner = (Evas_Object *)obj;
-   _edi_project_config->font.size = (int) elm_spinner_value_get(spinner);
-   _edi_project_config_save();
 }
 
 static void
@@ -101,10 +92,48 @@ _edi_settings_toolbar_hidden_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+static void
+_edi_settings_font_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Evas_Object *naviframe, *box;
+
+   naviframe = (Evas_Object *)data;
+   box = elm_box_add(naviframe);
+   elm_box_horizontal_set(box, EINA_FALSE);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(box);
+
+   edi_settings_font_add(box);
+   elm_naviframe_item_push(naviframe, "Font", NULL, NULL, box, NULL);
+}
+
+static Evas_Object *
+_edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int font_size)
+{
+   Elm_Code_Widget *widget;
+   Elm_Code *code;
+
+   code = elm_code_create();
+   elm_code_file_line_append(code->file, FONT_PREVIEW, 35, NULL);
+
+   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
+                   elm_code_widget_code_set(code));
+   eo_do(widget,
+         elm_code_widget_font_set(font_name, font_size),
+         elm_code_widget_line_numbers_set(EINA_TRUE),
+         elm_code_widget_editable_set(EINA_FALSE));
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
+
+   return widget;
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
-   Evas_Object *box, *hbox, *frame, *label, *spinner, *check;
+   Evas_Object *box, *hbox, *frame, *label, *spinner, *check, *button, *preview;
 
    frame = _edi_settings_panel_create(parent, "Display");
    box = elm_object_part_content_get(frame, "default");
@@ -117,24 +146,21 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Font size");
+   elm_object_text_set(label, "Font");
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
 
-   spinner = elm_spinner_add(hbox);
-   elm_spinner_value_set(spinner, _edi_project_config->font.size);
-   elm_spinner_editable_set(spinner, EINA_TRUE);
-   elm_spinner_label_format_set(spinner, "%1.0fpt");
-   elm_spinner_step_set(spinner, 1);
-   elm_spinner_wrap_set(spinner, EINA_FALSE);
-   elm_spinner_min_max_set(spinner, 8, 48);
-   evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(spinner, 0.0, 0.95);
-   evas_object_smart_callback_add(spinner, "changed",
-                                  _edi_settings_display_fontsize_cb, NULL);
-   elm_box_pack_end(hbox, spinner);
-   evas_object_show(spinner);
+   button = elm_button_add(hbox);
+   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(button);
+   preview = _edi_settings_font_preview_add(hbox, _edi_project_config->font.name,
+                                            _edi_project_config->font.size);
+   elm_layout_content_set(button, "elm.swallow.content", preview);
+   elm_box_pack_end(hbox, button);
+   evas_object_smart_callback_add(button, "clicked",
+                                  _edi_settings_font_choose_cb, parent);
 
    check = elm_check_add(box);
    elm_object_text_set(check, "Display whitespace");

@@ -5,6 +5,9 @@
 
 #include "Edi.h"
 
+#define EDI_FONT_MIN 6
+#define EDI_FONT_MAX 48
+
 #ifdef __cplusplus
 extern "C" {
 #endif
