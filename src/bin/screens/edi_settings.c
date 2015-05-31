@@ -256,10 +256,25 @@ _edi_settings_builds_binary_chosen_cb(void *data, Evas_Object *obj EINA_UNUSED,
    _edi_project_config_save();
 }
 
+static void
+_edi_settings_builds_args_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                             void *event EINA_UNUSED)
+{
+   Evas_Object *entry;
+
+   entry = (Evas_Object *)obj;
+
+   if (_edi_project_config->launch.args)
+     eina_stringshare_del(_edi_project_config->launch.args);
+
+   _edi_project_config->launch.args = eina_stringshare_add(elm_object_text_get(entry));
+   _edi_project_config_save();
+}
+
 static Evas_Object *
 _edi_settings_builds_create(Evas_Object *parent)
 {
-   Evas_Object *box, *frame, *hbox, *label, *ic, *selector, *file;
+   Evas_Object *box, *frame, *hbox, *label, *ic, *selector, *file, *entry;
 
    frame = _edi_settings_panel_create(parent, "Builds");
    box = elm_object_part_content_get(frame, "default");
@@ -300,6 +315,29 @@ _edi_settings_builds_create(Evas_Object *parent)
 
    evas_object_smart_callback_add(selector, "file,chosen",
                                   _edi_settings_builds_binary_chosen_cb, file);
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, "Runtime args");
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   entry = elm_entry_add(hbox);
+   elm_object_text_set(entry, _edi_project_config->launch.args);
+   evas_object_size_hint_weight_set(entry, 0.75, 0.0);
+   evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, entry);
+   evas_object_show(entry);
+   evas_object_smart_callback_add(entry, "changed",
+                                  _edi_settings_builds_args_cb, NULL);
 
    return frame;
 }
