@@ -45,23 +45,21 @@ Eina_Unicode status_icons[] = {
      } \
 } while (0)
 
-EOLIAN static Eo *
+EOLIAN static void
 _elm_code_widget_eo_base_constructor(Eo *obj, Elm_Code_Widget_Data *pd)
 {
-   obj = eo_do_super_ret(obj, ELM_CODE_WIDGET_CLASS, obj, eo_constructor());
+   eo_do_super(obj, ELM_CODE_WIDGET_CLASS, eo_constructor());
 
    pd->cursor_line = 1;
    pd->cursor_col = 1;
 
    pd->tabstop = 8;
-
-   return obj;
 }
 
 EOLIAN static Eo *
 _elm_code_widget_eo_base_finalize(Eo *obj, Elm_Code_Widget_Data *pd)
 {
-   obj = eo_do_super_ret(obj, ELM_CODE_WIDGET_CLASS, obj, eo_finalize());
+   eo_do_super(obj, ELM_CODE_WIDGET_CLASS, eo_finalize());
 
    if (pd->code)
      return obj;
