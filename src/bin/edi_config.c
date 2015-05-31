@@ -251,6 +251,8 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
 
    EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
+   EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, launch.args, EET_T_STRING);
 
    _edi_config_load();
 

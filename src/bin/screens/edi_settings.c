@@ -11,7 +11,8 @@
 
 #include "edi_private.h"
 
-static Elm_Object_Item *_edi_settings_display, *_edi_settings_behaviour;
+static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
+                       *_edi_settings_behaviour;
 
 static void
 _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
@@ -207,7 +208,7 @@ _edi_settings_display_create(Evas_Object *parent)
 
    label = elm_label_add(hbox);
    elm_object_text_set(label, "Tabstop");
-   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(label, 0.0D, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
 
@@ -233,6 +234,72 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_toolbar_hidden_cb, NULL);
    evas_object_show(check);
+
+   return frame;
+}
+
+static void
+_edi_settings_builds_binary_chosen_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                                      void *event_info)
+{
+   Evas_Object *label = data;
+   const char *file = event_info;
+
+   if (!file)
+     return;
+
+   if (_edi_project_config->launch.path)
+     eina_stringshare_del(_edi_project_config->launch.path);
+
+   elm_object_text_set(label, file);
+   _edi_project_config->launch.path = eina_stringshare_add(file);
+   _edi_project_config_save();
+}
+
+static Evas_Object *
+_edi_settings_builds_create(Evas_Object *parent)
+{
+   Evas_Object *box, *frame, *hbox, *label, *ic, *selector, *file;
+
+   frame = _edi_settings_panel_create(parent, "Builds");
+   box = elm_object_part_content_get(frame, "default");
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, "Runtime binary");
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   ic = elm_icon_add(hbox);
+   elm_icon_standard_set(ic, "file");
+   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+
+   selector = elm_fileselector_button_add(box);
+   elm_object_text_set(selector, "Select");
+   elm_object_part_content_set(selector, "icon", ic);
+   elm_fileselector_path_set(selector, edi_project_get());
+   evas_object_size_hint_weight_set(selector, 0.25, 0.0);
+   evas_object_size_hint_align_set(selector, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, selector);
+   evas_object_show(selector);
+
+   file = elm_label_add(hbox);
+   elm_object_text_set(file, _edi_project_config->launch.path);
+   evas_object_size_hint_weight_set(file, 0.75, 0.0);
+   evas_object_size_hint_align_set(file, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, file);
+   evas_object_show(file);
+
+   evas_object_smart_callback_add(selector, "file,chosen",
+                                  _edi_settings_builds_binary_chosen_cb, file);
 
    return frame;
 }
@@ -313,6 +380,9 @@ edi_settings_show(Evas_Object *mainwin)
    _edi_settings_display = elm_naviframe_item_push(naviframe, "", NULL, NULL,
                                                    _edi_settings_display_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_display, EINA_FALSE, EINA_FALSE);
+   _edi_settings_builds = elm_naviframe_item_push(naviframe, "", NULL, NULL,
+                                                   _edi_settings_builds_create(naviframe), NULL);
+   elm_naviframe_item_title_enabled_set(_edi_settings_builds, EINA_FALSE, EINA_FALSE);
    _edi_settings_behaviour = elm_naviframe_item_push(naviframe, "", NULL, NULL,
                                                    _edi_settings_behaviour_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
@@ -320,6 +390,8 @@ edi_settings_show(Evas_Object *mainwin)
    elm_toolbar_item_append(tb, NULL, "Project", NULL, NULL);
    default_it = elm_toolbar_item_append(tb, "preferences-desktop", "Display",
                                         _edi_settings_category_cb, _edi_settings_display);
+   elm_toolbar_item_append(tb, "system-run", "Builds",
+                           _edi_settings_category_cb, _edi_settings_builds);
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);

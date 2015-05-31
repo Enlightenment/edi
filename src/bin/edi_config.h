@@ -20,6 +20,7 @@ typedef struct _Edi_Config Edi_Config;
 
 typedef struct _Edi_Project_Config Edi_Project_Config;
 typedef struct _Edi_Project_Config_Tab Edi_Project_Config_Tab;
+typedef struct _Edi_Project_Config_Launch Edi_Project_Config_Launch;
 
 struct _Edi_Config_Project
 {
@@ -49,7 +50,13 @@ struct _Edi_Project_Config_Tab
    Eina_Bool windowed;
 };
 
-struct _Edi_Project_Config 
+struct _Edi_Project_Config_Launch
+{
+   char *path;
+   char *args;
+};
+
+struct _Edi_Project_Config
 {
    int version;
 
@@ -72,6 +79,7 @@ struct _Edi_Project_Config
      } gui;
 
    Eina_List *tabs;
+   Edi_Project_Config_Launch launch;
 };
 
 extern Edi_Config *_edi_config;

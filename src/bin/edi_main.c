@@ -440,6 +440,37 @@ edi_content_setup(Evas_Object *win, const char *path)
 }
 
 static void
+_edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   evas_object_del((Evas_Object *)data);
+}
+
+static void
+_edi_launcher_run(Edi_Project_Config_Launch *launch)
+{
+   Evas_Object *popup, *button;
+
+   if (_edi_project_config->launch.path)
+     {
+        ecore_exe_run(launch->path, NULL);
+
+        return;
+     }
+
+   popup = elm_popup_add(_edi_main_win);
+   elm_object_part_text_set(popup, "title,text", "Unable to launch");
+   elm_object_text_set(popup, "No launch binary found, please configure in Settings");
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "OK");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
+
+   evas_object_show(popup);
+}
+
+static void
 _tb_new_create_cb(void *data,
                              Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
@@ -455,14 +486,6 @@ _tb_new_create_cb(void *data,
 
    evas_object_del(_edi_new_popup);
    free((char*)path);
-}
-
-static void
-_tb_new_cancel_cb(void *data EINA_UNUSED,
-                                   Evas_Object *obj EINA_UNUSED,
-                                   void *event_info EINA_UNUSED)
-{
-   evas_object_del(_edi_new_popup);
 }
 
 static void
@@ -483,7 +506,7 @@ _edi_file_new()
    elm_object_text_set(button, "cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
-                                       _tb_new_cancel_cb, NULL);
+                                       _edi_popup_cancel_cb, _edi_new_popup);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "create");
@@ -635,14 +658,14 @@ _tb_test_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
    if (_edi_build_prep(obj, EINA_TRUE))
      edi_builder_test();
 }
-/*
+
 static void
 _tb_run_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    if (_edi_build_prep(obj, EINA_FALSE))
-     edi_builder_run();
+     _edi_launcher_run(&_edi_project_config->launch);
 }
-*/
+
 static void
 _tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
@@ -754,6 +777,13 @@ _edi_menu_test_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_run_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                 void *event_info EINA_UNUSED)
+{
+   _edi_launcher_run(&_edi_project_config->launch);
+}
+
+static void
 _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
@@ -803,6 +833,7 @@ _edi_menu_setup(Evas_Object *win)
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
    elm_menu_item_add(menu, menu_it, "dialog-ok", "Test", _edi_menu_test_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "stock_media-play", "Run", _edi_menu_run_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
@@ -856,7 +887,7 @@ edi_toolbar_setup(Evas_Object *win)
 
    tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "dialog-ok", "Test", _tb_test_cb, NULL);
-//   tb_it = elm_toolbar_item_append(tb, "player-play", "Run", _tb_run_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "stock_media-play", "Run", _tb_run_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
 
    elm_box_pack_end(box, tb);

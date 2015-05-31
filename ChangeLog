@@ -1,3 +1,7 @@
+2015-05-31 ajwillia.ms (Andy Williams)
+
+	* Add launch configuration so we can run a built binary
+
 2015-05-30 ajwillia.ms (Andy Williams)
 
 	* Added a monospaced font picker to settings
