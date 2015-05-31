@@ -52,8 +52,8 @@ struct _Edi_Project_Config_Tab
 
 struct _Edi_Project_Config_Launch
 {
-   char *path;
-   char *args;
+   const char *path;
+   const char *args;
 };
 
 struct _Edi_Project_Config
@@ -62,7 +62,7 @@ struct _Edi_Project_Config
 
    struct
      {
-        char *name;
+        const char *name;
         int size;
      } font;
 

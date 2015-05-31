@@ -152,7 +152,7 @@ _cb_op_font_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSE
 }
 
 static void
-_cb_op_fontsize_sel(void *data, Evas_Object *obj, void *event EINA_UNUSED)
+_cb_op_fontsize_sel(void *data EINA_UNUSED, Evas_Object *obj, void *event EINA_UNUSED)
 {
    int size = elm_slider_value_get(obj) + 0.5;
 
