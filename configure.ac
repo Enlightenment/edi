@@ -60,7 +60,7 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 PKG_CHECK_MODULES([EFL],
 [
- eina >= 1.14.99
+ eina >= 1.8.0
  evas >= 1.8.0
  ecore >= 1.8.0
  edje >= 1.8.0

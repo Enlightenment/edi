@@ -255,7 +255,7 @@ edi_create_efl_project(const char *parentdir, const char *name, const char *url,
 
    source = PACKAGE_DATA_DIR "/skeleton/eflproject.tar.gz";
    extract = "tar zxf %s -C %s";
-   snprintf(tmp, sizeof(tmp), "%s/edi_%s", eina_environment_tmp_get(), name);
+   snprintf(tmp, sizeof(tmp), "/tmp/edi_%s", name);
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);

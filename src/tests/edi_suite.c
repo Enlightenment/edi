@@ -24,7 +24,7 @@ START_TEST(edi_initialization)
 
    fail_if(edi_init() != 1);
 
-   path = eina_environment_tmp_get();
+   path = "/tmp";
    edi_project_set(path);
    ck_assert_str_eq(edi_project_get(), path);
 
