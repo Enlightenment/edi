@@ -40,8 +40,9 @@ filesdir = $(docdir)
 files_DATA = \
 	AUTHORS \
 	COPYING \
+	COPYING.LGPL \
+	COPYING.GPLv2 \
 	ChangeLog \
-	GPLv2.txt \
 	INSTALL \
 	NEWS \
 	README \

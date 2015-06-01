@@ -38,7 +38,6 @@ files_DATA = \
 	AUTHORS \
 	COPYING \
 	ChangeLog \
-	GPLv2.txt \
 	INSTALL \
 	NEWS \
 	README \
