@@ -481,8 +481,7 @@ edi_mainview_save()
    if (!editor)
      return;
 
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
    elm_code_file_save(code->file);
 }
 
@@ -589,8 +588,7 @@ edi_mainview_goto(int line)
    if (!content || !editor || line <= 0)
      return;
 
-   eo_do(editor->entry,
-         elm_code_widget_cursor_position_set(1, line));
+   elm_code_widget_cursor_position_set(editor->entry, 1, line);
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 

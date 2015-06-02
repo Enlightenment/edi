@@ -68,8 +68,10 @@ po/stamp-po
 /src/tests/check-results.xml
 
 /elm_code/src/lib/*.eo.h
+/elm_code/src/lib/*.eo.legacy.h
 /elm_code/src/lib/*.eo.c
 /elm_code/src/lib/widget/*.eo.h
+/elm_code/src/lib/widget/*.eo.legacy.h
 /elm_code/src/lib/widget/*.eo.c
 
 /elm_code/src/bin/elm_code_test

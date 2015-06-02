@@ -196,8 +196,7 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
    unsigned int col;
 
    widget = (Elm_Code_Widget *)obj;
-   eo_do(widget,
-         elm_code_widget_cursor_position_get(&col, &line));
+   elm_code_widget_cursor_position_get(widget, &col, &line);
 
    snprintf(buf, sizeof(buf), "Line:%d, Column:%d", line, col);
    elm_object_text_set((Evas_Object *)data, buf);
@@ -223,8 +222,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    elm_object_disabled_set(mime, EINA_TRUE);
 
    lines = elm_label_add(panel);
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
    if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
      elm_object_text_set(lines, "WIN");
    else
@@ -254,8 +252,7 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
    Elm_Code_Line *line, *extra_line;
    unsigned int number;
 
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, range.start.line);
 
    ecore_thread_main_loop_begin();
@@ -263,13 +260,11 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
    elm_code_line_token_add(line, range.start.col, range.end.col - 1,
                            range.end.line - range.start.line + 1, type);
 
-   eo_do(editor->entry,
-         elm_code_widget_line_refresh(line));
+   elm_code_widget_line_refresh(editor->entry, line);
    for (number = line->number + 1; number <= range.end.line; number++)
      {
         extra_line = elm_code_file_line_get(code->file, number);
-        eo_do(editor->entry,
-              elm_code_widget_line_refresh(extra_line));
+        elm_code_widget_line_refresh(editor->entry, extra_line);
      }
 
    ecore_thread_main_loop_end();
@@ -282,8 +277,7 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
    Elm_Code *code;
    Elm_Code_Line *line;
 
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, number);
    if (!line)
      {
@@ -298,8 +292,7 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
    if (text)
      elm_code_line_status_text_set(line, text);
 
-   eo_do(editor->entry,
-         elm_code_widget_line_refresh(line));
+   elm_code_widget_line_refresh(editor->entry, line);
 
    ecore_thread_main_loop_end();
 }
@@ -440,7 +433,7 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
    unsigned n = clang_getNumDiagnostics(editor->tx_unit);
    unsigned i = 0;
 
-   eo_do(editor->entry, code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
 
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
@@ -496,8 +489,7 @@ _edi_clang_setup(void *data, Ecore_Thread *thread EINA_UNUSED)
    unsigned int clang_argc;
 
    editor = (Edi_Editor *)data;
-   eo_do(editor->entry,
-         code = elm_code_widget_code_get());
+   code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
 
    /* Clang */
@@ -573,10 +565,10 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
 
    widget = (Elm_Code_Widget *) data;
    eo_do(widget,
-         elm_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
-         elm_code_widget_show_whitespace_set(_edi_project_config->gui.show_whitespace),
-         elm_code_widget_line_width_marker_set(_edi_project_config->gui.width_marker),
-         elm_code_widget_tabstop_set(_edi_project_config->gui.tabstop));
+         elm_obj_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
+         elm_obj_code_widget_show_whitespace_set(_edi_project_config->gui.show_whitespace),
+         elm_obj_code_widget_line_width_marker_set(_edi_project_config->gui.width_marker),
+         elm_obj_code_widget_tabstop_set(_edi_project_config->gui.tabstop));
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -616,11 +608,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_show(statusbar);
 
    code = elm_code_create();
-   widget = eo_add(ELM_CODE_WIDGET_CLASS, vbox,
-         elm_code_widget_code_set(code));
-   eo_do(widget,
-         elm_code_widget_editable_set(EINA_TRUE),
-         elm_code_widget_line_numbers_set(EINA_TRUE));
+   widget = elm_code_widget_add(vbox, code);
+   elm_code_widget_editable_set(widget, EINA_TRUE);
+   elm_code_widget_line_numbers_set(widget, EINA_TRUE);
    _edi_editor_config_changed(widget, 0, NULL);
 
    editor = calloc(1, sizeof(*editor));

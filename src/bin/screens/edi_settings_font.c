@@ -37,13 +37,12 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    code = elm_code_create();
    elm_code_file_line_append(code->file, FONT_PREVIEW, 35, NULL);
 
-   widget = eo_add(ELM_CODE_WIDGET_CLASS, parent,
-                   elm_code_widget_code_set(code));
+   widget = elm_code_widget_add(parent, code);
    eo_do(widget,
-         elm_code_widget_font_set(font_name, font_size),
-         elm_code_widget_line_numbers_set(EINA_TRUE),
-         elm_code_widget_editable_set(EINA_FALSE),
-         elm_code_widget_policy_set(ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF));
+         elm_obj_code_widget_font_set(font_name, font_size),
+         elm_obj_code_widget_line_numbers_set(EINA_TRUE),
+         elm_obj_code_widget_editable_set(EINA_FALSE),
+         elm_obj_code_widget_policy_set(ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF));
    evas_object_size_hint_weight_set(widget, 0.5, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);

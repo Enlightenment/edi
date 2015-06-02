@@ -54,9 +54,8 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         return EINA_FALSE;
      }
 
-   eo_do(entry,
-         code = elm_code_widget_code_get(),
-         elm_code_widget_cursor_position_get(&pos_col, &pos_line));
+   code = elm_code_widget_code_get(entry);
+   elm_code_widget_cursor_position_get(entry, &pos_col, &pos_line);
    if (search->current_search_line == pos_line ||
        search->current_search_col == pos_col)
      {
@@ -142,8 +141,7 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
      {
         if (search->current_search_line)
           {
-             eo_do(editor->entry,
-                   code = elm_code_widget_code_get());
+             code = elm_code_widget_code_get(editor->entry);
 
              elm_code_widget_selection_delete(editor->entry);
              replace = elm_object_text_get(search->replace_entry);
