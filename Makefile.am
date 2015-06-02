@@ -49,8 +49,9 @@ files_DATA = \
 	TODO
 
 EXTRA_DIST = \
-	GPLv2.txt \
 	autogen.sh \
+	COPYING.LGPL \
+	COPYING.GPLv2 \
 	config.rpath \
 	configure \
 	m4/efl_binary.m4 \

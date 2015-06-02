@@ -44,7 +44,6 @@ files_DATA = \
 	TODO
 
 EXTRA_DIST = \
-	GPLv2.txt \
 	autogen.sh \
 	config.rpath \
 	configure \
