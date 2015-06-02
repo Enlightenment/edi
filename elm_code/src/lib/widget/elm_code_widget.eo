@@ -18,7 +18,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Data */
          }
          values {
-            code: Elm_Code *; /*@ Our underlying Elm_Code object */
+            Elm_Code *code; /*@ Our underlying Elm_Code object */
          }
       }
       @property font {
@@ -37,8 +37,8 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Style */
          }
          values {
-            name: const(char) *; /*@ The name of the font to load */
-            size: Evas_Font_Size; /*@ The font size for the widget */
+            const(char) *name; /*@ The name of the font to load */
+            Evas_Font_Size font_size; /*@ The font size of the widgget */
          }
       }
       @property gravity {
@@ -58,8 +58,8 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Layout */
          }
          values {
-            x: double; /*@ The horizontal value of the scroller gravity - valid values are 0.0 and 1.0 */
-            y: double; /*@ The vertical gravity of the widget's scroller - valid values are 0.0 and 1.0 */
+            double x; /*@ The horizontal value of the scroller gravity - valid values are 0.0 and 1.0 */
+            double y; /*@ The vertical gravity of the widget's scroller - valid values are 0.0 and 1.0 */
          }
       }
       @property policy {
@@ -97,7 +97,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Layout */
          }
          values {
-            tabstop: uint; /*@ Maximum width of a tab character */
+            uint tabstop; /*@ Maximum width of a tab character */
          }
       }
       @property editable {
@@ -123,7 +123,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Features */
          }
          values {
-            editable: Eina_Bool; /*@ The editable state of the widget */
+            Eina_Bool editable; /*@ The editable state of the widget */
          }
       }
       @property line_numbers {
@@ -143,7 +143,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Features */
          }
          values {
-            line_numbers: Eina_Bool; /*@ Whether or not line numbers (or their placeholder) should be shown */
+            Eina_Bool line_numbers; /*@ Whether or not line numbers (or their placeholder) should be shown */
          }
       }
       @property line_width_marker {
@@ -163,7 +163,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Features */
          }
          values {
-            line_width_marker: uint; /*@ Where to display a line width marker, if at all */
+            uint line_width_marker; /*@ Where to display a line width marker, if at all */
          }
       }
       @property show_whitespace {
@@ -180,7 +180,7 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Features */
          }
          values {
-            show_whitespace: Eina_Bool; /*@ Whether or not we show whitespace characters */
+            Eina_Bool show_whitespace; /*@ Whether or not we show whitespace characters */
          }
       }
       @property cursor_position {
@@ -197,18 +197,18 @@ class Elm_Code_Widget (Elm.Layout, Elm_Interface_Atspi_Text)
             @ingroup Editing */
          }
          values {
-            col: uint; /*@ The horizontal position of the cursor, starting from column 1 */
-            line: uint; /*@ The vertical position of the cursor - the top row is 1 an */
+            uint col; /*@ The horizontal position of the cursor, starting from column 1 */
+            uint line; /*@ The vertical position of the cursor - the top row is 1 an */
          }
       }
       line_refresh {
          params {
-            line: Elm_Code_Line *; /*@ @in The line to refresh. */
+            Elm_Code_Line *line; /*@ @in The line to refresh. */
          }
       }
       line_visible_get {
          params {
-            line: Elm_Code_Line *; /*@ @in The line to test for visibility. */
+            Elm_Code_Line *line; /*@ @in The line to test for visibility. */
          }
          return: bool; /*@ true if the line specified is currently visible within the scroll region. */
       }
