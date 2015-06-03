@@ -257,7 +257,7 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
 
    ecore_thread_main_loop_begin();
 
-   elm_code_line_token_add(line, range.start.col, range.end.col - 1,
+   elm_code_line_token_add(line, range.start.col - 1, range.end.col - 2,
                            range.end.line - range.start.line + 1, type);
 
    elm_code_widget_line_refresh(editor->entry, line);

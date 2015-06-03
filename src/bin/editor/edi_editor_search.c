@@ -56,7 +56,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
    code = elm_code_widget_code_get(entry);
    elm_code_widget_cursor_position_get(entry, &pos_col, &pos_line);
-   if (search->current_search_line == pos_line ||
+   if (search->current_search_line == pos_line &&
        search->current_search_col == pos_col)
      {
         try_next = EINA_TRUE;
@@ -70,15 +70,15 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
         offset = 0;
         if (line->number == pos_line)
-          offset = pos_col - 1 + (try_next ? 1 : 0);
+          offset = elm_code_widget_line_text_position_for_column_get(entry, line, pos_col) + (try_next ? 1 : 0);
 
         found = elm_code_line_text_strpos(line, text, offset);
         if (found == ELM_CODE_TEXT_NOT_FOUND)
           continue;
 
         search->current_search_line = line->number;
-// TODO make this unicode
-        search->current_search_col = found + 1;
+        search->current_search_col =
+          elm_code_widget_line_text_column_width_to_position(entry, line, found);
         break;
      }
 
@@ -87,20 +87,10 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    if (!search->term_found)
      return EINA_FALSE;
 
-/*
-   size_t pos = 0;
-   int idx = 0;
-   while ((utf8 + idx) < found)
-     {
-        pos++;
-        eina_unicode_utf8_next_get(utf8, &idx);
-     }
-*/
    elm_code_widget_selection_start(entry, search->current_search_line,
                                         search->current_search_col);
-// TODO make that strlen unicode strlen
    elm_code_widget_selection_end(entry, search->current_search_line,
-                                 search->current_search_col + strlen(text) - 1);
+                                 elm_code_widget_line_text_column_width_to_position(entry, line, found + strlen(text)) - 1);
 
    return EINA_TRUE;
 }
