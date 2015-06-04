@@ -34,7 +34,7 @@ typedef struct _Edi_Panel_Slide_Effect
    Eina_Bool left;
 } Edi_Panel_Slide_Effect;
 
-#define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © 2014-2015 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel;
@@ -1099,8 +1099,8 @@ static const Ecore_Getopt optdesc = {
   "%prog [options] [project-dir]",
   PACKAGE_VERSION,
   COPYRIGHT,
-  "BSD with advertisement clause",
-  "The EFL IDE",
+  "GPLv2",
+  "The Enlightened IDE",
   EINA_TRUE,
   {
     ECORE_GETOPT_LICENSE('L', "license"),

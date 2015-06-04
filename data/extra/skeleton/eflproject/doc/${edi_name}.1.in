@@ -1,11 +1,11 @@
-.TH ${EDI_NAME} 1 "01 01 1970 FIXME" "@PACKAGE_NAME@ @PACKAGE_VERSION@"
+.TH ${EDI_NAME} 1 "01 01 ${Edi_Year} FIXME" "@PACKAGE_NAME@ @PACKAGE_VERSION@"
 
 .SH NAME
 ${edi_name} \- a demo application
 
 .SH SYNOPSIS
 .B ${edi_name}
-[-d] [-f] [-t=THEME] [-m=MINES] [-L] [-C] [-V] [-h]
+[-L] [-C] [-V] [-h]
 
 .SH DESCRIPTION
 

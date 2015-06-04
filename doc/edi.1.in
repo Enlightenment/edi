@@ -1,19 +1,20 @@
-.TH EDI 1 "01 01 1970 FIXME" "@PACKAGE_NAME@ @PACKAGE_VERSION@"
+.TH EDI 1 "04 06 2015" "@PACKAGE_NAME@ @PACKAGE_VERSION@"
 
 .SH NAME
-edi \- a demo application
+edi \- the Enlightened IDE
 
 .SH SYNOPSIS
 .B edi
-[-d] [-f] [-t=THEME] [-m=MINES] [-L] [-C] [-V] [-h]
+[-L] [-C] [-V] [-h]
+.B [project-dir]
 
 .SH DESCRIPTION
 
-Edi is a demo application to show how to integrate EFL and autotools into a
-cross platform build. You should be able to generate an executable easily for all
-target supported by EFL with this edi.
+Edi is an integrated development environment based on the EFL.
 
-With no option, the program starts and display an Hello World.
+With no option, the program starts and displays a project picker screen.
+If you launch with a project directory parameter it will open directly to
+that project.
 
 
 .SH OPTIONS
@@ -42,7 +43,7 @@ Reports are welcome. Send them at @PACKAGE_BUGREPORT@.
 
 .SH HOMEPAGE
 
-http://enlightenment.org
+http://edi-ide.com
 
 
 .SH AUTHORS
