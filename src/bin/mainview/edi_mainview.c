@@ -60,10 +60,10 @@ edi_mainview_item_prev()
    EINA_LIST_FOREACH(_edi_mainview_items, item, it)
      {
         if (first->view == current)
-	  {
-	     prev = eina_list_nth(_edi_mainview_items, eina_list_count(_edi_mainview_items)-1);
-	     edi_mainview_item_select(prev);
-	  }
+          {
+             prev = eina_list_nth(_edi_mainview_items, eina_list_count(_edi_mainview_items)-1);
+             edi_mainview_item_select(prev);
+          }
         if (it && it->view == current)
           {
              if (prev)
@@ -89,10 +89,10 @@ edi_mainview_item_next()
    EINA_LIST_FOREACH(_edi_mainview_items, item, it)
      {
         if (last->view == current)
-	  {
-	     next = eina_list_nth(_edi_mainview_items, 0);
-	     edi_mainview_item_select(next);
-	  }
+          {
+             next = eina_list_nth(_edi_mainview_items, 0);
+             edi_mainview_item_select(next);
+          }
         if (it && open_next)
           {
              edi_mainview_item_select(it);

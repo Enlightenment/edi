@@ -55,14 +55,13 @@ _edi_message_open(const char *message, Eina_Bool deletable)
 
    popup = elm_popup_add(_welcome_window);
    _edi_new_popup = popup;
-   elm_object_part_text_set(popup, "title,text",
-			    message);
+   elm_object_part_text_set(popup, "title,text", message);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "Ok");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
-				  _edi_on_close_message, NULL);
+                                  _edi_on_close_message, NULL);
 
    if (deletable)
      {
@@ -70,7 +69,7 @@ _edi_message_open(const char *message, Eina_Bool deletable)
         elm_object_text_set(button, "Delete");
         elm_object_part_content_set(popup, "button2", button);
         evas_object_smart_callback_add(button, "clicked",
-				  _edi_on_delete_message, NULL);
+                                       _edi_on_delete_message, NULL);
      }
 
    evas_object_show(popup);
