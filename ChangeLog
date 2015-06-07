@@ -1,3 +1,7 @@
+2015-06-07 ajwillia.ms (Andy Williams)
+
+	* Indent newlines to match whitespace in the previous line
+
 2015-05-31 ajwillia.ms (Andy Williams)
 
 	* Add launch configuration so we can run a built binary
