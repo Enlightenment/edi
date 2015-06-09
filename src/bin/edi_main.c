@@ -985,14 +985,21 @@ void
 _edi_open_tabs()
 {
    Edi_Project_Config_Tab *tab;
-   Eina_List *list, *next;
+   Eina_List *tabs, *list;
 
-   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
+   tabs = _edi_project_config->tabs;
+   _edi_project_config->tabs = NULL;
+   EINA_LIST_FOREACH(tabs, list, tab)
      {
         if (tab->windowed)
           edi_mainview_open_window_path(tab->path);
         else
           edi_mainview_open_path(tab->path);
+     }
+
+   EINA_LIST_FREE(tabs, tab)
+     {
+        free(tab);
      }
 }
 

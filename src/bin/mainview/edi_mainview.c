@@ -196,7 +196,6 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 
    if (options->line)
      edi_mainview_goto(options->line);
-   _edi_project_config_tab_add(options->path, EINA_FALSE);
 }
 
 static void
@@ -251,7 +250,6 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
-   _edi_project_config_tab_add(options->path, EINA_TRUE);
 }
 
 static void
@@ -378,18 +376,9 @@ void
 edi_mainview_open_path(const char *path)
 {
    Edi_Path_Options *options;
-   Edi_Mainview_Item *it;
-
-   it = _get_item_for_path(path);
-   if (it)
-     {
-        edi_mainview_item_select(it);
-        return;
-     }
 
    options = edi_path_options_create(path);
-
-   eio_file_direct_stat(path, _edi_mainview_tab_stat_done, dummy, options);
+   edi_mainview_open(options);
 }
 
 void
@@ -414,29 +403,18 @@ edi_mainview_open(Edi_Path_Options *options)
      {
         _edi_mainview_item_tab_add(options, NULL);
      }
+
+   _edi_project_config_tab_add(options->path, EINA_FALSE);
 }
 
 void
 edi_mainview_open_window_path(const char *path)
 {
    Edi_Path_Options *options;
-   Edi_Mainview_Item *it;
-
-   it = _get_item_for_path(path);
-   if (it)
-     {
-        edi_mainview_item_select(it);
-        elm_naviframe_item_pop(nf);
-        elm_object_item_del(elm_toolbar_selected_item_get(tb));
-        _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
-
-        eina_stringshare_del(it->path);
-        free(it);
-     }
 
    options = edi_path_options_create(path);
 
-   eio_file_direct_stat(path, _edi_mainview_win_stat_done, dummy, options);
+   edi_mainview_open_window(options);
 }
 
 void
@@ -464,6 +442,8 @@ edi_mainview_open_window(Edi_Path_Options *options)
      {
         _edi_mainview_item_win_add(options, NULL);
      }
+
+   _edi_project_config_tab_add(options->path, EINA_TRUE);
 }
 
 void
