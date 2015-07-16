@@ -18,7 +18,7 @@
 #include "edi_config.h"
 
 static Evas_Object *nf, *tb, *_main_win;
-static Evas_Object *_edi_mainview_choose_popup;
+static Evas_Object *_edi_mainview_choose_popup, *_edi_mainview_goto_popup;
 static Edi_Path_Options *_edi_mainview_choose_options;
 
 static Eina_List *_edi_mainview_items = NULL;
@@ -570,6 +570,71 @@ edi_mainview_goto(int line)
 
    elm_code_widget_cursor_position_set(editor->entry, 1, line);
    elm_object_focus_set(editor->entry, EINA_TRUE);
+}
+
+static void
+_edi_mainview_goto_popup_go_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   int number;
+
+   number = atoi(elm_entry_entry_get((Evas_Object *) data));
+   edi_mainview_goto(number);
+
+   evas_object_del(_edi_mainview_goto_popup);
+}
+
+static void
+_edi_mainview_goto_popup_cancel_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_mainview_goto_popup);
+}
+
+static void
+_edi_mainview_goto_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
+                                   Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *)event_info;
+   const char *str;
+
+   str = elm_object_text_get(obj);
+
+   if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
+     _edi_mainview_goto_popup_go_cb(obj, NULL, NULL);
+}
+
+void
+edi_mainview_goto_popup_show()
+{
+   Evas_Object *popup, *input, *button;
+
+   popup = elm_popup_add(_main_win);
+   _edi_mainview_goto_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+                            "Enter line number");
+
+   input = elm_entry_add(popup);
+   elm_entry_single_line_set(input, EINA_TRUE);
+   evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_goto_popup_key_up_cb, NULL);
+   elm_object_content_set(popup, input);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "cancel");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _edi_mainview_goto_popup_cancel_cb, NULL);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "go");
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _edi_mainview_goto_popup_go_cb, input);
+
+   evas_object_show(popup);
+   elm_object_focus_set(input, EINA_TRUE);
 }
 
 void

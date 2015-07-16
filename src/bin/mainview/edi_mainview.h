@@ -89,7 +89,6 @@ void edi_mainview_open_window_path(const char *path);
  */
 void edi_mainview_open_window(Edi_Path_Options *options);
 
-
 /**
  * Save the current file.
  *
@@ -147,6 +146,13 @@ void edi_mainview_search();
  * @ingroup Content
  */
 void edi_mainview_goto(int line);
+
+/**
+ * Present a popup that will initiate a goto in the current view.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_goto_popup_show();
 
 /**
  * @}

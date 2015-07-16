@@ -180,6 +180,10 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           {
              edi_mainview_search();
           }
+        else if (!strcmp(ev->key, "g"))
+          {
+             edi_mainview_goto_popup_show();
+          }
         else if (!strcmp(ev->key, "z"))
           {
              _undo_cb(editor, obj, event);

@@ -42,7 +42,7 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_new_popup, *_edi_goto_popup,*_edi_message_popup;
+static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_new_popup, *_edi_message_popup;
 int _edi_log_dom = -1;
 
 static void
@@ -585,61 +585,11 @@ _tb_search_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UN
 }
 
 static void
-_tb_goto_go_cb(void *data,
-                             Evas_Object *obj EINA_UNUSED,
-                             void *event_info EINA_UNUSED)
-{
-   int number;
-
-   number = atoi(elm_entry_entry_get((Evas_Object *) data));
-   edi_mainview_goto(number);
-
-   evas_object_del(_edi_goto_popup);
-}
-
-static void
-_tb_goto_cancel_cb(void *data EINA_UNUSED,
-                                   Evas_Object *obj EINA_UNUSED,
-                                   void *event_info EINA_UNUSED)
-{
-   evas_object_del(_edi_goto_popup);
-}
-
-static void
-_edi_edit_goto()
-{
-   Evas_Object *popup, *input, *button;
-
-   popup = elm_popup_add(_edi_main_win);
-   _edi_goto_popup = popup;
-   elm_object_part_text_set(popup, "title,text",
-                            "Enter line number");
-
-   input = elm_entry_add(popup);
-   elm_entry_single_line_set(input, EINA_TRUE);
-   elm_object_content_set(popup, input);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
-   elm_object_part_content_set(popup, "button1", button);
-   evas_object_smart_callback_add(button, "clicked",
-                                       _tb_goto_cancel_cb, NULL);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "go");
-   elm_object_part_content_set(popup, "button2", button);
-   evas_object_smart_callback_add(button, "clicked",
-                                       _tb_goto_go_cb, input);
-
-   evas_object_show(popup);
-}
-
-static void
 _tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
 
-   _edi_edit_goto();
+   edi_mainview_goto_popup_show();
 }
 
 static Eina_Bool
@@ -776,7 +726,7 @@ static void
 _edi_menu_goto_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
-   _edi_edit_goto();
+   edi_mainview_goto_popup_show();
 }
 
 static void
