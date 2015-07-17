@@ -41,6 +41,17 @@ typedef struct _Edi_Path_Options
 EAPI Edi_Path_Options *edi_path_options_create(const char *input);
 
 /**
+ * Append a file to the end of a given path.
+ *
+ * @param path The base path to append to
+ * @param file The file portion to add to the path
+ *
+ * @return a newly allocated string that merges the items to a path using the
+ *   correct separator for the current platform.
+ */
+EAPI const char *edi_path_append(const char *path, const char *file);
+
+/**
  * @}
  */
 

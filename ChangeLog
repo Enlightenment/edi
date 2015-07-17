@@ -1,3 +1,7 @@
+2015-07-17 ajwillia.ms (Andy Williams)
+
+	* Create new files in the selected directory rather than project root
+
 2015-06-07 ajwillia.ms (Andy Williams)
 
 	* Indent newlines to match whitespace in the previous line

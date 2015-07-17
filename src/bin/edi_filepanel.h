@@ -39,6 +39,8 @@ typedef void (*edi_filepanel_item_clicked_cb)(const char *path,
 void edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
                        const char *path, edi_filepanel_item_clicked_cb cb);
 
+const char *edi_filepanel_selected_path_get(Evas_Object *obj);
+
 /**
  * @}
  */

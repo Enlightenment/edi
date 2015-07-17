@@ -108,14 +108,7 @@ edi_project_get()
 EAPI const char *
 edi_project_file_path_get(const char *file)
 {
-   char *path;
-   int len;
-
-   len = strlen(file) + strlen(edi_project_get()) + 2;
-   path = malloc(sizeof(char) * len);
-   snprintf(path, len, "%s/%s", edi_project_get(), file);
-
-   return path;
+   return edi_path_append(edi_project_get(), file);
 }
 
 EAPI Eina_Bool

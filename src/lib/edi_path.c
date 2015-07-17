@@ -43,4 +43,20 @@ edi_path_options_create(const char *input)
    return ret;
 }
 
+EAPI const char *
+edi_path_append(const char *path, const char *file)
+{
+   char *concat;
+   int len;
+   char separator = '/';
+#ifdef WIN32
+   separator = '\\';
+#endif
+
+   len = strlen(path) + strlen(file) + 2;
+   concat = malloc(sizeof(char) * len);
+   snprintf(concat, len, "%s%c%s", path, separator, file);
+
+   return concat;
+}
 

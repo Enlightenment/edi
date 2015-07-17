@@ -492,10 +492,14 @@ _tb_new_create_cb(void *data,
                              Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
 {
-   const char *path, *name;
+   const char *selected, *path, *name;
 
    name = elm_entry_entry_get((Evas_Object *) data);
-   path = edi_project_file_path_get(name);
+   selected = edi_filepanel_selected_path_get(_edi_filepanel);
+   if (selected && ecore_file_is_dir(selected))
+     path = edi_path_append(selected, name);
+   else
+     path = edi_project_file_path_get(name);
 
    fclose(fopen(path, "w"));
    _edi_filepanel_reload();
@@ -532,6 +536,7 @@ _edi_file_new()
                                        _tb_new_create_cb, input);
 
    evas_object_show(popup);
+   elm_object_focus_set(input, EINA_TRUE);
 }
 
 static void

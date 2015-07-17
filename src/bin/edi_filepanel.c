@@ -440,3 +440,13 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
 
    elm_box_pack_end(parent, list);
 }
+
+const char *
+edi_filepanel_selected_path_get(Evas_Object *obj EINA_UNUSED)
+{
+   Elm_Object_Item *it;
+
+   it = elm_genlist_selected_item_get(list);
+   return elm_object_item_data_get(it);
+}
+
