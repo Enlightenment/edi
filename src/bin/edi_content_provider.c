@@ -12,7 +12,7 @@
 
 #include "edi_private.h"
 
-// TODO move out to edi_content.c ot similar just like the editor type
+// TODO move out to edi_content.c or similar just like the editor type
 // (and the Evas include)
 
 static Evas_Object *
