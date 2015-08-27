@@ -256,10 +256,10 @@ _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type ty
    Elm_Code_Line *line, *extra_line;
    unsigned int number;
 
+   ecore_thread_main_loop_begin();
+
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, range.start.line);
-
-   ecore_thread_main_loop_begin();
 
    elm_code_line_token_add(line, range.start.col - 1, range.end.col - 2,
                            range.end.line - range.start.line + 1, type);
@@ -281,16 +281,18 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
    Elm_Code *code;
    Elm_Code_Line *line;
 
+   ecore_thread_main_loop_begin();
+
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, number);
    if (!line)
      {
         if (text)
           ERR("Status on invalid line %d (\"%s\")", number, text);
+
+        ecore_thread_main_loop_end();
         return;
      }
-
-   ecore_thread_main_loop_begin();
 
    elm_code_line_status_set(line, status);
    if (text)
@@ -492,9 +494,13 @@ _edi_clang_setup(void *data, Ecore_Thread *thread EINA_UNUSED)
    char **clang_argv;
    unsigned int clang_argc;
 
+   ecore_thread_main_loop_begin();
+
    editor = (Edi_Editor *)data;
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
+
+   ecore_thread_main_loop_end();
 
    /* Clang */
    /* FIXME: index should probably be global. */
