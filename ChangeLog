@@ -1,6 +1,6 @@
 2015-08-27 ajwillia.ms (Andy Williams)
 
-	* Trim lines that are purely whitespace during save
+	* Trim trailing whitespace from lines during save
 
 2015-07-17 ajwillia.ms (Andy Williams)
 
