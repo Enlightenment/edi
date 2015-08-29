@@ -4,15 +4,26 @@ Edi 0.1
 
 Features:
 
+  * New icon :)
   * Integrated elm_code editor
     - faster code highlighting
     - highlighting of error lines
+    - highlighting of TODO lines
     - line width indicator in the editor
     - configurable tab stop width
+  * Add a main menu and tidy up toolbar
+  * Remember UI settings per project
+  * Add launch configuration so we can run a built binary
+  * Added a monospaced font picker to settings
+  * Indent newlines to match whitespace in the previous line
+  * Trim trailing whitespace when saving
+
 
 Bug fixes
 
   * T2057 Line numbers are not fully visible in new windows
+  * #3 assume bash as default shell when creating a new project
+  * #4 Unable to compile
 
 
 0.0.2

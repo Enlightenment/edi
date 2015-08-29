@@ -1,4 +1,4 @@
-EFL_VERSION([0], [0], [9])
+EFL_VERSION([0], [1], [0])
 AC_INIT([edi], [efl_version], [enlightenment-devel@lists.sourceforge.net])
 
 AC_PREREQ([2.65])
