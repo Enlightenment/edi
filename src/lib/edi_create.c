@@ -82,7 +82,7 @@ _edi_create_filter_file(Edi_Create *create, const char *path)
 
    create->filters++;
 // TODO speed this up - pre-cache this filter!
-   template = "sed -i \"s|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|ig;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|$%s|g;s|\\${Edi_Year}|%d|g\" %s";
+   template = "sh -c \"sed -i 's|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|ig;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|$%s|g;s|\\${Edi_Year}|%d|g' %s\"";
    length = strlen(template) + (strlen(create->name) * 3)  + strlen(create->user) + strlen(create->email) + strlen(create->url) + strlen(path) + 4 - 16 + 1;
 
    lowername = strdup(create->name);
@@ -174,7 +174,7 @@ _edi_create_move_done_cb(void *data, Eio_File *file EINA_UNUSED)
 static void
 _edi_create_move_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 {
-   ERR("move error for %s: [%s]\n", (char *) data, strerror(error));
+   WRN("move error for %s: [%s]\n", (char *) data, strerror(error));
 
    // This matches the filtered path copy created in the copy callback
    free(data);
