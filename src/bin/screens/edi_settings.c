@@ -207,7 +207,7 @@ _edi_settings_display_create(Evas_Object *parent)
 
    label = elm_label_add(hbox);
    elm_object_text_set(label, "Tabstop");
-   evas_object_size_hint_align_set(label, 0.0D, 0.5);
+   evas_object_size_hint_align_set(label, 0.0, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
 
