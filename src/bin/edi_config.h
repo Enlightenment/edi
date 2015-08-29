@@ -39,6 +39,7 @@ struct _Edi_Config
    int version;
 
    Eina_Bool autosave;
+   Eina_Bool trim_whitespace;
 
    Eina_List *projects;
    Eina_List *mime_assocs;

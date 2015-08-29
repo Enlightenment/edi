@@ -572,8 +572,13 @@ static Eina_Bool
 _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    Elm_Code_Widget *widget;
+   Elm_Code *code;
 
    widget = (Elm_Code_Widget *) data;
+   code = elm_code_widget_code_get(widget);
+
+   code->config.trim_whitespace = _edi_config->trim_whitespace;
+
    eo_do(widget,
          elm_obj_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
          elm_obj_code_widget_show_whitespace_set(_edi_project_config->gui.show_whitespace),

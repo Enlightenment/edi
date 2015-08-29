@@ -352,6 +352,17 @@ _edi_settings_behaviour_autosave_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_config_save();
 }
 
+static void
+_edi_settings_behaviour_trim_whitespace_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                           void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *)obj;
+   _edi_config->trim_whitespace = elm_check_state_get(check);
+   _edi_config_save();
+}
+
 static Evas_Object *
 _edi_settings_behaviour_create(Evas_Object *parent)
 {
@@ -367,6 +378,15 @@ _edi_settings_behaviour_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_behaviour_autosave_cb, NULL);
+   evas_object_show(check);
+
+   check = elm_check_add(box);
+   elm_object_text_set(check, "Trim trailing whitespace");
+   elm_check_state_set(check, _edi_config->trim_whitespace);
+   elm_box_pack_end(box, check);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_behaviour_trim_whitespace_cb, NULL);
    evas_object_show(check);
 
    return frame;
