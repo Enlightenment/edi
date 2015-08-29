@@ -160,6 +160,7 @@ elm_code/data/themes/Makefile
 elm_code/data/themes/default/Makefile
 elm_code/src/Makefile
 elm_code/src/lib/Makefile
+elm_code/src/lib/widget/Makefile
 elm_code/src/bin/Makefile
 elm_code/src/tests/Makefile
 doc/edi.1
