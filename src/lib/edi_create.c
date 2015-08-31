@@ -160,7 +160,7 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
    create->handler = handler;
 
    chdir(create->path);
-   ecore_exe_run("git init && git add .", data);
+   ecore_exe_run("sh -c 'git init && git add .'", data);
 
    return ECORE_CALLBACK_PASS_ON;
 }
