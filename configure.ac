@@ -64,7 +64,7 @@ PKG_CHECK_MODULES([EFL],
  evas >= 1.8.0
  ecore >= 1.8.0
  edje >= 1.8.0
- eo >= 1.15.0
+ eo >= 1.15.99
  elementary >= 1.8.0
  eio >= 1.8.0
 ])
