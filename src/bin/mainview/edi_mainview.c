@@ -196,6 +196,8 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 
    if (options->line)
      edi_mainview_goto(options->line);
+
+   _edi_project_config_tab_add(options->path, EINA_FALSE);
 }
 
 static void
@@ -250,6 +252,8 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
+
+   _edi_project_config_tab_add(options->path, EINA_TRUE);
 }
 
 static void
@@ -311,7 +315,7 @@ _edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *opt
 
    // popup title
    elm_object_part_text_set(popup, "title,text",
-                            "Unrecognied file type");
+                            "Unrecognised file type");
 
    _edi_mainview_filetype_create(popup, "text", cb);
    _edi_mainview_filetype_create(popup, "code", cb);
@@ -403,8 +407,6 @@ edi_mainview_open(Edi_Path_Options *options)
      {
         _edi_mainview_item_tab_add(options, NULL);
      }
-
-   _edi_project_config_tab_add(options->path, EINA_FALSE);
 }
 
 void
@@ -442,8 +444,6 @@ edi_mainview_open_window(Edi_Path_Options *options)
      {
         _edi_mainview_item_win_add(options, NULL);
      }
-
-   _edi_project_config_tab_add(options->path, EINA_TRUE);
 }
 
 void
@@ -649,8 +649,8 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(box);
-   elm_box_pack_end(parent, box);   
-   
+   elm_box_pack_end(parent, box);
+
    tb = elm_toolbar_add(parent);
    evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
