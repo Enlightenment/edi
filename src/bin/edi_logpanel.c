@@ -16,6 +16,12 @@
 static Evas_Object *_info_widget;
 static Elm_Code *_elm_code;
 
+static Eina_Bool
+_edi_logpanel_ignore(const char *fnc)
+{
+   return !strncmp(fnc, "_evas_object_smart_need_recalculate_set", strlen(fnc));
+}
+
 static void
 _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
                        const char *file, const char *fnc, int line, const char *fmt,
@@ -23,6 +29,9 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
 {
    unsigned int printed, buffer_len = 512;
    char buffer [buffer_len];
+
+   if (_edi_logpanel_ignore(fnc))
+     return;
 
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
            domain->domain_str, file, fnc, line);
