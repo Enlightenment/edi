@@ -11,6 +11,7 @@ Bug fixes
   * Correct selection so it works backwards as well
   * Don't remove highlighting of lines when backspace/delete or newline are entered
   * When opening unrecognised files and cancelling choice don't remember as opened
+  * Fix issue with whitespace indenting on newline when splitting at whitespace
 
 
 =======
