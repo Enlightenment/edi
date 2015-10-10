@@ -2,6 +2,10 @@
 Edi 0.2
 =======
 
+Features:
+
+  * Highlight the current line when editing
+
 Bug fixes
 
   * Correct selection so it works backwards as well
