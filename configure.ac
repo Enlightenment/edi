@@ -1,4 +1,4 @@
-EFL_VERSION([0], [1], [0])
+EFL_VERSION([0], [2], [0])
 AC_INIT([edi], [efl_version], [enlightenment-devel@lists.sourceforge.net])
 
 AC_PREREQ([2.65])
@@ -64,7 +64,7 @@ PKG_CHECK_MODULES([EFL],
  evas >= 1.8.0
  ecore >= 1.8.0
  edje >= 1.8.0
- eo >= 1.15.99
+ eo >= 1.16.0
  elementary >= 1.8.0
  eio >= 1.8.0
 ])

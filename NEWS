@@ -5,6 +5,7 @@ Edi 0.2
 Features:
 
   * Highlight the current line when editing
+  * Update to EFL 1.16 release
 
 Bug fixes
 
