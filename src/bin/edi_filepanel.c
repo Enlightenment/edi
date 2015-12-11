@@ -150,19 +150,31 @@ _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUS
    return strdup(basename(data));
 }
 
+static Eina_Hash *mime_entries = NULL;
+
+static Edi_Content_Provider*
+_get_provider_from_hashset(const char *filename)
+{
+   if ( mime_entries == NULL ) mime_entries = eina_hash_string_superfast_new(NULL);
+   const char *mime = eina_hash_find(mime_entries, filename);
+   if ( !mime )
+     {
+       mime = efreet_mime_type_get(filename);
+       eina_hash_add(mime_entries, filename, strdup(mime));
+     }
+   return edi_content_provider_for_mime_get(mime);
+}
+
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
-   Evas_Object *ic;
-   Edi_Content_Provider *provider;
-   const char *mime;
-
    if (strcmp(source, "elm.swallow.icon"))
      return NULL;
 
-   mime = efreet_mime_type_get((const char *)data);
-   provider = edi_content_provider_for_mime_get(mime);
+   Edi_Content_Provider *provider;
+   provider = _get_provider_from_hashset((const char *)data);
 
+   Evas_Object *ic;
    ic = elm_icon_add(obj);
    elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_FDO_THEME);
    if (provider)
