@@ -176,8 +176,10 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    Elm_Object_Item *it, *tab;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
+   Edi_Content_Provider *provider;
 
    item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
+   provider = edi_content_provider_for_id_get(item->editortype);
    content = _edi_mainview_content_create(item, nf);
 
    it = elm_naviframe_item_simple_push(nf, content);
@@ -185,7 +187,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    elm_object_item_data_set(it, item);
 
    elm_naviframe_item_style_set(it, "overlap");
-   tab = elm_toolbar_item_append(tb, NULL, basename((char*)options->path), _promote, it);
+   tab = elm_toolbar_item_append(tb, provider->icon, basename((char*)options->path), _promote, it);
    item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
 
@@ -655,7 +657,10 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
+   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
+   elm_toolbar_icon_size_set(tb, 24);
+   elm_object_style_set(tb, "item_horizontal");
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_box_pack_end(box, tb);
    evas_object_show(tb);
@@ -674,5 +679,5 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 
    it = elm_naviframe_item_simple_push(nf, txt);
    elm_naviframe_item_style_set(it, "overlap");
-   elm_toolbar_item_append(tb, NULL, "Welcome", _promote, it);
+   elm_toolbar_item_append(tb, "go-home", "Welcome", _promote, it);
 }
