@@ -30,7 +30,8 @@ EAPI void
 _edi_builder_build_configure(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./configure && make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run("/bin/sh -c \"./configure && make\"",
+                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
 }
 
@@ -38,7 +39,7 @@ EAPI void
 _edi_builder_build_cmake(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && make && cd ..",
+   ecore_exe_pipe_run("/bin/sh -c \"mkdir -p build && cd build && cmake .. && make && cd ..\"",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
 }
@@ -47,7 +48,8 @@ EAPI void
 _edi_builder_build_autogen(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./autogen.sh && make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run("/bin/sh -c \"./autogen.sh && make \"",
+                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
 }
 
