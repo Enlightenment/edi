@@ -493,17 +493,29 @@ _tb_new_create_cb(void *data,
                              void *event_info EINA_UNUSED)
 {
    const char *selected, *path, *name;
+   FILE *fileid;
 
    name = elm_entry_entry_get((Evas_Object *) data);
+   if (!name || strlen(name) == 0)
+     {
+        _edi_message_open("Please enter a file name.");
+        return;
+     }
+
    selected = edi_filepanel_selected_path_get(_edi_filepanel);
    if (selected && ecore_file_is_dir(selected))
      path = edi_path_append(selected, name);
    else
      path = edi_project_file_path_get(name);
 
-   fclose(fopen(path, "w"));
-   _edi_filepanel_reload();
-   edi_mainview_open_path(path);
+   fileid = fopen(path, "w");
+   if (!fileid)
+     _edi_message_open("Unable to write file.");
+   else
+     {
+        _edi_filepanel_reload();
+        edi_mainview_open_path(path);
+     }
 
    evas_object_del(_edi_new_popup);
    free((char*)path);
