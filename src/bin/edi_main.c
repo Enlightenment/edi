@@ -524,16 +524,23 @@ _tb_new_create_cb(void *data,
 static void
 _edi_file_new()
 {
-   Evas_Object *popup, *input, *button;
+   Evas_Object *popup, *box, *input, *button;
 
    popup = elm_popup_add(_edi_main_win);
    _edi_new_popup = popup;
    elm_object_part_text_set(popup, "title,text",
                             "Enter new file name");
 
-   input = elm_entry_add(popup);
+   box = elm_box_add(popup);
+   elm_box_horizontal_set(box, EINA_FALSE);
+   elm_object_content_set(popup, box);
+
+   input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
-   elm_object_content_set(popup, input);
+   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(input);
+   elm_box_pack_end(box, input);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "cancel");
