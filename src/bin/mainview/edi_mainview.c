@@ -665,7 +665,7 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
-   elm_toolbar_icon_size_set(tb, 24);
+   elm_toolbar_icon_size_set(tb, 16 * elm_config_scale_get());
    elm_object_style_set(tb, "item_horizontal");
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
