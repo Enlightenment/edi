@@ -60,13 +60,13 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 PKG_CHECK_MODULES([EFL],
 [
- eina >= 1.15.0
- evas >= 1.8.0
- ecore >= 1.8.0
- edje >= 1.8.0
- eo >= 1.16.0
- elementary >= 1.8.0
- eio >= 1.8.0
+ eina >= 1.17.0
+ evas >= 1.17.0
+ ecore >= 1.17.0
+ edje >= 1.17.0
+ eo >= 1.17.0
+ elementary >= 1.17.0
+ eio >= 1.17.0
 ])
 
 # Check edje_cc
