@@ -122,6 +122,8 @@ EFL_TESTS([${build_tests}])
 # Checks for library functions.
 
 if test "${have_clang}" = "yes"; then
+   ldflags="$LDFLAGS"
+   LDFLAGS+=" -L${libdir}/llvm"
    AC_CHECK_LIB([clang], [clang_Cursor_getArgument],
       [
        AC_DEFINE([HAVE_LIBCLANG], [1], [Set to 1 if clang is found])
