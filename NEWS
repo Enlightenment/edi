@@ -5,6 +5,12 @@ Edi 0.3
 Features:
 
   * Option to inserts spaces instead of tabs
+  * Update to EFFL 1.17 release for better toolbar handling
+
+Bug fixes:
+
+  * Focus input popups when they appear
+  * Support fish and other non-bash shells for build & test
 
 
 =======
