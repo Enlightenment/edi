@@ -15,6 +15,7 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/bin \
 -I$(top_srcdir)/elm_code/src/lib \
+-I$(top_builddir)/elm_code/src/lib \
 -I$(top_builddir)/src/lib \
 -DEFL_BETA_API_SUPPORT \
 -DEFL_CFLAGS=\"$(efl_cflags_safe)\" \
