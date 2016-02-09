@@ -39,7 +39,7 @@
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
 #  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0001
-#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0002
+#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0003
 #  define EDI_PROJECT_CONFIG_FILE_VERSION \
    ((EDI_PROJECT_CONFIG_FILE_EPOCH << 16) | EDI_PROJECT_CONFIG_FILE_GENERATION)
 
@@ -250,6 +250,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.tab_inserts_spaces, EET_T_UCHAR);
 
    EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
    EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
@@ -459,6 +460,10 @@ _edi_project_config_load()
    IFPCFG(0x0002);
    _edi_project_config->font.name = eina_stringshare_add("Mono");
    _edi_project_config->font.size = 12;
+   IFPCFGEND;
+
+   IFPCFG(0x0003);
+   _edi_project_config->gui.tab_inserts_spaces = EINA_TRUE;
    IFPCFGEND;
 
    /* limit config values so they are sane */

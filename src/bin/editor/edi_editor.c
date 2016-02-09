@@ -582,6 +582,7 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    eo_do(widget,
          elm_obj_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
          elm_obj_code_widget_show_whitespace_set(_edi_project_config->gui.show_whitespace),
+         elm_obj_code_widget_tab_inserts_spaces_set(_edi_project_config->gui.tab_inserts_spaces),
          elm_obj_code_widget_line_width_marker_set(_edi_project_config->gui.width_marker),
          elm_obj_code_widget_tabstop_set(_edi_project_config->gui.tabstop));
 

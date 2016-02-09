@@ -61,6 +61,17 @@ _edi_settings_display_whitespace_cb(void *data EINA_UNUSED, Evas_Object *obj,
 }
 
 static void
+_edi_settings_display_tab_inserts_spaces_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                            void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *)obj;
+   _edi_project_config->gui.tab_inserts_spaces = elm_check_state_get(check);
+   _edi_project_config_save();
+}
+
+static void
 _edi_settings_display_widthmarker_cb(void *data EINA_UNUSED, Evas_Object *obj,
                                      void *event EINA_UNUSED)
 {
@@ -223,6 +234,16 @@ _edi_settings_display_create(Evas_Object *parent)
                                   _edi_settings_display_tabstop_cb, NULL);
    elm_box_pack_end(hbox, spinner);
    evas_object_show(spinner);
+
+   check = elm_check_add(box);
+   elm_object_text_set(check, "Insert spaces when tab is pressed");
+   elm_check_state_set(check, _edi_project_config->gui.tab_inserts_spaces);
+   elm_box_pack_end(box, check);
+   evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(check, 0.0, 0.5);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_display_tab_inserts_spaces_cb, NULL);
+   evas_object_show(check);
 
    check = elm_check_add(box);
    elm_object_text_set(check, "Hide Toolbar");

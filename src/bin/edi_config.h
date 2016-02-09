@@ -77,6 +77,7 @@ struct _Edi_Project_Config
         unsigned int width_marker, tabstop;
 
         Eina_Bool toolbar_hidden;
+        Eina_Bool tab_inserts_spaces;
      } gui;
 
    Eina_List *tabs;
