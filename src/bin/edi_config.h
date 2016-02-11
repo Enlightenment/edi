@@ -67,7 +67,7 @@ struct _Edi_Project_Config
         int size;
      } font;
 
-   struct 
+   struct
      {
         Eina_Bool translucent;
         int width, height, bottomtab;

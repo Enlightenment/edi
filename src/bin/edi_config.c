@@ -87,7 +87,7 @@ _edi_config_descriptor_new(const char *name, int size)
 {
    Eet_Data_Descriptor_Class eddc;
 
-   if (!eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), 
+   if (!eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc),
                                                   name, size))
      return NULL;
 
@@ -157,7 +157,7 @@ _edi_config_domain_load(const char *dir, const char *domain, Eet_Data_Descriptor
    return NULL;
 }
 
-static Eina_Bool 
+static Eina_Bool
 _edi_config_domain_save(const char *dir, const char *domain, Eet_Data_Descriptor *edd, const void *data)
 {
    Eet_File *ef;
@@ -187,7 +187,7 @@ _edi_config_domain_save(const char *dir, const char *domain, Eet_Data_Descriptor
 }
 
 /* external functions */
-Eina_Bool 
+Eina_Bool
 _edi_config_init(void)
 {
    elm_need_efreet();
@@ -261,7 +261,7 @@ _edi_config_init(void)
    return EINA_TRUE;
 }
 
-Eina_Bool 
+Eina_Bool
 _edi_config_shutdown(void)
 {
    _edi_config_cb_free();
@@ -279,7 +279,7 @@ _edi_config_shutdown(void)
    return EINA_TRUE;
 }
 
-void 
+void
 _edi_config_load(void)
 {
    Eina_Bool save = EINA_FALSE;
@@ -304,7 +304,7 @@ _edi_config_load(void)
         if (reload) _edi_config_cb_free();
      }
 
-   if (!_edi_config) 
+   if (!_edi_config)
      {
         _edi_config = calloc(1, sizeof(Edi_Config));
         save = EINA_TRUE;
@@ -329,7 +329,7 @@ _edi_config_load(void)
    if (save) _edi_config_save();
 }
 
-void 
+void
 _edi_config_save(void)
 {
    if (_edi_config_domain_save(_edi_config_dir_get(), PACKAGE_NAME, _edi_cfg_edd, _edi_config))
@@ -485,7 +485,7 @@ _edi_project_config_save_no_notify()
    return _edi_config_domain_save(_edi_project_config_dir_get(), PACKAGE_NAME, _edi_proj_cfg_edd, _edi_project_config);
 }
 
-void 
+void
 _edi_project_config_save()
 {
    if (_edi_project_config_save_no_notify())

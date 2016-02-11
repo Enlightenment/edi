@@ -3,7 +3,7 @@
 #endif
 
 /*
- * Search for, and possibly replace, text within an entry based on what is entered into 
+ * Search for, and possibly replace, text within an entry based on what is entered into
  * the search and replace entry boxes.
  *
  * Based largely on code in Ecrire by Tom Hacohen <tom@stosb.com>
