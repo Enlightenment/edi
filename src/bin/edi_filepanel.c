@@ -19,7 +19,7 @@ static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
 
-static Evas_Object *menu, *_main_win;
+static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
 static const char *_menu_cb_path;
 
 static void
@@ -408,11 +408,119 @@ _edi_filepanel_reload()
    free(dir);
 }
 
+/* Panel filtering */
+
+static Eina_Bool
+_filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key)
+{
+   if (!strlen((char *)key)) return EINA_TRUE;
+
+   if (strstr(basename((char *)data), (char *)key))
+     return EINA_TRUE;
+
+   return EINA_FALSE;
+}
+
+static void
+_filter_clear(Evas_Object *filter)
+{
+   elm_object_text_set(filter, NULL);
+}
+
+static void
+_filter_clear_bt_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   _filter_clear((Evas_Object *)data);
+}
+
+static void
+_filter_cancel_bt_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   _filter_clear((Evas_Object *)data);
+
+   evas_object_hide(_filter_box);
+   elm_box_unpack(_filepanel_box, _filter_box);
+}
+
+static void
+_filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   Evas_Object *tree;
+   const char *match;
+
+   tree = (Evas_Object *)data;
+   match = elm_object_text_get(obj);
+
+   if (!match || strlen(match) == 0)
+     elm_genlist_filter_set(tree, NULL);
+   else
+     elm_genlist_filter_set(tree, (void *)strdup(match));
+}
+
+void
+edi_filepanel_search()
+{
+   elm_box_pack_start(_filepanel_box, _filter_box);
+   evas_object_show(_filter_box);
+   elm_object_focus_set(_filter, EINA_TRUE);
+}
+
+/* Panel setup */
+
 void
 edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
                   const char *path, edi_filepanel_item_clicked_cb cb)
 {
+   Evas_Object *box, *hbox, *filter, *clear, *cancel, *icon;
    const char *sharedpath;
+
+   box = elm_box_add(parent);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_homogeneous_set(box, EINA_FALSE);
+   evas_object_show(box);
+   elm_box_pack_end(parent, box);
+   _filepanel_box = box;
+
+   hbox = elm_box_add(box);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_FALSE);
+   _filter_box = hbox;
+
+   filter = elm_entry_add(hbox);
+   elm_entry_scrollable_set(filter, EINA_TRUE);
+   elm_entry_single_line_set(filter, EINA_TRUE);
+   elm_object_part_text_set(filter, "guide", "Find file");
+   evas_object_size_hint_weight_set(filter, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(filter, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_entry_editable_set(filter, EINA_TRUE);
+   evas_object_show(filter);
+   elm_box_pack_end(hbox, filter);
+   _filter = filter;
+
+   clear = elm_button_add(hbox);
+   evas_object_smart_callback_add(clear, "clicked", _filter_clear_bt_cb, filter);
+   evas_object_show(clear);
+   elm_box_pack_end(hbox, clear);
+
+   icon = elm_icon_add(clear);
+   elm_icon_order_lookup_set(icon, ELM_ICON_LOOKUP_FDO_THEME);
+   evas_object_size_hint_min_set(icon, 14 * elm_config_scale_get(), 14 * elm_config_scale_get());
+   elm_icon_standard_set(icon, "edit-clear");
+   elm_object_part_content_set(clear, "icon", icon);
+
+   cancel = elm_button_add(hbox);
+   evas_object_smart_callback_add(cancel, "clicked", _filter_cancel_bt_cb, filter);
+   evas_object_show(cancel);
+   elm_box_pack_end(hbox, cancel);
+
+   icon = elm_icon_add(cancel);
+   elm_icon_order_lookup_set(icon, ELM_ICON_LOOKUP_FDO_THEME);
+   evas_object_size_hint_min_set(icon, 14 * elm_config_scale_get(), 14 * elm_config_scale_get());
+   elm_icon_standard_set(icon, "window-close");
+   elm_object_part_content_set(cancel, "icon", icon);
 
    list = elm_genlist_add(parent);
    elm_genlist_homogeneous_set(list, EINA_TRUE);
@@ -421,6 +529,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
+   elm_box_pack_end(box, list);
 
    sharedpath = eina_stringshare_add(path);
    evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
@@ -438,6 +547,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    itc.item_style = "default";
    itc.func.text_get = _text_get;
    itc.func.content_get = _content_get;
+   itc.func.filter_get = _filter_get;
    itc.func.del = _item_del;
 
    itc2.item_style = "default";
@@ -449,8 +559,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    _open_cb = cb;
    _main_win = win;
    _populate(list, path, NULL, NULL);
-
-   elm_box_pack_end(parent, list);
+   evas_object_smart_callback_add(filter, "changed", _filter_key_down_cb, list);
 }
 
 const char *

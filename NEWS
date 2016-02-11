@@ -6,6 +6,7 @@ Features:
 
   * Option to inserts spaces instead of tabs
   * Update to EFFL 1.17 release for better toolbar handling
+  * Add file filtering for hunting down files in the list
 
 Bug fixes:
 
