@@ -5,7 +5,7 @@ AC_PREREQ([2.65])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall color-tests])
+AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall color-tests subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 
