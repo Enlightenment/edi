@@ -7,6 +7,7 @@ Features:
   * Option to inserts spaces instead of tabs
   * Update to EFL 1.17 release for better toolbar handling
   * Add file filtering for hunting down files in the list
+  * Double click to select word, triple click to select line
 
 Bug fixes:
 
