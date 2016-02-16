@@ -111,6 +111,13 @@ void edi_mainview_new_window();
 void edi_mainview_close();
 
 /**
+ * Close all open files.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_closeall();
+
+/**
  * Cut the current selection into the clipboard.
  *
  * @ingroup Content

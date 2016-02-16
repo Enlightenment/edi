@@ -705,6 +705,13 @@ _edi_menu_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_closeall_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   edi_mainview_closeall();
+}
+
+static void
 _edi_menu_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
@@ -815,6 +822,7 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
    elm_menu_item_add(menu, menu_it, "stock_close", "Close", _edi_menu_close_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "stock_close", "Close all", _edi_menu_closeall_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "preferences-desktop", "Settings", _edi_menu_settings_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);

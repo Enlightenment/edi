@@ -479,22 +479,42 @@ edi_mainview_new_window()
    edi_mainview_open_window_path(item->path);
 }
 
+static void
+_edi_mainview_close_item(Edi_Mainview_Item *item)
+{
+   if (!item)
+     return;
+
+   elm_naviframe_item_promote(item->view);
+   elm_naviframe_item_pop(nf);
+   elm_object_item_del(item->tab);
+   _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
+
+   _edi_project_config_tab_remove(item->path);
+   eina_stringshare_del(item->path);
+   free(item);
+}
+
 void
 edi_mainview_close()
 {
    Edi_Mainview_Item *item;
 
    item = edi_mainview_item_current_get();
-   if (!item)
-     return;
 
-   elm_naviframe_item_pop(nf);
-   elm_object_item_del(elm_toolbar_selected_item_get(tb));
-   _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
+   _edi_mainview_close_item(item);
+}
 
-   _edi_project_config_tab_remove(item->path);
-   eina_stringshare_del(item->path);
-   free(item);
+void
+edi_mainview_closeall()
+{
+   Eina_List *list, *next;
+   Edi_Mainview_Item *item;
+
+   EINA_LIST_FOREACH_SAFE(_edi_mainview_items, list, next, item)
+     {
+        _edi_mainview_close_item(item);
+     }
 }
 
 void
