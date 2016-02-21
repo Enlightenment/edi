@@ -1,6 +1,7 @@
 2016-02-21 ajwillia.ms (Andy Williams)
 
 	* Fix crash when deleting a selection ending in newline
+	* Begin the re-add of the undo feature (just text insertion now)
 
 2016-02-11 ajwillia.ms (Andy Williams)
 

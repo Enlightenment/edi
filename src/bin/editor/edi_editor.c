@@ -52,86 +52,13 @@ _edi_editor_autosave_cb(void *data)
    return ECORE_CALLBACK_CANCEL;
 }
 
-static void
-_undo_do(Edi_Editor *editor, Elm_Entry_Change_Info *inf)
-{
-   if (inf->insert)
-     {
-        const Evas_Object *tb = elm_entry_textblock_get(editor->entry);
-        Evas_Textblock_Cursor *mcur, *end;
-        mcur = (Evas_Textblock_Cursor *) evas_object_textblock_cursor_get(tb);
-        end = evas_object_textblock_cursor_new(tb);
 
-        if (inf->insert)
-          {
-             elm_entry_cursor_pos_set(editor->entry, inf->change.insert.pos);
-             evas_textblock_cursor_pos_set(end, inf->change.insert.pos +
-                   inf->change.insert.plain_length);
-          }
-        else
-          {
-             elm_entry_cursor_pos_set(editor->entry, inf->change.del.start);
-             evas_textblock_cursor_pos_set(end, inf->change.del.end);
-          }
-
-        evas_textblock_cursor_range_delete(mcur, end);
-        evas_textblock_cursor_free(end);
-        elm_entry_calc_force(editor->entry);
-     }
-   else
-     {
-        if (inf->insert)
-          {
-             elm_entry_cursor_pos_set(editor->entry, inf->change.insert.pos);
-             elm_entry_entry_insert(editor->entry, inf->change.insert.content);
-          }
-        else
-          {
-             size_t start;
-             start = (inf->change.del.start < inf->change.del.end) ?
-                inf->change.del.start : inf->change.del.end;
-
-             elm_entry_cursor_pos_set(editor->entry, start);
-             elm_entry_entry_insert(editor->entry, inf->change.insert.content);
-             elm_entry_cursor_pos_set(editor->entry, inf->change.del.end);
-          }
-     }
-}
 
 static void
-_undo_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Elm_Entry_Change_Info *change;
    Edi_Editor *editor = data;
 
-   if (!eina_list_next(editor->undo_stack))
-      return;
-
-   change = eina_list_data_get(editor->undo_stack);
-   _undo_do(editor, change);
-   editor->undo_stack = eina_list_next(editor->undo_stack);
-}
-
-static void
-_changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
-{
-   Elm_Entry_Change_Info *change;
-   Edi_Editor *editor = data;
-/*
-TODO move this code into elm_code for undo/redo
-   change = calloc(1, sizeof(*change));
-   memcpy(change, event_info, sizeof(*change));
-   if (change->insert)
-     {
-        eina_stringshare_ref(change->change.insert.content);
-     }
-   else
-     {
-        eina_stringshare_ref(change->change.del.content);
-     }
-
-   editor->undo_stack = eina_list_prepend(editor->undo_stack, change);
-*/
    editor->modified = EINA_TRUE;
 
    if (editor->save_timer)
@@ -183,10 +110,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
         else if (!strcmp(ev->key, "g"))
           {
              edi_mainview_goto_popup_show();
-          }
-        else if (!strcmp(ev->key, "z"))
-          {
-             _undo_cb(editor, obj, event);
           }
      }
 }
