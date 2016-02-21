@@ -581,6 +581,13 @@ _tb_close_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNU
 }
 
 static void
+_tb_undo_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+   edi_mainview_undo();
+}
+
+static void
 _tb_cut_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
@@ -726,6 +733,13 @@ _edi_menu_quit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_undo_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   edi_mainview_undo();
+}
+
+static void
 _edi_menu_cut_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                  void *event_info EINA_UNUSED)
 {
@@ -829,6 +843,8 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "application-exit", "Quit", _edi_menu_quit_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Edit", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-undo", "Undo", _edi_menu_undo_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-cut", "Cut", _edi_menu_cut_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-copy", "Copy", _edi_menu_copy_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-paste", "Paste", _edi_menu_paste_cb, NULL);
@@ -879,6 +895,8 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
+   tb_it = elm_toolbar_item_append(tb, "edit-undo", "Undo", _tb_undo_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);

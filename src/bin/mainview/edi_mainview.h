@@ -40,7 +40,7 @@ void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
 /**
  * @}
  *
- * 
+ *
  * @brief Content management functions.
  * @defgroup Content
  *
@@ -116,6 +116,13 @@ void edi_mainview_close();
  * @ingroup Content
  */
 void edi_mainview_closeall();
+
+/**
+ * Undo the most recent change in the current view.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_undo();
 
 /**
  * Cut the current selection into the clipboard.

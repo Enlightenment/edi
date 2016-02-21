@@ -524,6 +524,21 @@ edi_mainview_closeall()
 }
 
 void
+edi_mainview_undo()
+{
+   Evas_Object *content;
+   Elm_Object_Item *it;
+   Edi_Editor *editor;
+
+   it = elm_naviframe_top_item_get(nf);
+   content = elm_object_item_content_get(it);
+   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+
+   if (editor)
+     elm_code_widget_undo(editor->entry);
+}
+
+void
 edi_mainview_cut()
 {
    Evas_Object *content;
