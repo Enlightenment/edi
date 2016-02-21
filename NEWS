@@ -13,6 +13,7 @@ Bug fixes:
 
   * Focus input popups when they appear
   * Support fish and other non-bash shells for build & test
+  * Fix crash when deleting a selection ending with newline
 
 
 =======
