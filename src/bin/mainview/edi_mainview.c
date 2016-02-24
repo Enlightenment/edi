@@ -720,7 +720,7 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_show(nf);
 
    txt = elm_label_add(parent);
-   elm_object_text_set(txt, "Welcome - tap a file to edit");
+   elm_object_text_set(txt, "Welcome - click on a file to edit");
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
