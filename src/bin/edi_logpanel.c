@@ -47,12 +47,11 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
 }
 
 static Eina_Bool
-_edi_logpanel_line_cb(void *data EINA_UNUSED, Eo *obj EINA_UNUSED,
-                      const Eo_Event_Description *desc EINA_UNUSED, void *event_info)
+_edi_logpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
 
-   line = (Elm_Code_Line *)event_info;
+   line = (Elm_Code_Line *)event->event_info;
 
    if (line->data)
      line->status = ELM_CODE_STATUS_TYPE_ERROR;
@@ -75,10 +74,9 @@ void edi_logpanel_add(Evas_Object *parent)
 
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
-   eo_do(widget,
-         elm_obj_code_widget_font_set(_edi_project_config->font.name, _edi_project_config->font.size),
-         elm_obj_code_widget_gravity_set(0.0, 1.0),
-         eo_event_callback_add(&ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_logpanel_line_cb, NULL));
+   elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
+   eo_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_logpanel_line_cb, NULL);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
