@@ -558,9 +558,6 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
    evas_object_smart_callback_add(widget, "line,gutter,clicked", _gutter_clicked_cb, editor);
-/*
-   evas_object_smart_callback_add(txt, "undo,request", _undo_cb, editor);
-*/
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
