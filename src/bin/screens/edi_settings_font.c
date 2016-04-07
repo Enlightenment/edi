@@ -49,7 +49,34 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    return widget;
 }
 
-static int
+static Eina_Bool
+_font_monospaced_check(const char *name, Evas_Object *parent)
+{
+   Evas_Object *textblock;
+   Evas_Coord w1, w2, h1, h2;
+
+   textblock = evas_object_text_add(parent);
+   evas_object_size_hint_weight_set(textblock, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(textblock, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(textblock);
+
+   evas_object_text_font_set(textblock, name, 14);
+   evas_object_text_text_set(textblock, "i");
+
+   // check width is consistent - i.e. monospaced
+   evas_object_geometry_get(textblock, NULL, NULL, &w1, &h1);
+
+   evas_object_text_text_set(textblock, "m");
+   evas_object_geometry_get(textblock, NULL, NULL, &w2, NULL);
+
+   // also check that height varies i.e. not fixed
+   evas_object_text_font_set(textblock, name, 4);
+   evas_object_geometry_get(textblock, NULL, NULL, NULL, &h2);
+
+   return w1 == w2 && h1 != h2;
+}
+
+static void
 _parse_font_name(const char *full_name,
                  const char **name, const char **pretty_name)
 {
@@ -65,14 +92,11 @@ _parse_font_name(const char *full_name,
 
    font_len = strlen(full_name);
    if (font_len >= sizeof(buf))
-     return -1;
+     return;
+
    style = strchr(full_name, ':');
    if (style)
      font_len = (size_t)(style - full_name);
-
-   if (elm_code_text_strnpos(full_name, font_len, "Mono", 0) == ELM_CODE_TEXT_NOT_FOUND &&
-       elm_code_text_strnpos(full_name, font_len, "mono", 0) == ELM_CODE_TEXT_NOT_FOUND)
-      return -1;
 
    s = strchr(full_name, ',');
    if (s && style && s < style)
@@ -132,7 +156,6 @@ _parse_font_name(const char *full_name,
      *s = '\0';
 
    *pretty_name = eina_stringshare_add_length(buf, len);
-   return 0;
 }
 
 static void
@@ -303,7 +326,8 @@ edi_settings_font_add(Evas_Object *opbox)
         if (!eina_hash_find(fonthash, fname))
           {
              f = calloc(1, sizeof(Font));
-             if (_parse_font_name(fname, &f->full_name, &f->pretty_name) < 0)
+             _parse_font_name(fname, &f->full_name, &f->pretty_name);
+             if (!_font_monospaced_check(f->full_name, opbox))
                {
                   free(f);
                   continue;
