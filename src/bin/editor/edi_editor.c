@@ -466,15 +466,36 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 }
 
 static void
-_gutter_clicked_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                   void *event_info)
+_mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
+             Evas_Object *obj EINA_UNUSED, void *event_info)
 {
-   Elm_Code_Line *line;
+   Elm_Code_Widget *widget;
+   Evas_Object *popup;
+   Evas_Event_Mouse_Up *event;
+   unsigned int row;
+   int col;
+   const char *word;
 
-   line = (Elm_Code_Line *)event_info;
+   widget = (Elm_Code_Widget *)data;
+   event = (Evas_Event_Mouse_Up *)event_info;
 
-   if (line->status_text)
-     printf("CLANG %s\n", line->status_text);
+   if (event->button != 3)
+     return;
+
+   elm_code_widget_position_at_coordinates_get(widget, event->canvas.x, event->canvas.y, &row, &col);
+   elm_code_widget_selection_select_word(widget, row, col);
+   word = elm_code_widget_selection_text_get(widget);
+   if (!word || !strlen(word))
+     return;
+
+   popup = elm_popup_add(widget);
+   elm_popup_timeout_set(popup,1.5);
+
+   elm_object_style_set(popup, "transparent");
+   elm_object_part_text_set(popup, "title,text", word);
+   elm_object_text_set(popup, "No help available for this term");
+
+   evas_object_show(popup);
 }
 
 static void
@@ -557,7 +578,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
-   evas_object_smart_callback_add(widget, "line,gutter,clicked", _gutter_clicked_cb, editor);
+   evas_object_event_callback_add(widget, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, widget);
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
