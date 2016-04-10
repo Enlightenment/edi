@@ -455,9 +455,6 @@ Evas_Object *edi_welcome_show()
    elm_box_pack_end(box, button);
    evas_object_show(button);
 
-   evas_object_resize(win, 480 * elm_config_scale_get(), 260 * elm_config_scale_get());
-   evas_object_show(win);
-
    item = elm_naviframe_item_push(naviframe,
                                 "Choose Project",
                                 NULL,
@@ -466,6 +463,8 @@ Evas_Object *edi_welcome_show()
                                 NULL);
 
    elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
+   evas_object_show(win);
+   evas_object_resize(win, 480 * elm_config_scale_get(), 260 * elm_config_scale_get());
 
    return win;
 }
