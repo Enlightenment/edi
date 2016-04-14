@@ -51,7 +51,7 @@ _edi_logpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
 
-   line = (Elm_Code_Line *)event->event_info;
+   line = (Elm_Code_Line *)event->info;
 
    if (line->data)
      line->status = ELM_CODE_STATUS_TYPE_ERROR;

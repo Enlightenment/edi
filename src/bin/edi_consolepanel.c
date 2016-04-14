@@ -91,7 +91,7 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Eo_Event *event)
    char *path, *terminated;
    unsigned int length;
 
-   line = (Elm_Code_Line *)event->event_info;
+   line = (Elm_Code_Line *)event->info;
    content = elm_code_line_text_get(line, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));
@@ -118,7 +118,7 @@ _edi_consolepanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
 
-   line = (Elm_Code_Line *)event->event_info;
+   line = (Elm_Code_Line *)event->info;
 
    if (line->data)
      line->status = ELM_CODE_STATUS_TYPE_ERROR;
@@ -274,7 +274,7 @@ _edi_testpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
 
-   line = (Elm_Code_Line *)event->event_info;
+   line = (Elm_Code_Line *)event->info;
 
    if (!line->data)
      return EO_CALLBACK_CONTINUE;
