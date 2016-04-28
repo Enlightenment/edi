@@ -363,7 +363,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
         icon_button = elm_button_add(box);
         ic = elm_icon_add(icon_button);
         elm_icon_standard_set(ic, "edit-delete");
-        elm_image_resizable_set(ic, EINA_FALSE, EINA_FALSE);
+        elm_image_resizable_set(ic, EINA_FALSE, EINA_TRUE);
 
         label = elm_label_add(box);
         elm_object_text_set(label, display);
