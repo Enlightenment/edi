@@ -855,8 +855,8 @@ _edi_menu_setup(Evas_Object *win)
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "dialog-ok", "Test", _edi_menu_test_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "stock_media-play", "Run", _edi_menu_run_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "media-record", "Test", _edi_menu_test_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "media-playback-start", "Run", _edi_menu_run_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
@@ -883,7 +883,6 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_align_set(tb, 0.0);
-   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
    elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(tb, 0.86, 0.0);
@@ -911,8 +910,8 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "dialog-ok", "Test", _tb_test_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "stock_media-play", "Run", _tb_run_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "media-record", "Test", _tb_test_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "media-playback-start", "Run", _tb_run_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
 
    elm_box_pack_end(box, tb);
@@ -923,7 +922,6 @@ edi_toolbar_setup(Evas_Object *win)
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_align_set(tb, 1.0);
-   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
    elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(tb, 0.14, 0.0);

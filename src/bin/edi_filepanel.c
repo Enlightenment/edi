@@ -176,7 +176,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    Evas_Object *ic;
    ic = elm_icon_add(obj);
-   elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_FDO_THEME);
    if (provider)
      elm_icon_standard_set(ic, provider->icon);
    else
@@ -212,7 +211,6 @@ _content_dir_get(void *data EINA_UNUSED, Evas_Object *obj, const char *source)
      return NULL;
 
    ic = elm_icon_add(obj);
-   elm_icon_order_lookup_set(ic, ELM_ICON_LOOKUP_FDO_THEME);
    elm_icon_standard_set(ic, "folder");
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    evas_object_show(ic);
@@ -506,7 +504,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_box_pack_end(hbox, clear);
 
    icon = elm_icon_add(clear);
-   elm_icon_order_lookup_set(icon, ELM_ICON_LOOKUP_FDO_THEME);
    evas_object_size_hint_min_set(icon, 14 * elm_config_scale_get(), 14 * elm_config_scale_get());
    elm_icon_standard_set(icon, "edit-clear");
    elm_object_part_content_set(clear, "icon", icon);
@@ -517,7 +514,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_box_pack_end(hbox, cancel);
 
    icon = elm_icon_add(cancel);
-   elm_icon_order_lookup_set(icon, ELM_ICON_LOOKUP_FDO_THEME);
    evas_object_size_hint_min_set(icon, 14 * elm_config_scale_get(), 14 * elm_config_scale_get());
    elm_icon_standard_set(icon, "window-close");
    elm_object_part_content_set(cancel, "icon", icon);

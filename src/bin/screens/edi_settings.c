@@ -443,7 +443,6 @@ edi_settings_show(Evas_Object *mainwin)
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_horizontal_set(tb, EINA_FALSE);
-   elm_toolbar_icon_order_lookup_set(tb, ELM_ICON_LOOKUP_FDO_THEME);
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tb, 0.0, EVAS_HINT_FILL);
    elm_table_pack(table, tb, 0, 0, 1, 5);
