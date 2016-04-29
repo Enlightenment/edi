@@ -53,7 +53,7 @@ static const Ecore_Getopt optdesc = {
   "%prog [options]",
   PACKAGE_VERSION,
   COPYRIGHT,
-  "BSD with advertisement clause",
+  "3 clause BSD license",
   "An EFL ${edi_name} program",
   0,
   {
