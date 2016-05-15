@@ -3,6 +3,7 @@
 #endif
 
 #include <libgen.h>
+#include <regex.h>
 
 #include <Eina.h>
 #include <Eio.h>
@@ -20,7 +21,9 @@ static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
 
 static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
-static const char *_menu_cb_path;
+static const char *_menu_cb_path, *_root_path;
+static regex_t _filter_regex;
+static Eina_Bool _filter_set = EINA_FALSE;
 
 static void
 _populate(Evas_Object *obj, const char *path, Elm_Object_Item *parent_it, const char *selected);
@@ -409,20 +412,22 @@ _edi_filepanel_reload()
 /* Panel filtering */
 
 static Eina_Bool
-_filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key)
+_filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
 {
-   if (!strlen((char *)key)) return EINA_TRUE;
+   const char *relative;
 
-   if (strstr(basename((char *)data), (char *)key))
-     return EINA_TRUE;
+   if (!_filter_set) return EINA_TRUE;
 
-   return EINA_FALSE;
+   relative = (char *)data + strlen(_root_path);
+   return !regexec(&_filter_regex, relative, 0, NULL, 0);
 }
 
 static void
 _filter_clear(Evas_Object *filter)
 {
    elm_object_text_set(filter, NULL);
+   _filter_set = EINA_FALSE;
+   regfree(&_filter_regex);
 }
 
 static void
@@ -449,7 +454,10 @@ _filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
    tree = (Evas_Object *)data;
    match = elm_object_text_get(obj);
 
-   if (!match || strlen(match) == 0)
+   regfree(&_filter_regex);
+   _filter_set = !regcomp(&_filter_regex, match, REG_NOSUB | REG_ICASE);
+
+   if (!match || strlen(match) == 0 || !_filter_set)
      elm_genlist_filter_set(tree, NULL);
    else
      elm_genlist_filter_set(tree, (void *)strdup(match));
@@ -470,7 +478,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
                   const char *path, edi_filepanel_item_clicked_cb cb)
 {
    Evas_Object *box, *hbox, *filter, *clear, *cancel, *icon;
-   const char *sharedpath;
 
    box = elm_box_add(parent);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -527,13 +534,13 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    evas_object_show(list);
    elm_box_pack_end(box, list);
 
-   sharedpath = eina_stringshare_add(path);
+   _root_path = eina_stringshare_add(path);
    evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
                                   _item_clicked_cb, NULL);
-   ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
-   ecore_event_handler_add(EIO_MONITOR_FILE_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
-   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
-   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, sharedpath);
+   ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
+   ecore_event_handler_add(EIO_MONITOR_FILE_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
+   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
+   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
 
    evas_object_smart_callback_add(list, "expand,request", _on_list_expand_req, parent);
    evas_object_smart_callback_add(list, "contract,request", _on_list_contract_req, parent);
