@@ -462,8 +462,8 @@ Evas_Object *edi_welcome_show()
                                 NULL);
 
    elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
+   evas_object_resize(win, ELM_SCALE_SIZE(480), ELM_SCALE_SIZE(260));
    evas_object_show(win);
-   evas_object_resize(win, 480 * elm_config_scale_get(), 260 * elm_config_scale_get());
 
    return win;
 }
