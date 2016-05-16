@@ -50,7 +50,7 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime);
  * Look up a content provider based on a provider id.
  * This is useful for overriding mime-type based lookup.
  *
- * @param mime the id of a provider you wish to get a handle for.
+ * @param id the id of a provider you wish to get a handle for.
  *
  * @return an Edi_Content_Provider if one is registered or NULL otherwise
  *
