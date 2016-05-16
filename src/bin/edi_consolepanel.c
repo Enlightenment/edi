@@ -254,7 +254,7 @@ _edi_test_line_parse_suite(const char *path)
              _edi_test_fail++;
              elm_code_file_line_append(_edi_test_code->file, line->start, line->length, strdup(_current_test_dir));
           }
-        else if (_edi_test_line_contains(line->start, 10, "*** Error"))
+        else if (_edi_test_line_contains(line->start, line->length, ":E:"))
           {
              _edi_test_count++;
              _edi_test_fail++;
