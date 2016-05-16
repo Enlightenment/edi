@@ -414,7 +414,15 @@ _edi_filepanel_reload()
 static Eina_Bool
 _filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
 {
+   Edi_Build_Provider *provider;
    const char *relative;
+
+   provider = edi_build_provider_for_project_get();
+   if (provider)
+     {
+        if (provider->file_hidden_is((char *)data))
+          return EINA_FALSE;
+     }
 
    if (!_filter_set) return EINA_TRUE;
 
@@ -458,7 +466,7 @@ _filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
    _filter_set = !regcomp(&_filter_regex, match, REG_NOSUB | REG_ICASE);
 
    if (!match || strlen(match) == 0 || !_filter_set)
-     elm_genlist_filter_set(tree, NULL);
+     elm_genlist_filter_set(tree, "");
    else
      elm_genlist_filter_set(tree, (void *)strdup(match));
 }
@@ -528,6 +536,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    list = elm_genlist_add(parent);
    elm_genlist_homogeneous_set(list, EINA_TRUE);
    elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_ALWAYS);
+   elm_genlist_filter_set(list, "");
    evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
