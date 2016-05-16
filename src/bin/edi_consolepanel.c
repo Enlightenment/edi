@@ -72,7 +72,7 @@ static void _edi_consolepanel_parse_directory(const char *line)
    const char *pos;
 
    pos = strstr(line, "Entering directory ");
-   if (pos) 
+   if (pos)
      {
         if (_current_dir)
           eina_stringshare_del(_current_dir);
@@ -249,6 +249,12 @@ _edi_test_line_parse_suite(const char *path)
              continue;
           }
         else if (_edi_test_line_contains(line->start, line->length, ":F:"))
+          {
+             _edi_test_count++;
+             _edi_test_fail++;
+             elm_code_file_line_append(_edi_test_code->file, line->start, line->length, strdup(_current_test_dir));
+          }
+        else if (_edi_test_line_contains(line->start, 10, "*** Error"))
           {
              _edi_test_count++;
              _edi_test_fail++;
