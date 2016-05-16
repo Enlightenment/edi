@@ -1,4 +1,20 @@
 =======
+Edi 0.4
+=======
+
+Features:
+
+  * Auto-detected build provider for project
+  * Filter file list based on ignored build files
+  * Allow filtering of file list using regular expressions
+  * Display build errors inline in editor
+
+Bug fixes:
+
+  * 
+
+
+=======
 Edi 0.3
 =======
 

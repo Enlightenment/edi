@@ -1,3 +1,16 @@
+2016-05-16 ajwillia.ms (Andy Williams)
+
+	* Make build providers pluggable and auto-detected for project
+	* Filter file list based on ignored build files
+
+2016-05-15 ajwillia.ms (Andy Williams)
+
+	* Allow user searching of file list using regexp
+
+2016-03-31 ajwillia.ms (Andy Williams)
+
+	* Split elm_code lines apart and insert status messages (inline errors)
+
 2016-02-21 ajwillia.ms (Andy Williams)
 
 	* Fix crash when deleting a selection ending in newline
