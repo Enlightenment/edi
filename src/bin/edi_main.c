@@ -938,10 +938,20 @@ static char *
 _edi_win_title_get(const char *path)
 {
    char *winname, *dirname;
+   const char *type;
+   Edi_Build_Provider *provider;
+   int len;
+
+   provider = edi_build_provider_for_project_get();
+   if (provider)
+     type = provider->id;
+   else
+     type = "unknown";
 
    dirname = basename((char*)path);
-   winname = malloc((8 + strlen(dirname)) * sizeof(char));
-   snprintf(winname, 8 + strlen(dirname), "Edi :: %s", dirname);
+   len = 8 + 3 + strlen(dirname) + strlen(type);
+   winname = malloc(len * sizeof(char));
+   snprintf(winname, len, "Edi :: %s (%s)", dirname, type);
 
    return winname;
 }

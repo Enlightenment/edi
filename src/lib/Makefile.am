@@ -11,6 +11,7 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libedi.la
 
 includes_HEADERS = \
+edi_build_provider.h \
 edi_builder.h \
 edi_create.h \
 edi_path.h \
@@ -19,6 +20,8 @@ includesdir = $(includedir)/edi-@VMAJ@
 
 libedi_la_SOURCES = \
 edi_private.h \
+edi_build_provider_make.c \
+edi_build_provider.c \
 edi_builder.c \
 edi_create.c \
 edi_path.c \

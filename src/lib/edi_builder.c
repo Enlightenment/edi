@@ -12,78 +12,47 @@
 EAPI Eina_Bool
 edi_builder_can_build(void)
 {
-   return edi_project_file_exists("Makefile") ||
-          edi_project_file_exists("configure") ||
-          edi_project_file_exists("CMakeLists.txt") ||
-          edi_project_file_exists("autogen.sh");
-}
+   Edi_Build_Provider *provider;
 
-EAPI void
-_edi_builder_build_make(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
-}
+   provider = edi_build_provider_for_project_get();
 
-EAPI void
-_edi_builder_build_configure(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("./configure && make",
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
-}
-
-EAPI void
-_edi_builder_build_cmake(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && make && cd ..",
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
-}
-
-EAPI void
-_edi_builder_build_autogen(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("./autogen.sh && make",
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
+   return !!provider;
 }
 
 EAPI void
 edi_builder_build(void)
 {
-   if (edi_project_file_exists("Makefile"))
-     _edi_builder_build_make();
-   else if (edi_project_file_exists("configure"))
-     _edi_builder_build_configure();
-   else if (edi_project_file_exists("CMakeLists.txt"))
-     _edi_builder_build_cmake();
-   else if (edi_project_file_exists("autogen.sh"))
-     _edi_builder_build_autogen();
+   Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+   if (!provider)
+     return;
+
+   provider->build();
 }
 
 EAPI void
 edi_builder_test(void)
 {
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+   Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+   if (!provider)
+     return;
+
+   provider->test();
 }
 
 EAPI void
 edi_builder_clean(void)
 {
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+      Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+   if (!provider)
+     return;
+
+   provider->clean();
 }
 
 
