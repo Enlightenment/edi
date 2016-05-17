@@ -603,7 +603,6 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    (void)!evas_object_key_grab(widget, "Next", ctrl, shift | alt, 1);
    (void)!evas_object_key_grab(widget, "s", ctrl, shift | alt, 1);
    (void)!evas_object_key_grab(widget, "f", ctrl, shift | alt, 1);
-   (void)!evas_object_key_grab(widget, "z", ctrl, shift | alt, 1);
 
    evas_object_data_set(vbox, "editor", editor);
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
