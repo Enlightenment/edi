@@ -27,7 +27,7 @@ edi_about_show(Evas_Object *mainwin)
    int alpha, r, g, b;
    char buf[PATH_MAX];
 
-   win = elm_win_add(mainwin, "about", ELM_WIN_DIALOG_BASIC);
+   win = elm_win_add(mainwin, "about", ELM_WIN_BASIC);
    if (!win) return NULL;
 
    elm_win_title_set(win, "About Edi (" VERSION ")");
