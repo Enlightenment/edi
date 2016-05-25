@@ -835,8 +835,8 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "window-close", "Close", _edi_menu_close_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "window-close", "Close all", _edi_menu_closeall_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-close", "Close", _edi_menu_close_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-close", "Close all", _edi_menu_closeall_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "preferences-desktop", "Settings", _edi_menu_settings_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
@@ -889,7 +889,7 @@ edi_toolbar_setup(Evas_Object *win)
 
    tb_it = elm_toolbar_item_append(tb, "document-new", "New File", _tb_new_cb, NULL);
    tb_it = elm_toolbar_item_append(tb, "document-save", "Save", _tb_save_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "window-close", "Close", _tb_close_cb, NULL);
+   tb_it = elm_toolbar_item_append(tb, "document-close", "Close", _tb_close_cb, NULL);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
