@@ -256,7 +256,7 @@ static void
 _listing_request_cleanup(Listing_Request *lreq)
 {
    eina_stringshare_del(lreq->path);
-   eina_stringshare_del(lreq->selected);
+   eina_stringshare_del(lreq->selected_path);
    free(lreq);
 }
 
@@ -369,9 +369,9 @@ _populate(Evas_Object *obj,
    lreq->first = EINA_TRUE;
 
    if (selected)
-     lreq->selected = eina_stringshare_add(selected);
+     lreq->selected_path = eina_stringshare_add(selected);
    else
-     lreq->selected = NULL;
+     lreq->selected_path = NULL;
 
    // FIXME re-enable the monitors once we have a less intrusive manner of refreshing the file tree
    /* TODO: keep track of monitors so they can be cleaned */
