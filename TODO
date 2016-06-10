@@ -9,7 +9,6 @@ This project is in heavy development, we are currenty working towards the
 * Integrated console
 * notepad, emacs and vim and editing modes
 * Documentation finding
-* Compilation error message integrated in the flow of code
 * Cross reference for c, c++ and some scripting language
 
 The next phase is "Basic IDE" and it, along with other future phases
