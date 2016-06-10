@@ -6,7 +6,6 @@
 
 #include <Eina.h>
 #include <Elementary.h>
-#include <Elm_Code.h>
 
 #include "edi_editor.h"
 

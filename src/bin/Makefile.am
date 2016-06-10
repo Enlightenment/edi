@@ -14,8 +14,6 @@ AM_CPPFLAGS = \
 -DLOCALEDIR=\"$(datadir)/locale\" \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/bin \
--I$(top_srcdir)/elm_code/src/lib \
--I$(top_builddir)/elm_code/src/lib \
 -I$(top_builddir)/src/lib \
 -DEFL_BETA_API_SUPPORT \
 -DEFL_CFLAGS=\"$(efl_cflags_safe)\" \
@@ -50,7 +48,7 @@ mainview/edi_mainview.c \
 edi_main.c \
 edi_private.h
 
-edi_LDADD = @EFL_LIBS@ $(top_builddir)/elm_code/src/lib/libelm_code.la $(top_builddir)/src/lib/libedi.la $(LTLIBINTL)
+edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la $(LTLIBINTL)
 
 edi_build_SOURCES = \
 edi_build_main.c

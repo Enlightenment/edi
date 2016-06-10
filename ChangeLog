@@ -1,3 +1,7 @@
+2016-06-10 ajwillia.ms (Andy Williams)
+
+	* Remove elm_code from this codebase now it's within Elementary
+
 2016-05-16 ajwillia.ms (Andy Williams)
 
 	* Make build providers pluggable and auto-detected for project

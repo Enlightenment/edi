@@ -4,7 +4,6 @@
 
 #include <Elementary.h>
 #include <Ecore.h>
-#include <Elm_Code.h>
 
 #include "edi_config.h"
 

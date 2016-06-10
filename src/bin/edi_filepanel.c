@@ -6,6 +6,7 @@
 #include <regex.h>
 
 #include <Eina.h>
+#include <Elementary.h>
 #include <Eio.h>
 #include <elm_widget_fileselector.h>
 

@@ -3,10 +3,9 @@ This project is in heavy development, we are currenty working towards the
 
 * Redo changes that have been undone
 * Search / replace in project / directory
-* Integrate elm_code project (cedric, ajwillia-ms and TAsn)
-  - Code folding
-  - Automatic code indenting / formatting
-  - Code expansion (nested display of function call body)
+* Code folding
+* Automatic code indenting / formatting
+* Code expansion (nested display of function call body)
 * Integrated console
 * notepad, emacs and vim and editing modes
 * Documentation finding

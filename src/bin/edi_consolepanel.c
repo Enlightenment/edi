@@ -10,7 +10,6 @@
 
 #include <Eina.h>
 #include <Ecore.h>
-#include <Elm_Code.h>
 #include <Elementary.h>
 #include <Elementary_Cursor.h>
 #include <regex.h>

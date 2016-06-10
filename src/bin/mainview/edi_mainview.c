@@ -6,7 +6,6 @@
 
 #include <Eina.h>
 #include <Eio.h>
-#include <Elm_Code.h>
 
 #include "mainview/edi_mainview_item.h"
 #include "mainview/edi_mainview.h"

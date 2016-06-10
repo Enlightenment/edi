@@ -4,7 +4,7 @@
 
 #include <Eo.h>
 #include <Eina.h>
-#include <Elm_Code.h>
+#include <Elementary.h>
 
 #include "edi_logpanel.h"
 #include "edi_config.h"

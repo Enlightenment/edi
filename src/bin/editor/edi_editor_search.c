@@ -12,7 +12,6 @@
 
 #include <Elementary.h>
 #include <Evas.h>
-#include <Elm_Code.h>
 
 #include "edi_editor.h"
 #include "edi_private.h"

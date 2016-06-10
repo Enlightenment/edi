@@ -3,7 +3,7 @@
 #endif
 
 #include <Evas.h>
-#include <Elm_Code.h>
+#include <Elementary.h>
 
 #include "edi_content_provider.h"
 #include "editor/edi_editor.h"

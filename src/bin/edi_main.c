@@ -12,7 +12,6 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
-#include <Elm_Code.h>
 #include <Eio.h>
 
 #include "Edi.h"
