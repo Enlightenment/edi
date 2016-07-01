@@ -81,7 +81,7 @@ static void _edi_consolepanel_parse_directory(const char *line)
      }
 }
 
-static Eina_Bool
+static void
 _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Edi_Path_Options *options;
@@ -109,10 +109,9 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Eo_Event *event)
      }
 
    free(terminated);
-   return EINA_TRUE;
 }
 
-static Eina_Bool
+static void
 _edi_consolepanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
@@ -121,8 +120,6 @@ _edi_consolepanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 
    if (line->data)
      line->status = ELM_CODE_STATUS_TYPE_ERROR;
-
-   return EO_CALLBACK_CONTINUE;
 }
 
 static void _edi_consolepanel_append_line_type(const char *line, Eina_Bool err)
@@ -274,7 +271,7 @@ _edi_test_line_parse_suite(const char *path)
      }
 }
 
-static Eina_Bool
+static void
 _edi_testpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
@@ -282,14 +279,12 @@ _edi_testpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
    line = (Elm_Code_Line *)event->info;
 
    if (!line->data)
-     return EO_CALLBACK_CONTINUE;
+     return;
 
    if (!strcmp(_EDI_SUITE_PASSED, line->data))
      line->status = ELM_CODE_STATUS_TYPE_PASSED;
    else
      line->status = ELM_CODE_STATUS_TYPE_FAILED;
-
-   return EO_CALLBACK_CONTINUE;
 }
 
 static void _edi_test_line_callback(const char *content)

@@ -46,7 +46,7 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
                              (level <= EINA_LOG_LEVEL_ERR) ? _EDI_LOG_ERROR : NULL);
 }
 
-static Eina_Bool
+static void
 _edi_logpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 {
    Elm_Code_Line *line;
@@ -55,8 +55,6 @@ _edi_logpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
 
    if (line->data)
      line->status = ELM_CODE_STATUS_TYPE_ERROR;
-
-   return EO_CALLBACK_CONTINUE;
 }
 
 static Eina_Bool
