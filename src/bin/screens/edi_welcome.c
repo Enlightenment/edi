@@ -146,7 +146,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
 }
 
 static void
-_edi_welcome_project_new_directory_row_add(const char *text, const char *placeholder, int row,
+_edi_welcome_project_new_directory_row_add(const char *text, int row,
    Evas_Object *parent)
 {
    Evas_Object *label, *input;
@@ -166,10 +166,6 @@ _edi_welcome_project_new_directory_row_add(const char *text, const char *placeho
    elm_table_pack(parent, input, 1, row, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 1, 1);
    evas_object_show(input);
 
-   if (placeholder)
-     {
-        elm_object_text_set(input, placeholder);
-     }
    _create_inputs[row] = input;
 }
 
@@ -217,9 +213,11 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
 static void
 _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
+   Evas_Object *entry;
    const char *path, *name, *user, *email, *url;
 
-   path = elm_fileselector_path_get(_create_inputs[0]);
+   entry = elm_layout_content_get(_create_inputs[0], "elm.swallow.entry");
+   path = elm_object_text_get(entry);
    name = elm_object_text_get(_create_inputs[1]);
    url = elm_object_text_get(_create_inputs[2]);
    user = elm_object_text_get(_create_inputs[3]);
@@ -281,7 +279,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    username = getenv("USER");
    if (!username)
      username = getenv("USERNAME");
-   _edi_welcome_project_new_directory_row_add("Parent Path", NULL, row++, content);
+   _edi_welcome_project_new_directory_row_add("Parent Path", row++, content);
    _edi_welcome_project_new_input_row_add("Project Name", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project URL", NULL, row++, content);
    if (_edi_welcome_user_fullname_get(username, fullname, 1024) > 0)
