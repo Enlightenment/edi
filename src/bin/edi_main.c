@@ -1135,7 +1135,8 @@ _edi_log_shutdown()
 
 static const Ecore_Getopt optdesc = {
   "edi",
-  "%prog [options] [project-dir]",
+  "%prog [options] [project-dir]\n"
+    "   or: %prog [options] [file]",
   PACKAGE_VERSION,
   COPYRIGHT,
   "GPLv2",
