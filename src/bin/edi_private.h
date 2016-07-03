@@ -1,7 +1,7 @@
 #ifndef EDI_PRIVATE_H_
 # define EDI_PRIVATE_H_
 
-#include <Evas.h>
+#include <Eina.h>
 #include <Elementary.h>
 
 extern int _edi_log_dom;
@@ -31,11 +31,13 @@ extern int _edi_log_dom;
 
 #define FONT_PREVIEW " Evas *dostuff(void) {...}"
 
-Evas_Object *edi_open(const char *path);
+Eina_Bool edi_open(const char *path);
 
 void edi_close();
 
 void edi_open_url();
+
+Eina_Bool edi_noproject();
 
 // TODO remove this once our filepanel is updating gracefully
 void _edi_filepanel_reload();

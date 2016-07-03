@@ -219,6 +219,9 @@ _edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
 
    _edi_project_config_tab_remove(it->path);
    eina_stringshare_del(it->path);
+
+   if (edi_noproject())
+     edi_close();
    free(it);
 }
 

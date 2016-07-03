@@ -1018,7 +1018,7 @@ _edi_open_tabs()
      }
 }
 
-Evas_Object *
+Eina_Bool
 edi_open(const char *inputpath)
 {
    Evas_Object *win, *vbx, *content, *tb;
@@ -1028,7 +1028,7 @@ edi_open(const char *inputpath)
    if (!edi_project_set(inputpath))
      {
         fprintf(stderr, "Project path must be a directory\n");
-        return NULL;
+        return EINA_FALSE;
      }
    path = realpath(inputpath, NULL);
    _edi_project_config_load();
@@ -1039,7 +1039,7 @@ edi_open(const char *inputpath)
    winname = _edi_win_title_get(path);
    win = elm_win_util_standard_add("main", winname);
    free((char*)winname);
-   if (!win) return NULL;
+   if (!win) return EINA_FALSE;
 
    _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
@@ -1072,7 +1072,18 @@ edi_open(const char *inputpath)
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_config_changed, NULL);
 
    free(path);
-   return win;
+   return EINA_TRUE;
+}
+
+void
+edi_open_file(const char *filepath)
+{
+   // TODO we should make this window more functional (i.e. toolbar etc)
+
+   edi_project_set(eina_environment_home_get());
+
+   _edi_project_config_load();
+   edi_mainview_open_window_path(filepath);
 }
 
 void
@@ -1094,6 +1105,12 @@ edi_open_url(const char *url)
    ecore_exe_run(cmd, NULL);
 
    free(cmd);
+}
+
+Eina_Bool
+edi_noproject()
+{
+   return !_edi_main_win;
 }
 
 static Eina_Bool
@@ -1136,7 +1153,6 @@ static const Ecore_Getopt optdesc = {
 EAPI_MAIN int
 elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 {
-   Evas_Object *win;
    int args;
    Eina_Bool quit_option = EINA_FALSE;
    const char *project_path = NULL;
@@ -1191,7 +1207,11 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
         if (!edi_welcome_show())
           goto end;
      }
-   else if (!(win = edi_open(project_path)))
+   else if (!ecore_file_is_dir(project_path))
+     {
+        edi_open_file(project_path);
+     }
+   else if (!(edi_open(project_path)))
      goto end;
 
    elm_run();

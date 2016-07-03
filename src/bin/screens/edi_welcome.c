@@ -80,7 +80,7 @@ _edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
 {
    edi_project_set(path);
 
-   if ((edi_open(edi_project_get()) == NULL) && !_edi_creating)
+   if (!edi_open(edi_project_get()) && !_edi_creating)
      {
        _edi_message_path = path;
        _edi_message_open("Apparently that project directory doesn't exist", EINA_TRUE);
