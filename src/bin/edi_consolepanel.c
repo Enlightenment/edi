@@ -337,8 +337,8 @@ void edi_consolepanel_add(Evas_Object *parent)
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
-   eo_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL);
-   eo_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
+   efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL);
+   efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -362,8 +362,8 @@ void edi_testpanel_add(Evas_Object *parent)
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
-   eo_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL);
-   eo_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
+   efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL);
+   efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
