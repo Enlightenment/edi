@@ -8,10 +8,12 @@ Features:
   * Filter file list based on ignored build files
   * Allow filtering of file list using regular expressions
   * Display build errors inline in editor
+  * Support opening a single file
 
 Bug fixes:
 
-  * 
+  * Fix some missing icons
+  * Fix about and settings window attributes
 
 
 =======
