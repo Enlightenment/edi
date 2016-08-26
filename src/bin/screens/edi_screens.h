@@ -31,6 +31,14 @@ extern "C" {
  */
 Evas_Object *edi_welcome_show();
 
+/**
+ * Initialise a new Edi welcome screen and open it on the create project panel.
+ *
+ * @return The welcome screen window that is created
+ *
+ * @ingroup UI
+ */
+Evas_Object *edi_welcome_create_show();
 
 /**
  * Initialize a new Edi about window and display it.

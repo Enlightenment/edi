@@ -683,6 +683,16 @@ _tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *even
 }
 
 static void
+_edi_menu_project_new_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                         void *event_info EINA_UNUSED)
+{
+   char path[PATH_MAX];
+
+   eina_file_path_join(path, sizeof(path), elm_app_bin_dir_get(), "edi -c");
+   ecore_exe_run(path, NULL);
+}
+
+static void
 _edi_menu_new_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                  void *event_info EINA_UNUSED)
 {
@@ -831,6 +841,8 @@ _edi_menu_setup(Evas_Object *win)
    menu = elm_win_main_menu_get(win);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "File", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", "New Project ...", _edi_menu_project_new_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
@@ -1143,6 +1155,7 @@ static const Ecore_Getopt optdesc = {
   "The Enlightened IDE",
   EINA_TRUE,
   {
+    ECORE_GETOPT_STORE_TRUE('c', "create", "Create a new project"),
     ECORE_GETOPT_LICENSE('L', "license"),
     ECORE_GETOPT_COPYRIGHT('C', "copyright"),
     ECORE_GETOPT_VERSION('V', "version"),
@@ -1155,10 +1168,11 @@ EAPI_MAIN int
 elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 {
    int args;
-   Eina_Bool quit_option = EINA_FALSE;
+   Eina_Bool create = EINA_FALSE, quit_option = EINA_FALSE;
    const char *project_path = NULL;
 
    Ecore_Getopt_Value values[] = {
+     ECORE_GETOPT_VALUE_BOOL(create),
      ECORE_GETOPT_VALUE_BOOL(quit_option),
      ECORE_GETOPT_VALUE_BOOL(quit_option),
      ECORE_GETOPT_VALUE_BOOL(quit_option),
@@ -1205,7 +1219,9 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    if (!project_path)
      {
-        if (!edi_welcome_show())
+        if (create)
+          edi_welcome_create_show();
+        else if (!edi_welcome_show())
           goto end;
      }
    else if (!ecore_file_is_dir(project_path))

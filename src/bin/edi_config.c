@@ -450,7 +450,7 @@ _edi_project_config_load()
    _edi_project_config->gui.bottomopen = EINA_FALSE;
    _edi_project_config->gui.bottomtab = 0;
 
-   _edi_project_config->gui.width_marker = 80;
+   _edi_project_config->gui.width_marker = 81;
    _edi_project_config->gui.tabstop = 8;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
 

@@ -14,7 +14,7 @@
 
 #define _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH 4
 
-static Evas_Object *_welcome_window;
+static Evas_Object *_welcome_window, *_welcome_naviframe;
 static Evas_Object *_edi_new_popup;
 static Evas_Object *_edi_welcome_list;
 static Evas_Object *_edi_project_box;
@@ -398,6 +398,7 @@ Evas_Object *edi_welcome_show()
    evas_object_size_hint_weight_set(naviframe, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_win_resize_object_add(win, naviframe);
    evas_object_show(naviframe);
+   _welcome_naviframe = naviframe;
 
    hbx = elm_box_add(naviframe);
    elm_box_horizontal_set(hbx, EINA_TRUE);
@@ -463,5 +464,16 @@ Evas_Object *edi_welcome_show()
    evas_object_resize(win, ELM_SCALE_SIZE(480), ELM_SCALE_SIZE(260));
    evas_object_show(win);
 
+   return win;
+}
+
+Evas_Object *
+edi_welcome_create_show()
+{
+   Evas_Object *win;
+
+   win = edi_welcome_show();
+
+   _edi_welcome_project_new_cb(_welcome_naviframe, NULL, NULL);
    return win;
 }
