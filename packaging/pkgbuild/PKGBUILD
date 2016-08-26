@@ -1,14 +1,13 @@
 # Maintainer: Enlightenment Developers <enlightenment-devel@enlightenment.org>
 pkgname=('edi-git' 'edi_doc-git')
-pkgver=1.8.99.8967.a1cfce6
+pkgver=0.4.99.0001
 pkgrel=1
 pkgdesc="Enlightenment toolkit edi - GIT development snapshot"
 arch=('i686' 'x86_64' 'arm')
 url="http://andywilliams.me"
 license=('WTFPL')
 makedepends=('doxygen' 'imagemagick' 'git')
-depends=('elementary-git')
-optdepends=('emotion_generic_players' 'evas_generic_loaders')
+depends=('efl-git')
 options=('!libtool' 'debug')
 provides=('edi')
 
