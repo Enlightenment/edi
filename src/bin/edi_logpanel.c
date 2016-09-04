@@ -47,7 +47,7 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
 }
 
 static void
-_edi_logpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
+_edi_logpanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
 {
    Elm_Code_Line *line;
 

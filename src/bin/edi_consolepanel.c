@@ -82,7 +82,7 @@ static void _edi_consolepanel_parse_directory(const char *line)
 }
 
 static void
-_edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Eo_Event *event)
+_edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
 {
    Edi_Path_Options *options;
    Elm_Code_Line *line;
@@ -112,7 +112,7 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Eo_Event *event)
 }
 
 static void
-_edi_consolepanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
+_edi_consolepanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
 {
    Elm_Code_Line *line;
 
@@ -272,7 +272,7 @@ _edi_test_line_parse_suite(const char *path)
 }
 
 static void
-_edi_testpanel_line_cb(void *data EINA_UNUSED, const Eo_Event *event)
+_edi_testpanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
 {
    Elm_Code_Line *line;
 
