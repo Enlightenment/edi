@@ -13,6 +13,8 @@ lib_LTLIBRARIES = lib${edi_name}.la
 includes_HEADERS = ${Edi_Name}.h
 includesdir = $(includedir)/${edi_name}-@VMAJ@
 
-lib${edi_name}_la_SOURCES = ${edi_name}.c
+lib${edi_name}_la_SOURCES = \
+${efl_name}_private.h \
+${edi_name}.c
 lib${edi_name}_la_LIBADD = @EFL_LIBS@ -lm
 lib${edi_name}_la_LDFLAGS = -no-undefined @EFL_LTLIBRARY_FLAGS@

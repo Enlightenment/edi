@@ -6,10 +6,12 @@
  * Always put system first, then EFL, then your public header,
  * and finally your private one. */
 
+#if ENABLE_NLS
+# include <libintl.h>
+#endif
+
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
-
-#include "gettext.h"
 
 #include "${Edi_Name}.h"
 
@@ -37,11 +39,13 @@ ${edi_name}_win_setup(void)
 
    label = elm_label_add(win);
    elm_object_text_set(label, " Hello World !");
-   evas_object_size_hint_weight_set(label, 0.0, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(label);
 
    elm_win_resize_object_add(win, label);
+   evas_object_resize(win, 300 * elm_config_scale_get(),
+                           200 * elm_config_scale_get());
 
    evas_object_show(win);
 

@@ -1,3 +1,5 @@
+MAINTAINERCLEANFILES = Makefile.in
+CLEANFILES = check-results.xml
 
 if EFL_HAVE_TESTS
 
@@ -5,6 +7,7 @@ check_PROGRAMS = ${edi_name}_tests
 
 ${edi_name}_tests_SOURCES = test_${edi_name}.c
 ${edi_name}_tests_CPPFLAGS = -I$(top_builddir)/src/lib/ \
+-I$(top_srcdir)/src/lib \
 -DPACKAGE_TESTS_DIR=\"$(top_srcdir)/src/tests/\" \
 -DPACKAGE_BUILD_DIR=\"`pwd`/$(top_builddir)/src/tests/\" \
 @EFL_CFLAGS@ \
