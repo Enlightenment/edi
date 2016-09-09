@@ -358,10 +358,14 @@ static void
 _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
 {
    Elm_Code *code;
+   const char *filename;
    unsigned n = clang_getNumDiagnostics(editor->tx_unit);
    unsigned i = 0;
 
+   ecore_thread_main_loop_begin();
    code = elm_code_widget_code_get(editor->entry);
+   filename = elm_code_file_path_get(code->file);
+   ecore_thread_main_loop_end();
 
    for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
      {
@@ -374,7 +378,7 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
         clang_getSpellingLocation(clang_getDiagnosticLocation(diag), &file, &line, NULL, NULL);
 
         path = clang_getFileName(file);
-        if (!clang_getCString(path) || strcmp(elm_code_file_path_get(code->file), clang_getCString(path)))
+        if (!clang_getCString(path) || strcmp(filename, clang_getCString(path)))
           continue;
 
         /* FIXME: Also handle ranges and fix suggestions. */
