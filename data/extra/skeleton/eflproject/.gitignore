@@ -58,6 +58,9 @@ po/remove-potcdate.sed
 po/remove-potcdate.sin
 po/stamp-po
 
+doc/${edi_name}.1
+data/desktop/${edi_name}.desktop
+
 /coverage/
 /src/tests/${edi_name}_tests.*
 /src/tests/test-suite.log
