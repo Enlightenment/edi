@@ -67,9 +67,6 @@ data/desktop/${edi_name}.desktop
 data/themes/Makefile
 data/themes/default/Makefile
 doc/Makefile
-packaging/Makefile
-packaging/slackware/Makefile
-packaging/pkgbuild/Makefile
 po/Makefile.in
 src/Makefile
 src/bin/Makefile
