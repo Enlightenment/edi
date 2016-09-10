@@ -22,7 +22,8 @@ _edi_logpanel_ignore(Eina_Log_Level level, const char *fnc)
    if (level <= EINA_LOG_LEVEL_DBG)
      return !strncmp(fnc, "_eo_", 4) || !strncmp(fnc, "_evas_", 6) ||
             !strncmp(fnc, "_ecore_", 7) || !strncmp(fnc, "_edje_", 6) ||
-            !strncmp(fnc, "_elm_", 5) || !strncmp(fnc, "_drm_", 5);
+            !strncmp(fnc, "_elm_", 5) || !strncmp(fnc, "_drm_", 5) ||
+            !strncmp(fnc, "_eina_", 6);
 
    return !strncmp(fnc, "_evas_object_smart_need_recalculate_set", strlen(fnc));
 }
@@ -38,6 +39,8 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
    if (_edi_logpanel_ignore(level, fnc))
      return;
 
+   // TODO figure why we get repains
+   return;
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
