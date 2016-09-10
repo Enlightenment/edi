@@ -72,7 +72,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 {
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
-   Evas_Object *content;
    Eina_Bool ctrl, alt, shift;
    Evas_Event_Key_Down *ev = event;
 
@@ -85,8 +84,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    if (!item)
      return;
 
-   content = elm_object_item_content_get(item->view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
 
    if ((!alt) && (ctrl) && (!shift))
      {

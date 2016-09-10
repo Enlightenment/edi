@@ -478,12 +478,10 @@ edi_mainview_open_window(Edi_Path_Options *options)
 void
 edi_mainview_save()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
    Elm_Code *code;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (!editor)
      return;
@@ -529,11 +527,9 @@ edi_mainview_closeall()
 void
 edi_mainview_undo()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (editor)
      elm_code_widget_undo(editor->entry);
@@ -542,11 +538,9 @@ edi_mainview_undo()
 void
 edi_mainview_cut()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (editor)
      elm_code_widget_selection_cut(editor->entry);
@@ -555,11 +549,9 @@ edi_mainview_cut()
 void
 edi_mainview_copy()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (editor)
      elm_code_widget_selection_copy(editor->entry);
@@ -568,11 +560,9 @@ edi_mainview_copy()
 void
 edi_mainview_paste()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (editor)
      elm_code_widget_selection_paste(editor->entry);
@@ -581,11 +571,9 @@ edi_mainview_paste()
 void
 edi_mainview_search()
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
 
    if (editor)
      edi_editor_search(editor);
@@ -594,12 +582,10 @@ edi_mainview_search()
 void
 edi_mainview_goto(int line)
 {
-   Evas_Object *content;
    Edi_Editor *editor;
 
-   content = elm_object_item_content_get(_current_view);
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
-   if (!content || !editor || line <= 0)
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
+   if (!editor || line <= 0)
      return;
 
    elm_code_widget_cursor_position_set(editor->entry, 1, line);
