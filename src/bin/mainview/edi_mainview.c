@@ -179,8 +179,7 @@ _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 static void
 _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 {
-   Evas_Object *content;
-   Elm_Object_Item *tab;
+   Evas_Object *content, *tab, *icon;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
    Edi_Content_Provider *provider;
@@ -192,7 +191,18 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    _edi_mainview_view_show(content);
    item->view = content;
 
-   tab = elm_toolbar_item_append(tb, provider->icon, basename((char*)options->path), _promote, content);
+   tab = elm_button_add(tb);
+   evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
+
+   elm_object_text_set(tab, basename((char*)options->path));
+   icon = elm_icon_add(tab);
+   elm_icon_standard_set(icon, provider->icon);
+   elm_object_part_content_set(tab, "icon", icon);
+   evas_object_smart_callback_add(tab, "clicked", _promote, content);
+
+   elm_box_pack_end(tb, tab);
+   evas_object_show(tab);
    item->tab = tab;
    elm_toolbar_item_selected_set(tab, EINA_TRUE);
 
@@ -307,7 +317,7 @@ _edi_mainview_item_close(Edi_Mainview_Item *item)
 
    edi_mainview_item_prev();
    evas_object_del(item->view);
-   elm_object_item_del(item->tab);
+   evas_object_del(item->tab);
    _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
 
    _edi_project_config_tab_remove(item->path);
@@ -458,7 +468,6 @@ edi_mainview_open_window(Edi_Path_Options *options)
      {
         edi_mainview_item_select(it);
         _edi_mainview_item_close(it);
-        elm_object_item_del(elm_toolbar_selected_item_get(tb));
         _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
 
         eina_stringshare_del(it->path);
@@ -677,14 +686,10 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_show(box);
    elm_box_pack_end(parent, box);
 
-   tb = elm_toolbar_add(parent);
+   tb = elm_box_add(parent);
    evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_toolbar_icon_size_set(tb, 20);
-   elm_object_style_set(tb, "item_horizontal");
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_MENU);
-   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_ALWAYS);
+   evas_object_size_hint_align_set(tb, 0.0, EVAS_HINT_FILL);
+   elm_box_horizontal_set(tb, EINA_TRUE);
    elm_box_pack_end(box, tb);
    evas_object_show(tb);
 
