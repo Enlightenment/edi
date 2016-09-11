@@ -207,13 +207,13 @@ _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 static void
 _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 {
-   Evas_Object *content, *tab, *icon;
+   Evas_Object *content, *tab;//, *icon;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
 //   Edi_Content_Provider *provider;
 
    item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
-   provider = edi_content_provider_for_id_get(item->editortype);
+//   provider = edi_content_provider_for_id_get(item->editortype);
    content = _edi_mainview_content_create(item, _content_frame);
 
    _edi_mainview_view_show(content);
