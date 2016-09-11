@@ -473,6 +473,7 @@ _mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    Elm_Code_Widget *widget;
    Evas_Object *popup;
    Evas_Event_Mouse_Up *event;
+   Eina_Bool ctrl;
    unsigned int row;
    int col;
    const char *word;
@@ -480,7 +481,8 @@ _mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    widget = (Elm_Code_Widget *)data;
    event = (Evas_Event_Mouse_Up *)event_info;
 
-   if (event->button != 3)
+   ctrl = evas_key_modifier_is_set(event->modifiers, "Control");
+   if (event->button != 3 || !ctrl)
      return;
 
    elm_code_widget_position_at_coordinates_get(widget, event->canvas.x, event->canvas.y, &row, &col);
