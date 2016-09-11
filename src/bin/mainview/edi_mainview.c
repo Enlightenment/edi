@@ -126,9 +126,37 @@ edi_mainview_item_select(Edi_Mainview_Item *item)
 }
 
 static void
-_promote(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_edi_mainview_item_close(Edi_Mainview_Item *item)
+{
+   if (!item)
+     return;
+
+   edi_mainview_item_prev();
+   evas_object_del(item->view);
+   elm_box_unpack(tb, item->tab);
+   evas_object_del(item->tab);
+   _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
+
+   _edi_project_config_tab_remove(item->path);
+   eina_stringshare_del(item->path);
+   free(item);
+
+   if (eina_list_count(_edi_mainview_items) == 0)
+     _edi_mainview_view_show(_welcome_panel);
+}
+
+static void
+_promote(void *data, Evas_Object *obj EINA_UNUSED,
+         const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
    _edi_mainview_view_show(data);
+}
+
+static void
+_closetab(void *data, Evas_Object *obj EINA_UNUSED,
+          const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
+{
+   _edi_mainview_item_close(data);
 }
 
 static Edi_Mainview_Item *
@@ -182,7 +210,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    Evas_Object *content, *tab, *icon;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
-   Edi_Content_Provider *provider;
+//   Edi_Content_Provider *provider;
 
    item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
    provider = edi_content_provider_for_id_get(item->editortype);
@@ -195,11 +223,15 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
 
-   elm_object_text_set(tab, basename((char*)options->path));
+   elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
+   elm_object_part_text_set(tab, "elm.btn.text", basename((char*)options->path));
+/*
    icon = elm_icon_add(tab);
    elm_icon_standard_set(icon, provider->icon);
    elm_object_part_content_set(tab, "icon", icon);
-   evas_object_smart_callback_add(tab, "clicked", _promote, content);
+*/
+   elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, content);
+   elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
 
    elm_box_pack_end(tb, tab);
    evas_object_show(tab);
@@ -307,25 +339,6 @@ _edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
                                    void *event_info EINA_UNUSED)
 {
    evas_object_del(_edi_mainview_choose_popup);
-}
-
-static void
-_edi_mainview_item_close(Edi_Mainview_Item *item)
-{
-   if (!item)
-     return;
-
-   edi_mainview_item_prev();
-   evas_object_del(item->view);
-   evas_object_del(item->tab);
-   _edi_mainview_items = eina_list_remove(_edi_mainview_items, item);
-
-   _edi_project_config_tab_remove(item->path);
-   eina_stringshare_del(item->path);
-   free(item);
-
-   if (eina_list_count(_edi_mainview_items) == 0)
-     _edi_mainview_view_show(_welcome_panel);
 }
 
 static void
