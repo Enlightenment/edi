@@ -876,73 +876,70 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "help-about", "About", _edi_menu_about_cb, NULL);
 }
 
+static void
+_edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_Smart_Cb func)
+{
+   Evas_Object *content;
+   Elm_Object_Item *tb_it;
+
+   tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
+   content = elm_toolbar_item_object_get(tb_it);
+   elm_object_tooltip_text_set(content, name);
+}
+
 static Evas_Object *
 edi_toolbar_setup(Evas_Object *win)
 {
-   Evas_Object *box, *tb;
+   Evas_Object *tb;
    Elm_Object_Item *tb_it;
 
-   box = elm_box_add(win);
-   elm_box_horizontal_set(box, EINA_TRUE);
-   elm_box_homogeneous_set(box, EINA_FALSE);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, 0.0);
-   evas_object_show(box);
-
-   tb = elm_toolbar_add(box);
-   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
-   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
+   tb = elm_toolbar_add(win);
+   elm_toolbar_horizontal_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 0.0);
-   elm_object_focus_allow_set(tb, EINA_FALSE);
-   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(tb, 0.86, 0.0);
-
-   tb_it = elm_toolbar_item_append(tb, "document-new", "New File", _tb_new_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "document-save", "Save", _tb_save_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "document-close", "Close", _tb_close_cb, NULL);
-
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
-   tb_it = elm_toolbar_item_append(tb, "edit-undo", "Undo", _tb_undo_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   tb_it = elm_toolbar_item_append(tb, "edit-cut", "Cut", _tb_cut_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "edit-copy", "Copy", _tb_copy_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "edit-paste", "Paste", _tb_paste_cb, NULL);
-
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
-   tb_it = elm_toolbar_item_append(tb, "edit-find-replace", "Find...", _tb_search_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "go-jump", "Goto Line", _tb_goto_cb, NULL);
-
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
-   tb_it = elm_toolbar_item_append(tb, "system-run", "Build", _tb_build_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "media-record", "Test", _tb_test_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "media-playback-start", "Run", _tb_run_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "edit-clear", "Clean", _tb_clean_cb, NULL);
-
-   elm_box_pack_end(box, tb);
-   evas_object_show(tb);
-
-   tb = elm_toolbar_add(box);
-   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
-   elm_toolbar_align_set(tb, 1.0);
    elm_object_focus_allow_set(tb, EINA_FALSE);
-   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(tb, 0.14, 0.0);
+   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
 
-   tb_it = elm_toolbar_item_append(tb, "preferences-desktop", "Settings", _tb_settings_cb, NULL);
-   tb_it = elm_toolbar_item_append(tb, "help-about", "About", _tb_about_cb, NULL);
+   _edi_toolbar_item_add(tb, "document-new", "New File", _tb_new_cb);
+   _edi_toolbar_item_add(tb, "document-save", "Save", _tb_save_cb);
+   _edi_toolbar_item_add(tb, "document-close", "Close", _tb_close_cb);
 
-   elm_box_pack_end(box, tb);
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   _edi_toolbar_item_add(tb, "edit-undo", "Undo", _tb_undo_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   _edi_toolbar_item_add(tb, "edit-cut", "Cut", _tb_cut_cb);
+   _edi_toolbar_item_add(tb, "edit-copy", "Copy", _tb_copy_cb);
+   _edi_toolbar_item_add(tb, "edit-paste", "Paste", _tb_paste_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   _edi_toolbar_item_add(tb, "edit-find-replace", "Find...", _tb_search_cb);
+   _edi_toolbar_item_add(tb, "go-jump", "Goto Line", _tb_goto_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   _edi_toolbar_item_add(tb, "system-run", "Build", _tb_build_cb);
+   _edi_toolbar_item_add(tb, "media-record", "Test", _tb_test_cb);
+   _edi_toolbar_item_add(tb, "media-playback-start", "Run", _tb_run_cb);
+   _edi_toolbar_item_add(tb, "edit-clear", "Clean", _tb_clean_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
+   _edi_toolbar_item_add(tb, "preferences-desktop", "Settings", _tb_settings_cb);
+   _edi_toolbar_item_add(tb, "help-about", "About", _tb_about_cb);
+
    evas_object_show(tb);
-   return box;
+   return tb;
 }
 
 static char *
@@ -1033,7 +1030,7 @@ _edi_open_tabs()
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *win, *vbx, *content, *tb;
+   Evas_Object *win, *hbx, *vbx, *tb, *content;
    const char *winname;
    char *path;
 
@@ -1058,15 +1055,24 @@ edi_open(const char *inputpath)
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
 
-   vbx = elm_box_add(win);
-   _edi_main_box = vbx;
-   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   elm_win_resize_object_add(win, vbx);
-   evas_object_show(vbx);
+   hbx = elm_box_add(win);
+   _edi_main_box = hbx;
+   elm_box_horizontal_set(hbx, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_win_resize_object_add(win, hbx);
+   evas_object_show(hbx);
 
-   tb = edi_toolbar_setup(win);
+   tb = edi_toolbar_setup(hbx);
    _edi_toolbar = tb;
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+
+   vbx = elm_box_add(hbx);
+   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbx, vbx);
+   evas_object_show(vbx);
+
    _edi_menu_setup(win);
 
    content = edi_content_setup(vbx, path);
