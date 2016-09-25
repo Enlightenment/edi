@@ -137,7 +137,8 @@ _edi_create_project_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
    create = (Edi_Create *)data;
 
    ecore_event_handler_del(create->handler);
-   create->callback(create->path, EINA_TRUE);
+   if (create->callback)
+     create->callback(create->path, EINA_TRUE);
 
    _edi_create_free_data();
    return ECORE_CALLBACK_DONE; // or ECORE_CALLBACK_PASS_ON
@@ -217,7 +218,8 @@ _edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 
    create = (Edi_Create *) data;
    ERR("copy error: [%s]\n", strerror(error));
-   create->callback(create->path, EINA_FALSE);
+   if (create->callback)
+     create->callback(create->path, EINA_FALSE);
 
    _edi_create_free_data();
 }
