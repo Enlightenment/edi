@@ -33,36 +33,17 @@ _make_project_supported(const char *path)
 }
 
 static Eina_Bool
-_make_file_hidden_is(const char *relative)
+_make_file_hidden_is(const char *file)
 {
-   int len;
-
-   if (!relative || strlen(relative) == 0)
+   if (!file || strlen(file) == 0)
      return EINA_FALSE;
 
-   len = strlen(relative);
-   if (relative[len-1] == 'o' && len >= 2)
-     {
-        if (relative[len-2] == '.')
-          return EINA_TRUE;
-        else
-          {
-            if ((relative[len-2] == 's' || relative[len-2] == 'l') &&
-              len >= 3 && relative[len-3] == '.')
-              return EINA_TRUE;
-          }
-     }
-   if (relative[len-1] == 'a' && len >= 2)
-     {
-        if (relative[len-2] == '.')
-          return EINA_TRUE;
-        else
-          {
-            if ((relative[len-2] == 'l') &&
-              len >= 3 && relative[len-3] == '.')
-              return EINA_TRUE;
-          }
-     }
+   if (eina_str_has_extension(file, "o") || eina_str_has_extension(file, "so") ||
+       eina_str_has_extension(file, "lo"))
+     return EINA_TRUE;
+   if (eina_str_has_extension(file, "a") || eina_str_has_extension(file, "la"))
+     return EINA_TRUE;
+
    return EINA_FALSE;
 }
 
