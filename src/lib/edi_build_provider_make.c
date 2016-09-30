@@ -52,6 +52,17 @@ _make_file_hidden_is(const char *relative)
               return EINA_TRUE;
           }
      }
+   if (relative[len-1] == 'a' && len >= 2)
+     {
+        if (relative[len-2] == '.')
+          return EINA_TRUE;
+        else
+          {
+            if ((relative[len-2] == 'l') &&
+              len >= 3 && relative[len-3] == '.')
+              return EINA_TRUE;
+          }
+     }
    return EINA_FALSE;
 }
 
