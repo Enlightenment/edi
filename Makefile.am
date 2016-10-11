@@ -31,6 +31,13 @@ MAINTAINERCLEANFILES = \
 	po/Rules-quot \
 	$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz \
 	$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.bz2
+if HAVE_FREEBSD
+pkgconfigdir = $(libdir)data/pkgconfig
+else
+pkgconfigdir = $(libdir)/pkgconfig
+endif
+
+pkgconfig_DATA = pc/edi.pc
 
 SUBDIRS = data doc packaging po src
 

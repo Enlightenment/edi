@@ -1,0 +1,21 @@
+prefix=/opt/efler
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}/edi
+pkgdatadir=${datarootdir}/edi
+vmaj=0
+vmin=4
+vmic=0
+themes=${pkgdatadir}/themes
+eoincludedir=${datarootdir}/eolian/include
+eolian_flags=-I${pc_sysrootdir}${eoincludedir}/edi-0
+
+Name: edi
+Description: Edi ide library
+Requires.private: @requirements_pc_edi@
+Version: 0.4.0
+Libs: -L${libdir} -ledi @requirements_public_libs_edi@
+Cflags: -I${includedir}/edi-0
+

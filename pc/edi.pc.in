@@ -1,0 +1,21 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+datadir=@datadir@/edi
+pkgdatadir=@datadir@/edi
+vmaj=@VMAJ@
+vmin=@VMIN@
+vmic=@VMIC@
+themes=${pkgdatadir}/themes
+eoincludedir=@datadir@/eolian/include
+eolian_flags=-I${pc_sysrootdir}${eoincludedir}/edi-@VMAJ@
+
+Name: edi
+Description: Edi ide library
+Requires.private: @requirements_pc_edi@
+Version: @VERSION@
+Libs: -L${libdir} -ledi @requirements_public_libs_edi@
+Cflags: -I${includedir}/edi-@VMAJ@
+

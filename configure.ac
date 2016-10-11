@@ -75,6 +75,8 @@ EFL_WITH_BIN([eolian], [eolian-gen], [eolian_gen])
 # Force the helper to try external eolian generators
 AM_CONDITIONAL([HAVE_EOLIAN_GEN], [true])
 
+AM_CONDITIONAL([HAVE_FREEBSD], [test "x${have_freebsd}" = "xyes"])
+
 # Needs to be moved into a macro, and also, needs a way to automatically fetch
 # from all the dependencies using the Requires.
 DEPS_EOLIAN_FLAGS=`${PKG_CONFIG} --variable=eolian_flags eo evas edje efl elementary`
@@ -157,6 +159,7 @@ src/bin/Makefile
 src/lib/Makefile
 src/tests/Makefile
 doc/edi.1
+pc/edi.pc
 ])
 AC_OUTPUT
 
