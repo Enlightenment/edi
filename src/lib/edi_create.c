@@ -82,7 +82,7 @@ _edi_create_filter_file(Edi_Create *create, const char *path)
 
    create->filters++;
 // TODO speed this up - pre-cache this filter!
-   template = "sh -c \"sed -i.bak 's|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|ig;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|%s|g;s|\\${Edi_Year}|%d|g' %s\"; rm %s.bak";
+   template = "sh -c \"sed -i.bak 's|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|g;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|%s|g;s|\\${Edi_Year}|%d|g' %s\"; rm %s.bak";
    length = strlen(template) + (strlen(create->name) * 3)  + strlen(create->user) + strlen(create->email) + strlen(create->url) + (strlen(path) * 2) + 4 - 16 + 1;
 
    lowername = strdup(create->name);
