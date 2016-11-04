@@ -20,6 +20,7 @@ edi-*.tar.?z*
 po/*.gmo
 po/POTFILES
 .libs
+pc/edi.pc
 
 # autotools crap
 m4/*.m4
@@ -67,16 +68,3 @@ po/stamp-po
 /src/tests/test-suite.log
 /src/tests/check-results.xml
 
-/elm_code/src/lib/*.eo.h
-/elm_code/src/lib/*.eo.legacy.h
-/elm_code/src/lib/*.eo.c
-/elm_code/src/lib/widget/*.eo.h
-/elm_code/src/lib/widget/*.eo.legacy.h
-/elm_code/src/lib/widget/*.eo.c
-
-/elm_code/src/bin/elm_code_test
-
-/elm_code/src/tests/elm_code_suite
-/elm_code/src/tests/elm_code_suite.*
-/elm_code/src/tests/test-suite.log
-/elm_code/src/tests/check-results.xml
