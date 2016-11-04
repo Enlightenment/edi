@@ -943,10 +943,10 @@ edi_toolbar_setup(Evas_Object *win)
 }
 
 static char *
-_edi_win_title_get(const char *path)
+_edi_win_title_get()
 {
-   char *winname, *dirname;
-   const char *type;
+   char *winname;
+   const char *name, *type;
    Edi_Build_Provider *provider;
    int len;
 
@@ -956,10 +956,10 @@ _edi_win_title_get(const char *path)
    else
      type = "unknown";
 
-   dirname = basename((char*)path);
-   len = 8 + 3 + strlen(dirname) + strlen(type);
+   name = edi_project_name_get();
+   len = 8 + 3 + strlen(name) + strlen(type);
    winname = malloc(len * sizeof(char));
-   snprintf(winname, len, "Edi :: %s (%s)", dirname, type);
+   snprintf(winname, len, "Edi :: %s (%s)", name, type);
 
    return winname;
 }
@@ -1045,7 +1045,7 @@ edi_open(const char *inputpath)
    elm_need_ethumb();
    elm_need_efreet();
 
-   winname = _edi_win_title_get(path);
+   winname = _edi_win_title_get();
    win = elm_win_util_standard_add("main", winname);
    free((char*)winname);
    if (!win) return EINA_FALSE;

@@ -12,6 +12,9 @@
 
 #include "edi_private.h"
 
+#define EDI_CONFIG_NAME PACKAGE_NAME
+#define EDI_PROJECT_CONFIG_NAME "project"
+
 # define EDI_CONFIG_LIMIT(v, min, max) \
    if (v > max) v = max; else if (v < min) v = min;
 
@@ -76,7 +79,7 @@ _edi_project_config_dir_get(void)
    static char dir[PATH_MAX];
 
    if (!dir[0] && edi_project_get())
-     snprintf(dir, sizeof(dir), "%s/.edi", edi_project_get());
+     snprintf(dir, sizeof(dir), "%s/edi/%s", efreet_config_home_get(), edi_project_name_get());
 
    return dir;
 }
@@ -284,7 +287,7 @@ _edi_config_load(void)
 {
    Eina_Bool save = EINA_FALSE;
 
-   _edi_config = _edi_config_domain_load(_edi_config_dir_get(), PACKAGE_NAME, _edi_cfg_edd);
+   _edi_config = _edi_config_domain_load(_edi_config_dir_get(), EDI_CONFIG_NAME, _edi_cfg_edd);
    if (_edi_config)
      {
         Eina_Bool reload = EINA_FALSE;
@@ -332,7 +335,7 @@ _edi_config_load(void)
 void
 _edi_config_save(void)
 {
-   if (_edi_config_domain_save(_edi_config_dir_get(), PACKAGE_NAME, _edi_cfg_edd, _edi_config))
+   if (_edi_config_domain_save(_edi_config_dir_get(), EDI_CONFIG_NAME, _edi_cfg_edd, _edi_config))
      ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
 }
 
@@ -408,7 +411,7 @@ _edi_project_config_load()
 {
    Eina_Bool save = EINA_FALSE;
 
-   _edi_project_config = _edi_config_domain_load(_edi_project_config_dir_get(), PACKAGE_NAME, _edi_proj_cfg_edd);
+   _edi_project_config = _edi_config_domain_load(_edi_project_config_dir_get(), EDI_PROJECT_CONFIG_NAME, _edi_proj_cfg_edd);
    if (_edi_project_config)
      {
         Eina_Bool reload = EINA_FALSE;
@@ -482,7 +485,7 @@ _edi_project_config_load()
 static Eina_Bool
 _edi_project_config_save_no_notify()
 {
-   return _edi_config_domain_save(_edi_project_config_dir_get(), PACKAGE_NAME, _edi_proj_cfg_edd, _edi_project_config);
+   return _edi_config_domain_save(_edi_project_config_dir_get(), EDI_PROJECT_CONFIG_NAME, _edi_proj_cfg_edd, _edi_project_config);
 }
 
 void

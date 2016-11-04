@@ -120,6 +120,15 @@ EAPI Eina_Bool edi_project_set(const char *path);
 EAPI const char *edi_project_get(void);
 
 /**
+ * Get the name of the current edi project that is loaded.
+ *
+ * @return the name of the project that Edi is current working with.
+ *
+ * @ingroup Main
+ */
+EAPI const char *edi_project_name_get(void);
+
+/**
  * Get the path to a file within the current project.
  *
  * @param file The file within a project to get the absolute path for.

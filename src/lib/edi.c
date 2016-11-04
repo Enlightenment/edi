@@ -106,6 +106,12 @@ edi_project_get()
 }
 
 EAPI const char *
+edi_project_name_get()
+{
+   return basename((char*)edi_project_get());
+}
+
+EAPI const char *
 edi_project_file_path_get(const char *file)
 {
    return edi_path_append(edi_project_get(), file);
