@@ -396,7 +396,6 @@ _file_listing_updated(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
    dir = (const char *)data;
    DBG("File created in %s\n", dir);
 
-   _file_listing_reload(dir);
 }
 
 void
