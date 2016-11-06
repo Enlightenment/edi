@@ -6,6 +6,7 @@
 
 #include <Eina.h>
 #include <Eio.h>
+#include <Elementary.h>
 
 #include "mainview/edi_mainview_item.h"
 #include "mainview/edi_mainview.h"
@@ -114,14 +115,22 @@ edi_mainview_item_next()
 void
 edi_mainview_item_select(Edi_Mainview_Item *item)
 {
+   Eina_List *list;
+   Edi_Mainview_Item *it;
+
    if (item->win)
      {
         elm_win_raise(item->win);
      }
    else
      {
+        EINA_LIST_FOREACH(_edi_mainview_items, list, it)
+          {
+             elm_object_signal_emit(it->tab, "mouse,up,1", "base");
+          }
+
         _edi_mainview_view_show(item->view);
-        elm_toolbar_item_selected_set(item->tab, EINA_TRUE);
+        elm_object_signal_emit(item->tab, "mouse,down,1", "base");
      }
 }
 
@@ -149,7 +158,7 @@ static void
 _promote(void *data, Evas_Object *obj EINA_UNUSED,
          const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
-   _edi_mainview_view_show(data);
+   edi_mainview_item_select((Edi_Mainview_Item *)data);
 }
 
 static void
@@ -230,13 +239,13 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    elm_icon_standard_set(icon, provider->icon);
    elm_object_part_content_set(tab, "icon", icon);
 */
-   elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, content);
+   elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
    elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
 
    elm_box_pack_end(tb, tab);
    evas_object_show(tab);
    item->tab = tab;
-   elm_toolbar_item_selected_set(tab, EINA_TRUE);
+   edi_mainview_item_select(item);
 
    // Set focus on the newly opening window so that one can just start typing
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
@@ -689,7 +698,7 @@ edi_mainview_goto_popup_show()
 void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
-   Evas_Object *box, *txt, *nf;
+   Evas_Object *box, *txt, *nf, *tabs, *tab, *bg, *pad, *scr;
 
    _main_win = win;
 
@@ -699,11 +708,45 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_show(box);
    elm_box_pack_end(parent, box);
 
-   tb = elm_box_add(parent);
-   evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
+   tabs = elm_table_add(box);
+   elm_box_pack_end(box, tabs);
+   evas_object_size_hint_weight_set(tabs, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(tabs, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(tabs);
+
+   bg = elm_box_add(tabs);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bg, 0.0, EVAS_HINT_FILL);
+   evas_object_show(bg);
+   elm_table_pack(tabs, bg, 0, 0, 1, 1);
+
+   tab = elm_button_add(tabs);
+   evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
+   elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
+   elm_object_part_text_set(tab, "elm.btn.text", "hg");
+   elm_box_pack_end(bg, tab);
+
+   pad = elm_box_add(tabs);
+   evas_object_size_hint_weight_set(pad, 0.0, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(pad, 0.0, EVAS_HINT_FILL);
+   evas_object_size_hint_min_set(pad, 0, 1.5 * elm_config_scale_get());
+   elm_box_pack_end(bg, pad);
+
+   scr = elm_scroller_add(parent);
+   evas_object_size_hint_weight_set(scr, EVAS_HINT_EXPAND, 0.04);
+   evas_object_size_hint_align_set(scr, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_min_set(scr, 0, 100 * elm_config_scale_get());
+   elm_scroller_bounce_set(scr, EINA_FALSE, EINA_FALSE);
+   elm_scroller_policy_set(scr, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
+   elm_table_pack(tabs, scr, 0, 0, 1, 1);
+   evas_object_show(scr);
+
+   tb = elm_box_add(scr);
+   evas_object_size_hint_weight_set(tb, 0.0, 0.0);
    evas_object_size_hint_align_set(tb, 0.0, EVAS_HINT_FILL);
    elm_box_horizontal_set(tb, EINA_TRUE);
-   elm_box_pack_end(box, tb);
+   elm_object_content_set(scr, tb);
    evas_object_show(tb);
 
    nf = elm_box_add(parent);
