@@ -16,6 +16,6 @@ Name: edi
 Description: Edi ide library
 Requires.private: @requirements_pc_edi@
 Version: @VERSION@
-Libs: -L${libdir} -ledi @requirements_public_libs_edi@
+Libs: -L${libdir} -ledi
 Cflags: -I${includedir}/edi-@VMAJ@
 
