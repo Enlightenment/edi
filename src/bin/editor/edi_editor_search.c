@@ -188,6 +188,7 @@ edi_editor_search(Edi_Editor *editor)
           elm_object_disabled_set(search->replace_btn, EINA_TRUE);
      }
 
+   elm_object_text_set(search->entry, "");
    elm_object_focus_set(search->entry, EINA_TRUE);
 }
 
