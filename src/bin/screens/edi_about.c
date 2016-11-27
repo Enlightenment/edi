@@ -130,7 +130,7 @@ edi_about_show(Evas_Object *mainwin)
    button = elm_button_add(box);
    elm_object_text_set(button, "Report Issue");
    evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
-                                  "https://phab.enlightenment.org/maniphest/task/create/?projects=PHID-PROJ-geg2fyscqgjjxt3fider");
+                                  "https://phab.enlightenment.org/maniphest/task/edit/form/2/?projects=PHID-PROJ-geg2fyscqgjjxt3fider");
    elm_box_pack_end(buttonbox, button);
    evas_object_show(button);
 
