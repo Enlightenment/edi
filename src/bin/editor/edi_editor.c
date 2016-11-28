@@ -341,6 +341,8 @@ _clang_show_highlighting(Edi_Editor *editor)
                 break;
           }
 
+        if (editor->highlight_cancel)
+          break;
         _edi_range_color_set(editor, range, type);
      }
 }
@@ -406,6 +408,8 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
         clang_disposeString(str);
 
         clang_disposeDiagnostic(diag);
+        if (editor->highlight_cancel)
+          break;
      }
 }
 
@@ -452,6 +456,7 @@ _edi_clang_dispose(void *data, Ecore_Thread *thread EINA_UNUSED)
    clang_disposeIndex(editor->idx);
 
    editor->highlight_thread = NULL;
+   editor->highlight_cancel = EINA_FALSE;
 }
 #endif
 
@@ -502,6 +507,18 @@ _mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 }
 
 static void
+_edi_editor_parse_line_cb(Elm_Code_Line *line EINA_UNUSED, void *data)
+{
+   Edi_Editor *editor = (Edi_Editor *)data;
+
+   // We have caused a reset in the file parser, if it is active
+   if (!editor->highlight_thread)
+     return;
+
+   editor->highlight_cancel = EINA_TRUE;
+}
+
+static void
 _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
 {
    Edi_Editor *editor;
@@ -511,6 +528,7 @@ _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
      return;
 
 #if HAVE_LIBCLANG
+   editor->highlight_cancel = EINA_FALSE;
    editor->highlight_thread = ecore_thread_run(_edi_clang_setup, _edi_clang_dispose, NULL, editor);
 #endif
 }
@@ -586,7 +604,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
    if (editor->show_highlight)
-     elm_code_parser_add(code, NULL, _edi_editor_parse_file_cb, editor);
+     elm_code_parser_add(code, _edi_editor_parse_line_cb,
+		               _edi_editor_parse_file_cb, editor);
    elm_code_file_open(code, item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
