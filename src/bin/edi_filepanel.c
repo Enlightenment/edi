@@ -323,14 +323,62 @@ _on_list_contracted(void *data EINA_UNUSED,
    _file_listing_empty(sd, it);
 }
 
-static void
-_ls_main_cb(void *data,
-            Eio_File *handler,
-            const Eina_File_Direct_Info *info)
+static Elm_Object_Item *_file_listing_item_find(const char *path, Elm_Object_Item *root)
 {
-   Listing_Request *lreq = data;
+   Elm_Object_Item *item;
+   Edi_Dir_Data *sd;
+   const Eina_List *itemlist, *l;
+
+   if (root)
+     itemlist = elm_genlist_item_subitems_get(root);
+   else
+     itemlist = elm_genlist_realized_items_get(list);
+   EINA_LIST_FOREACH(itemlist, l, item)
+     {
+        sd = elm_object_item_data_get(item);
+
+        if (!strcmp(path, sd->path))
+          return item;
+     }
+
+   return NULL;
+}
+
+static void
+_file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *parent_it)
+{
    Elm_Genlist_Item_Class *clas = &itc;
    Edi_Dir_Data *sd;
+
+   sd = calloc(1, sizeof(Edi_Dir_Data));
+   if (isdir)
+     {
+        clas = &itc2;
+        sd->isdir = EINA_TRUE;
+     }
+
+   sd->path = eina_stringshare_add(path);
+   (void)!elm_genlist_item_sorted_insert(list, clas, sd, parent_it,
+                                         isdir ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
+                                         _file_list_cmp, _item_sel, sd);
+}
+
+static void
+_file_listing_item_delete(const char *path, Elm_Object_Item *parent_it)
+{
+   Elm_Object_Item *item;
+
+   item = _file_listing_item_find(path, parent_it);
+   if (!item)
+     return;
+
+   elm_object_item_del(item);
+}
+
+static void
+_ls_main_cb(void *data, Eio_File *handler, const Eina_File_Direct_Info *info)
+{
+   Listing_Request *lreq = data;
 
    if (eio_file_check(handler)) return;
 
@@ -342,17 +390,7 @@ _ls_main_cb(void *data,
 
 //   _signal_first(lreq);
 
-   sd = calloc(1, sizeof(Edi_Dir_Data));
-   if (info->type == EINA_FILE_DIR)
-     {
-        clas = &itc2;
-        sd->isdir = EINA_TRUE;
-     }
-
-   sd->path = eina_stringshare_add(info->path);
-   (void)!elm_genlist_item_sorted_insert(list, clas, sd, lreq->parent_it,
-                                         (clas == &itc2) ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
-                                         _file_list_cmp, _item_sel, sd);
+   _file_listing_item_insert(info->path, info->type == EINA_FILE_DIR, lreq->parent_it);
 }
 
 static void
@@ -404,9 +442,21 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
 {
    const char *dir;
    Eio_Monitor_Event *ev = event;
+   Elm_Object_Item *parent_it;
 
    dir = ecore_file_dir_get(ev->filename);
+   parent_it = _file_listing_item_find(dir, NULL);
 
+   if (type == EIO_MONITOR_FILE_CREATED)
+     _file_listing_item_insert(ev->filename, EINA_FALSE, parent_it);
+   else if (type == EIO_MONITOR_FILE_DELETED)
+     _file_listing_item_delete(ev->filename, parent_it);
+   if (type == EIO_MONITOR_DIRECTORY_CREATED)
+     _file_listing_item_insert(ev->filename, EINA_TRUE, parent_it);
+   else if (type == EIO_MONITOR_DIRECTORY_DELETED)
+     _file_listing_item_delete(ev->filename, parent_it);
+   else
+     DBG("Ignoring file update event for %s", ev->filename);
 }
 
 /* Panel filtering */
