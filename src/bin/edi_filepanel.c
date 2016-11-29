@@ -21,6 +21,7 @@ typedef struct _Edi_Dir_Data
 {
    const char *path;
    Eio_Monitor *monitor;
+   Eina_Bool isdir;
 } Edi_Dir_Data;
 
 static Elm_Genlist_Item_Class itc, itc2;
@@ -148,6 +149,9 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
    sd = elm_object_item_data_get(it);
+
+   if (sd->isdir)
+     return;
 
    if (!menu)
      _item_menu_create(_main_win);
@@ -342,6 +346,7 @@ _ls_main_cb(void *data,
    if (info->type == EINA_FILE_DIR)
      {
         clas = &itc2;
+        sd->isdir = EINA_TRUE;
      }
 
    sd->path = eina_stringshare_add(info->path);
