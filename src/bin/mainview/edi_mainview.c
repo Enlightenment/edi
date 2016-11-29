@@ -491,9 +491,6 @@ edi_mainview_open_window(Edi_Path_Options *options)
         edi_mainview_item_select(it);
         _edi_mainview_item_close(it);
         _edi_mainview_items = eina_list_remove(_edi_mainview_items, it);
-
-        eina_stringshare_del(it->path);
-        free(it);
      }
 
    if (options->type == NULL)
