@@ -39,7 +39,4 @@ void edi_open_url();
 
 Eina_Bool edi_noproject();
 
-// TODO remove this once our filepanel is updating gracefully
-void _edi_filepanel_reload();
-
 #endif

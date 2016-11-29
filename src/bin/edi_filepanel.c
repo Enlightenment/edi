@@ -17,6 +17,12 @@
 
 #include "edi_private.h"
 
+typedef struct _Edi_Dir_Data
+{
+   const char *path;
+   Eio_Monitor *monitor;
+} Edi_Dir_Data;
+
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
 static edi_filepanel_item_clicked_cb _open_cb;
@@ -25,9 +31,12 @@ static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
 static const char *_menu_cb_path, *_root_path;
 static regex_t _filter_regex;
 static Eina_Bool _filter_set = EINA_FALSE;
+static Edi_Dir_Data *_root_dir;
 
 static void
-_populate(Evas_Object *obj, const char *path, Elm_Object_Item *parent_it, const char *selected);
+_file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
+static void
+_file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
 
 static void
 _item_menu_open_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
@@ -132,18 +141,18 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 {
    Evas_Event_Mouse_Down *ev;
    Elm_Object_Item *it;
-   const char *path;
+   Edi_Dir_Data *sd;
 
    ev = event_info;
    if (ev->button != 3) return;
 
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
-   path = elm_object_item_data_get(it);
+   sd = elm_object_item_data_get(it);
 
    if (!menu)
      _item_menu_create(_main_win);
 
-   _menu_cb_path = eina_stringshare_add(path);
+   _menu_cb_path = eina_stringshare_add(sd->path);
    elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
    evas_object_show(menu);
 }
@@ -151,7 +160,9 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
 {
-   return strdup(basename(data));
+   Edi_Dir_Data *sd = data;
+
+   return strdup(basename((char *)sd->path));
 }
 
 static Eina_Hash *mime_entries = NULL;
@@ -172,13 +183,15 @@ _get_provider_from_hashset(const char *filename)
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
+   Edi_Content_Provider *provider;
+   Edi_Dir_Data *sd = data;
+   Evas_Object *ic;
+
    if (strcmp(source, "elm.swallow.icon"))
      return NULL;
 
-   Edi_Content_Provider *provider;
-   provider = _get_provider_from_hashset((const char *)data);
+   provider = _get_provider_from_hashset(sd->path);
 
-   Evas_Object *ic;
    ic = elm_icon_add(obj);
    if (provider)
      elm_icon_standard_set(ic, provider->icon);
@@ -194,16 +207,18 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 static void
 _item_del(void *data, Evas_Object *obj EINA_UNUSED)
 {
-   eina_stringshare_del(data);
+   Edi_Dir_Data *sd = data;
+
+   eina_stringshare_del(sd->path);
 }
 
 static void
 _item_sel(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   const char *path = data;
+   Edi_Dir_Data *sd = data;
 
-   if (!ecore_file_is_dir(path))
-     _open_cb(path, NULL, EINA_FALSE);
+   if (!ecore_file_is_dir(sd->path))
+     _open_cb(sd->path, NULL, EINA_FALSE);
 }
 
 static Evas_Object *
@@ -231,11 +246,14 @@ _ls_filter_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED,
 static int
 _file_list_cmp(const void *data1, const void *data2)
 {
+   Edi_Dir_Data *sd1, *sd2;
+
    const Elm_Object_Item *item1 = data1;
    const Elm_Object_Item *item2 = data2;
    const Elm_Genlist_Item_Class *ca = elm_genlist_item_item_class_get(item1);
    const Elm_Genlist_Item_Class *cb = elm_genlist_item_item_class_get(item2);
 
+   // move dirs to the top
    if (ca == &itc2)
      {
         if (cb != &itc2)
@@ -246,17 +264,16 @@ _file_list_cmp(const void *data1, const void *data2)
         return 1;
      }
 
-   const char *name1 = elm_object_item_data_get(item1);
-   const char *name2 = elm_object_item_data_get(item2);
+   sd1 = elm_object_item_data_get(item1);
+   sd2 = elm_object_item_data_get(item2);
 
-   return strcasecmp(name1, name2);
+   return strcasecmp(sd1->path, sd2->path);
 }
 
 static void
 _listing_request_cleanup(Listing_Request *lreq)
 {
    eina_stringshare_del(lreq->path);
-   eina_stringshare_del(lreq->selected_path);
    free(lreq);
 }
 
@@ -281,24 +298,25 @@ _on_list_contract_req(void *data       EINA_UNUSED,
 }
 
 static void
-_on_list_expanded(void *data,
+_on_list_expanded(void *data EINA_UNUSED,
                   Evas_Object *obj EINA_UNUSED,
                   void *event_info)
 {
    Elm_Object_Item *it = event_info;
-   const char *path = elm_object_item_data_get(it);
+   Edi_Dir_Data *sd = elm_object_item_data_get(it);
 
-   _populate(data, path, it, NULL);
+   _file_listing_fill(sd, it);
 }
 
 static void
-_on_list_contracted(void *data       EINA_UNUSED,
+_on_list_contracted(void *data EINA_UNUSED,
                     Evas_Object *obj EINA_UNUSED,
                     void *event_info)
 {
    Elm_Object_Item *it = event_info;
+   Edi_Dir_Data *sd = elm_object_item_data_get(it);
 
-   elm_genlist_item_subitems_clear(it);
+   _file_listing_empty(sd, it);
 }
 
 static void
@@ -308,7 +326,7 @@ _ls_main_cb(void *data,
 {
    Listing_Request *lreq = data;
    Elm_Genlist_Item_Class *clas = &itc;
-   const char  *path;
+   Edi_Dir_Data *sd;
 
    if (eio_file_check(handler)) return;
 
@@ -320,15 +338,16 @@ _ls_main_cb(void *data,
 
 //   _signal_first(lreq);
 
+   sd = calloc(1, sizeof(Edi_Dir_Data));
    if (info->type == EINA_FILE_DIR)
      {
         clas = &itc2;
      }
 
-   path = eina_stringshare_add(info->path);
-   (void)!elm_genlist_item_sorted_insert(list, clas, path, lreq->parent_it,
+   sd->path = eina_stringshare_add(info->path);
+   (void)!elm_genlist_item_sorted_insert(list, clas, sd, lreq->parent_it,
                                          (clas == &itc2) ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
-                                         _file_list_cmp, _item_sel, path);
+                                         _file_list_cmp, _item_sel, sd);
 }
 
 static void
@@ -348,65 +367,41 @@ _ls_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error EINA_UNUSED)
 }
 
 static void
-_populate(Evas_Object *obj,
-          const char *path,
-          Elm_Object_Item *parent_it,
-          const char *selected)
+_file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
 {
-   if (!path) return;
+   if (dir->monitor) eio_monitor_del(dir->monitor);
 
+   elm_genlist_item_subitems_clear(parent_it);
+}
+
+static void
+_file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
+{
    Listing_Request *lreq;
 
-   //if (sd->monitor) eio_monitor_del(sd->monitor);
-   //if (sd->current) eio_file_cancel(sd->current);
+   if (!dir) return;
 
    lreq = malloc(sizeof (Listing_Request));
    if (!lreq) return;
 
    lreq->parent_it = parent_it;
-   lreq->obj = obj;
-   lreq->path = eina_stringshare_add(path);
+   lreq->path = eina_stringshare_add(dir->path);
    lreq->first = EINA_TRUE;
 
-   if (selected)
-     lreq->selected_path = eina_stringshare_add(selected);
-   else
-     lreq->selected_path = NULL;
-
-   // FIXME re-enable the monitors once we have a less intrusive manner of refreshing the file tree
-   /* TODO: keep track of monitors so they can be cleaned */
-   //sd->monitor = eio_monitor_add(path);
-   //sd->current = 
-   eio_file_stat_ls(path, _ls_filter_cb, _ls_main_cb,
-                                  _ls_done_cb, _ls_error_cb, lreq);
+   dir->monitor = eio_monitor_add(dir->path);
+   eio_file_stat_ls(dir->path, _ls_filter_cb, _ls_main_cb,
+                               _ls_done_cb, _ls_error_cb, lreq);
 }
 
 static void
-_file_listing_reload(const char *dir)
-{
-   elm_genlist_clear(list);
-   _populate(list, dir, NULL, NULL);
-}
-
-static void
-_file_listing_updated(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+_file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
+                      void *event EINA_UNUSED)
 {
    const char *dir;
+   Eio_Monitor_Event *ev = event;
 
-   dir = (const char *)data;
-   DBG("File created in %s\n", dir);
+   dir = ecore_file_dir_get(ev->filename);
 
-}
-
-void
-_edi_filepanel_reload()
-{
-   char *dir;
-
-   dir = realpath(edi_project_get(), NULL);
-   _file_listing_reload(dir);
-
-   free(dir);
 }
 
 /* Panel filtering */
@@ -415,12 +410,13 @@ static Eina_Bool
 _filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
 {
    Edi_Build_Provider *provider;
+   Edi_Dir_Data *sd = data;
    const char *relative;
 
    provider = edi_build_provider_for_project_get();
    if (provider)
      {
-        if (provider->file_hidden_is((char *)data))
+        if (provider->file_hidden_is(sd->path))
           return EINA_FALSE;
      }
 
@@ -547,8 +543,10 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
                                   _item_clicked_cb, NULL);
    ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
+   ecore_event_handler_add(EIO_MONITOR_FILE_MODIFIED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
    ecore_event_handler_add(EIO_MONITOR_FILE_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
    ecore_event_handler_add(EIO_MONITOR_DIRECTORY_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
+   ecore_event_handler_add(EIO_MONITOR_DIRECTORY_MODIFIED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
    ecore_event_handler_add(EIO_MONITOR_DIRECTORY_DELETED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
 
    evas_object_smart_callback_add(list, "expand,request", _on_list_expand_req, parent);
@@ -570,7 +568,10 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
 
    _open_cb = cb;
    _main_win = win;
-   _populate(list, path, NULL, NULL);
+
+   _root_dir = calloc(1, sizeof(Edi_Dir_Data));
+   _root_dir->path = path;
+   _file_listing_fill(_root_dir, NULL);
    evas_object_smart_callback_add(filter, "changed", _filter_key_down_cb, list);
 }
 
