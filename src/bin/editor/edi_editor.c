@@ -553,11 +553,20 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    return ECORE_CALLBACK_RENEW;
 }
 
+static void
+_editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Ecore_Event_Handler *ev_handler = data;
+
+   ecore_event_handler_del(ev_handler);
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
+   Ecore_Event_Handler *ev_handler;
    Evas *e;
 
    Elm_Code *code;
@@ -627,7 +636,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    (void)!evas_object_key_grab(widget, "f", ctrl, shift | alt, 1);
 
    evas_object_data_set(vbox, "editor", editor);
-   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
+   ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
+   evas_object_event_callback_add(vbox, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
    return vbox;
 }
