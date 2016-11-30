@@ -179,8 +179,11 @@ _get_provider_from_hashset(const char *filename)
    if ( !mime )
      {
        mime = efreet_mime_type_get(filename);
-       eina_hash_add(mime_entries, filename, strdup(mime));
+
+       if (mime)
+         eina_hash_add(mime_entries, filename, strdup(mime));
      }
+
    return edi_content_provider_for_mime_get(mime);
 }
 
