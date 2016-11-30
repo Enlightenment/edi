@@ -38,10 +38,10 @@ _make_file_hidden_is(const char *file)
    if (!file || strlen(file) == 0)
      return EINA_FALSE;
 
-   if (eina_str_has_extension(file, "o") || eina_str_has_extension(file, "so") ||
-       eina_str_has_extension(file, "lo"))
+   if (eina_str_has_extension(file, ".o") || eina_str_has_extension(file, ".so") ||
+       eina_str_has_extension(file, ".lo"))
      return EINA_TRUE;
-   if (eina_str_has_extension(file, "a") || eina_str_has_extension(file, "la"))
+   if (eina_str_has_extension(file, ".a") || eina_str_has_extension(file, ".la"))
      return EINA_TRUE;
 
    return EINA_FALSE;
