@@ -75,7 +75,7 @@ _edi_editor_current_word_get(Edi_Editor *editor)
    char *ptr, *curword, *curtext;
    unsigned int curlen, col, row, wordlen;
 
-   elm_obj_code_widget_cursor_position_get(editor->entry, &col, &row);
+   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, row);
@@ -118,7 +118,7 @@ _autocomplete_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 
    editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
 
-   elm_code_widget_cursor_position_get(editor->entry, &col, &row);
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, row);
@@ -139,8 +139,8 @@ _autocomplete_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 
         elm_code_line_text_insert(line, col - wordlen - 1,
                                   list_word, strlen(list_word));
-        elm_code_widget_cursor_position_set(editor->entry,
-                                  col - wordlen + strlen(list_word), row);
+        elm_code_widget_cursor_position_set(editor->entry, row,
+                                  col - wordlen + strlen(list_word));
      }
 
    evas_object_del(_clang_autocomplete_popup_bg);
@@ -209,7 +209,7 @@ _autocomplete_list_update(Evas_Object *genlist, Edi_Editor *editor)
    const char *path, *args;
    unsigned int clang_argc, row, col;
 
-   elm_obj_code_widget_cursor_position_get(editor->entry, &col, &row);
+   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
@@ -277,7 +277,7 @@ _clang_autocomplete_popup(Edi_Editor *editor)
    unsigned int col, row;
    Evas_Coord cx, cy, cw, ch;
 
-   elm_obj_code_widget_cursor_position_get(editor->entry, &col, &row);
+   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
    edi_editor_save(editor);
@@ -372,7 +372,7 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
    unsigned int col;
 
    widget = (Elm_Code_Widget *)obj;
-   elm_code_widget_cursor_position_get(widget, &col, &line);
+   elm_code_widget_cursor_position_get(widget, &line, &col);
 
    snprintf(buf, sizeof(buf), "Line:%d, Column:%d", line, col);
    elm_object_text_set((Evas_Object *)data, buf);

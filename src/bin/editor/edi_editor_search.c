@@ -54,7 +54,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
      }
 
    code = elm_code_widget_code_get(entry);
-   elm_code_widget_cursor_position_get(entry, &pos_col, &pos_line);
+   elm_code_widget_cursor_position_get(entry, &pos_line, &pos_col);
    if (search->current_search_line == pos_line &&
        search->current_search_col == pos_col)
      {

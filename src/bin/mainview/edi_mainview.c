@@ -616,7 +616,7 @@ edi_mainview_goto(int line)
    if (!editor || line <= 0)
      return;
 
-   elm_code_widget_cursor_position_set(editor->entry, 1, line);
+   elm_code_widget_cursor_position_set(editor->entry, line, 1);
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
