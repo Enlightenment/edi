@@ -68,7 +68,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 
 #if HAVE_LIBCLANG
 static char*
-_edi_editor_currnet_word_get(Edi_Editor *editor)
+_edi_editor_current_word_get(Edi_Editor *editor)
 {
    Elm_Code *code;
    Elm_Code_Line *line;
@@ -129,7 +129,7 @@ _autocomplete_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
      {
         Elm_Object_Item *it;
 
-        word = _edi_editor_currnet_word_get(editor);
+        word = _edi_editor_current_word_get(editor);
         wordlen = strlen(word);
         free(word);
 
@@ -214,7 +214,7 @@ _autocomplete_list_update(Evas_Object *genlist, Edi_Editor *editor)
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
 
-   curword = _edi_editor_currnet_word_get(editor);
+   curword = _edi_editor_current_word_get(editor);
 
    //Genlist Item Class
    Elm_Genlist_Item_Class *ic = elm_genlist_item_class_new();
