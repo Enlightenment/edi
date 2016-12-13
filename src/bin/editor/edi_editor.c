@@ -26,7 +26,7 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
-static Evas_Object *_clang_autocomplete_popup_bg;
+static Evas_Object *_clang_autocomplete_popup_bg, *_clang_autocomplete_popup_genlist;
 
 void
 edi_editor_save(Edi_Editor *editor)
@@ -68,14 +68,12 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 
 #if HAVE_LIBCLANG
 static char*
-_edi_editor_current_word_get(Edi_Editor *editor)
+_edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    Elm_Code *code;
    Elm_Code_Line *line;
    char *ptr, *curword, *curtext;
-   unsigned int curlen, col, row, wordlen;
-
-   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
+   unsigned int curlen, wordlen;
 
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, row);
@@ -96,62 +94,6 @@ _edi_editor_current_word_get(Edi_Editor *editor)
    curword[wordlen] = '\0';
 
    return curword;
-}
-
-static void
-_autocomplete_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
-                               Evas_Object *obj, void *event_info)
-{
-   Edi_Mainview_Item *item;
-   Edi_Editor *editor;
-   Elm_Code *code;
-   Elm_Code_Line *line;
-   Evas_Event_Key_Down *ev = event_info;
-   char *word;
-   const char *list_word;
-   unsigned int wordlen, col, row;
-
-   item = edi_mainview_item_current_get();
-
-   if (!item)
-     return;
-
-   editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
-
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-
-   code = elm_code_widget_code_get(editor->entry);
-   line = elm_code_file_line_get(code->file, row);
-
-   if (!strcmp(ev->key, "Down") || !strcmp(ev->key, "Up"))
-     return;
-   else if (!strcmp(ev->key, "Return"))
-     {
-        Elm_Object_Item *it;
-
-        word = _edi_editor_current_word_get(editor);
-        wordlen = strlen(word);
-        free(word);
-
-        elm_code_line_text_remove(line, col - wordlen - 1, wordlen);
-        it = elm_genlist_selected_item_get(obj);
-        list_word = elm_object_item_data_get(it);
-
-        elm_code_line_text_insert(line, col - wordlen - 1,
-                                  list_word, strlen(list_word));
-        elm_code_widget_cursor_position_set(editor->entry, row,
-                                  col - wordlen + strlen(list_word));
-     }
-
-   evas_object_del(_clang_autocomplete_popup_bg);
-}
-
-static void
-_autocomplete_list_cb_focus(void *data EINA_UNUSED,
-                            Evas_Object *obj EINA_UNUSED, void *event_info)
-{
-   Elm_Object_Item *it = event_info;
-   elm_genlist_item_selected_set(it, EINA_TRUE);
 }
 
 static Evas_Object *
@@ -192,14 +134,45 @@ _autocomplete_list_content_get(void *data, Evas_Object *obj, const char *part)
 }
 
 static void
-_autocomplete_list_del(void *data, Evas_Object *obj EINA_UNUSED)
+_autocomplete_list_update(char *word)
 {
-   char *auto_str = data;
-   free(auto_str);
+   Eina_List *list, *l;
+   Elm_Genlist_Item_Class *ic;
+   Elm_Object_Item *item;
+   char *auto_str;
+
+   elm_genlist_clear(_clang_autocomplete_popup_genlist);
+
+   list = (Eina_List *)evas_object_data_get(_clang_autocomplete_popup_genlist,
+                                            "autocomplete_list");
+   ic = elm_genlist_item_class_new();
+   ic->item_style = "full";
+   ic->func.content_get = _autocomplete_list_content_get;
+
+   EINA_LIST_FOREACH(list, l, auto_str)
+     {
+        if (eina_str_has_prefix(auto_str, word))
+          {
+             elm_genlist_item_append(_clang_autocomplete_popup_genlist,
+                                     ic,
+                                     auto_str,
+                                     NULL,
+                                     ELM_GENLIST_ITEM_NONE,
+                                     NULL,
+                                     NULL);
+          }
+     }
+   elm_genlist_item_class_free(ic);
+
+   item = elm_genlist_first_item_get(_clang_autocomplete_popup_genlist);
+   if (item)
+     elm_genlist_item_selected_set(item, EINA_TRUE);
+   else
+     evas_object_hide(_clang_autocomplete_popup_bg);
 }
 
 static void
-_autocomplete_list_update(Evas_Object *genlist, Edi_Editor *editor)
+_autocomplete_list_set(Edi_Editor *editor)
 {
    Elm_Code *code;
    CXIndex idx;
@@ -208,19 +181,27 @@ _autocomplete_list_update(Evas_Object *genlist, Edi_Editor *editor)
    char *curword, **clang_argv;
    const char *path, *args;
    unsigned int clang_argc, row, col;
+   Eina_List *list = NULL;
 
-   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
+   list = (Eina_List *)evas_object_data_get(_clang_autocomplete_popup_genlist,
+                                            "autocomplete_list");
+   if (list)
+     {
+        char *temp_str;
+        EINA_LIST_FREE(list, temp_str)
+          free(temp_str);
+        list = NULL;
+        evas_object_data_del(_clang_autocomplete_popup_genlist,
+                             "autocomplete_list");
+     }
+
+   edi_editor_save(editor);
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
 
-   curword = _edi_editor_current_word_get(editor);
-
-   //Genlist Item Class
-   Elm_Genlist_Item_Class *ic = elm_genlist_item_class_new();
-   ic->item_style = "full";
-   ic->func.content_get = _autocomplete_list_content_get;
-   ic->func.del = _autocomplete_list_del;
+   curword = _edi_editor_current_word_get(editor, row, col);
 
    //Initialize Clang
    args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
@@ -251,64 +232,249 @@ _autocomplete_list_update(Evas_Object *genlist, Edi_Editor *editor)
              const CXString str_out = clang_getCompletionChunkText(str, j);
              char *auto_str = strdup(clang_getCString(str_out));
 
-             if (eina_str_has_prefix(auto_str, curword))
-               {
-                  elm_genlist_item_append(genlist,
-                                          ic,
-                                          auto_str,
-                                          NULL,
-                                          ELM_GENLIST_ITEM_NONE,
-                                          NULL,
-                                          NULL);
-               }
+             list = eina_list_append(list, auto_str);
           }
      }
-   elm_genlist_item_class_free(ic);
 
    clang_disposeCodeCompleteResults(res);
    clang_disposeTranslationUnit(tx_unit);
    clang_disposeIndex(idx);
+
+   evas_object_data_set(_clang_autocomplete_popup_genlist,
+                        "autocomplete_list", list);
+   _autocomplete_list_update(curword);
    free(curword);
 }
 
 static void
-_clang_autocomplete_popup(Edi_Editor *editor)
+_autocomplete_bg_cb_hide(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
+                     Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Eina_List *list = NULL;
+
+   list = (Eina_List *)evas_object_data_get(_clang_autocomplete_popup_genlist,
+                                            "autocomplete_list");
+   if (list)
+     {
+        char *temp_str;
+        EINA_LIST_FREE(list, temp_str)
+          free(temp_str);
+        list = NULL;
+        evas_object_data_del(_clang_autocomplete_popup_genlist,
+                             "autocomplete_list");
+     }
+   evas_object_key_ungrab(_clang_autocomplete_popup_genlist, "Return", 0, 0);
+   evas_object_key_ungrab(_clang_autocomplete_popup_genlist, "Up", 0, 0);
+   evas_object_key_ungrab(_clang_autocomplete_popup_genlist, "Down", 0, 0);
+}
+
+static void
+_autocomplete_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
+                               Evas_Object *obj, void *event_info)
+{
+   Edi_Mainview_Item *m_it;
+   Elm_Object_Item *it;
+   Edi_Editor *editor;
+   Evas_Object *genlist = obj;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   Evas_Event_Key_Down *ev = event_info;
+   char *word;
+   const char *list_word;
+   unsigned int wordlen, col, row;
+
+   m_it = edi_mainview_item_current_get();
+
+   if (!m_it)
+     return;
+
+   editor = (Edi_Editor *)evas_object_data_get(m_it->view, "editor");
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   code = elm_code_widget_code_get(editor->entry);
+   line = elm_code_file_line_get(code->file, row);
+
+   if (!strcmp(ev->key, "Return"))
+     {
+        word = _edi_editor_current_word_get(editor, row, col);
+        wordlen = strlen(word);
+        free(word);
+
+        elm_code_line_text_remove(line, col - wordlen - 1, wordlen);
+        it = elm_genlist_selected_item_get(genlist);
+        list_word = elm_object_item_data_get(it);
+
+        elm_code_line_text_insert(line, col - wordlen - 1,
+                                  list_word, strlen(list_word));
+        elm_code_widget_cursor_position_set(editor->entry, row,
+                                            col - wordlen + strlen(list_word));
+        evas_object_hide(_clang_autocomplete_popup_bg);
+     }
+   else if (!strcmp(ev->key, "Up"))
+     {
+        it = elm_genlist_item_prev_get(elm_genlist_selected_item_get(genlist));
+        if(!it) it = elm_genlist_last_item_get(genlist);
+
+        elm_genlist_item_selected_set(it, EINA_TRUE);
+        elm_genlist_item_show(it, ELM_GENLIST_ITEM_SCROLLTO_IN);
+     }
+   else if (!strcmp(ev->key, "Down"))
+     {
+        it = elm_genlist_item_next_get(elm_genlist_selected_item_get(genlist));
+        if(!it) it = elm_genlist_first_item_get(genlist);
+
+        elm_genlist_item_selected_set(it, EINA_TRUE);
+        elm_genlist_item_show(it, ELM_GENLIST_ITEM_SCROLLTO_IN);
+     }
+}
+
+static void
+_autocomplete_list_cb_focus(void *data EINA_UNUSED,
+                            Evas_Object *obj EINA_UNUSED, void *event_info)
+{
+   Elm_Object_Item *it = event_info;
+   elm_genlist_item_selected_set(it, EINA_TRUE);
+}
+
+static void
+_clang_autocomplete_popup_show(Edi_Editor *editor)
 {
    unsigned int col, row;
    Evas_Coord cx, cy, cw, ch;
 
-   elm_obj_code_widget_cursor_position_get(editor->entry, &row, &col);
+   if (elm_genlist_items_count(_clang_autocomplete_popup_genlist) <= 0)
+     return;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
-   edi_editor_save(editor);
 
+   evas_object_move(_clang_autocomplete_popup_bg, cx, cy);
+   evas_object_show(_clang_autocomplete_popup_bg);
+
+   if (!evas_object_key_grab(_clang_autocomplete_popup_genlist, "Return", 0, 0,
+                             EINA_TRUE))
+     ERR("Failed to grab key - %s", "Return");
+   if (!evas_object_key_grab(_clang_autocomplete_popup_genlist, "Up", 0, 0,
+                             EINA_TRUE))
+     ERR("Failed to grab key - %s", "Up");
+   if (!evas_object_key_grab(_clang_autocomplete_popup_genlist, "Down", 0, 0,
+                             EINA_TRUE))
+     ERR("Failed to grab key - %s", "Down");
+}
+
+static void
+_clang_autocomplete_popup_key_down_cb(Edi_Editor *editor, const char *key,
+                                      const char *string)
+{
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   unsigned int col, row;
+   char *word;
+
+   if (!evas_object_visible_get(_clang_autocomplete_popup_bg))
+     return;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   code = elm_code_widget_code_get(editor->entry);
+   line = elm_code_file_line_get(code->file, row);
+
+   if (!strcmp(key, "Left"))
+     {
+        if (col - 1 <= 0)
+          {
+             evas_object_hide(_clang_autocomplete_popup_bg);
+             return;
+          }
+
+        word = _edi_editor_current_word_get(editor, row, col - 1);
+        if (!strcmp(word, ""))
+          evas_object_hide(_clang_autocomplete_popup_bg);
+        else
+          {
+             _autocomplete_list_update(word);
+             _clang_autocomplete_popup_show(editor);
+          }
+        free(word);
+     }
+   else if (!strcmp(key, "Right"))
+     {
+        if (line->length < col)
+          {
+             evas_object_hide(_clang_autocomplete_popup_bg);
+             return;
+          }
+
+        word = _edi_editor_current_word_get(editor, row, col + 1);
+        if (!strcmp(word, ""))
+          evas_object_hide(_clang_autocomplete_popup_bg);
+        else
+          {
+             _autocomplete_list_update(word);
+             _clang_autocomplete_popup_show(editor);
+          }
+        free(word);
+     }
+   else if (!strcmp(key, "BackSpace"))
+     {
+        if (col - 1 <= 0)
+          {
+             evas_object_hide(_clang_autocomplete_popup_bg);
+             return;
+          }
+
+        word = _edi_editor_current_word_get(editor, row, col - 1);
+        if (!strcmp(word, ""))
+          evas_object_hide(_clang_autocomplete_popup_bg);
+        else
+          {
+             _autocomplete_list_update(word);
+             _clang_autocomplete_popup_show(editor);
+          }
+        free(word);
+     }
+   else if (!strcmp(key, "Escape"))
+     {
+        evas_object_hide(_clang_autocomplete_popup_bg);
+     }
+   else if (!strcmp(key, "Delete"))
+     {
+        //Do nothing
+     }
+   else if (string && strlen(string) == 1)
+     {
+        word = _edi_editor_current_word_get(editor, row, col);
+        strncat(word, string, 1);
+        _autocomplete_list_update(word);
+        _clang_autocomplete_popup_show(editor);
+        free(word);
+     }
+}
+
+static void
+_clang_autocomplete_popup_init(Edi_Editor *editor)
+{
    //Popup bg
    Evas_Object *bg = elm_bubble_add(editor->entry);
    _clang_autocomplete_popup_bg = bg;
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_event_callback_add(bg, EVAS_CALLBACK_HIDE,
+                                  _autocomplete_bg_cb_hide, NULL);
    evas_object_resize(bg, 350, 200);
-   evas_object_move(bg, cx, cy);
-   evas_object_show(bg);
 
    //Genlist
    Evas_Object *genlist = elm_genlist_add(editor->entry);
+   _clang_autocomplete_popup_genlist = genlist;
+   elm_object_focus_allow_set(genlist, EINA_FALSE);
    evas_object_event_callback_add(genlist, EVAS_CALLBACK_KEY_DOWN,
                                   _autocomplete_list_cb_key_down, NULL);
    evas_object_smart_callback_add(genlist, "item,focused",
                                   _autocomplete_list_cb_focus, NULL);
    elm_object_content_set(bg, genlist);
    evas_object_show(genlist);
-
-   _autocomplete_list_update(genlist, editor);
-
-   //Focus first item
-   Elm_Object_Item *item = elm_genlist_first_item_get(genlist);
-   if (item)
-     elm_object_item_focus_set(item, EINA_TRUE);
-   else
-     evas_object_del(bg);
-
 }
 #endif
 
@@ -357,10 +523,15 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 #if HAVE_LIBCLANG
         else if (!strcmp(ev->key, "space"))
           {
-             _clang_autocomplete_popup(editor);
+             _autocomplete_list_set(editor);
+             _clang_autocomplete_popup_show(editor);
           }
 #endif
      }
+#if HAVE_LIBCLANG
+   if ((!alt) && (!ctrl))
+     _clang_autocomplete_popup_key_down_cb(editor, ev->key, ev->string);
+#endif
 }
 
 static void
@@ -739,7 +910,7 @@ _mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    event = (Evas_Event_Mouse_Up *)event_info;
 
    if (_clang_autocomplete_popup_bg)
-     evas_object_del(_clang_autocomplete_popup_bg);
+     evas_object_hide(_clang_autocomplete_popup_bg);
 
    ctrl = evas_key_modifier_is_set(event->modifiers, "Control");
    if (event->button != 3 || !ctrl)
@@ -894,5 +1065,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
    evas_object_event_callback_add(vbox, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
+#if HAVE_LIBCLANG
+   _clang_autocomplete_popup_init(editor);
+#endif
    return vbox;
 }
