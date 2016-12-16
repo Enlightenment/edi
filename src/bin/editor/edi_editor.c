@@ -178,6 +178,7 @@ _autocomplete_list_set(Edi_Editor *editor)
    CXIndex idx;
    CXTranslationUnit tx_unit;
    CXCodeCompleteResults *res;
+   struct CXUnsavedFile unsaved_file;
    char *curword, **clang_argv;
    const char *path, *args;
    unsigned int clang_argc, row, col;
@@ -195,7 +196,6 @@ _autocomplete_list_set(Edi_Editor *editor)
                              "autocomplete_list");
      }
 
-   edi_editor_save(editor);
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    code = elm_code_widget_code_get(editor->entry);
@@ -208,13 +208,19 @@ _autocomplete_list_set(Edi_Editor *editor)
    clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
 
    idx = clang_createIndex(0, 0);
+
+   unsaved_file.Filename = path;
+   unsaved_file.Contents = elm_code_widget_text_between_positions_get(
+                                                 editor->entry, 1, 1, col, row);
+   unsaved_file.Length = strlen(unsaved_file.Contents);
    /* FIXME: Possibly activate more options? */
    tx_unit = clang_parseTranslationUnit(idx, path,
                                         (const char *const *)clang_argv,
-                                        (int)clang_argc, NULL, 0,
+                                        (int)clang_argc, &unsaved_file, 1,
                                         CXTranslationUnit_PrecompiledPreamble);
    clang_reparseTranslationUnit(tx_unit, 0, 0, 0);
-   res = clang_codeCompleteAt(tx_unit, path, row, col - strlen(curword), NULL, 0,
+   res = clang_codeCompleteAt(tx_unit, path, row, col - strlen(curword),
+                              &unsaved_file, 1,
                               CXCodeComplete_IncludeMacros |
                               CXCodeComplete_IncludeCodePatterns);
 
