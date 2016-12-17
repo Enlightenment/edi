@@ -26,7 +26,9 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
+#if HAVE_LIBCLANG
 static Evas_Object *_clang_autocomplete_popup_bg, *_clang_autocomplete_popup_genlist;
+#endif
 
 void
 edi_editor_save(Edi_Editor *editor)
@@ -915,8 +917,10 @@ _mouse_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
    widget = (Elm_Code_Widget *)data;
    event = (Evas_Event_Mouse_Up *)event_info;
 
+#if HAVE_LIBCLANG
    if (_clang_autocomplete_popup_bg)
      evas_object_hide(_clang_autocomplete_popup_bg);
+#endif
 
    ctrl = evas_key_modifier_is_set(event->modifiers, "Control");
    if (event->button != 3 || !ctrl)
