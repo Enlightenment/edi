@@ -352,6 +352,7 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
 {
    Elm_Genlist_Item_Class *clas = &itc;
    Edi_Dir_Data *sd;
+   Elm_Object_Item *it;
 
    sd = calloc(1, sizeof(Edi_Dir_Data));
    if (isdir)
@@ -361,6 +362,11 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
      }
 
    sd->path = eina_stringshare_add(path);
+   it = elm_genlist_search_by_text_item_get(list, NULL, "elm.text",
+                                            basename((char *)sd->path),
+                                            ELM_GLOB_MATCH_NO_ESCAPE);
+   if (it) return;
+
    (void)!elm_genlist_item_sorted_insert(list, clas, sd, parent_it,
                                          isdir ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
                                          _file_list_cmp, _item_sel, sd);
