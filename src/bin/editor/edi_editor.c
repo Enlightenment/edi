@@ -89,6 +89,9 @@ _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int 
    code = elm_code_widget_code_get(editor->entry);
    line = elm_code_file_line_get(code->file, row);
 
+   if (!line)
+     return strdup("");
+
    curtext = (char *)elm_code_line_text_get(line, &curlen);
    ptr = curtext + col - 1;
 
