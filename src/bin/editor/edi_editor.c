@@ -116,14 +116,12 @@ _suggest_item_return_get(Suggest_Item *item)
    char *ret_str;
    int retlen;
 
-   if (item->ret)
-     {
-        retlen = strlen(item->ret) + 6;
-        ret_str = malloc(sizeof(char) * retlen);
-        snprintf(ret_str, retlen, " %s<br>", item->ret);
-     }
-   else
-     ret_str = strdup("");
+   if (!item->ret)
+     return strdup("");
+
+   retlen = strlen(item->ret) + 6;
+   ret_str = malloc(sizeof(char) * retlen);
+   snprintf(ret_str, retlen, " %s<br>", item->ret);
 
    return ret_str;
 }
@@ -134,14 +132,12 @@ _suggest_item_parameter_get(Suggest_Item *item)
    char *param_str;
    int paramlen;
 
-   if (item->param)
-     {
-        paramlen = strlen(item->param) + 6;
-        param_str = malloc(sizeof(char) * paramlen);
-        snprintf(param_str, paramlen, "<br>%s", item->param);
-     }
-   else
-     param_str = strdup("");
+   if (!item->param)
+     return strdup("");
+
+   paramlen = strlen(item->param) + 6;
+   param_str = malloc(sizeof(char) * paramlen);
+   snprintf(param_str, paramlen, "<br>%s", item->param);
 
    return param_str;
 }
@@ -1156,7 +1152,7 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
 }
 
 static void
-_editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o EINA_UNUSED, void *event_info EINA_UNUSED)
+_editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o, void *event_info EINA_UNUSED)
 {
    Ecore_Event_Handler *ev_handler = data;
 
