@@ -27,6 +27,15 @@ typedef struct
 } Edi_Range;
 
 #if HAVE_LIBCLANG
+typedef struct
+{
+   enum CXCursorKind kind;
+   char             *ret;
+   char             *name;
+   char             *param;
+   Eina_Bool         is_param_cand;
+} Suggest_Item;
+
 static Evas_Object *_suggest_popup_bg, *_suggest_popup_genlist;
 #endif
 
@@ -69,7 +78,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 }
 
 #if HAVE_LIBCLANG
-static char*
+static char *
 _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    Elm_Code *code;
@@ -98,13 +107,58 @@ _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int 
    return curword;
 }
 
+static char *
+_suggest_item_return_get(Suggest_Item *item)
+{
+   char *ret_str;
+   int retlen;
+
+   if (item->ret)
+     {
+        retlen = strlen(item->ret) + 6;
+        ret_str = malloc(sizeof(char) * retlen);
+        snprintf(ret_str, retlen, " %s<br>", item->ret);
+     }
+   else
+     ret_str = strdup("");
+
+   return ret_str;
+}
+
+static char *
+_suggest_item_parameter_get(Suggest_Item *item)
+{
+   char *param_str;
+   int paramlen;
+
+   if (item->param)
+     {
+        paramlen = strlen(item->param) + 6;
+        param_str = malloc(sizeof(char) * paramlen);
+        snprintf(param_str, paramlen, "<br>%s", item->param);
+     }
+   else
+     param_str = strdup("");
+
+   return param_str;
+}
+
+static void
+_suggest_item_free(Suggest_Item *item)
+{
+   if (item->ret) free(item->ret);
+   if (item->name) free(item->name);
+   if (item->param) free(item->param);
+   free(item);
+}
+
 static Evas_Object *
 _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
 {
    Edi_Editor *editor;
    Edi_Mainview_Item *item;
-   Evas_Object *label;
-   char *format, *display, *auto_str = data;
+   Suggest_Item *suggest_it = data;
+   char *format, *display;
    const char *font;
    int font_size, displen;
 
@@ -120,15 +174,14 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
    elm_code_widget_font_get(editor->entry, &font, &font_size);
 
    format = "<align=left><font=%s><font_size=%d> %s</font_size></font></align>";
-   displen = strlen(auto_str) + strlen(format) + strlen(font);
+   displen = strlen(suggest_it->name) + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
-   snprintf(display, displen, format, font, font_size, auto_str);
+   snprintf(display, displen, format, font, font_size, suggest_it->name);
 
-   label = elm_label_add(obj);
+   Evas_Object *label = elm_label_add(obj);
+   elm_label_ellipsis_set(label, EINA_TRUE);
    elm_object_text_set(label, display);
    evas_object_color_set(label, 255, 255, 255, 255);
-   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(label);
    free(display);
 
@@ -136,12 +189,49 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
 }
 
 static void
+_suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
+{
+   Edi_Editor *editor;
+   Edi_Mainview_Item *item;
+   Suggest_Item *suggest_it;
+   Evas_Object *label = data;
+   char *format, *display, *ret_str, *param_str;
+   const char *font;
+   int font_size, displen;
+
+   suggest_it = elm_object_item_data_get(event_info);
+
+   item = edi_mainview_item_current_get();
+
+   if (!item)
+     return;
+
+   editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
+   elm_code_widget_font_get(editor->entry, &font, &font_size);
+
+   ret_str = _suggest_item_return_get(suggest_it);
+   param_str = _suggest_item_parameter_get(suggest_it);
+
+   format = "<align=left><font=%s><font_size=%d>%s<b> %s</b>%s</font_size></font></align>";
+   displen = strlen(ret_str) + strlen(param_str) + strlen(suggest_it->name)
+             + strlen(format) + strlen(font);
+   display = malloc(sizeof(char) * displen);
+   snprintf(display, displen, format, font, font_size, ret_str, suggest_it->name,
+            param_str);
+
+   elm_object_text_set(label, display);
+   free(display);
+   free(ret_str);
+   free(param_str);
+}
+
+static void
 _suggest_list_update(char *word)
 {
+   Suggest_Item *suggest_it;
    Eina_List *list, *l;
    Elm_Genlist_Item_Class *ic;
    Elm_Object_Item *item;
-   char *auto_str;
 
    elm_genlist_clear(_suggest_popup_genlist);
 
@@ -151,13 +241,13 @@ _suggest_list_update(char *word)
    ic->item_style = "full";
    ic->func.content_get = _suggest_list_content_get;
 
-   EINA_LIST_FOREACH(list, l, auto_str)
+   EINA_LIST_FOREACH(list, l, suggest_it)
      {
-        if (eina_str_has_prefix(auto_str, word))
+        if (eina_str_has_prefix(suggest_it->name, word))
           {
              elm_genlist_item_append(_suggest_popup_genlist,
                                      ic,
-                                     auto_str,
+                                     suggest_it,
                                      NULL,
                                      ELM_GENLIST_ITEM_NONE,
                                      NULL,
@@ -168,7 +258,10 @@ _suggest_list_update(char *word)
 
    item = elm_genlist_first_item_get(_suggest_popup_genlist);
    if (item)
-     elm_genlist_item_selected_set(item, EINA_TRUE);
+     {
+        elm_genlist_item_selected_set(item, EINA_TRUE);
+        elm_genlist_item_show(item, ELM_GENLIST_ITEM_SCROLLTO_TOP);
+     }
    else
      evas_object_hide(_suggest_popup_bg);
 }
@@ -177,22 +270,22 @@ static void
 _suggest_list_set(Edi_Editor *editor)
 {
    Elm_Code *code;
-   CXIndex idx;
-   CXTranslationUnit tx_unit;
    CXCodeCompleteResults *res;
    struct CXUnsavedFile unsaved_file;
-   char *curword, **clang_argv;
-   const char *path, *args;
-   unsigned int clang_argc, row, col;
+   char *curword;
+   const char *path;
+   unsigned int row, col;
    Eina_List *list = NULL;
 
    list = (Eina_List *)evas_object_data_get(_suggest_popup_genlist,
                                             "suggest_list");
    if (list)
      {
-        char *temp_str;
-        EINA_LIST_FREE(list, temp_str)
-          free(temp_str);
+        Suggest_Item *suggest_it;
+
+        EINA_LIST_FREE(list, suggest_it)
+          _suggest_item_free(suggest_it);
+
         list = NULL;
         evas_object_data_del(_suggest_popup_genlist, "suggest_list");
      }
@@ -204,23 +297,12 @@ _suggest_list_set(Edi_Editor *editor)
 
    curword = _edi_editor_current_word_get(editor, row, col);
 
-   //Initialize Clang
-   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
-   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
-
-   idx = clang_createIndex(0, 0);
-
    unsaved_file.Filename = path;
    unsaved_file.Contents = elm_code_widget_text_between_positions_get(
                                                  editor->entry, 1, 1, col, row);
    unsaved_file.Length = strlen(unsaved_file.Contents);
-   /* FIXME: Possibly activate more options? */
-   tx_unit = clang_parseTranslationUnit(idx, path,
-                                        (const char *const *)clang_argv,
-                                        (int)clang_argc, &unsaved_file, 1,
-                                        CXTranslationUnit_PrecompiledPreamble);
-   clang_reparseTranslationUnit(tx_unit, 0, 0, 0);
-   res = clang_codeCompleteAt(tx_unit, path, row, col - strlen(curword),
+
+   res = clang_codeCompleteAt(editor->as_unit, path, row, col - strlen(curword),
                               &unsaved_file, 1,
                               CXCodeComplete_IncludeMacros |
                               CXCodeComplete_IncludeCodePatterns);
@@ -230,26 +312,79 @@ _suggest_list_set(Edi_Editor *editor)
    for (unsigned int i = 0; i < res->NumResults; i++)
      {
         const CXCompletionString str = res->Results[i].CompletionString;
+        Suggest_Item *suggest_it;
+        Eina_Strbuf *buf = NULL;
+
+        suggest_it = calloc(1, sizeof(Suggest_Item));
+        suggest_it->kind = res->Results[i].CursorKind;
+        if (suggest_it->kind == CXCursor_OverloadCandidate)
+          suggest_it->is_param_cand = EINA_TRUE;
+
         for (unsigned int j = 0; j < clang_getNumCompletionChunks(str); j++)
           {
-             if (clang_getCompletionChunkKind(str, j) !=
-                 CXCompletionChunk_TypedText)
-               continue;
-
+             enum CXCompletionChunkKind ch_kind;
              const CXString str_out = clang_getCompletionChunkText(str, j);
-             char *auto_str = strdup(clang_getCString(str_out));
 
-             list = eina_list_append(list, auto_str);
+             ch_kind = clang_getCompletionChunkKind(str, j);
+
+             switch (ch_kind)
+               {
+                case CXCompletionChunk_ResultType:
+                   suggest_it->ret = strdup(clang_getCString(str_out));
+                   break;
+                case CXCompletionChunk_TypedText:
+                case CXCompletionChunk_Text:
+                   suggest_it->name = strdup(clang_getCString(str_out));
+                   break;
+                case CXCompletionChunk_LeftParen:
+                case CXCompletionChunk_Placeholder:
+                case CXCompletionChunk_Comma:
+                case CXCompletionChunk_CurrentParameter:
+                   if (!buf)
+                     buf = eina_strbuf_new();
+                   eina_strbuf_append(buf, clang_getCString(str_out));
+                   break;
+                case CXCompletionChunk_RightParen:
+                   eina_strbuf_append(buf, clang_getCString(str_out));
+                   suggest_it->param = eina_strbuf_string_steal(buf);
+                   eina_strbuf_free(buf);
+                   buf = NULL;
+                   break;
+                default:
+                   break;
+               }
           }
+        list = eina_list_append(list, suggest_it);
      }
 
    clang_disposeCodeCompleteResults(res);
-   clang_disposeTranslationUnit(tx_unit);
-   clang_disposeIndex(idx);
 
    evas_object_data_set(_suggest_popup_genlist, "suggest_list", list);
    _suggest_list_update(curword);
    free(curword);
+}
+
+static void
+_suggest_list_selection_insert(Edi_Editor *editor, const char *selection)
+{
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   char *word;
+   unsigned int wordlen, col, row;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   code = elm_code_widget_code_get(editor->entry);
+   line = elm_code_file_line_get(code->file, row);
+   word = _edi_editor_current_word_get(editor, row, col);
+   wordlen = strlen(word);
+   free(word);
+
+   elm_code_line_text_remove(line, col - wordlen - 1, wordlen);
+   elm_code_line_text_insert(line, col - wordlen - 1, selection,
+                             strlen(selection));
+   elm_code_widget_cursor_position_set(editor->entry, row,
+                                       col - wordlen + strlen(selection));
 }
 
 static void
@@ -262,9 +397,11 @@ _suggest_bg_cb_hide(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
                                             "suggest_list");
    if (list)
      {
-        char *temp_str;
-        EINA_LIST_FREE(list, temp_str)
-          free(temp_str);
+        Suggest_Item *suggest_it;
+
+        EINA_LIST_FREE(list, suggest_it)
+          _suggest_item_free(suggest_it);
+
         list = NULL;
         evas_object_data_del(_suggest_popup_genlist, "suggest_list");
      }
@@ -274,46 +411,21 @@ _suggest_bg_cb_hide(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 }
 
 static void
-_suggest_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
-                          Evas_Object *obj, void *event_info)
+_suggest_list_cb_key_down(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
+                          void *event_info)
 {
-   Edi_Mainview_Item *m_it;
+   Edi_Editor *editor = (Edi_Editor *)data;
+   Suggest_Item *suggest_it;
    Elm_Object_Item *it;
-   Edi_Editor *editor;
    Evas_Object *genlist = obj;
-   Elm_Code *code;
-   Elm_Code_Line *line;
    Evas_Event_Key_Down *ev = event_info;
-   char *word;
-   const char *list_word;
-   unsigned int wordlen, col, row;
-
-   m_it = edi_mainview_item_current_get();
-
-   if (!m_it)
-     return;
-
-   editor = (Edi_Editor *)evas_object_data_get(m_it->view, "editor");
-
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-
-   code = elm_code_widget_code_get(editor->entry);
-   line = elm_code_file_line_get(code->file, row);
 
    if (!strcmp(ev->key, "Return"))
      {
-        word = _edi_editor_current_word_get(editor, row, col);
-        wordlen = strlen(word);
-        free(word);
-
-        elm_code_line_text_remove(line, col - wordlen - 1, wordlen);
         it = elm_genlist_selected_item_get(genlist);
-        list_word = elm_object_item_data_get(it);
+        suggest_it = elm_object_item_data_get(it);
 
-        elm_code_line_text_insert(line, col - wordlen - 1,
-                                  list_word, strlen(list_word));
-        elm_code_widget_cursor_position_set(editor->entry, row,
-                                            col - wordlen + strlen(list_word));
+        _suggest_list_selection_insert(editor, suggest_it->name);
         evas_object_hide(_suggest_popup_bg);
      }
    else if (!strcmp(ev->key, "Up"))
@@ -335,11 +447,17 @@ _suggest_list_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 }
 
 static void
-_suggest_list_cb_focus(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                       void *event_info)
+_suggest_list_cb_clicked_double(void *data, Evas_Object *obj EINA_UNUSED,
+                                void *event_info)
 {
    Elm_Object_Item *it = event_info;
-   elm_genlist_item_selected_set(it, EINA_TRUE);
+   Suggest_Item *suggest_it;
+   Edi_Editor *editor = (Edi_Editor *)data;
+
+   suggest_it = elm_object_item_data_get(it);
+   _suggest_list_selection_insert(editor, suggest_it->name);
+
+   evas_object_hide(_suggest_popup_bg);
 }
 
 static void
@@ -372,7 +490,7 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
    Elm_Code *code;
    Elm_Code_Line *line;
    unsigned int col, row;
-   char *word;
+   char *word = NULL;
 
    if (!evas_object_visible_get(_suggest_popup_bg))
      return;
@@ -398,7 +516,6 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              _suggest_list_update(word);
              _suggest_popup_show(editor);
           }
-        free(word);
      }
    else if (!strcmp(key, "Right"))
      {
@@ -416,7 +533,6 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              _suggest_list_update(word);
              _suggest_popup_show(editor);
           }
-        free(word);
      }
    else if (!strcmp(key, "BackSpace"))
      {
@@ -434,7 +550,6 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              _suggest_list_update(word);
              _suggest_popup_show(editor);
           }
-        free(word);
      }
    else if (!strcmp(key, "Escape"))
      {
@@ -450,12 +565,13 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
         strncat(word, string, 1);
         _suggest_list_update(word);
         _suggest_popup_show(editor);
-        free(word);
      }
+   if (word)
+     free(word);
 }
 
 static void
-_suggest_popup_init(Edi_Editor *editor)
+_suggest_popup_setup(Edi_Editor *editor)
 {
    //Popup bg
    Evas_Object *bg = elm_bubble_add(editor->entry);
@@ -464,18 +580,72 @@ _suggest_popup_init(Edi_Editor *editor)
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_event_callback_add(bg, EVAS_CALLBACK_HIDE,
                                   _suggest_bg_cb_hide, NULL);
-   evas_object_resize(bg, 350, 200);
+   evas_object_resize(bg, 400 * elm_config_scale_get(), 300 * elm_config_scale_get());
+
+   //Box
+   Evas_Object *box = elm_box_add(bg);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(bg, box);
+   evas_object_show(box);
 
    //Genlist
-   Evas_Object *genlist = elm_genlist_add(editor->entry);
+   Evas_Object *genlist = elm_genlist_add(box);
    _suggest_popup_genlist = genlist;
+   evas_object_size_hint_weight_set(genlist, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(genlist, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_focus_allow_set(genlist, EINA_FALSE);
+   elm_genlist_homogeneous_set(genlist, EINA_TRUE);
    evas_object_event_callback_add(genlist, EVAS_CALLBACK_KEY_DOWN,
-                                  _suggest_list_cb_key_down, NULL);
-   evas_object_smart_callback_add(genlist, "item,focused",
-                                  _suggest_list_cb_focus, NULL);
-   elm_object_content_set(bg, genlist);
+                                  _suggest_list_cb_key_down, editor);
+   evas_object_smart_callback_add(genlist, "clicked,double",
+                                  _suggest_list_cb_clicked_double, editor);
    evas_object_show(genlist);
+   elm_box_pack_end(box, genlist);
+
+   //Label
+   Evas_Object *label = elm_label_add(box);
+   elm_label_line_wrap_set(label, ELM_WRAP_MIXED);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_color_set(label, 255, 255, 255, 255);
+   evas_object_show(label);
+   elm_box_pack_end(box, label);
+
+   evas_object_smart_callback_add(genlist, "selected",
+                                  _suggest_list_cb_selected, label);
+}
+
+static void
+_clang_autosuggest_setup(Edi_Editor *editor)
+{
+   Elm_Code *code;
+   const char *path;
+   char **clang_argv;
+   const char *args;
+   unsigned int clang_argc;
+
+   code = elm_code_widget_code_get(editor->entry);
+   path = elm_code_file_path_get(code->file);
+
+   //Initialize Clang
+   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
+   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
+
+   editor->as_idx = clang_createIndex(0, 0);
+
+   editor->as_unit = clang_parseTranslationUnit(editor->as_idx, path,
+                                  (const char *const *)clang_argv,
+                                  (int)clang_argc, NULL, 0,
+                                  clang_defaultEditingTranslationUnitOptions());
+
+   _suggest_popup_setup(editor);
+}
+
+static void
+_clang_autosuggest_dispose(Edi_Editor *editor)
+{
+   clang_disposeTranslationUnit(editor->as_unit);
+   clang_disposeIndex(editor->as_idx);
 }
 #endif
 
@@ -988,6 +1158,11 @@ _editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o EINA_UNUSED, void
    Ecore_Event_Handler *ev_handler = data;
 
    ecore_event_handler_del(ev_handler);
+#if HAVE_LIBCLANG
+   Evas_Object *view = o;
+   Edi_Editor *editor = (Edi_Editor *)evas_object_data_get(view, "editor");
+   _clang_autosuggest_dispose(editor);
+#endif
 }
 
 Evas_Object *
@@ -1071,7 +1246,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_event_callback_add(vbox, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
 #if HAVE_LIBCLANG
-   _suggest_popup_init(editor);
+   _clang_autosuggest_setup(editor);
 #endif
    return vbox;
 }

@@ -52,6 +52,9 @@ struct _Edi_Editor
    CXToken *tokens;
    CXCursor *cursors;
    unsigned int token_count;
+
+   CXIndex as_idx;
+   CXTranslationUnit as_unit;
 #endif
 
    Eina_Bool show_highlight;
