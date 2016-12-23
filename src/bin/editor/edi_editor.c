@@ -110,36 +110,22 @@ _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int 
    return curword;
 }
 
-static char *
+static const char *
 _suggest_item_return_get(Suggest_Item *item)
 {
-   char *ret_str;
-   int retlen;
-
    if (!item->ret)
-     return strdup("");
+     return "";
 
-   retlen = strlen(item->ret) + 6;
-   ret_str = malloc(sizeof(char) * retlen);
-   snprintf(ret_str, retlen, " %s<br>", item->ret);
-
-   return ret_str;
+   return item->ret;
 }
 
-static char *
+static const char *
 _suggest_item_parameter_get(Suggest_Item *item)
 {
-   char *param_str;
-   int paramlen;
-
    if (!item->param)
-     return strdup("");
+     return "";
 
-   paramlen = strlen(item->param) + 6;
-   param_str = malloc(sizeof(char) * paramlen);
-   snprintf(param_str, paramlen, "<br>%s", item->param);
-
-   return param_str;
+   return item->param;
 }
 
 static void
@@ -172,7 +158,7 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
    editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
    elm_code_widget_font_get(editor->entry, &font, &font_size);
 
-   format = "<align=left><font=%s><font_size=%d> %s</font_size></font></align>";
+   format = "<align=left><font=\"%s\"><font_size=%d> %s</font_size></font></align>";
    displen = strlen(suggest_it->name) + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
    snprintf(display, displen, format, font, font_size, suggest_it->name);
@@ -194,8 +180,8 @@ _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_
    Edi_Mainview_Item *item;
    Suggest_Item *suggest_it;
    Evas_Object *label = data;
-   char *format, *display, *ret_str, *param_str;
-   const char *font;
+   char *format, *display;
+   const char *font, *ret_str, *param_str;
    int font_size, displen;
 
    suggest_it = elm_object_item_data_get(event_info);
@@ -211,7 +197,7 @@ _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_
    ret_str = _suggest_item_return_get(suggest_it);
    param_str = _suggest_item_parameter_get(suggest_it);
 
-   format = "<align=left><font=%s><font_size=%d>%s<b> %s</b>%s</font_size></font></align>";
+   format = "<align=left><font=\"%s\"><font_size=%d>%s<br><b>%s</b><br>  %s</font_size></font></align>";
    displen = strlen(ret_str) + strlen(param_str) + strlen(suggest_it->name)
              + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
@@ -220,8 +206,6 @@ _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_
 
    elm_object_text_set(label, display);
    free(display);
-   free(ret_str);
-   free(param_str);
 }
 
 static void
