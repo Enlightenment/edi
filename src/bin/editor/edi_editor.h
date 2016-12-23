@@ -38,6 +38,8 @@ typedef struct _Edi_Editor Edi_Editor;
 struct _Edi_Editor
 {
    Evas_Object *entry; /**< The main text entry widget for the editor */
+   Evas_Object *suggest_bg; /**< The autosuggest background */
+   Evas_Object *suggest_genlist; /**< The autosuggest genlist */
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */
@@ -62,6 +64,7 @@ struct _Edi_Editor
    Eina_Bool highlight_cancel;
    time_t save_time;
 
+   Eina_Bool show_suggest;
    /* Add new members here. */
 };
 
