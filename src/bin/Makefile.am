@@ -23,6 +23,7 @@ AM_CPPFLAGS = \
 noinst_HEADERS = \
 edi_config.h \
 editor/edi_editor.h \
+editor/edi_editor_suggest_provider.h \
 edi_content_provider.h \
 screens/edi_screens.h \
 edi_filepanel.h \
@@ -34,6 +35,7 @@ mainview/edi_mainview.h
 edi_SOURCES = \
 edi_config.c \
 editor/edi_editor_search.c \
+editor/edi_editor_suggest_provider.c \
 editor/edi_editor.c \
 edi_content_provider.c \
 screens/edi_welcome.c \

@@ -64,7 +64,8 @@ struct _Edi_Editor
    Eina_Bool highlight_cancel;
    time_t save_time;
 
-   Eina_Bool show_suggest;
+   const char *mimetype;
+
    /* Add new members here. */
 };
 
