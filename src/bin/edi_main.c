@@ -620,15 +620,12 @@ _tb_goto_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static Eina_Bool
-_edi_build_prep(Evas_Object *button, Eina_Bool test)
+_edi_build_prep(Evas_Object *button)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(button), EINA_FALSE);
 
    edi_consolepanel_clear();
-   if (test)
-     edi_testpanel_show();
-   else
-     edi_consolepanel_show();
+   edi_consolepanel_show();
 
    if (!edi_builder_can_build())
      {
@@ -642,28 +639,28 @@ _edi_build_prep(Evas_Object *button, Eina_Bool test)
 static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj, EINA_FALSE))
+   if (_edi_build_prep(obj))
      edi_builder_build();
 }
 
 static void
 _tb_test_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj, EINA_TRUE))
+   if (_edi_build_prep(obj))
      edi_builder_test();
 }
 
 static void
 _tb_run_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj, EINA_FALSE))
+   if (_edi_build_prep(obj))
      _edi_launcher_run(&_edi_project_config->launch);
 }
 
 static void
 _tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj, EINA_FALSE))
+   if (_edi_build_prep(obj))
      edi_builder_clean();
 }
 

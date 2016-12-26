@@ -38,8 +38,20 @@ void edi_consolepanel_add(Evas_Object *parent);
  */
 void edi_consolepanel_show();
 
+/**
+ * Initialize a new Edi testpanel and add it to the parent panel.
+ *
+ * @param parent The panel into which the panel will be loaded.
+ *
+ * @ingroup UI
+ */
 void edi_testpanel_add(Evas_Object *parent);
 
+/**
+ * Show the Edi testpanel - animating on to screen if required.
+ *
+ * @ingroup UI
+ */
 void edi_testpanel_show();
 
 /**
