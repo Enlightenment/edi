@@ -53,7 +53,7 @@ _make_build_make(void)
    chdir(edi_project_get());
    ecore_exe_pipe_run("make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
@@ -63,7 +63,7 @@ _make_build_configure(void)
    ecore_exe_pipe_run("./configure && make",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
@@ -73,7 +73,7 @@ _make_build_cmake(void)
    ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && make && cd ..",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
@@ -83,7 +83,7 @@ _make_build_autogen(void)
    ecore_exe_pipe_run("./autogen.sh && make",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_USE_SH, NULL);
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
@@ -104,7 +104,8 @@ _make_test(void)
 {
    chdir(edi_project_get());
    ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
@@ -112,7 +113,8 @@ _make_clean(void)
 {
    chdir(edi_project_get());
    ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR, NULL);
+                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 Edi_Build_Provider _edi_build_provider_make =
