@@ -115,7 +115,7 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
 
    unsaved_file.Filename = path;
    unsaved_file.Contents = elm_code_widget_text_between_positions_get(
-                                                 editor->entry, 1, 1, col, row);
+                                                 editor->entry, 1, 1, row, col);
    unsaved_file.Length = strlen(unsaved_file.Contents);
 
    res = clang_codeCompleteAt(editor->as_unit, path, row, col,
