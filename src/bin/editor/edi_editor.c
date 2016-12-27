@@ -163,6 +163,7 @@ static void
 _suggest_list_update(Edi_Editor *editor, char *word)
 {
    Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Editor_Suggest_Provider *provider;
    Eina_List *list, *l;
    Elm_Genlist_Item_Class *ic;
    Elm_Object_Item *item;
@@ -175,10 +176,11 @@ _suggest_list_update(Edi_Editor *editor, char *word)
    ic->item_style = "full";
    ic->func.content_get = _suggest_list_content_get;
 
+   provider = edi_editor_suggest_provider_get(editor);
    EINA_LIST_FOREACH(list, l, suggest_it)
      {
         const char *term;
-        term = edi_editor_suggest_provider_get(editor)->summary_get(editor, suggest_it);
+        term = provider->summary_get(editor, suggest_it);
 
         if (eina_str_has_prefix(term, word))
           {
@@ -229,7 +231,7 @@ _suggest_list_set(Edi_Editor *editor)
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    curword = _edi_editor_current_word_get(editor, row, col);
-   list = edi_editor_suggest_provider_get(editor)->lookup(editor, curword);
+   list = edi_editor_suggest_provider_get(editor)->lookup(editor, row, col - strlen(curword));
 
    evas_object_data_set(editor->suggest_genlist, "suggest_list", list);
    _suggest_list_update(editor, curword);

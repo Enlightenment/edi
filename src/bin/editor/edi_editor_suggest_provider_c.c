@@ -2,6 +2,13 @@
 # include "config.h"
 #endif
 
+#if HAVE_LIBCLANG
+#include <clang-c/Index.h>
+#endif
+
+#include <Eina.h>
+#include <Elementary.h>
+
 #include "edi_editor_suggest_provider.h"
 
 #include "edi_config.h"
@@ -89,7 +96,7 @@ _edi_editor_sugget_c_del(Edi_Editor *editor)
 }
 
 Eina_List *
-_edi_editor_suggest_c_lookup(Edi_Editor *editor, const char *curword)
+_edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    Eina_List *list = NULL;
 
@@ -97,22 +104,21 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, const char *curword)
    CXCodeCompleteResults *res;
    struct CXUnsavedFile unsaved_file;
    Elm_Code *code;
-   const char *path;
-   unsigned int col, row;
+   const char *path = NULL;
 
    if (!editor->as_unit)
      return list;
 
    code = elm_code_widget_code_get(editor->entry);
-   path = elm_code_file_path_get(code->file);
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   if (code->file->file)
+     path = elm_code_file_path_get(code->file);
 
    unsaved_file.Filename = path;
    unsaved_file.Contents = elm_code_widget_text_between_positions_get(
                                                  editor->entry, 1, 1, col, row);
    unsaved_file.Length = strlen(unsaved_file.Contents);
 
-   res = clang_codeCompleteAt(editor->as_unit, path, row, col - strlen(curword),
+   res = clang_codeCompleteAt(editor->as_unit, path, row, col,
                               &unsaved_file, 1,
                               CXCodeComplete_IncludeMacros |
                               CXCodeComplete_IncludeCodePatterns);

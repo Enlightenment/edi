@@ -31,7 +31,7 @@ typedef struct _Edi_Editor_Suggest_Provider
 
    void (*add)(Edi_Editor *editor);
    void (*del)(Edi_Editor *editor);
-   Eina_List *(*lookup)(Edi_Editor *editor, const char *word);
+   Eina_List *(*lookup)(Edi_Editor *editor, unsigned int row, unsigned int col);
    const char *(*summary_get)(Edi_Editor *editor, Edi_Editor_Suggest_Item *item);
    char *(*detail_get)(Edi_Editor *editor, Edi_Editor_Suggest_Item *item);
    void (*item_free)(Edi_Editor_Suggest_Item *item);

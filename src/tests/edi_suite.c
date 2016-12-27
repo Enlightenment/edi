@@ -15,7 +15,9 @@ static const struct {
 } tests[] = {
   { "basic", edi_test_basic },
   { "path", edi_test_path },
-  { "content_provider", edi_test_content_provider }
+  { "content_provider", edi_test_content_provider },
+  { "editor_suggest_provider", edi_test_editor_suggest_provider },
+  { "editor_suggest_provider_c", edi_test_editor_suggest_provider_c }
 };
 
 START_TEST(edi_initialization)

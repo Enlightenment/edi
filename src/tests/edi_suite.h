@@ -9,5 +9,7 @@ void edi_test_basic(TCase *tc);
 void edi_test_console(TCase *tc);
 void edi_test_path(TCase *tc);
 void edi_test_content_provider(TCase *tc);
+void edi_test_editor_suggest_provider(TCase *tc);
+void edi_test_editor_suggest_provider_c(TCase *tc);
 
 #endif /* _EDI_SUITE_H */
