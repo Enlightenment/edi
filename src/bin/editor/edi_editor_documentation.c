@@ -416,8 +416,7 @@ edi_editor_doc_open(Edi_Editor *editor)
    elm_grid_size_set(grid, 100, 100);
    evas_object_size_hint_weight_set(grid, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_geometry_get(editor->entry, NULL, NULL, &w, &h);
-   evas_object_size_hint_min_set(grid, w * 0.8 * elm_config_scale_get(),
-                                 h * 0.8 * elm_config_scale_get());
+   evas_object_size_hint_min_set(grid, w * 0.8, h * 0.8);
    elm_object_content_set(editor->doc_popup, grid);
    evas_object_show(grid);
 
