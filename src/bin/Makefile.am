@@ -37,6 +37,7 @@ edi_config.c \
 editor/edi_editor_search.c \
 editor/edi_editor_suggest_provider.c \
 editor/edi_editor.c \
+editor/edi_editor_documentation.c \
 edi_content_provider.c \
 screens/edi_welcome.c \
 screens/edi_about.c \

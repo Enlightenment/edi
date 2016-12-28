@@ -907,6 +907,9 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
 
    if (editor->suggest_bg)
      evas_object_hide(editor->suggest_bg);
+
+   if (editor->doc_popup && evas_object_visible_get(editor->doc_popup))
+     evas_object_del(editor->doc_popup);
 }
 
 static void
@@ -914,7 +917,6 @@ _mouse_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
              void *event_info)
 {
    Edi_Editor *editor;
-   Evas_Object *popup;
    Evas_Event_Mouse_Up *event;
    Eina_Bool ctrl;
    unsigned int row;
@@ -937,14 +939,7 @@ _mouse_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    if (!word || !strlen(word))
      return;
 
-   popup = elm_popup_add(editor->entry);
-   elm_popup_timeout_set(popup,1.5);
-
-   elm_object_style_set(popup, "transparent");
-   elm_object_part_text_set(popup, "title,text", word);
-   elm_object_text_set(popup, "No help available for this term");
-
-   evas_object_show(popup);
+   edi_editor_doc_open(editor);
 }
 
 static void

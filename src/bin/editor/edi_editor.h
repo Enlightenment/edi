@@ -3,6 +3,7 @@
 
 #if HAVE_LIBCLANG
 #include <clang-c/Index.h>
+#include <clang-c/Documentation.h>
 #endif
 #include <time.h>
 
@@ -40,6 +41,7 @@ struct _Edi_Editor
    Evas_Object *entry; /**< The main text entry widget for the editor */
    Evas_Object *suggest_bg; /**< The autosuggest background */
    Evas_Object *suggest_genlist; /**< The autosuggest genlist */
+   Evas_Object *doc_popup; /**< The popup for documentation */
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */
@@ -125,6 +127,15 @@ void edi_editor_search(Edi_Editor *editor);
  * @ingroup Widgets
  */
 void edi_editor_save(Edi_Editor *editor);
+
+/**
+ * Open the document of the entity where the cursor is located.
+ *
+ * @param editor the text editor instance to open document.
+ *
+ * @ingroup Widgets
+ */
+void edi_editor_doc_open(Edi_Editor *editor);
 
 /**
  * @}
