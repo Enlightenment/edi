@@ -122,7 +122,7 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
    elm_code_widget_font_get(editor->entry, &font, &font_size);
 
    summary = edi_editor_suggest_provider_get(editor)->summary_get(editor, suggest_it);
-   format = "<align=left><font=\"%s\"><font_size=%d> %s</font_size></font></align>";
+   format = "<align=left><font='%s'><font_size=%d> %s</font_size></font></align>";
    displen = strlen(summary) + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
    snprintf(display, displen, format, font, font_size, summary);
@@ -346,7 +346,8 @@ static void
 _suggest_popup_show(Edi_Editor *editor)
 {
    unsigned int col, row;
-   Evas_Coord cx, cy, cw, ch;
+   Evas_Coord cx, cy, cw, ch, sy, sh, ey, eh, bg_x, bg_y;
+   char *word;
 
    if (!editor->suggest_genlist)
      return;
@@ -358,8 +359,23 @@ _suggest_popup_show(Edi_Editor *editor)
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
 
-   evas_object_move(editor->suggest_bg, cx, cy);
+   word = _edi_editor_current_word_get(editor, row, col);
+
+   bg_x = cx - (strlen(word) + 1) * cw;
+   bg_y = cy + ch;
+
+   evas_object_move(editor->suggest_bg, bg_x, bg_y);
    evas_object_show(editor->suggest_bg);
+
+   evas_object_geometry_get(editor->suggest_bg, NULL, &sy, NULL, &sh);
+   evas_object_geometry_get(editor->entry, NULL, &ey, NULL, &eh);
+
+   if (sy + sh > ey + eh)
+     {
+        bg_y = cy - sh;
+
+        evas_object_move(editor->suggest_bg, bg_x, bg_y);
+     }
 
    if (!evas_object_key_grab(editor->suggest_genlist, "Return", 0, 0, EINA_TRUE))
      ERR("Failed to grab key - %s", "Return");
@@ -367,6 +383,8 @@ _suggest_popup_show(Edi_Editor *editor)
      ERR("Failed to grab key - %s", "Up");
    if (!evas_object_key_grab(editor->suggest_genlist, "Down", 0, 0, EINA_TRUE))
      ERR("Failed to grab key - %s", "Down");
+
+   free(word);
 }
 
 static void
@@ -449,18 +467,16 @@ static void
 _suggest_popup_setup(Edi_Editor *editor)
 {
    //Popup bg
-   Evas_Object *bg = elm_bubble_add(editor->entry);
+   Evas_Object *bg = elm_bg_add(editor->entry);
    editor->suggest_bg = bg;
-   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_bg_color_set(bg, 30, 30, 30);
    evas_object_event_callback_add(bg, EVAS_CALLBACK_HIDE,
                                   _suggest_bg_cb_hide, editor);
    evas_object_resize(bg, 400 * elm_config_scale_get(), 300 * elm_config_scale_get());
 
    //Box
    Evas_Object *box = elm_box_add(bg);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_padding_set(box, 5, 5);
    elm_object_content_set(bg, box);
    evas_object_show(box);
 
@@ -482,7 +498,6 @@ _suggest_popup_setup(Edi_Editor *editor)
    Evas_Object *label = elm_label_add(box);
    elm_label_line_wrap_set(label, ELM_WRAP_MIXED);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_color_set(label, 255, 255, 255, 255);
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
@@ -535,7 +550,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
         else if (edi_editor_suggest_provider_has(editor) && !strcmp(ev->key, "space"))
           {
              _suggest_list_set(editor);
-             _suggest_popup_show(editor);
           }
      }
 

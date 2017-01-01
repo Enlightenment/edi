@@ -207,18 +207,23 @@ _edi_editor_suggest_c_detail_get(Edi_Editor *editor, Edi_Editor_Suggest_Item *it
    char *format, *display;
    const char *font, *term_str, *ret_str, *param_str;
    int font_size, displen;
+   unsigned int row, col;
+   Evas_Coord w;
 
    elm_code_widget_font_get(editor->entry, &font, &font_size);
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   elm_code_widget_geometry_for_position_get(editor->entry, row, col,
+                                             NULL, NULL, &w, NULL);
 
    term_str = _edi_editor_suggest_c_summary_get(editor, item);
    ret_str = _suggest_item_return_get(item);
    param_str = _suggest_item_parameter_get(item);
 
-   format = "<align=left><font=\"%s\"><font_size=%d>%s<br><b>%s</b><br>  %s</font_size></font></align>";
+   format = "<left_margin=%d><align=left><font='%s'><font_size=%d>%s<br><b>%s</b><br>%s</font_size></font></align></left_margin>";
    displen = strlen(ret_str) + strlen(param_str) + strlen(term_str)
              + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
-   snprintf(display, displen, format, font, font_size, ret_str, term_str, param_str);
+   snprintf(display, displen, format, w, font, font_size, ret_str, term_str, param_str);
 
    return display;
 }
