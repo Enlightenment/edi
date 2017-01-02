@@ -1193,7 +1193,6 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    edi_init();
    if (!_edi_log_init())
      goto end;
-   elm_code_init();
 
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
@@ -1235,7 +1234,6 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
  end:
    _edi_log_shutdown();
-   elm_code_shutdown();
    elm_shutdown();
    edi_shutdown();
 
