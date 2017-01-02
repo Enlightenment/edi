@@ -1004,15 +1004,22 @@ _edi_open_tabs()
 {
    Edi_Project_Config_Tab *tab;
    Eina_List *tabs, *list;
+   char *path;
 
    tabs = _edi_project_config->tabs;
    _edi_project_config->tabs = NULL;
    EINA_LIST_FOREACH(tabs, list, tab)
      {
-        if (tab->windowed)
-          edi_mainview_open_window_path(tab->path);
+        if (!strncmp(tab->path, edi_project_get(), strlen(edi_project_get())))
+          path = strdup(tab->path);
         else
-          edi_mainview_open_path(tab->path);
+          path = edi_path_append(edi_project_get(), tab->path);
+
+        if (tab->windowed)
+          edi_mainview_open_window_path(eina_stringshare_add(path));
+        else
+          edi_mainview_open_path(eina_stringshare_add(path));
+        free(path);
      }
 
    EINA_LIST_FREE(tabs, tab)

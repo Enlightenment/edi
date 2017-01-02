@@ -13,13 +13,13 @@
 static Eina_Bool
 _relative_path_exists(const char *base, const char *relative)
 {
-   const char *path;
+   char *path;
    Eina_Bool ret;
 
    path = edi_path_append(base, relative);
    ret = ecore_file_exists(path);
 
-   free((void *)path);
+   free(path);
    return ret;
 }
 

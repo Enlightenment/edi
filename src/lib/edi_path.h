@@ -49,7 +49,7 @@ EAPI Edi_Path_Options *edi_path_options_create(const char *input);
  * @return a newly allocated string that merges the items to a path using the
  *   correct separator for the current platform.
  */
-EAPI const char *edi_path_append(const char *path, const char *file);
+EAPI char *edi_path_append(const char *path, const char *file);
 
 /**
  * @}

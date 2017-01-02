@@ -508,7 +508,13 @@ _edi_project_config_tab_add(const char *path, Eina_Bool windowed)
      }
 
    tab = malloc(sizeof(*tab));
-   tab->path = eina_stringshare_add(path);
+
+   // let's keep paths relative
+   if (!strncmp(path, edi_project_get(), strlen(edi_project_get())))
+     tab->path = eina_stringshare_add(path + strlen(edi_project_get()) + 1);
+   else
+     tab->path = eina_stringshare_add(path);
+
    tab->windowed = windowed;
    _edi_project_config->tabs = eina_list_append(_edi_project_config->tabs, tab);
    _edi_project_config_save_no_notify();
@@ -523,6 +529,9 @@ _edi_project_config_tab_remove(const char *path)
    EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
      {
         if (!strncmp(tab->path, path, strlen(tab->path)))
+          break;
+        if (!strncmp(path, edi_project_get(), strlen(edi_project_get())) &&
+            !strncmp(path + strlen(edi_project_get()) + 1, tab->path, strlen(tab->path)))
           break;
      }
 

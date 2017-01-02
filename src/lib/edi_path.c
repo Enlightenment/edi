@@ -43,7 +43,7 @@ edi_path_options_create(const char *input)
    return ret;
 }
 
-EAPI const char *
+EAPI char *
 edi_path_append(const char *path, const char *file)
 {
    char *concat;
