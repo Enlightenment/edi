@@ -23,6 +23,14 @@ typedef struct _Edi_Editor_Suggest_Item
    const char *detail;
 } Edi_Editor_Suggest_Item;
 
+typedef struct _Edi_Editor_Suggest_Document
+{
+   Eina_Strbuf *title;
+   Eina_Strbuf *detail;
+   Eina_Strbuf *param;
+   Eina_Strbuf *ret;
+   Eina_Strbuf *see;
+} Edi_Editor_Suggest_Document;
 /**
  * @struct Edi_Editor_Suggest_Provider
  * A description of the requirements for a suggestion provider.
@@ -36,6 +44,7 @@ typedef struct _Edi_Editor_Suggest_Provider
    void (*add)(Edi_Editor *editor);
    void (*del)(Edi_Editor *editor);
    Eina_List *(*lookup)(Edi_Editor *editor, unsigned int row, unsigned int col);
+   Edi_Editor_Suggest_Document *(*lookup_doc)(Edi_Editor *editor, unsigned int row, unsigned int col);
 } Edi_Editor_Suggest_Provider;
 
 /**
@@ -71,6 +80,15 @@ Eina_Bool edi_editor_suggest_provider_has(Edi_Editor *editor);
  * @ingroup Lookup
  */
 void edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item);
+
+/**
+ * Free a suggest document.
+ *
+ * @param doc the suggest document to free
+ *
+ * @ingroup Lookup
+ */
+void edi_editor_suggest_doc_free(Edi_Editor_Suggest_Document *doc);
 
 /**
  * @}

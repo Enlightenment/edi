@@ -180,3 +180,243 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
    return list;
 }
 
+#if HAVE_LIBCLANG
+static void
+_edi_doc_init(Edi_Editor_Suggest_Document *doc)
+{
+   doc->title = eina_strbuf_new();
+   doc->detail = eina_strbuf_new();
+   doc->param = eina_strbuf_new();
+   doc->ret = eina_strbuf_new();
+   doc->see = eina_strbuf_new();
+}
+
+static Eina_Bool
+_edi_doc_newline_check(Eina_Strbuf *strbuf)
+{
+   const char *str;
+
+   str = eina_strbuf_string_get(strbuf);
+
+   if (strlen(str) < 4)
+     return EINA_TRUE;
+
+   str = str + strlen(str) - 4;
+
+   if (!strcmp(str, "<br>"))
+     return EINA_FALSE;
+   else
+     return EINA_TRUE;
+}
+
+static void
+_edi_doc_trim(Eina_Strbuf *strbuf)
+{
+   const char *str;
+   int cmp_strlen, ori_strlen;
+
+   str = eina_strbuf_string_get(strbuf);
+   ori_strlen = strlen(str);
+
+   if (strlen(str) < 8)
+     return;
+
+   cmp_strlen = strlen(str) - 8;
+   str += cmp_strlen;
+
+   if (!strcmp(str, "<br><br>"))
+     {
+        eina_strbuf_remove(strbuf, cmp_strlen, ori_strlen);
+        _edi_doc_trim(strbuf);
+     }
+   else
+     return;
+}
+
+static void
+_edi_doc_title_get(CXCursor cursor, Eina_Strbuf *strbuf)
+{
+   CXCompletionString str;
+   int chunk_num;
+
+   str = clang_getCursorCompletionString(cursor);
+   chunk_num = clang_getNumCompletionChunks(str);
+
+   for (int i = 0; i < chunk_num; i++)
+     {
+        enum CXCompletionChunkKind kind = clang_getCompletionChunkKind(str, i);
+        switch (kind)
+          {
+           case CXCompletionChunk_ResultType:
+             eina_strbuf_append_printf(strbuf, "<color=#31d12f><b>%s</b></color><br>",
+                        clang_getCString(clang_getCompletionChunkText(str, i)));
+             break;
+           case CXCompletionChunk_Placeholder:
+             eina_strbuf_append_printf(strbuf, "<color=#edd400><b>%s</b></color>",
+                        clang_getCString(clang_getCompletionChunkText(str, i)));
+             break;
+           default:
+             eina_strbuf_append(strbuf,
+                        clang_getCString(clang_getCompletionChunkText(str, i)));
+             break;
+          }
+     }
+}
+
+static void
+_edi_doc_dump(Edi_Editor_Suggest_Document *doc, CXComment comment, Eina_Strbuf *strbuf)
+{
+   const char *str ,*tag;
+   enum CXCommentKind kind = clang_Comment_getKind(comment);
+
+   if (kind == CXComment_Null) return;
+
+   switch (kind)
+     {
+      case CXComment_Text:
+        str = clang_getCString(clang_TextComment_getText(comment));
+
+        if (doc->see == strbuf)
+          {
+             eina_strbuf_append_printf(strbuf, "   %s", str);
+             break;
+          }
+        if (clang_Comment_isWhitespace(comment))
+          {
+             if (_edi_doc_newline_check(strbuf))
+               {
+                  if (strbuf == doc->detail)
+                    eina_strbuf_append(strbuf, "<br><br>");
+                  else
+                    eina_strbuf_append(strbuf, "<br>");
+               }
+             break;
+          }
+        eina_strbuf_append(strbuf, str);
+        break;
+      case CXComment_InlineCommand:
+        str = clang_getCString(clang_InlineCommandComment_getCommandName(comment));
+
+        if (str[0] == 'p')
+          eina_strbuf_append_printf(strbuf, "<font_style=italic>%s</font_style>",
+             clang_getCString(clang_InlineCommandComment_getArgText(comment, 0)));
+        else if (str[0] == 'c')
+          eina_strbuf_append_printf(strbuf, "<b>%s</b>",
+             clang_getCString(clang_InlineCommandComment_getArgText(comment, 0)));
+        else
+          eina_strbuf_append_printf(strbuf, "@%s", str);
+        break;
+      case CXComment_BlockCommand:
+        tag = clang_getCString(clang_BlockCommandComment_getCommandName(comment));
+
+        if (!strcmp(tag, "return"))
+          strbuf = doc->ret;
+        else if (!strcmp(tag, "see"))
+          strbuf = doc->see;
+
+        break;
+      case CXComment_ParamCommand:
+        str = clang_getCString(clang_ParamCommandComment_getParamName(comment));
+        strbuf = doc->param;
+
+        eina_strbuf_append_printf(strbuf, "<color=#edd400><b>   %s</b></color>",
+                                  str);
+        break;
+      case CXComment_VerbatimBlockLine:
+        str = clang_getCString(clang_VerbatimBlockLineComment_getText(comment));
+
+        if (str[0] == 10)
+          {
+             eina_strbuf_append(strbuf, "<br>");
+             break;
+          }
+        eina_strbuf_append_printf(strbuf, "%s<br>", str);
+        break;
+      case CXComment_VerbatimLine:
+        str = clang_getCString(clang_VerbatimLineComment_getText(comment));
+
+        if (doc->see == strbuf)
+          eina_strbuf_append(strbuf, str);
+        break;
+      default:
+        break;
+     }
+   for (unsigned i = 0; i < clang_Comment_getNumChildren(comment); i++)
+     _edi_doc_dump(doc, clang_Comment_getChild(comment, i), strbuf);
+}
+
+static CXCursor
+_edi_doc_cursor_get(Edi_Editor *editor, CXIndex idx, CXTranslationUnit unit,
+                    unsigned int row, unsigned int col)
+{
+   CXFile cxfile;
+   CXSourceLocation location;
+   CXCursor cursor;
+   struct CXUnsavedFile unsaved_file;
+   Elm_Code *code;
+   const char *path, *args;
+   char **clang_argv;
+   unsigned int clang_argc, end_row, end_col;
+
+   code = elm_code_widget_code_get(editor->entry);
+   path = elm_code_file_path_get(code->file);
+
+   end_row = elm_code_file_lines_get(code->file);
+   end_col = elm_code_file_line_get(code->file, end_row)->length;
+
+   unsaved_file.Filename = path;
+   unsaved_file.Contents = elm_code_widget_text_between_positions_get(
+                                         editor->entry, 1, 1, end_row, end_col);
+   unsaved_file.Length = strlen(unsaved_file.Contents);
+
+   //Initialize Clang
+   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
+   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
+
+   idx = clang_createIndex(0, 0);
+
+   unit = clang_parseTranslationUnit(idx, path, (const char *const *)clang_argv,
+                                  (int)clang_argc, &unsaved_file, 1,
+                                  clang_defaultEditingTranslationUnitOptions());
+
+   cxfile = clang_getFile(unit, path);
+   location = clang_getLocation(unit, cxfile, row, col);
+   cursor = clang_getCursor(unit, location);
+
+   return clang_getCursorReferenced(cursor);
+}
+#endif
+
+static Edi_Editor_Suggest_Document *
+_edi_editor_suggest_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int col)
+{
+   Edi_Editor_Suggest_Document *doc = NULL;
+#if HAVE_LIBCLANG
+   CXIndex idx = NULL;
+   CXTranslationUnit unit = NULL;
+   CXCursor cursor;
+   CXComment comment;
+
+   cursor = _edi_doc_cursor_get(editor, idx, unit, row, col);
+   comment = clang_Cursor_getParsedComment(cursor);
+
+   if (clang_Comment_getKind(comment) == CXComment_Null)
+     {
+        clang_disposeTranslationUnit(unit);
+        clang_disposeIndex(idx);
+        return NULL;
+     }
+
+   doc = malloc(sizeof(Edi_Editor_Suggest_Document));
+
+   _edi_doc_init(doc);
+   _edi_doc_dump(doc, comment, doc->detail);
+   _edi_doc_title_get(cursor, doc->title);
+   _edi_doc_trim(doc->detail);
+
+   clang_disposeTranslationUnit(unit);
+   clang_disposeIndex(idx);
+#endif
+   return doc;
+}
+

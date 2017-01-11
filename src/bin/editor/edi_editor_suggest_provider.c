@@ -14,10 +14,10 @@ static Edi_Editor_Suggest_Provider _edi_editor_suggest_provider_registry[] =
 {
    {
       "c", _edi_editor_sugggest_c_add, _edi_editor_sugget_c_del,
-      _edi_editor_suggest_c_lookup
+      _edi_editor_suggest_c_lookup, _edi_editor_suggest_c_lookup_doc
    },
 
-   {NULL, NULL, NULL, NULL}
+   {NULL, NULL, NULL, NULL, NULL}
 };
 
 Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
@@ -61,5 +61,17 @@ edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item)
    free((char *)item->detail);
 
    free(item);
+}
+
+void
+edi_editor_suggest_doc_free(Edi_Editor_Suggest_Document *doc)
+{
+   if (!doc) return;
+
+   eina_strbuf_free(doc->title);
+   eina_strbuf_free(doc->detail);
+   eina_strbuf_free(doc->param);
+   eina_strbuf_free(doc->ret);
+   eina_strbuf_free(doc->see);
 }
 

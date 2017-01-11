@@ -527,6 +527,13 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
              _suggest_list_set(editor);
           }
      }
+   else if ((!alt) && (ctrl) && (shift))
+     {
+        if (edi_editor_suggest_provider_has(editor) && !strcmp(ev->key, "space"))
+          {
+             edi_editor_doc_open(editor);
+          }
+     }
 
    if (edi_editor_suggest_provider_has(editor))
      {
@@ -919,7 +926,7 @@ _mouse_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
      evas_object_hide(editor->suggest_bg);
 
    ctrl = evas_key_modifier_is_set(event->modifiers, "Control");
-   if (event->button != 3 || !ctrl)
+   if (event->button != 3 || !ctrl || !edi_editor_suggest_provider_has(editor))
      return;
 
    elm_code_widget_position_at_coordinates_get(editor->entry, event->canvas.x, event->canvas.y, &row, &col);
