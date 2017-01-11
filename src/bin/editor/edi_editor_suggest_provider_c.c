@@ -16,15 +16,6 @@
 #include "edi_private.h"
 
 #if HAVE_LIBCLANG
-typedef struct
-{
-   enum CXCursorKind kind;
-   char             *ret;
-   char             *name;
-   char             *param;
-   Eina_Bool         is_param_cand;
-} _Clang_Suggest_Item;
-
 static void
 _clang_autosuggest_setup(Edi_Editor *editor)
 {
@@ -57,28 +48,6 @@ _clang_autosuggest_dispose(Edi_Editor *editor)
 }
 #endif
 
-static const char *
-_suggest_item_return_get(Edi_Editor_Suggest_Item *item)
-{
-#if HAVE_LIBCLANG
-   if (((_Clang_Suggest_Item *)item)->ret)
-     return ((_Clang_Suggest_Item *)item)->ret;
-#endif
-
-   return "";
-}
-
-static const char *
-_suggest_item_parameter_get(Edi_Editor_Suggest_Item *item)
-{
-#if HAVE_LIBCLANG
-   if (((_Clang_Suggest_Item *)item)->param)
-     return ((_Clang_Suggest_Item *)item)->param;
-#endif
-
-   return "";
-}
-
 void
 _edi_editor_sugggest_c_add(Edi_Editor *editor)
 {
@@ -94,6 +63,32 @@ _edi_editor_sugget_c_del(Edi_Editor *editor)
    _clang_autosuggest_dispose(editor);
 #endif
 }
+
+#if HAVE_LIBCLANG
+char *
+_edi_editor_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,
+                                 const char *ret_str, const char *param_str)
+{
+   char *format, *display;
+   const char *font;
+   int font_size, displen;
+   unsigned int row, col;
+   Evas_Coord w;
+
+   elm_code_widget_font_get(editor->entry, &font, &font_size);
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   elm_code_widget_geometry_for_position_get(editor->entry, row, col,
+                                             NULL, NULL, &w, NULL);
+
+   format = "<left_margin=%d><align=left><font='%s'><font_size=%d>%s<br><b>%s</b><br>%s</font_size></font></align></left_margin>";
+   displen = strlen(ret_str) + strlen(param_str) + strlen(term_str)
+             + strlen(format) + strlen(font);
+   display = malloc(sizeof(char) * displen);
+   snprintf(display, displen, format, w, font, font_size, ret_str, term_str, param_str);
+
+   return display;
+}
+#endif
 
 Eina_List *
 _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
@@ -128,13 +123,12 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
    for (unsigned int i = 0; i < res->NumResults; i++)
      {
         const CXCompletionString str = res->Results[i].CompletionString;
-        _Clang_Suggest_Item *suggest_it;
+        const char *name = NULL, *ret = NULL;
+        char *param = NULL;
+        Edi_Editor_Suggest_Item *suggest_it;
         Eina_Strbuf *buf = NULL;
 
-        suggest_it = calloc(1, sizeof(_Clang_Suggest_Item));
-        suggest_it->kind = res->Results[i].CursorKind;
-        if (suggest_it->kind == CXCursor_OverloadCandidate)
-          suggest_it->is_param_cand = EINA_TRUE;
+        suggest_it = calloc(1, sizeof(Edi_Editor_Suggest_Item));
 
         for (unsigned int j = 0; j < clang_getNumCompletionChunks(str); j++)
           {
@@ -146,13 +140,14 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
              switch (ch_kind)
                {
                 case CXCompletionChunk_ResultType:
-                   suggest_it->ret = strdup(clang_getCString(str_out));
+                   ret = clang_getCString(str_out);
                    break;
                 case CXCompletionChunk_TypedText:
                 case CXCompletionChunk_Text:
-                   suggest_it->name = strdup(clang_getCString(str_out));
+                   name = clang_getCString(str_out);
                    break;
                 case CXCompletionChunk_LeftParen:
+                  // todo buf == eina_strbuf_new();
                 case CXCompletionChunk_Placeholder:
                 case CXCompletionChunk_Comma:
                 case CXCompletionChunk_CurrentParameter:
@@ -162,7 +157,7 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
                    break;
                 case CXCompletionChunk_RightParen:
                    eina_strbuf_append(buf, clang_getCString(str_out));
-                   suggest_it->param = eina_strbuf_string_steal(buf);
+                   param = eina_strbuf_string_steal(buf);
                    eina_strbuf_free(buf);
                    buf = NULL;
                    break;
@@ -170,61 +165,18 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
                    break;
                }
           }
+
+        if (name)
+          suggest_it->summary = strdup(name);
+        suggest_it->detail = _edi_editor_suggest_c_detail_get(editor, name, ret?ret:"", param?param:"");
+        if (param)
+          free(param);
+
         list = eina_list_append(list, suggest_it);
      }
    clang_disposeCodeCompleteResults(res);
 #endif
 
    return list;
-}
-
-const char *
-_edi_editor_suggest_c_summary_get(Edi_Editor *editor EINA_UNUSED, Edi_Editor_Suggest_Item *item)
-{
-#if HAVE_LIBCLANG
-   return ((_Clang_Suggest_Item *)item)->name;
-#else
-   return "";
-#endif
-}
-
-static void
-_edi_editor_suggest_c_item_free(Edi_Editor_Suggest_Item *item)
-{
-#if HAVE_LIBCLANG
-   _Clang_Suggest_Item *clang_item = (_Clang_Suggest_Item *)item;
-
-   if (clang_item->ret) free(clang_item->ret);
-   if (clang_item->name) free(clang_item->name);
-   if (clang_item->param) free(clang_item->param);
-   free(clang_item);
-#endif
-}
-
-char *
-_edi_editor_suggest_c_detail_get(Edi_Editor *editor, Edi_Editor_Suggest_Item *item)
-{
-   char *format, *display;
-   const char *font, *term_str, *ret_str, *param_str;
-   int font_size, displen;
-   unsigned int row, col;
-   Evas_Coord w;
-
-   elm_code_widget_font_get(editor->entry, &font, &font_size);
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-   elm_code_widget_geometry_for_position_get(editor->entry, row, col,
-                                             NULL, NULL, &w, NULL);
-
-   term_str = _edi_editor_suggest_c_summary_get(editor, item);
-   ret_str = _suggest_item_return_get(item);
-   param_str = _suggest_item_parameter_get(item);
-
-   format = "<left_margin=%d><align=left><font='%s'><font_size=%d>%s<br><b>%s</b><br>%s</font_size></font></align></left_margin>";
-   displen = strlen(ret_str) + strlen(param_str) + strlen(term_str)
-             + strlen(format) + strlen(font);
-   display = malloc(sizeof(char) * displen);
-   snprintf(display, displen, format, w, font, font_size, ret_str, term_str, param_str);
-
-   return display;
 }
 

@@ -107,7 +107,7 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
    Edi_Mainview_Item *item;
    Edi_Editor_Suggest_Item *suggest_it = data;
    char *format, *display;
-   const char *font, *summary;
+   const char *font;
    int font_size, displen;
 
    if (strcmp(part, "elm.swallow.content"))
@@ -121,11 +121,10 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
    editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
    elm_code_widget_font_get(editor->entry, &font, &font_size);
 
-   summary = edi_editor_suggest_provider_get(editor)->summary_get(editor, suggest_it);
    format = "<align=left><font='%s'><font_size=%d> %s</font_size></font></align>";
-   displen = strlen(summary) + strlen(format) + strlen(font);
+   displen = strlen(suggest_it->summary) + strlen(format) + strlen(font);
    display = malloc(sizeof(char) * displen);
-   snprintf(display, displen, format, font, font_size, summary);
+   snprintf(display, displen, format, font, font_size, suggest_it->summary);
 
    Evas_Object *label = elm_label_add(obj);
    elm_label_ellipsis_set(label, EINA_TRUE);
@@ -140,30 +139,18 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
 static void
 _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 {
-   Edi_Editor *editor;
-   Edi_Mainview_Item *item;
    Edi_Editor_Suggest_Item *suggest_it;
    Evas_Object *label = data;
-   char *display;
 
    suggest_it = elm_object_item_data_get(event_info);
-   item = edi_mainview_item_current_get();
 
-   if (!item)
-     return;
-
-   editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
-   display = edi_editor_suggest_provider_get(editor)->detail_get(editor, suggest_it);
-
-   elm_object_text_set(label, display);
-   free(display);
+   elm_object_text_set(label, suggest_it->detail);
 }
 
 static void
 _suggest_list_update(Edi_Editor *editor, char *word)
 {
    Edi_Editor_Suggest_Item *suggest_it;
-   Edi_Editor_Suggest_Provider *provider;
    Eina_List *list, *l;
    Elm_Genlist_Item_Class *ic;
    Elm_Object_Item *item;
@@ -176,13 +163,9 @@ _suggest_list_update(Edi_Editor *editor, char *word)
    ic->item_style = "full";
    ic->func.content_get = _suggest_list_content_get;
 
-   provider = edi_editor_suggest_provider_get(editor);
    EINA_LIST_FOREACH(list, l, suggest_it)
      {
-        const char *term;
-        term = provider->summary_get(editor, suggest_it);
-
-        if (eina_str_has_prefix(term, word))
+        if (eina_str_has_prefix(suggest_it->summary, word))
           {
              elm_genlist_item_append(editor->suggest_genlist,
                                      ic,
@@ -211,10 +194,8 @@ _suggest_list_set(Edi_Editor *editor)
 {
    char *curword;
    unsigned int row, col;
-   Edi_Editor_Suggest_Provider *provider;
    Eina_List *list = NULL;
 
-   provider = edi_editor_suggest_provider_get(editor);
    list = (Eina_List *)evas_object_data_get(editor->suggest_genlist,
                                             "suggest_list");
    if (list)
@@ -222,7 +203,7 @@ _suggest_list_set(Edi_Editor *editor)
         Edi_Editor_Suggest_Item *suggest_it;
 
         EINA_LIST_FREE(list, suggest_it)
-          provider->item_free(suggest_it);
+          edi_editor_suggest_item_free(suggest_it);
 
         list = NULL;
         evas_object_data_del(editor->suggest_genlist, "suggest_list");
@@ -267,10 +248,8 @@ _suggest_bg_cb_hide(void *data, Evas *e EINA_UNUSED,
 {
    Eina_List *list = NULL;
    Edi_Editor *editor;
-   Edi_Editor_Suggest_Provider *provider;
 
    editor = (Edi_Editor *)data;
-   provider = edi_editor_suggest_provider_get(editor);
    list = (Eina_List *)evas_object_data_get(editor->suggest_genlist,
                                             "suggest_list");
    if (list)
@@ -278,7 +257,7 @@ _suggest_bg_cb_hide(void *data, Evas *e EINA_UNUSED,
         Edi_Editor_Suggest_Item *suggest_it;
 
         EINA_LIST_FREE(list, suggest_it)
-          provider->item_free(suggest_it);
+          edi_editor_suggest_item_free(suggest_it);
 
         list = NULL;
         evas_object_data_del(editor->suggest_genlist, "suggest_list");
@@ -300,13 +279,10 @@ _suggest_list_cb_key_down(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
 
    if (!strcmp(ev->key, "Return"))
      {
-        const char *term;
-
         it = elm_genlist_selected_item_get(genlist);
         suggest_it = elm_object_item_data_get(it);
 
-        term = edi_editor_suggest_provider_get(editor)->summary_get(editor, suggest_it);
-        _suggest_list_selection_insert(editor, term);
+        _suggest_list_selection_insert(editor, suggest_it->summary);
         evas_object_hide(editor->suggest_bg);
      }
    else if (!strcmp(ev->key, "Up"))
@@ -336,8 +312,7 @@ _suggest_list_cb_clicked_double(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Editor *editor = (Edi_Editor *)data;
 
    suggest_it = elm_object_item_data_get(it);
-   _suggest_list_selection_insert(editor,
-     edi_editor_suggest_provider_get(editor)->summary_get(editor, suggest_it));
+   _suggest_list_selection_insert(editor, suggest_it->summary);
 
    evas_object_hide(editor->suggest_bg);
 }

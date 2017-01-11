@@ -14,11 +14,10 @@ static Edi_Editor_Suggest_Provider _edi_editor_suggest_provider_registry[] =
 {
    {
       "c", _edi_editor_sugggest_c_add, _edi_editor_sugget_c_del,
-      _edi_editor_suggest_c_lookup, _edi_editor_suggest_c_summary_get,
-      _edi_editor_suggest_c_detail_get, _edi_editor_suggest_c_item_free
+      _edi_editor_suggest_c_lookup
    },
 
-   {NULL, NULL, NULL, NULL, NULL, NULL, NULL}
+   {NULL, NULL, NULL, NULL}
 };
 
 Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
@@ -53,5 +52,14 @@ Eina_Bool
 edi_editor_suggest_provider_has(Edi_Editor *editor)
 {
    return !!edi_editor_suggest_provider_get(editor);
+}
+
+void
+edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item)
+{
+   free((char *)item->summary);
+   free((char *)item->detail);
+
+   free(item);
 }
 

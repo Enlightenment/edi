@@ -17,7 +17,11 @@ extern "C" {
  * @typedef Edi_Editor_Suggest_Item
  * A handle for passig a suggest item to the ui and back
  */
-typedef void *Edi_Editor_Suggest_Item;
+typedef struct _Edi_Editor_Suggest_Item
+{
+   const char *summary;
+   const char *detail;
+} Edi_Editor_Suggest_Item;
 
 /**
  * @struct Edi_Editor_Suggest_Provider
@@ -32,9 +36,6 @@ typedef struct _Edi_Editor_Suggest_Provider
    void (*add)(Edi_Editor *editor);
    void (*del)(Edi_Editor *editor);
    Eina_List *(*lookup)(Edi_Editor *editor, unsigned int row, unsigned int col);
-   const char *(*summary_get)(Edi_Editor *editor, Edi_Editor_Suggest_Item *item);
-   char *(*detail_get)(Edi_Editor *editor, Edi_Editor_Suggest_Item *item);
-   void (*item_free)(Edi_Editor_Suggest_Item *item);
 } Edi_Editor_Suggest_Provider;
 
 /**
@@ -61,6 +62,15 @@ Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
  * @ingroup Lookup
  */
 Eina_Bool edi_editor_suggest_provider_has(Edi_Editor *editor);
+
+/**
+ * Free a suggest item.
+ *
+ * @param item the suggest item to free
+ *
+ * @ingroup Lookup
+ */
+void edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item);
 
 /**
  * @}
