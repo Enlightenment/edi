@@ -16,8 +16,8 @@ static const struct {
   { "basic", edi_test_basic },
   { "path", edi_test_path },
   { "content_provider", edi_test_content_provider },
-  { "editor_suggest_provider", edi_test_editor_suggest_provider },
-  { "editor_suggest_provider_c", edi_test_editor_suggest_provider_c }
+  { "language_provider", edi_test_language_provider },
+  { "language_provider_c", edi_test_language_provider_c }
 };
 
 START_TEST(edi_initialization)

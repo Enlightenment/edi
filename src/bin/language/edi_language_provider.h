@@ -17,35 +17,35 @@ extern "C" {
  * @typedef Edi_Editor_Suggest_Item
  * A handle for passig a suggest item to the ui and back
  */
-typedef struct _Edi_Editor_Suggest_Item
+typedef struct _Edi_Language_Suggest_Item
 {
    const char *summary;
    const char *detail;
-} Edi_Editor_Suggest_Item;
+} Edi_Language_Suggest_Item;
 
-typedef struct _Edi_Editor_Suggest_Document
+typedef struct _Edi_Language_Document
 {
    Eina_Strbuf *title;
    Eina_Strbuf *detail;
    Eina_Strbuf *param;
    Eina_Strbuf *ret;
    Eina_Strbuf *see;
-} Edi_Editor_Suggest_Document;
+} Edi_Language_Document;
 /**
  * @struct Edi_Editor_Suggest_Provider
  * A description of the requirements for a suggestion provider.
  * This handles the set up and teardown of a provider as well as the lookup and
  * description lookup functions
  */
-typedef struct _Edi_Editor_Suggest_Provider
+typedef struct _Edi_Language_Provider
 {
    const char *id;
 
    void (*add)(Edi_Editor *editor);
    void (*del)(Edi_Editor *editor);
    Eina_List *(*lookup)(Edi_Editor *editor, unsigned int row, unsigned int col);
-   Edi_Editor_Suggest_Document *(*lookup_doc)(Edi_Editor *editor, unsigned int row, unsigned int col);
-} Edi_Editor_Suggest_Provider;
+   Edi_Language_Document *(*lookup_doc)(Edi_Editor *editor, unsigned int row, unsigned int col);
+} Edi_Language_Provider;
 
 /**
  * @brief Lookup information in suggest provider registry.
@@ -61,7 +61,7 @@ typedef struct _Edi_Editor_Suggest_Provider
  *
  * @ingroup Lookup
  */
-Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor);
+Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor);
 
 /**
  * Query whether a suggest provider is available for the spcified editor session.
@@ -70,7 +70,7 @@ Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
  *
  * @ingroup Lookup
  */
-Eina_Bool edi_editor_suggest_provider_has(Edi_Editor *editor);
+Eina_Bool edi_language_provider_has(Edi_Editor *editor);
 
 /**
  * Free a suggest item.
@@ -79,7 +79,7 @@ Eina_Bool edi_editor_suggest_provider_has(Edi_Editor *editor);
  *
  * @ingroup Lookup
  */
-void edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item);
+void edi_language_suggest_item_free(Edi_Language_Suggest_Item *item);
 
 /**
  * Free a suggest document.
@@ -88,7 +88,7 @@ void edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item);
  *
  * @ingroup Lookup
  */
-void edi_editor_suggest_doc_free(Edi_Editor_Suggest_Document *doc);
+void edi_language_doc_free(Edi_Language_Document *doc);
 
 /**
  * @}

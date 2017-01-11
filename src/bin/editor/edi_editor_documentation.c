@@ -7,12 +7,12 @@
 
 #include "edi_editor.h"
 
-#include "editor/edi_editor_suggest_provider.h"
+#include "language/edi_language_provider.h"
 
 #include "edi_private.h"
 
 static void
-_edi_doc_font_set(Edi_Editor_Suggest_Document *doc, const char *font, int font_size)
+_edi_doc_font_set(Edi_Language_Document *doc, const char *font, int font_size)
 {
    char *format = "<align=left><font=\'%s\'><font_size=%d>";
    char *font_head;
@@ -57,7 +57,7 @@ _edi_doc_font_set(Edi_Editor_Suggest_Document *doc, const char *font, int font_s
 }
 
 static void
-_edi_doc_tag_name_set(Edi_Editor_Suggest_Document *doc)
+_edi_doc_tag_name_set(Edi_Language_Document *doc)
 {
    if (strlen(eina_strbuf_string_get(doc->param)) > 0)
      eina_strbuf_prepend(doc->param, "<b><br><br> Parameters<br></b>");
@@ -97,15 +97,15 @@ static void
 _edi_doc_popup_cb_del(void *data, Evas *e EINA_UNUSED,
                      Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Edi_Editor_Suggest_Document *doc = data;
+   Edi_Language_Document *doc = data;
 
-   edi_editor_suggest_doc_free(doc);
+   edi_language_doc_free(doc);
 }
 
 void
 edi_editor_doc_open(Edi_Editor *editor)
 {
-   Edi_Editor_Suggest_Document *doc = NULL;
+   Edi_Language_Document *doc = NULL;
    const char *detail, *param, *ret, *see;
    char *display;
    int displen;
@@ -113,12 +113,12 @@ edi_editor_doc_open(Edi_Editor *editor)
    const char *font;
    int font_size;
 
-   if (edi_editor_suggest_provider_has(editor))
+   if (edi_language_provider_has(editor))
      {
         unsigned int row, col;
 
         elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-        doc = edi_editor_suggest_provider_get(editor)->lookup_doc(editor, row, col);
+        doc = edi_language_provider_get(editor)->lookup_doc(editor, row, col);
      }
 
    //Popup

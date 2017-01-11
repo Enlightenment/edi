@@ -5,7 +5,7 @@
 #include <Elementary.h>
 
 #include "../bin/edi_private.h"
-#include "editor/edi_editor_suggest_provider.h"
+#include "language/edi_language_provider.h"
 
 #include "edi_suite.h"
 
@@ -31,7 +31,7 @@ _setup(Edi_Editor *editor, Evas_Object *win)
 static Eina_List *
 _filtered_list_get(Eina_List *list, const char *word)
 {
-   Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Language_Suggest_Item *suggest_it;
    Eina_List *l, *ret = NULL;
 
    EINA_LIST_FOREACH(list, l, suggest_it)
@@ -43,26 +43,26 @@ _filtered_list_get(Eina_List *list, const char *word)
    return ret;
 }
 
-START_TEST (edi_test_editor_suggest_provider_c_lookup)
+START_TEST (edi_test_language_provider_c_lookup)
 {
    Elm_Code *code;
    Evas_Object *win;
    Edi_Editor editor;
-   Edi_Editor_Suggest_Provider *provider;
-   Edi_Editor_Suggest_Item *item;
+   Edi_Language_Provider *provider;
+   Edi_Language_Suggest_Item *item;
    Eina_List *list;
 
    elm_init(1, NULL);
    win = elm_win_add(NULL, "entry", ELM_WIN_BASIC);
    code = _setup(&editor, win);
 
-   provider = edi_editor_suggest_provider_get(&editor);
+   provider = edi_language_provider_get(&editor);
    provider->add(&editor);
    list = provider->lookup(&editor, 3, 12);
    ck_assert_int_eq(eina_list_count(_filtered_list_get(list, "_xyzabc_")), 1);
 
    EINA_LIST_FREE(list, item)
-     edi_editor_suggest_item_free(item);
+     edi_language_suggest_item_free(item);
 
    provider->del(&editor);
    elm_code_free(code);
@@ -70,27 +70,27 @@ START_TEST (edi_test_editor_suggest_provider_c_lookup)
 }
 END_TEST
 
-START_TEST (edi_test_editor_suggest_provider_c_summary)
+START_TEST (edi_test_language_provider_c_summary)
 {
    Elm_Code *code;
    Evas_Object *win;
    Edi_Editor editor;
-   Edi_Editor_Suggest_Provider *provider;
-   Edi_Editor_Suggest_Item *item;
+   Edi_Language_Provider *provider;
+   Edi_Language_Suggest_Item *item;
    Eina_List *list;
 
    elm_init(1, NULL);
    win = elm_win_add(NULL, "entry", ELM_WIN_BASIC);
    code = _setup(&editor, win);
 
-   provider = edi_editor_suggest_provider_get(&editor);
+   provider = edi_language_provider_get(&editor);
    provider->add(&editor);
    list = provider->lookup(&editor, 3, 12);
    item = eina_list_nth(_filtered_list_get(list, "_xyzabc_"), 0);
    ck_assert_str_eq(item->summary, "_xyzabc_test");
 
    EINA_LIST_FREE(list, item)
-     edi_editor_suggest_item_free(item);
+     edi_language_suggest_item_free(item);
 
    provider->del(&editor);
    elm_code_free(code);
@@ -98,11 +98,11 @@ START_TEST (edi_test_editor_suggest_provider_c_summary)
 }
 END_TEST
 
-void edi_test_editor_suggest_provider_c(TCase *tc)
+void edi_test_language_provider_c(TCase *tc)
 {
 #if HAVE_LIBCLANG
-   tcase_add_test(tc, edi_test_editor_suggest_provider_c_lookup);
-   tcase_add_test(tc, edi_test_editor_suggest_provider_c_summary);
+   tcase_add_test(tc, edi_test_language_provider_c_lookup);
+   tcase_add_test(tc, edi_test_language_provider_c_summary);
 #endif
 }
 

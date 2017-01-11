@@ -12,7 +12,7 @@
 #include "mainview/edi_mainview.h"
 #include "edi_config.h"
 
-#include "editor/edi_editor_suggest_provider.h"
+#include "language/edi_language_provider.h"
 
 #include "edi_private.h"
 
@@ -105,7 +105,7 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
 {
    Edi_Editor *editor;
    Edi_Mainview_Item *item;
-   Edi_Editor_Suggest_Item *suggest_it = data;
+   Edi_Language_Suggest_Item *suggest_it = data;
    char *format, *display;
    const char *font;
    int font_size, displen;
@@ -139,7 +139,7 @@ _suggest_list_content_get(void *data, Evas_Object *obj, const char *part)
 static void
 _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_info)
 {
-   Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Language_Suggest_Item *suggest_it;
    Evas_Object *label = data;
 
    suggest_it = elm_object_item_data_get(event_info);
@@ -150,7 +150,7 @@ _suggest_list_cb_selected(void *data, Evas_Object *obj EINA_UNUSED, void *event_
 static void
 _suggest_list_update(Edi_Editor *editor, char *word)
 {
-   Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Language_Suggest_Item *suggest_it;
    Eina_List *list, *l;
    Elm_Genlist_Item_Class *ic;
    Elm_Object_Item *item;
@@ -200,10 +200,10 @@ _suggest_list_set(Edi_Editor *editor)
                                             "suggest_list");
    if (list)
      {
-        Edi_Editor_Suggest_Item *suggest_it;
+        Edi_Language_Suggest_Item *suggest_it;
 
         EINA_LIST_FREE(list, suggest_it)
-          edi_editor_suggest_item_free(suggest_it);
+          edi_language_suggest_item_free(suggest_it);
 
         list = NULL;
         evas_object_data_del(editor->suggest_genlist, "suggest_list");
@@ -212,7 +212,7 @@ _suggest_list_set(Edi_Editor *editor)
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
    curword = _edi_editor_current_word_get(editor, row, col);
-   list = edi_editor_suggest_provider_get(editor)->lookup(editor, row, col - strlen(curword));
+   list = edi_language_provider_get(editor)->lookup(editor, row, col - strlen(curword));
 
    evas_object_data_set(editor->suggest_genlist, "suggest_list", list);
    _suggest_list_update(editor, curword);
@@ -254,10 +254,10 @@ _suggest_bg_cb_hide(void *data, Evas *e EINA_UNUSED,
                                             "suggest_list");
    if (list)
      {
-        Edi_Editor_Suggest_Item *suggest_it;
+        Edi_Language_Suggest_Item *suggest_it;
 
         EINA_LIST_FREE(list, suggest_it)
-          edi_editor_suggest_item_free(suggest_it);
+          edi_language_suggest_item_free(suggest_it);
 
         list = NULL;
         evas_object_data_del(editor->suggest_genlist, "suggest_list");
@@ -272,7 +272,7 @@ _suggest_list_cb_key_down(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
                           void *event_info)
 {
    Edi_Editor *editor = (Edi_Editor *)data;
-   Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Language_Suggest_Item *suggest_it;
    Elm_Object_Item *it;
    Evas_Object *genlist = obj;
    Evas_Event_Key_Down *ev = event_info;
@@ -308,7 +308,7 @@ _suggest_list_cb_clicked_double(void *data, Evas_Object *obj EINA_UNUSED,
                                 void *event_info)
 {
    Elm_Object_Item *it = event_info;
-   Edi_Editor_Suggest_Item *suggest_it;
+   Edi_Language_Suggest_Item *suggest_it;
    Edi_Editor *editor = (Edi_Editor *)data;
 
    suggest_it = elm_object_item_data_get(it);
@@ -522,20 +522,20 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           {
              edi_mainview_goto_popup_show();
           }
-        else if (edi_editor_suggest_provider_has(editor) && !strcmp(ev->key, "space"))
+        else if (edi_language_provider_has(editor) && !strcmp(ev->key, "space"))
           {
              _suggest_list_set(editor);
           }
      }
    else if ((!alt) && (ctrl) && (shift))
      {
-        if (edi_editor_suggest_provider_has(editor) && !strcmp(ev->key, "space"))
+        if (edi_language_provider_has(editor) && !strcmp(ev->key, "space"))
           {
              edi_editor_doc_open(editor);
           }
      }
 
-   if (edi_editor_suggest_provider_has(editor))
+   if (edi_language_provider_has(editor))
      {
         if ((!alt) && (!ctrl))
           _suggest_popup_key_down_cb(editor, ev->key, ev->string);
@@ -926,7 +926,7 @@ _mouse_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
      evas_object_hide(editor->suggest_bg);
 
    ctrl = evas_key_modifier_is_set(event->modifiers, "Control");
-   if (event->button != 3 || !ctrl || !edi_editor_suggest_provider_has(editor))
+   if (event->button != 3 || !ctrl || !edi_language_provider_has(editor))
      return;
 
    elm_code_widget_position_at_coordinates_get(editor->entry, event->canvas.x, event->canvas.y, &row, &col);
@@ -993,8 +993,8 @@ _editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o, void *event_info
 
    ecore_event_handler_del(ev_handler);
 
-   if (edi_editor_suggest_provider_has(editor))
-     edi_editor_suggest_provider_get(editor)->del(editor);
+   if (edi_language_provider_has(editor))
+     edi_language_provider_get(editor)->del(editor);
 }
 
 Evas_Object *
@@ -1078,9 +1078,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
    evas_object_event_callback_add(vbox, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
-   if (edi_editor_suggest_provider_has(editor))
+   if (edi_language_provider_has(editor))
      {
-        edi_editor_suggest_provider_get(editor)->add(editor);
+        edi_language_provider_get(editor)->add(editor);
         _suggest_popup_setup(editor);
      }
 

@@ -9,7 +9,7 @@
 #include <Eina.h>
 #include <Elementary.h>
 
-#include "edi_editor_suggest_provider.h"
+#include "edi_language_provider.h"
 
 #include "edi_config.h"
 
@@ -49,7 +49,7 @@ _clang_autosuggest_dispose(Edi_Editor *editor)
 #endif
 
 void
-_edi_editor_sugggest_c_add(Edi_Editor *editor)
+_edi_language_c_add(Edi_Editor *editor)
 {
 #if HAVE_LIBCLANG
    _clang_autosuggest_setup(editor);
@@ -57,7 +57,7 @@ _edi_editor_sugggest_c_add(Edi_Editor *editor)
 }
 
 void
-_edi_editor_sugget_c_del(Edi_Editor *editor)
+_edi_language_c_del(Edi_Editor *editor)
 {
 #if HAVE_LIBCLANG
    _clang_autosuggest_dispose(editor);
@@ -66,7 +66,7 @@ _edi_editor_sugget_c_del(Edi_Editor *editor)
 
 #if HAVE_LIBCLANG
 char *
-_edi_editor_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,
+_edi_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,
                                  const char *ret_str, const char *param_str)
 {
    char *format, *display;
@@ -91,7 +91,7 @@ _edi_editor_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,
 #endif
 
 Eina_List *
-_edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
+_edi_language_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    Eina_List *list = NULL;
 
@@ -125,10 +125,10 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
         const CXCompletionString str = res->Results[i].CompletionString;
         const char *name = NULL, *ret = NULL;
         char *param = NULL;
-        Edi_Editor_Suggest_Item *suggest_it;
+        Edi_Language_Suggest_Item *suggest_it;
         Eina_Strbuf *buf = NULL;
 
-        suggest_it = calloc(1, sizeof(Edi_Editor_Suggest_Item));
+        suggest_it = calloc(1, sizeof(Edi_Language_Suggest_Item));
 
         for (unsigned int j = 0; j < clang_getNumCompletionChunks(str); j++)
           {
@@ -168,7 +168,7 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
 
         if (name)
           suggest_it->summary = strdup(name);
-        suggest_it->detail = _edi_editor_suggest_c_detail_get(editor, name, ret?ret:"", param?param:"");
+        suggest_it->detail = _edi_suggest_c_detail_get(editor, name, ret?ret:"", param?param:"");
         if (param)
           free(param);
 
@@ -182,7 +182,7 @@ _edi_editor_suggest_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int 
 
 #if HAVE_LIBCLANG
 static void
-_edi_doc_init(Edi_Editor_Suggest_Document *doc)
+_edi_doc_init(Edi_Language_Document *doc)
 {
    doc->title = eina_strbuf_new();
    doc->detail = eina_strbuf_new();
@@ -264,7 +264,7 @@ _edi_doc_title_get(CXCursor cursor, Eina_Strbuf *strbuf)
 }
 
 static void
-_edi_doc_dump(Edi_Editor_Suggest_Document *doc, CXComment comment, Eina_Strbuf *strbuf)
+_edi_doc_dump(Edi_Language_Document *doc, CXComment comment, Eina_Strbuf *strbuf)
 {
    const char *str ,*tag;
    enum CXCommentKind kind = clang_Comment_getKind(comment);
@@ -387,10 +387,10 @@ _edi_doc_cursor_get(Edi_Editor *editor, CXIndex idx, CXTranslationUnit unit,
 }
 #endif
 
-static Edi_Editor_Suggest_Document *
-_edi_editor_suggest_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int col)
+static Edi_Language_Document *
+_edi_language_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
-   Edi_Editor_Suggest_Document *doc = NULL;
+   Edi_Language_Document *doc = NULL;
 #if HAVE_LIBCLANG
    CXIndex idx = NULL;
    CXTranslationUnit unit = NULL;
@@ -407,7 +407,7 @@ _edi_editor_suggest_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned 
         return NULL;
      }
 
-   doc = malloc(sizeof(Edi_Editor_Suggest_Document));
+   doc = malloc(sizeof(Edi_Language_Document));
 
    _edi_doc_init(doc);
    _edi_doc_dump(doc, comment, doc->detail);

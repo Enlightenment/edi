@@ -2,27 +2,27 @@
 # include "config.h"
 #endif
 
-#include "edi_editor_suggest_provider.h"
+#include "edi_language_provider.h"
 
 #include "edi_config.h"
 
 #include "edi_private.h"
 
-#include "edi_editor_suggest_provider_c.c"
+#include "edi_language_provider_c.c"
 
-static Edi_Editor_Suggest_Provider _edi_editor_suggest_provider_registry[] =
+static Edi_Language_Provider _edi_language_provider_registry[] =
 {
    {
-      "c", _edi_editor_sugggest_c_add, _edi_editor_sugget_c_del,
-      _edi_editor_suggest_c_lookup, _edi_editor_suggest_c_lookup_doc
+      "c", _edi_language_c_add, _edi_language_c_del,
+      _edi_language_c_lookup, _edi_language_c_lookup_doc
    },
 
    {NULL, NULL, NULL, NULL, NULL}
 };
 
-Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
+Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor)
 {
-   Edi_Editor_Suggest_Provider *provider;
+   Edi_Language_Provider *provider;
    const char *mime = editor->mimetype;
    const char *id = NULL;
 
@@ -36,7 +36,7 @@ Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
    if (!id)
      return NULL;
 
-   provider = _edi_editor_suggest_provider_registry;
+   provider = _edi_language_provider_registry;
    while (provider != NULL && provider->id != NULL)
      {
         if (!strncmp(id, provider->id, strlen(provider->id)))
@@ -49,13 +49,13 @@ Edi_Editor_Suggest_Provider *edi_editor_suggest_provider_get(Edi_Editor *editor)
 }
 
 Eina_Bool
-edi_editor_suggest_provider_has(Edi_Editor *editor)
+edi_language_provider_has(Edi_Editor *editor)
 {
-   return !!edi_editor_suggest_provider_get(editor);
+   return !!edi_language_provider_get(editor);
 }
 
 void
-edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item)
+edi_language_suggest_item_free(Edi_Language_Suggest_Item *item)
 {
    free((char *)item->summary);
    free((char *)item->detail);
@@ -64,7 +64,7 @@ edi_editor_suggest_item_free(Edi_Editor_Suggest_Item *item)
 }
 
 void
-edi_editor_suggest_doc_free(Edi_Editor_Suggest_Document *doc)
+edi_language_doc_free(Edi_Language_Document *doc)
 {
    if (!doc) return;
 

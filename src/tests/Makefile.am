@@ -10,8 +10,8 @@ clang_include = '$(CLANG_INCLUDE)'
 edi_suite_SOURCES = \
 edi_test_path.c \
 edi_test_content_provider.c \
-edi_test_editor_suggest_provider.c \
-edi_test_editor_suggest_provider_c.c \
+edi_test_language_provider.c \
+edi_test_language_provider_c.c \
 edi_suite.c
 
 edi_suite_CPPFLAGS = -I$(top_builddir)/src/lib/ -I$(top_builddir)/src/bin/ \
