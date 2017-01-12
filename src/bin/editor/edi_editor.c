@@ -560,6 +560,7 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
 static void
 _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
+   Edi_Language_Provider *provider;
    Evas_Object *position, *mime, *lines;
    Elm_Code *code;
 
@@ -567,7 +568,17 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
    mime = elm_label_add(panel);
    if (item->mimetype)
-     elm_object_text_set(mime, item->mimetype);
+     {
+        provider = edi_language_provider_get(editor);
+        if (provider && provider->mime_name(item->mimetype))
+          {
+             char summary[1024];
+             sprintf(summary, "%s (%s)", provider->mime_name(item->mimetype), item->mimetype);
+             elm_object_text_set(mime, summary);
+          }
+        else
+          elm_object_text_set(mime, item->mimetype);
+     }
    else
      elm_object_text_set(mime, item->editortype);
    evas_object_size_hint_align_set(mime, 0.0, 0.5);

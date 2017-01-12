@@ -43,6 +43,7 @@ typedef struct _Edi_Language_Provider
 
    void (*add)(Edi_Editor *editor);
    void (*del)(Edi_Editor *editor);
+   const char *(*mime_name)(const char *mime);
    Eina_List *(*lookup)(Edi_Editor *editor, unsigned int row, unsigned int col);
    Edi_Language_Document *(*lookup_doc)(Edi_Editor *editor, unsigned int row, unsigned int col);
 } Edi_Language_Provider;

@@ -13,11 +13,11 @@
 static Edi_Language_Provider _edi_language_provider_registry[] =
 {
    {
-      "c", _edi_language_c_add, _edi_language_c_del,
+      "c", _edi_language_c_add, _edi_language_c_del, _edi_language_c_mime_name,
       _edi_language_c_lookup, _edi_language_c_lookup_doc
    },
 
-   {NULL, NULL, NULL, NULL, NULL}
+   {NULL, NULL, NULL, NULL, NULL, NULL}
 };
 
 Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor)

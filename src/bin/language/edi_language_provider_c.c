@@ -64,6 +64,17 @@ _edi_language_c_del(Edi_Editor *editor)
 #endif
 }
 
+const char *
+_edi_language_c_mime_name(const char *mime)
+{
+   if (!strcasecmp(mime, "text/x-chdr"))
+     return "C header";
+   if (!strcasecmp(mime, "text/x-csrc"))
+     return "C source";
+
+   return NULL;
+}
+
 #if HAVE_LIBCLANG
 char *
 _edi_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,
