@@ -92,10 +92,10 @@ _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int 
           *(ptr - 1) == '_'))
      ptr--;
 
-   wordlen = col - (ptr - curtext) - 1;
+   wordlen = col - (ptr - curtext);
    curword = malloc(sizeof(char) * (wordlen + 1));
    strncpy(curword, ptr, wordlen);
-   curword[wordlen] = '\0';
+   curword[wordlen - 1] = '\0';
 
    return curword;
 }
