@@ -484,6 +484,9 @@ _filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
           return EINA_FALSE;
      }
 
+   if (ecore_file_file_get(sd->path)[0] == '.')
+     return EINA_FALSE;
+
    if (!_filter_set) return EINA_TRUE;
 
    relative = (char *)data + strlen(_root_path);
