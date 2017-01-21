@@ -61,7 +61,6 @@ struct _Edi_Editor
    CXTranslationUnit as_unit;
 #endif
 
-   Eina_Bool show_highlight;
    Ecore_Thread *highlight_thread;
    Eina_Bool highlight_cancel;
    time_t save_time;

@@ -699,12 +699,6 @@ _clang_show_highlighting(Edi_Editor *editor)
         switch (clang_getTokenKind(editor->tokens[i]))
           {
              case CXToken_Punctuation:
-                if (i < editor->token_count - 1 && range.start.col == 1 &&
-                    (clang_getTokenKind(editor->tokens[i + 1]) == CXToken_Identifier && (editor->cursors[i + 1].kind == CXCursor_MacroDefinition ||
-                    editor->cursors[i + 1].kind == CXCursor_InclusionDirective || editor->cursors[i + 1].kind == CXCursor_PreprocessingDirective)))
-                  type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
-                else
-                  type = ELM_CODE_TOKEN_TYPE_BRACE;
                 break;
              case CXToken_Identifier:
                 if (editor->cursors[i].kind < CXCursor_FirstRef)
@@ -721,62 +715,17 @@ _clang_show_highlighting(Edi_Editor *editor)
                    case CXCursor_MacroDefinition:
                    case CXCursor_InclusionDirective:
                    case CXCursor_PreprocessingDirective:
-                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
+                   case CXCursor_MacroExpansion:
                       break;
                    case CXCursor_TypeRef:
                       type = ELM_CODE_TOKEN_TYPE_TYPE;
-                      break;
-                   case CXCursor_MacroExpansion:
-                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;//_MACRO_EXPANSION;
                       break;
                    default:
                       break;
                   }
                 break;
              case CXToken_Keyword:
-                switch (editor->cursors[i].kind)
-                  {
-                   case CXCursor_PreprocessingDirective:
-                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
-                      break;
-                   case CXCursor_CaseStmt:
-                   case CXCursor_DefaultStmt:
-                   case CXCursor_IfStmt:
-                   case CXCursor_SwitchStmt:
-                   case CXCursor_WhileStmt:
-                   case CXCursor_DoStmt:
-                   case CXCursor_ForStmt:
-                   case CXCursor_GotoStmt:
-                   case CXCursor_IndirectGotoStmt:
-                   case CXCursor_ContinueStmt:
-                   case CXCursor_BreakStmt:
-                   case CXCursor_ReturnStmt:
-                   case CXCursor_AsmStmt:
-                   case CXCursor_ObjCAtTryStmt:
-                   case CXCursor_ObjCAtCatchStmt:
-                   case CXCursor_ObjCAtFinallyStmt:
-                   case CXCursor_ObjCAtThrowStmt:
-                   case CXCursor_ObjCAtSynchronizedStmt:
-                   case CXCursor_ObjCAutoreleasePoolStmt:
-                   case CXCursor_ObjCForCollectionStmt:
-                   case CXCursor_CXXCatchStmt:
-                   case CXCursor_CXXTryStmt:
-                   case CXCursor_CXXForRangeStmt:
-                   case CXCursor_SEHTryStmt:
-                   case CXCursor_SEHExceptStmt:
-                   case CXCursor_SEHFinallyStmt:
-//                      type = ELM_CODE_TOKEN_TYPE_KEYWORD_STMT;
-                      break;
-                   default:
-                      type = ELM_CODE_TOKEN_TYPE_KEYWORD;
-                      break;
-                  }
-                break;
              case CXToken_Literal:
-                if (editor->cursors[i].kind == CXCursor_StringLiteral || editor->cursors[i].kind == CXCursor_CharacterLiteral)
-                  type = ELM_CODE_TOKEN_TYPE_STRING;
-                else
-                  type = ELM_CODE_TOKEN_TYPE_NUMBER;
                 break;
              case CXToken_Comment:
                 type = ELM_CODE_TOKEN_TYPE_COMMENT;
@@ -785,7 +734,8 @@ _clang_show_highlighting(Edi_Editor *editor)
 
         if (editor->highlight_cancel)
           break;
-        _edi_range_color_set(editor, range, type);
+        if (type != ELM_CODE_TOKEN_TYPE_DEFAULT)
+          _edi_range_color_set(editor, range, type);
      }
 }
 
@@ -1052,7 +1002,6 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    editor = calloc(1, sizeof(*editor));
    editor->entry = widget;
    editor->mimetype = item->mimetype;
-   editor->show_highlight = !strcmp(item->editortype, "code");
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
@@ -1060,9 +1009,12 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
-   if (editor->show_highlight)
-     elm_code_parser_add(code, _edi_editor_parse_line_cb,
-		               _edi_editor_parse_file_cb, editor);
+   if (!strcmp(item->editortype, "code"))
+     {
+        elm_code_parser_add(code, _edi_editor_parse_line_cb,
+                            _edi_editor_parse_file_cb, editor);
+        elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
+     }
    elm_code_file_open(code, item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
