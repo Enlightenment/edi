@@ -516,7 +516,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
         else if (!strcmp(ev->key, "f"))
           {
-             edi_mainview_search();
+             edi_editor_search(editor);
           }
         else if (!strcmp(ev->key, "g"))
           {

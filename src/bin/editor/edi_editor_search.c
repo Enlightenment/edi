@@ -61,7 +61,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         try_next = EINA_TRUE;
      }
 
-   found = 0;
+   found = ELM_CODE_TEXT_NOT_FOUND;
    EINA_LIST_FOREACH(code->file->lines, item, line)
      {
         if (line->number < pos_line)
@@ -86,6 +86,8 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    if (!search->term_found)
      return EINA_FALSE;
 
+   elm_code_widget_cursor_position_set(entry, search->current_search_line,
+                                              search->current_search_col);
    elm_code_widget_selection_start(entry, search->current_search_line,
                                         search->current_search_col);
    elm_code_widget_selection_end(entry, search->current_search_line,
