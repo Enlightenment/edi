@@ -39,8 +39,6 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
    if (_edi_logpanel_ignore(level, fnc))
      return;
 
-   // TODO figure why we get repains
-   return;
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);

@@ -726,9 +726,7 @@ _clang_show_highlighting(Edi_Editor *editor)
                 break;
              case CXToken_Keyword:
              case CXToken_Literal:
-                break;
              case CXToken_Comment:
-                type = ELM_CODE_TOKEN_TYPE_COMMENT;
                 break;
           }
 
