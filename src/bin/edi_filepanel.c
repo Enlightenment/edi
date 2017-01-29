@@ -26,6 +26,7 @@ typedef struct _Edi_Dir_Data
 
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
+static Eina_Hash *_list_items;
 static edi_filepanel_item_clicked_cb _open_cb;
 
 static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
@@ -38,6 +39,26 @@ static void
 _file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
 static void
 _file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
+
+static Eina_Bool
+_file_path_hidden(const char *path)
+{
+   Edi_Build_Provider *provider;
+   const char *relative;
+
+   provider = edi_build_provider_for_project_get();
+   if (provider && provider->file_hidden_is(path))
+     return EINA_TRUE;
+
+   if (ecore_file_file_get(path)[0] == '.')
+     return EINA_TRUE;
+
+   if (!_filter_set)
+     return EINA_FALSE;
+
+   relative = path + strlen(_root_path);
+   return regexec(&_filter_regex, relative, 0, NULL, 0);
+}
 
 static void
 _item_menu_open_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
@@ -332,19 +353,7 @@ static Elm_Object_Item *_file_listing_item_find(const char *path, Elm_Object_Ite
    Edi_Dir_Data *sd;
    const Eina_List *itemlist, *l;
 
-   if (root)
-     itemlist = elm_genlist_item_subitems_get(root);
-   else
-     itemlist = elm_genlist_realized_items_get(list);
-   EINA_LIST_FOREACH(itemlist, l, item)
-     {
-        sd = elm_object_item_data_get(item);
-
-        if (!strcmp(path, sd->path))
-          return item;
-     }
-
-   return NULL;
+   return  eina_hash_find(_list_items, path);
 }
 
 static void
@@ -365,11 +374,14 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
         sd->isdir = EINA_TRUE;
      }
 
+   if (_file_path_hidden(path))
+     return;
    sd->path = eina_stringshare_add(path);
 
-   (void)!elm_genlist_item_sorted_insert(list, clas, sd, parent_it,
+   item = elm_genlist_item_sorted_insert(list, clas, sd, parent_it,
                                          isdir ? ELM_GENLIST_ITEM_TREE : ELM_GENLIST_ITEM_NONE,
                                          _file_list_cmp, _item_sel, sd);
+   eina_hash_add(_list_items, sd->path, item);
 }
 
 static void
@@ -381,6 +393,7 @@ _file_listing_item_delete(const char *path, Elm_Object_Item *parent_it)
    if (!item)
      return;
 
+   eina_hash_del(_list_items, path, NULL);
    elm_object_item_del(item);
 }
 
@@ -454,6 +467,9 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    Elm_Object_Item *parent_it;
 
    dir = ecore_file_dir_get(ev->filename);
+   if (strncmp(edi_project_get(), dir, strlen(edi_project_get())))
+     return;
+
    parent_it = _file_listing_item_find(dir, NULL);
 
    if (type == EIO_MONITOR_FILE_CREATED)
@@ -473,24 +489,9 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
 static Eina_Bool
 _filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
 {
-   Edi_Build_Provider *provider;
    Edi_Dir_Data *sd = data;
-   const char *relative;
 
-   provider = edi_build_provider_for_project_get();
-   if (provider)
-     {
-        if (provider->file_hidden_is(sd->path))
-          return EINA_FALSE;
-     }
-
-   if (ecore_file_file_get(sd->path)[0] == '.')
-     return EINA_FALSE;
-
-   if (!_filter_set) return EINA_TRUE;
-
-   relative = (char *)data + strlen(_root_path);
-   return !regexec(&_filter_regex, relative, 0, NULL, 0);
+   return !_file_path_hidden(sd->path);
 }
 
 static void
@@ -636,6 +637,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    _open_cb = cb;
    _main_win = win;
 
+   _list_items = eina_hash_string_superfast_new(NULL);
    _root_dir = calloc(1, sizeof(Edi_Dir_Data));
    _root_dir->path = path;
    _file_listing_fill(_root_dir, NULL);
