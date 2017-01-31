@@ -716,6 +716,7 @@ _clang_show_highlighting(Edi_Editor *editor)
                    case CXCursor_InclusionDirective:
                    case CXCursor_PreprocessingDirective:
                    case CXCursor_MacroExpansion:
+                      type = ELM_CODE_TOKEN_TYPE_PREPROCESSOR;
                       break;
                    case CXCursor_TypeRef:
                       type = ELM_CODE_TOKEN_TYPE_TYPE;
