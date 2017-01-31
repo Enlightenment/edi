@@ -41,7 +41,7 @@ static void
 _file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
 
 static Eina_Bool
-_file_path_hidden(const char *path)
+_file_path_hidden(const char *path, Eina_Bool filter)
 {
    Edi_Build_Provider *provider;
    const char *relative;
@@ -53,7 +53,7 @@ _file_path_hidden(const char *path)
    if (ecore_file_file_get(path)[0] == '.')
      return EINA_TRUE;
 
-   if (!_filter_set)
+   if (!filter || !_filter_set)
      return EINA_FALSE;
 
    relative = path + strlen(_root_path);
@@ -374,7 +374,7 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
         sd->isdir = EINA_TRUE;
      }
 
-   if (_file_path_hidden(path))
+   if (_file_path_hidden(path, !isdir))
      return;
    sd->path = eina_stringshare_add(path);
 
@@ -501,7 +501,7 @@ _filter_get(void *data, Evas_Object *obj EINA_UNUSED, void *key EINA_UNUSED)
 {
    Edi_Dir_Data *sd = data;
 
-   return !_file_path_hidden(sd->path);
+   return !_file_path_hidden(sd->path, EINA_TRUE);
 }
 
 static void
