@@ -434,8 +434,18 @@ _ls_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error EINA_UNUSED)
 static void
 _file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
 {
+   const Eina_List *list, *l;
+   Elm_Object_Item *subit;
+   Edi_Dir_Data *subdir;
+
    if (dir->monitor) eio_monitor_del(dir->monitor);
 
+   list = elm_genlist_item_subitems_get(parent_it);
+   EINA_LIST_FOREACH(list, l, subit)
+     {
+        subdir = elm_object_item_data_get(subit);
+        eina_hash_del(_list_items, subdir->path, NULL);
+     }
    elm_genlist_item_subitems_clear(parent_it);
 }
 
