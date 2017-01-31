@@ -347,12 +347,8 @@ _on_list_contracted(void *data EINA_UNUSED,
    _file_listing_empty(sd, it);
 }
 
-static Elm_Object_Item *_file_listing_item_find(const char *path, Elm_Object_Item *root)
+static Elm_Object_Item *_file_listing_item_find(const char *path)
 {
-   Elm_Object_Item *item;
-   Edi_Dir_Data *sd;
-   const Eina_List *itemlist, *l;
-
    return  eina_hash_find(_list_items, path);
 }
 
@@ -363,7 +359,7 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
    Edi_Dir_Data *sd;
    Elm_Object_Item *item;
 
-   item = _file_listing_item_find(path, parent_it);
+   item = _file_listing_item_find(path);
    if (item)
      return;
 
@@ -385,11 +381,11 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
 }
 
 static void
-_file_listing_item_delete(const char *path, Elm_Object_Item *parent_it)
+_file_listing_item_delete(const char *path)
 {
    Elm_Object_Item *item;
 
-   item = _file_listing_item_find(path, parent_it);
+   item = _file_listing_item_find(path);
    if (!item)
      return;
 
@@ -480,16 +476,16 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    if (strncmp(edi_project_get(), dir, strlen(edi_project_get())))
      return;
 
-   parent_it = _file_listing_item_find(dir, NULL);
+   parent_it = _file_listing_item_find(dir);
 
    if (type == EIO_MONITOR_FILE_CREATED)
      _file_listing_item_insert(ev->filename, EINA_FALSE, parent_it);
    else if (type == EIO_MONITOR_FILE_DELETED)
-     _file_listing_item_delete(ev->filename, parent_it);
+     _file_listing_item_delete(ev->filename);
    if (type == EIO_MONITOR_DIRECTORY_CREATED)
      _file_listing_item_insert(ev->filename, EINA_TRUE, parent_it);
    else if (type == EIO_MONITOR_DIRECTORY_DELETED)
-     _file_listing_item_delete(ev->filename, parent_it);
+     _file_listing_item_delete(ev->filename);
    else
      DBG("Ignoring file update event for %s", ev->filename);
 }
