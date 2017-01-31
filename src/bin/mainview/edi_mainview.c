@@ -17,7 +17,7 @@
 #include "edi_private.h"
 #include "edi_config.h"
 
-static Evas_Object *_content_frame, *_current_view, *tb, *_main_win, *_welcome_panel;
+static Evas_Object *_content_frame, *_current_view, *tb, *_main_win, *_welcome_panel, *_tab_scroller;
 static Evas_Object *_edi_mainview_choose_popup, *_edi_mainview_goto_popup;
 static Edi_Path_Options *_edi_mainview_choose_options;
 
@@ -117,6 +117,7 @@ edi_mainview_item_select(Edi_Mainview_Item *item)
 {
    Eina_List *list;
    Edi_Mainview_Item *it;
+   Evas_Coord tabw, region_x = 0, w, total_w = 0;
 
    if (item->win)
      {
@@ -127,10 +128,16 @@ edi_mainview_item_select(Edi_Mainview_Item *item)
         EINA_LIST_FOREACH(_edi_mainview_items, list, it)
           {
              elm_object_signal_emit(it->tab, "mouse,up,1", "base");
+             evas_object_geometry_get(it->tab, NULL, NULL, &w, NULL);
+             if (item == it) region_x = total_w;
+             total_w += w;
           }
 
         _edi_mainview_view_show(item->view);
         elm_object_signal_emit(item->tab, "mouse,down,1", "base");
+
+        evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
+        elm_scroller_region_bring_in(_tab_scroller, region_x, 0, tabw, 0);
      }
 }
 
@@ -244,6 +251,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
 
    elm_box_pack_end(tb, tab);
    evas_object_show(tab);
+   elm_box_recalculate(tb);
    item->tab = tab;
    edi_mainview_item_select(item);
 
@@ -738,6 +746,7 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    elm_scroller_policy_set(scr, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_table_pack(tabs, scr, 0, 0, 1, 1);
    evas_object_show(scr);
+   _tab_scroller = scr;
 
    tb = elm_box_add(scr);
    evas_object_size_hint_weight_set(tb, 0.0, 0.0);
