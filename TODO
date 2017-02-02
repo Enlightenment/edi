@@ -1,14 +1,12 @@
 This project is in heavy development, we are currenty working towards the
 "Code aware editor" phase, the following work is still to be done:
 
-* Redo changes that have been undone
 * Search / replace in project / directory
 * Code folding
 * Automatic code indenting / formatting
 * Code expansion (nested display of function call body)
 * Integrated console
 * notepad, emacs and vim and editing modes
-* Documentation finding
 * Cross reference for c, c++ and some scripting language
 
 The next phase is "Basic IDE" and it, along with other future phases
