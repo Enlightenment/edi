@@ -18,6 +18,7 @@
 #include "edi_private.h"
 
 #define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define EXIT_NOACTION -2
 
 static int _exit_code;
 
@@ -75,6 +76,38 @@ _edi_build_create_done_cb(const char *path, Eina_Bool success)
 }
 
 static void
+_edi_build_print_start(Edi_Build_Provider *provider, const char *action)
+{
+   printf("Building \"%s\" target [%s] using [%s].\n", edi_project_name_get(), action, provider->id);
+}
+
+static void
+_edi_build_print_noop(Edi_Build_Provider *provider, const char *action)
+{
+   printf("Target [%s] not supported for builder [%s].\n", action, provider->id);
+}
+
+static int
+_edi_build_action_try(Edi_Build_Provider *provider, void (*action)(void), const char *name, const char *request)
+{
+   if (strncmp(name, request, strlen(name)))
+     return EXIT_NOACTION;
+
+   if (action)
+     {
+        _edi_build_print_start(provider, name);
+        action();
+     }
+   else
+     {
+        _edi_build_print_noop(provider, name);
+        return EXIT_FAILURE;
+     }
+
+   return EXIT_SUCCESS;
+}
+
+static void
 _edi_build_create_start(int argc, int arg0, char **argv)
 {
    elm_init(argc, argv);
@@ -85,9 +118,10 @@ _edi_build_create_start(int argc, int arg0, char **argv)
 EAPI_MAIN int
 main(int argc, char **argv)
 {
-   int args;
+   int args, ret;
    char path[PATH_MAX], *build_type = NULL;
    Eina_Bool quit_option = EINA_FALSE;
+   Edi_Build_Provider *provider;
 
    Ecore_Getopt_Value values[] = {
      ECORE_GETOPT_VALUE_BOOL(quit_option),
@@ -150,21 +184,22 @@ main(int argc, char **argv)
         goto end;
      }
 
+   provider = edi_build_provider_for_project_get();
+
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_data, NULL);
-   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_del, NULL); 
+   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_del, NULL);
 
-   if (!strncmp("clean", build_type, 5))
-     edi_builder_clean();
-   else if (!strncmp("test", build_type, 4))
-     edi_builder_test();
-   else if (!strncmp("build", build_type, 5))
-     edi_builder_build();
-   else
+   if (
+       ((ret = _edi_build_action_try(provider, provider->clean, "clean", build_type)) == EXIT_NOACTION) &&
+       ((ret = _edi_build_action_try(provider, provider->test, "test", build_type)) == EXIT_NOACTION) &&
+       ((ret = _edi_build_action_try(provider, provider->build, "build", build_type)) == EXIT_NOACTION))
      {
         fprintf(stderr, "Unrecognised build type - try build, clean, create or test.\n");
         goto end;
      }
+   if (ret != EXIT_SUCCESS)
+     return ret;
    ecore_main_loop_begin();
 
    end:
