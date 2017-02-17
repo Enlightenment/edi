@@ -51,7 +51,7 @@ static void
 _make_build_make(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(BEAR_COMMAND " make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -60,7 +60,7 @@ static void
 _make_build_configure(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./configure && make",
+   ecore_exe_pipe_run("./configure && " BEAR_COMMAND " make",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -70,7 +70,7 @@ static void
 _make_build_cmake(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && make && cd ..",
+   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && " BEAR_COMMAND " make && cd ..",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -80,7 +80,7 @@ static void
 _make_build_autogen(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./autogen.sh && make",
+   ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND " make",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);

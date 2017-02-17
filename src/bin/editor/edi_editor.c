@@ -668,15 +668,15 @@ _edi_line_status_set(Edi_Editor *editor, unsigned int number, Elm_Code_Status_Ty
 static void
 _clang_load_highlighting(const char *path, Edi_Editor *editor)
 {
-        CXFile cfile = clang_getFile(editor->tx_unit, path);
+        CXFile cfile = clang_getFile(editor->clang_unit, path);
 
         CXSourceRange range = clang_getRange(
-              clang_getLocationForOffset(editor->tx_unit, cfile, 0),
-              clang_getLocationForOffset(editor->tx_unit, cfile, eina_file_size_get(eina_file_open(path, EINA_FALSE))));
+              clang_getLocationForOffset(editor->clang_unit, cfile, 0),
+              clang_getLocationForOffset(editor->clang_unit, cfile, ecore_file_size(path)));
 
-        clang_tokenize(editor->tx_unit, range, &editor->tokens, &editor->token_count);
+        clang_tokenize(editor->clang_unit, range, &editor->tokens, &editor->token_count);
         editor->cursors = (CXCursor *) malloc(editor->token_count * sizeof(CXCursor));
-        clang_annotateTokens(editor->tx_unit, editor->tokens, editor->token_count, editor->cursors);
+        clang_annotateTokens(editor->clang_unit, editor->tokens, editor->token_count, editor->cursors);
 }
 
 static void
@@ -689,7 +689,7 @@ _clang_show_highlighting(Edi_Editor *editor)
         Edi_Range range;
         Elm_Code_Token_Type type = ELM_CODE_TOKEN_TYPE_DEFAULT;
 
-        CXSourceRange tkrange = clang_getTokenExtent(editor->tx_unit, editor->tokens[i]);
+        CXSourceRange tkrange = clang_getTokenExtent(editor->clang_unit, editor->tokens[i]);
         clang_getSpellingLocation(clang_getRangeStart(tkrange), NULL,
               &range.start.line, &range.start.col, NULL);
         clang_getSpellingLocation(clang_getRangeEnd(tkrange), NULL,
@@ -742,15 +742,15 @@ static void
 _clang_free_highlighting(Edi_Editor *editor)
 {
    free(editor->cursors);
-   clang_disposeTokens(editor->tx_unit, editor->tokens, editor->token_count);
+   clang_disposeTokens(editor->clang_unit, editor->tokens, editor->token_count);
 }
 
 static void
-_clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
+_clang_load_errors(Edi_Editor *editor)
 {
    Elm_Code *code;
    const char *filename;
-   unsigned n = clang_getNumDiagnostics(editor->tx_unit);
+   unsigned n = clang_getNumDiagnostics(editor->clang_unit);
    unsigned i = 0;
 
    ecore_thread_main_loop_begin();
@@ -758,9 +758,9 @@ _clang_load_errors(const char *path EINA_UNUSED, Edi_Editor *editor)
    filename = elm_code_file_path_get(code->file);
    ecore_thread_main_loop_end();
 
-   for(i = 0, n = clang_getNumDiagnostics(editor->tx_unit); i != n; ++i)
+   for(i = 0, n = clang_getNumDiagnostics(editor->clang_unit); i != n; ++i)
      {
-        CXDiagnostic diag = clang_getDiagnostic(editor->tx_unit, i);
+        CXDiagnostic diag = clang_getDiagnostic(editor->clang_unit, i);
         CXFile file;
         unsigned int line;
         CXString path;
@@ -809,9 +809,7 @@ _edi_clang_setup(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    Edi_Editor *editor;
    Elm_Code *code;
-   const char *path, *args;
-   char **clang_argv;
-   unsigned int clang_argc;
+   const char *path;
 
    ecore_thread_main_loop_begin();
 
@@ -821,18 +819,7 @@ _edi_clang_setup(void *data, Ecore_Thread *thread EINA_UNUSED)
 
    ecore_thread_main_loop_end();
 
-   /* Clang */
-   /* FIXME: index should probably be global. */
-   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
-   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
-
-   editor->idx = clang_createIndex(0, 0);
-
-   /* FIXME: Possibly activate more options? */
-   editor->tx_unit = clang_parseTranslationUnit(editor->idx, path, (const char *const *)clang_argv, (int)clang_argc, NULL, 0,
-     clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
-
-   _clang_load_errors(path, editor);
+   _clang_load_errors(editor);
    _clang_load_highlighting(path, editor);
    _clang_show_highlighting(editor);
 }
@@ -843,8 +830,6 @@ _edi_clang_dispose(void *data, Ecore_Thread *thread EINA_UNUSED)
    Edi_Editor *editor = (Edi_Editor *)data;
 
    _clang_free_highlighting(editor);
-   clang_disposeTranslationUnit(editor->tx_unit);
-   clang_disposeIndex(editor->idx);
 
    editor->highlight_thread = NULL;
    editor->highlight_cancel = EINA_FALSE;

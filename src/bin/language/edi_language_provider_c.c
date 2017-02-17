@@ -4,6 +4,7 @@
 
 #if HAVE_LIBCLANG
 #include <clang-c/Index.h>
+#include <clang-c/CXCompilationDatabase.h>
 #endif
 
 #include <Eina.h>
@@ -16,35 +17,92 @@
 #include "edi_private.h"
 
 #if HAVE_LIBCLANG
+
+static void
+_clang_commands_fallback_get(const char ***args, unsigned int *argc)
+{
+   const char *argstr;
+
+   argstr = "-I/usr/include/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
+   *args = (const char **) eina_str_split_full(argstr, " ", 0, argc);
+}
+
+static void
+_clang_commands_get(const char *path, const char ***args, unsigned int *argc)
+{
+   CXCompilationDatabase_Error compilationDatabaseError;
+   CXCompilationDatabase compilationDatabase = clang_CompilationDatabase_fromDirectory(edi_project_get(), &compilationDatabaseError );
+
+   if ( compilationDatabaseError == CXCompilationDatabase_CanNotLoadDatabase)
+     {
+        INF("Could not load compile_commands.json in %s", edi_project_get());
+        _clang_commands_fallback_get(args, argc);
+        return;
+     }
+
+   CXCompileCommands compileCommands         = clang_CompilationDatabase_getCompileCommands( compilationDatabase, path);
+   CXCompileCommand compileCommand = clang_CompileCommands_getCommand( compileCommands, 0 );
+   unsigned int numArguments       = clang_CompileCommand_getNumArgs( compileCommand );
+
+   if (numArguments == 0)
+     {
+        INF("File %s not found in compile_commands.json", path);
+        _clang_commands_fallback_get(args, argc);
+        return;
+     }
+
+   const char** arguments                = malloc(sizeof(char*) * numArguments);
+
+   arguments[0] = CLANG_INCLUDES;
+   for( unsigned int i = 1; numArguments > i + 4; i++ )
+   {
+     CXString argument = clang_CompileCommand_getArg( compileCommand, i + 1 );
+     const char * strArgument = clang_getCString( argument );
+
+     arguments[i] = strdup(strArgument);
+
+     clang_disposeString( argument );
+   }
+
+   *args = arguments;
+   *argc = numArguments <= 4 ? 1 : numArguments - 4;
+
+   clang_CompilationDatabase_dispose(compilationDatabase);
+}
+
 static void
 _clang_autosuggest_setup(Edi_Editor *editor)
 {
    Elm_Code *code;
    const char *path;
-   char **clang_argv;
-   const char *args;
-   unsigned int clang_argc;
+   const char **args;
+   unsigned int argc, end_row, end_col;
+   struct CXUnsavedFile unsaved_file;
 
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
 
+   end_row = elm_code_file_lines_get(code->file);
+   end_col = elm_code_file_line_get(code->file, end_row)->length;
+
+   unsaved_file.Filename = path;
+   unsaved_file.Contents = elm_code_widget_text_between_positions_get(
+                                         editor->entry, 1, 1, end_row, end_col);
+   unsaved_file.Length = strlen(unsaved_file.Contents);
+
    //Initialize Clang
-   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
-   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
-
-   editor->as_idx = clang_createIndex(0, 0);
-
-   editor->as_unit = clang_parseTranslationUnit(editor->as_idx, path,
-                                  (const char *const *)clang_argv,
-                                  (int)clang_argc, NULL, 0,
-                                  clang_defaultEditingTranslationUnitOptions());
+   _clang_commands_get(path, &args, &argc);
+   editor->clang_idx = clang_createIndex(0, 0);
+   editor->clang_unit = clang_parseTranslationUnit(editor->clang_idx, path,
+                                  args, argc, NULL, 0, //&unsaved_file, 1,
+                                  clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 }
 
 static void
 _clang_autosuggest_dispose(Edi_Editor *editor)
 {
-   clang_disposeTranslationUnit(editor->as_unit);
-   clang_disposeIndex(editor->as_idx);
+   clang_disposeTranslationUnit(editor->clang_unit);
+   clang_disposeIndex(editor->clang_idx);
 }
 #endif
 
@@ -112,7 +170,7 @@ _edi_language_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
    Elm_Code *code;
    const char *path = NULL;
 
-   if (!editor->as_unit)
+   if (!editor->clang_unit)
      return list;
 
    code = elm_code_widget_code_get(editor->entry);
@@ -124,7 +182,7 @@ _edi_language_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
                                                  editor->entry, 1, 1, row, col);
    unsaved_file.Length = strlen(unsaved_file.Contents);
 
-   res = clang_codeCompleteAt(editor->as_unit, path, row, col,
+   res = clang_codeCompleteAt(editor->clang_unit, path, row, col,
                               &unsaved_file, 1,
                               CXCodeComplete_IncludeMacros |
                               CXCodeComplete_IncludeCodePatterns);
@@ -357,42 +415,20 @@ _edi_doc_dump(Edi_Language_Document *doc, CXComment comment, Eina_Strbuf *strbuf
 }
 
 static CXCursor
-_edi_doc_cursor_get(Edi_Editor *editor, CXIndex idx, CXTranslationUnit unit,
-                    unsigned int row, unsigned int col)
+_edi_doc_cursor_get(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    CXFile cxfile;
    CXSourceLocation location;
    CXCursor cursor;
-   struct CXUnsavedFile unsaved_file;
    Elm_Code *code;
-   const char *path, *args;
-   char **clang_argv;
-   unsigned int clang_argc, end_row, end_col;
+   const char *path;
 
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
 
-   end_row = elm_code_file_lines_get(code->file);
-   end_col = elm_code_file_line_get(code->file, end_row)->length;
-
-   unsaved_file.Filename = path;
-   unsaved_file.Contents = elm_code_widget_text_between_positions_get(
-                                         editor->entry, 1, 1, end_row, end_col);
-   unsaved_file.Length = strlen(unsaved_file.Contents);
-
-   //Initialize Clang
-   args = "-I/usr/inclue/ " EFL_CFLAGS " " CLANG_INCLUDES " -Wall -Wextra";
-   clang_argv = eina_str_split_full(args, " ", 0, &clang_argc);
-
-   idx = clang_createIndex(0, 0);
-
-   unit = clang_parseTranslationUnit(idx, path, (const char *const *)clang_argv,
-                                  (int)clang_argc, &unsaved_file, 1,
-                                  clang_defaultEditingTranslationUnitOptions());
-
-   cxfile = clang_getFile(unit, path);
-   location = clang_getLocation(unit, cxfile, row, col);
-   cursor = clang_getCursor(unit, location);
+   cxfile = clang_getFile(editor->clang_unit, path);
+   location = clang_getLocation(editor->clang_unit, cxfile, row, col);
+   cursor = clang_getCursor(editor->clang_unit, location);
 
    return clang_getCursorReferenced(cursor);
 }
@@ -403,18 +439,14 @@ _edi_language_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int co
 {
    Edi_Language_Document *doc = NULL;
 #if HAVE_LIBCLANG
-   CXIndex idx = NULL;
-   CXTranslationUnit unit = NULL;
    CXCursor cursor;
    CXComment comment;
 
-   cursor = _edi_doc_cursor_get(editor, idx, unit, row, col);
+   cursor = _edi_doc_cursor_get(editor, row, col);
    comment = clang_Cursor_getParsedComment(cursor);
 
    if (clang_Comment_getKind(comment) == CXComment_Null)
      {
-        clang_disposeTranslationUnit(unit);
-        clang_disposeIndex(idx);
         return NULL;
      }
 
@@ -424,9 +456,6 @@ _edi_language_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int co
    _edi_doc_dump(doc, comment, doc->detail);
    _edi_doc_title_get(cursor, doc->title);
    _edi_doc_trim(doc->detail);
-
-   clang_disposeTranslationUnit(unit);
-   clang_disposeIndex(idx);
 #endif
    return doc;
 }

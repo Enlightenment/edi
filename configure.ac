@@ -31,6 +31,19 @@ AC_ARG_ENABLE([libclang],
    ],
    [want_clang="yes"])
 
+# Build EAR support
+AC_ARG_ENABLE([bear],
+   [AS_HELP_STRING([--disable-bear], [Disable use of BuildEAR. @<:@default=enable@:>@])],
+   [
+    if test "x${enableval}" = "xyes" ; then
+       want_bear="yes"
+    else
+       want_bear="no"
+    fi
+   ],
+   [want_bear="yes"])
+
+
 
 ### Checks for programs
 
@@ -112,6 +125,12 @@ if test "${want_clang}" = "yes"; then
   AC_CHECK_HEADERS([clang-c/Index.h], [have_clang="yes"], [have_clang="no"])
 fi
 
+if test "${want_bear}" = "yes"; then
+  AC_MSG_WARN([Checking...])
+  AC_CHECK_PROG([have_bear], [bear], [yes])
+  AC_MSG_WARN([got ${have_bear}])
+fi
+
 EFL_TESTS([${build_tests}])
 
 # Checks for library functions.
@@ -132,6 +151,14 @@ if test "${have_clang}" = "no"; then
 fi
 CLANG_INCLUDE=`clang -E - -v < /dev/null 2>&1 | grep "^ /usr" | grep clang`
 AC_SUBST([CLANG_INCLUDE])
+
+BEAR_COMMAND=""
+if test "${have_bear}" = "no"; then
+   AC_MSG_WARN([Could not find a usable bear command. Please install bear (BuildEAR) to enable better support for complex make projects.])
+else
+   BEAR_COMMAND="bear"
+fi
+AC_SUBST([BEAR_COMMAND])
 
 AC_CONFIG_FILES([
 Makefile
@@ -168,6 +195,7 @@ echo "  CFLAGS.................: $CFLAGS"
 echo "  LDFLAGS................: $LDFLAGS"
 echo "  edje_cc................: ${edje_cc}"
 echo "  highlighting (libclang): ${have_clang}"
+echo "  compilation db (bear)..: ${have_bear}"
 echo
 echo "eolian_gen...............: ${eolian_gen}"
 echo

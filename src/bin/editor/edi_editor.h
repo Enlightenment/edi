@@ -51,14 +51,11 @@ struct _Edi_Editor
 
 #if HAVE_LIBCLANG
    /* Clang */
-   CXIndex idx;
-   CXTranslationUnit tx_unit;
+   CXIndex clang_idx;
+   CXTranslationUnit clang_unit;
    CXToken *tokens;
    CXCursor *cursors;
    unsigned int token_count;
-
-   CXIndex as_idx;
-   CXTranslationUnit as_unit;
 #endif
 
    Ecore_Thread *highlight_thread;

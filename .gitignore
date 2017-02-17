@@ -47,6 +47,7 @@ stamp-h1
 ar-lib
 test-driver
 test-suite.log
+compile_commands.json
 
 # gettext crap
 ABOUT-NLS

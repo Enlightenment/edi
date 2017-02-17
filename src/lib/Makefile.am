@@ -6,7 +6,8 @@ AM_CPPFLAGS = \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \
 @EFL_CFLAGS@ \
--DEFL_EDI_BUILD
+-DEFL_EDI_BUILD \
+-DBEAR_COMMAND=\"$(BEAR_COMMAND)\"
 
 lib_LTLIBRARIES = libedi.la
 
