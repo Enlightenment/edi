@@ -22,6 +22,7 @@ includesdir = $(includedir)/edi-@VMAJ@
 libedi_la_SOURCES = \
 edi_private.h \
 edi_build_provider_make.c \
+edi_build_provider_cmake.c \
 edi_build_provider_python.c \
 edi_build_provider.c \
 edi_builder.c \

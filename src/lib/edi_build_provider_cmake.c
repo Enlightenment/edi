@@ -24,15 +24,13 @@ _relative_path_exists(const char *base, const char *relative)
 }
 
 static Eina_Bool
-_make_project_supported(const char *path)
+_cmake_project_supported(const char *path)
 {
-   return _relative_path_exists(path, "Makefile") ||
-          _relative_path_exists(path, "configure") ||
-          _relative_path_exists(path, "autogen.sh");
+   return _relative_path_exists(path, "CMakeLists.txt");
 }
 
 static Eina_Bool
-_make_file_hidden_is(const char *file)
+_cmake_file_hidden_is(const char *file)
 {
    if (!file || strlen(file) == 0)
      return EINA_FALSE;
@@ -47,47 +45,17 @@ _make_file_hidden_is(const char *file)
 }
 
 static void
-_make_build_make(void)
+_cmake_build(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run(BEAR_COMMAND " make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
-}
-
-static void
-_make_build_configure(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("./configure && " BEAR_COMMAND " make",
+   ecore_exe_pipe_run("mkdir -p build && cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && cd ..",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
 static void
-_make_build_autogen(void)
-{
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND " make",
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
-}
-
-static void
-_make_build(void)
-{
-   if (edi_project_file_exists("Makefile"))
-     _make_build_make();
-   else if (edi_project_file_exists("configure"))
-     _make_build_configure();
-   else if (edi_project_file_exists("autogen.sh"))
-     _make_build_autogen();
-}
-
-static void
-_make_test(void)
+_cmake_test(void)
 {
    chdir(edi_project_get());
    ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
@@ -96,7 +64,7 @@ _make_test(void)
 }
 
 static void
-_make_clean(void)
+_cmake_clean(void)
 {
    chdir(edi_project_get());
    ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
@@ -104,6 +72,6 @@ _make_clean(void)
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
 
-Edi_Build_Provider _edi_build_provider_make =
-   {"make", _make_project_supported, _make_file_hidden_is,
-     _make_build, _make_test, _make_clean};
+Edi_Build_Provider _edi_build_provider_cmake =
+   {"cmake", _cmake_project_supported, _cmake_file_hidden_is,
+     _cmake_build, _cmake_test, _cmake_clean};
