@@ -70,7 +70,7 @@ static void
 _make_build_cmake(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("mkdir -p build && cd build && cmake .. && " BEAR_COMMAND " make && cd ..",
+   ecore_exe_pipe_run("mkdir -p build && cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && cd ..",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
