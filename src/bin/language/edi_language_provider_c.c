@@ -76,25 +76,16 @@ _clang_autosuggest_setup(Edi_Editor *editor)
    Elm_Code *code;
    const char *path;
    const char **args;
-   unsigned int argc, end_row, end_col;
-   struct CXUnsavedFile unsaved_file;
+   unsigned int argc;
 
    code = elm_code_widget_code_get(editor->entry);
    path = elm_code_file_path_get(code->file);
-
-   end_row = elm_code_file_lines_get(code->file);
-   end_col = elm_code_file_line_get(code->file, end_row)->length;
-
-   unsaved_file.Filename = path;
-   unsaved_file.Contents = elm_code_widget_text_between_positions_get(
-                                         editor->entry, 1, 1, end_row, end_col);
-   unsaved_file.Length = strlen(unsaved_file.Contents);
 
    //Initialize Clang
    _clang_commands_get(path, &args, &argc);
    editor->clang_idx = clang_createIndex(0, 0);
    editor->clang_unit = clang_parseTranslationUnit(editor->clang_idx, path,
-                                  args, argc, NULL, 0, //&unsaved_file, 1,
+                                  args, argc, NULL, 0,
                                   clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
 }
 
@@ -110,6 +101,15 @@ void
 _edi_language_c_add(Edi_Editor *editor)
 {
 #if HAVE_LIBCLANG
+   _clang_autosuggest_setup(editor);
+#endif
+}
+
+void
+_edi_language_c_refresh(Edi_Editor *editor)
+{
+#if HAVE_LIBCLANG
+   _clang_autosuggest_dispose(editor);
    _clang_autosuggest_setup(editor);
 #endif
 }

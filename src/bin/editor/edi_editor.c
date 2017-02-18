@@ -42,6 +42,9 @@ edi_editor_save(Edi_Editor *editor)
    editor->modified = EINA_FALSE;
    ecore_timer_del(editor->save_timer);
    editor->save_timer = NULL;
+
+   if (edi_language_provider_has(editor))
+     edi_language_provider_get(editor)->refresh(editor);
 }
 
 static Eina_Bool
