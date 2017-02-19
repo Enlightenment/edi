@@ -195,7 +195,7 @@ echo "  CFLAGS.................: $CFLAGS"
 echo "  LDFLAGS................: $LDFLAGS"
 echo "  edje_cc................: ${edje_cc}"
 echo "  highlighting (libclang): ${have_clang}"
-echo "  compilation db (bear)..: ${have_bear}"
+echo "  make command db (bear).: ${have_bear}"
 echo
 echo "eolian_gen...............: ${eolian_gen}"
 echo
