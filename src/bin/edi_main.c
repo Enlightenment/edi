@@ -491,7 +491,8 @@ _tb_new_create_cb(void *data,
                              Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
 {
-   const char *selected, *path, *name;
+   const char *selected, *name;
+   char *path;
    FILE *fileid;
 
    name = elm_entry_entry_get((Evas_Object *) data);

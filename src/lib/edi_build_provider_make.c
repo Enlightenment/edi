@@ -11,24 +11,11 @@
 #include "edi_private.h"
 
 static Eina_Bool
-_relative_path_exists(const char *base, const char *relative)
-{
-   char *path;
-   Eina_Bool ret;
-
-   path = edi_path_append(base, relative);
-   ret = ecore_file_exists(path);
-
-   free(path);
-   return ret;
-}
-
-static Eina_Bool
 _make_project_supported(const char *path)
 {
-   return _relative_path_exists(path, "Makefile") ||
-          _relative_path_exists(path, "configure") ||
-          _relative_path_exists(path, "autogen.sh");
+   return edi_path_relative_exists(path, "Makefile") ||
+          edi_path_relative_exists(path, "configure") ||
+          edi_path_relative_exists(path, "autogen.sh");
 }
 
 static Eina_Bool

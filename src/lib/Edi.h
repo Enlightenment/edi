@@ -133,11 +133,11 @@ EAPI const char *edi_project_name_get(void);
  *
  * @param file The file within a project to get the absolute path for.
  *
- * @return the full path to the requested file
+ * @return an allocated string containing the full path to the requested file
  *
  * @ingroup Main
  */
-EAPI const char *edi_project_file_path_get(const char *file);
+EAPI char *edi_project_file_path_get(const char *file);
 
 /**
  * Find if a requested file exists within the current project.

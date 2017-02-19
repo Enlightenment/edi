@@ -2,6 +2,8 @@
 # include "config.h"
 #endif
 
+#include <Ecore_File.h>
+
 #include "Edi.h"
 #include "edi_path.h"
 
@@ -58,5 +60,18 @@ edi_path_append(const char *path, const char *file)
    snprintf(concat, len, "%s%c%s", path, separator, file);
 
    return concat;
+}
+
+EAPI Eina_Bool
+edi_path_relative_exists(const char *dir, const char *file)
+{
+   char *path;
+   Eina_Bool ret;
+
+   path = edi_path_append(dir, file);
+   ret = ecore_file_exists(path);
+
+   free(path);
+   return ret;
 }
 

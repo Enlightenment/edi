@@ -52,6 +52,18 @@ EAPI Edi_Path_Options *edi_path_options_create(const char *input);
 EAPI char *edi_path_append(const char *path, const char *file);
 
 /**
+ * Find if a requested file exists within the specified directory.
+ *
+ * @param dir The directory relative to which we should check.
+ * @param file The filename to check for existance.
+ *
+ * @return whether or not the requested file exists within the specified directory.
+ *
+ * @ingroup Main
+ */
+EAPI Eina_Bool edi_path_relative_exists(const char *dir, const char *file);
+
+/**
  * @}
  */
 

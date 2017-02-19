@@ -11,22 +11,9 @@
 #include "edi_private.h"
 
 static Eina_Bool
-_relative_path_exists(const char *base, const char *relative)
-{
-   char *path;
-   Eina_Bool ret;
-
-   path = edi_path_append(base, relative);
-   ret = ecore_file_exists(path);
-
-   free(path);
-   return ret;
-}
-
-static Eina_Bool
 _cmake_project_supported(const char *path)
 {
-   return _relative_path_exists(path, "CMakeLists.txt");
+   return edi_path_relative_exists(path, "CMakeLists.txt");
 }
 
 static Eina_Bool

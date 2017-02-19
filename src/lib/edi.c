@@ -112,7 +112,7 @@ edi_project_name_get()
    return basename((char*)edi_project_get());
 }
 
-EAPI const char *
+EAPI char *
 edi_project_file_path_get(const char *file)
 {
    return edi_path_append(edi_project_get(), file);
@@ -121,12 +121,12 @@ edi_project_file_path_get(const char *file)
 EAPI Eina_Bool
 edi_project_file_exists(const char *file)
 {
-   const char *path;
+   char *path;
    Eina_Bool exists;
 
    path = edi_project_file_path_get(file);
    exists = ecore_file_exists(path);
 
-   free((void *)path);
+   free(path);
    return exists;
 }
