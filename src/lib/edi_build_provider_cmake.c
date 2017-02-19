@@ -22,6 +22,9 @@ _cmake_file_hidden_is(const char *file)
    if (!file || strlen(file) == 0)
      return EINA_FALSE;
 
+   if (!strcmp("build", ecore_file_file_get(file)))
+     return EINA_TRUE;
+
    if (eina_str_has_extension(file, ".o") || eina_str_has_extension(file, ".so") ||
        eina_str_has_extension(file, ".lo"))
      return EINA_TRUE;

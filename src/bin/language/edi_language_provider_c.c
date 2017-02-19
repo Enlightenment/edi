@@ -30,44 +30,65 @@ _clang_commands_fallback_get(const char ***args, unsigned int *argc)
 static void
 _clang_commands_get(const char *path, const char ***args, unsigned int *argc)
 {
-   CXCompilationDatabase_Error compilationDatabaseError;
-   CXCompilationDatabase compilationDatabase = clang_CompilationDatabase_fromDirectory(edi_project_get(), &compilationDatabaseError );
+   CXCompilationDatabase_Error error;
+   CXCompilationDatabase database = NULL;
+   CXCompileCommands commands;
+   CXCompileCommand command;
+   const char** arguments;
+   unsigned int i, numargs, ignored = 0;
 
-   if ( compilationDatabaseError == CXCompilationDatabase_CanNotLoadDatabase)
+   if (edi_project_file_exists("compile_commands.json"))
+     {
+        database = clang_CompilationDatabase_fromDirectory(edi_project_get(), &error);
+     }
+   else if (edi_project_file_exists("build/compile_commands.json"))
+     {
+        char *build = edi_project_file_path_get("build");
+        database = clang_CompilationDatabase_fromDirectory(build, &error);
+        free(build);
+     }
+
+   if (database == NULL || error == CXCompilationDatabase_CanNotLoadDatabase)
      {
         INF("Could not load compile_commands.json in %s", edi_project_get());
         _clang_commands_fallback_get(args, argc);
         return;
      }
 
-   CXCompileCommands compileCommands         = clang_CompilationDatabase_getCompileCommands( compilationDatabase, path);
-   CXCompileCommand compileCommand = clang_CompileCommands_getCommand( compileCommands, 0 );
-   unsigned int numArguments       = clang_CompileCommand_getNumArgs( compileCommand );
+   commands = clang_CompilationDatabase_getCompileCommands(database, path);
+   command = clang_CompileCommands_getCommand(commands, 0);
+   numargs = clang_CompileCommand_getNumArgs(command);
 
-   if (numArguments == 0)
+   if (numargs == 0)
      {
         INF("File %s not found in compile_commands.json", path);
         _clang_commands_fallback_get(args, argc);
         return;
      }
 
-   const char** arguments                = malloc(sizeof(char*) * numArguments);
+   arguments = malloc(sizeof(char*) * (numargs + 1));
+   INF("Loading clang parameters for %s", path);
 
    arguments[0] = CLANG_INCLUDES;
-   for( unsigned int i = 1; numArguments > i + 4; i++ )
-   {
-     CXString argument = clang_CompileCommand_getArg( compileCommand, i + 1 );
-     const char * strArgument = clang_getCString( argument );
+   for(i = 1; i <= numargs; i++ )
+     {
+        const char *argstr;
+        CXString argument = clang_CompileCommand_getArg(command, i + 1);
+        argstr = clang_getCString(argument);
 
-     arguments[i] = strdup(strArgument);
+        if (argstr && strlen(argstr) > 2 && argstr[0] == '-' &&
+            (argstr[1] == 'I' || argstr[1] == 'D'))
+          arguments[i - ignored] = strdup(argstr);
+        else
+          ignored++;
 
-     clang_disposeString( argument );
-   }
+        clang_disposeString(argument);
+     }
 
    *args = arguments;
-   *argc = numArguments <= 4 ? 1 : numArguments - 4;
+   *argc = numargs + 1 - ignored;
 
-   clang_CompilationDatabase_dispose(compilationDatabase);
+   clang_CompilationDatabase_dispose(database);
 }
 
 static void
