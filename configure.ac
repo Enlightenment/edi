@@ -126,9 +126,7 @@ if test "${want_clang}" = "yes"; then
 fi
 
 if test "${want_bear}" = "yes"; then
-  AC_MSG_WARN([Checking...])
-  AC_CHECK_PROG([have_bear], [bear], [yes])
-  AC_MSG_WARN([got ${have_bear}])
+  AC_CHECK_PROG([have_bear], [bear], [yes], [no])
 fi
 
 EFL_TESTS([${build_tests}])
