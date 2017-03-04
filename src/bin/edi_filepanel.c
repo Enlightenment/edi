@@ -161,15 +161,20 @@ static void
 _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
                  void *event_info)
 {
-   Evas_Event_Mouse_Down *ev;
+   Evas_Event_Mouse_Up *ev;
    Elm_Object_Item *it;
    Edi_Dir_Data *sd;
 
    ev = event_info;
-   if (ev->button != 3) return;
-
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
    sd = elm_object_item_data_get(it);
+
+   if (ev->button == 1 && it)
+     {
+        if (ev->flags == EVAS_BUTTON_DOUBLE_CLICK && elm_genlist_item_type_get(it) == ELM_GENLIST_ITEM_TREE)
+          elm_genlist_item_expanded_set(it, !elm_genlist_item_expanded_get(it));
+     }
+   if (ev->button != 3) return;
 
    if (sd->isdir)
      return;
@@ -614,7 +619,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_box_pack_end(box, list);
 
    _root_path = eina_stringshare_add(path);
-   evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_DOWN,
+   evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_UP,
                                   _item_clicked_cb, NULL);
    ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
    ecore_event_handler_add(EIO_MONITOR_FILE_MODIFIED, (Ecore_Event_Handler_Cb)_file_listing_updated, _root_path);
