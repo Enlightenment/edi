@@ -1003,6 +1003,11 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
         elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
      }
    elm_code_file_open(code, item->path);
+   if (eina_str_has_extension(item->path, ".eo"))
+     {
+        code->file->mime = "text/x-eolian";
+        elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
+     }
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
