@@ -1,14 +1,15 @@
 This project is in heavy development, we are currenty working towards the
 "Code aware editor" phase, the following work is still to be done:
 
-* Search / replace in project / directory
+* Search / replace in project
 * Code folding
+* Split pane view (split editor into multiple tabs and split tab to multiple panes)
 * Automatic code indenting / formatting
-* Code expansion (nested display of function call body)
+* LLVM parsing
 * Integrated console
-* notepad, emacs and vim and editing modes
+* notepad, emacs and vim and editing modes (key bindings)
 * Cross reference for c, c++ and some scripting language
 
 The next phase is "Basic IDE" and it, along with other future phases
-are documented online at https://phab.enlightenment.org/w/edi/
+are documented online at https://phab.enlightenment.org/w/projects/edi/
 
