@@ -17,6 +17,18 @@
 #include "edi_private.h"
 
 /**
+ * @struct _Edi_Search_Result
+ * An instance of a single search.
+ */
+struct _Edi_Search_Result
+{
+   int found;
+   Elm_Code_Line *line;
+   unsigned int line_number;
+   unsigned int column;
+};
+
+/**
  * @struct _Edi_Editor_Search
  * An instance of an editor view search session.
  */
@@ -25,13 +37,13 @@ struct _Edi_Editor_Search
    Evas_Object *entry; /**< The search text widget */
    Evas_Object *widget; /**< The search UI panel we wish to show and hide */
    Evas_Object *parent; /**< The parent panel we will insert into */
+   Evas_Object *checkbox; /**< The checkbox for wrapping search */
    unsigned int current_search_line; /**< The current search cursor line for this session */
    unsigned int current_search_col; /**< The current search cursor column for this session */
-
    Eina_Bool term_found;
    Evas_Object *replace_entry; /**< The replace text widget */
    Evas_Object *replace_btn; /**< The replace button for our search */
-
+   struct _Edi_Search_Result first; /**< The first found search instance */
    /* Add new members here. */
 };
 
@@ -45,6 +57,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    const char *text;
    unsigned int offset, pos_line, pos_col;
    int found;
+   Eina_Bool wrap = elm_check_state_get(search->checkbox);
 
    text = elm_object_text_get(search->entry);
    if (!text || !*text)
@@ -75,6 +88,15 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         if (found == ELM_CODE_TEXT_NOT_FOUND)
           continue;
 
+        if (!search->first.found)	
+          {
+             search->first.found = found;
+             search->first.line = line;
+             search->first.line_number = line->number;
+             search->first.column = 
+                elm_code_widget_line_text_column_width_to_position(entry, line, found);
+          }
+
         search->current_search_line = line->number;
         search->current_search_col =
           elm_code_widget_line_text_column_width_to_position(entry, line, found);
@@ -83,8 +105,16 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
    search->term_found = found != ELM_CODE_TEXT_NOT_FOUND;
    elm_code_widget_selection_clear(entry);
-   if (!search->term_found)
+   if (!search->term_found && !wrap)
      return EINA_FALSE;
+
+   if (wrap && !search->term_found && search->first.found)
+     {
+        line = search->first.line;
+        found = search->first.found;
+        search->current_search_line = search->first.line_number;
+        search->current_search_col = search->first.column;
+     }
 
    elm_code_widget_cursor_position_set(entry, search->current_search_line,
                                               search->current_search_col);
@@ -256,6 +286,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
    Evas_Object *entry, *lbl, *btn, *box, *big_box;
    Evas_Object *replace_entry, *replace_lbl, *replace_btn, *replace_box;
+   Evas_Object *checkbox;
    Edi_Editor_Search *search;
 
    big_box = elm_box_add(parent);
@@ -321,6 +352,12 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_UP, _edi_search_key_up_cb, editor);
 
+   checkbox = elm_check_add(parent);
+   elm_object_text_set(checkbox, "Wrap search?");
+   elm_check_state_set(checkbox, EINA_TRUE); 
+   evas_object_show(checkbox);
+   elm_box_pack_end(box, checkbox);
+
    btn = elm_button_add(parent);
    elm_object_text_set(btn, "Search");
    evas_object_size_hint_align_set(btn, 1.0, 0.0);
@@ -344,13 +381,14 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(btn);
    elm_box_pack_end(box, btn);
    evas_object_smart_callback_add(btn, "clicked", _edi_cancel_clicked, editor);
-
+   
    search = calloc(1, sizeof(*search));
    search->entry = entry;
    search->replace_entry = replace_entry;
    search->replace_btn = replace_btn;
    search->parent = parent;
    search->widget = big_box;
+   search->checkbox = checkbox;
    editor->search = search;
    evas_object_show(parent);
 }
