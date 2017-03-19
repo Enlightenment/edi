@@ -38,6 +38,7 @@ struct _Edi_Editor_Search
    Evas_Object *widget; /**< The search UI panel we wish to show and hide */
    Evas_Object *parent; /**< The parent panel we will insert into */
    Evas_Object *checkbox; /**< The checkbox for wrapping search */
+   Evas_Object *wrapped; /**< A display that shows the user that the search wrapped */
    unsigned int current_search_line; /**< The current search cursor line for this session */
    unsigned int current_search_col; /**< The current search cursor column for this session */
    Eina_Bool term_found;
@@ -110,11 +111,15 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
    if (wrap && !search->term_found && search->first.found)
      {
+        evas_object_show(search->wrapped);
+
         line = search->first.line;
         found = search->first.found;
         search->current_search_line = search->first.line_number;
         search->current_search_col = search->first.column;
      }
+   else
+     evas_object_hide(search->wrapped);
 
    elm_code_widget_cursor_position_set(entry, search->current_search_line,
                                               search->current_search_col);
@@ -286,7 +291,7 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
 void
 edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *entry, *lbl, *btn, *box, *big_box;
+   Evas_Object *entry, *wrapped, *lbl, *btn, *box, *big_box;
    Evas_Object *replace_entry, *replace_lbl, *replace_btn, *replace_box;
    Evas_Object *checkbox;
    Edi_Editor_Search *search;
@@ -354,6 +359,10 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_UP, _edi_search_key_up_cb, editor);
 
+   wrapped = elm_label_add(parent);
+   elm_object_text_set(wrapped, "Reached end of file, starting from beginning");
+   elm_box_pack_end(box, wrapped);
+
    checkbox = elm_check_add(parent);
    elm_object_text_set(checkbox, "Wrap search?");
    elm_check_state_set(checkbox, EINA_TRUE);
@@ -386,6 +395,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    search = calloc(1, sizeof(*search));
    search->entry = entry;
+   search->wrapped = wrapped;
    search->replace_entry = replace_entry;
    search->replace_btn = replace_btn;
    search->parent = parent;
