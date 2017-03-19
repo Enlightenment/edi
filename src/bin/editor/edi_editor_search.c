@@ -162,13 +162,15 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
      {
         if (search->current_search_line)
           {
+             unsigned int position;
              code = elm_code_widget_code_get(editor->entry);
 
              elm_code_widget_selection_delete(editor->entry);
              replace = elm_object_text_get(search->replace_entry);
 
              line = elm_code_file_line_get(code->file, search->current_search_line);
-             elm_code_line_text_insert(line, search->current_search_col, replace, strlen(replace));
+             position = elm_code_widget_line_text_position_for_column_get(editor->entry, line, search->current_search_col);
+             elm_code_line_text_insert(line, position, replace, strlen(replace));
              search->current_search_line = 0;
           }
         _edi_search_in_entry(editor->entry, search);
