@@ -88,12 +88,12 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         if (found == ELM_CODE_TEXT_NOT_FOUND)
           continue;
 
-        if (!search->first.found)	
+        if (!search->first.found)
           {
              search->first.found = found;
              search->first.line = line;
              search->first.line_number = line->number;
-             search->first.column = 
+             search->first.column =
                 elm_code_widget_line_text_column_width_to_position(entry, line, found);
           }
 
@@ -356,7 +356,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    checkbox = elm_check_add(parent);
    elm_object_text_set(checkbox, "Wrap search?");
-   elm_check_state_set(checkbox, EINA_TRUE); 
+   elm_check_state_set(checkbox, EINA_TRUE);
    evas_object_show(checkbox);
    elm_box_pack_end(box, checkbox);
 
@@ -383,7 +383,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(btn);
    elm_box_pack_end(box, btn);
    evas_object_smart_callback_add(btn, "clicked", _edi_cancel_clicked, editor);
-   
+
    search = calloc(1, sizeof(*search));
    search->entry = entry;
    search->replace_entry = replace_entry;
