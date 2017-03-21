@@ -36,6 +36,8 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
    unsigned int printed, buffer_len = 512;
    char buffer [buffer_len];
 
+   if (_edi_log_dom == -1) return; 
+
    if (_edi_logpanel_ignore(level, fnc))
      return;
 
