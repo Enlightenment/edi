@@ -462,6 +462,7 @@ Evas_Object *edi_welcome_show()
 
    elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
    evas_object_resize(win, ELM_SCALE_SIZE(480), ELM_SCALE_SIZE(260));
+   elm_win_center(win, EINA_TRUE, EINA_TRUE);
    evas_object_show(win);
 
    return win;
