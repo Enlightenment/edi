@@ -26,6 +26,8 @@ struct _Edi_Search_Result
    Elm_Code_Line *line;
    unsigned int line_number;
    unsigned int column;
+   char *text;
+   Eina_Bool success;
 };
 
 /**
@@ -42,11 +44,57 @@ struct _Edi_Editor_Search
    unsigned int current_search_line; /**< The current search cursor line for this session */
    unsigned int current_search_col; /**< The current search cursor column for this session */
    Eina_Bool term_found;
+   Eina_Bool wrap;
    Evas_Object *replace_entry; /**< The replace text widget */
    Evas_Object *replace_btn; /**< The replace button for our search */
-   struct _Edi_Search_Result first; /**< The first found search instance */
+   struct _Edi_Search_Result first_result; /**< The first found search instance */
    /* Add new members here. */
 };
+
+static void
+_edi_search_cache_reset(Edi_Editor_Search *search)
+{
+   free(search->first_result.text);
+   search->first_result.text = NULL;
+   search->first_result.found = ELM_CODE_TEXT_NOT_FOUND;
+   search->first_result.success = EINA_FALSE;
+}
+
+static Eina_Bool
+_edi_search_cache_exists(Edi_Editor_Search *search)
+{
+   return search->first_result.success;
+}
+
+static void
+_edi_search_cache_store(Edi_Editor_Search *search, int found, const char *text, Elm_Code_Line *line, unsigned int line_col)
+{
+   search->first_result.found = found;
+   search->first_result.text = strdup(text);
+   search->first_result.line = line;
+   search->first_result.line_number = line->number;
+   search->first_result.column = line_col;
+   search->first_result.success = EINA_TRUE;
+}
+
+Eina_Bool
+_edi_search_term_changed(Edi_Editor_Search *search, const char *text)
+{
+   if (!strcmp(search->first_result.text, text))
+     return EINA_FALSE;
+
+   return EINA_TRUE;
+}
+
+static void
+_edi_search_cache_use(Edi_Editor_Search *search, const char **text EINA_UNUSED, Elm_Code_Line **line EINA_UNUSED, int *found)
+{
+   *text = search->first_result.text;
+   *line = search->first_result.line;
+   *found = search->first_result.found;
+   search->current_search_line = search->first_result.line_number;
+   search->current_search_col = search->first_result.column;
+}
 
 static Eina_Bool
 _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
@@ -58,7 +106,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    const char *text;
    unsigned int offset, pos_line, pos_col;
    int found;
-   Eina_Bool wrap = elm_check_state_get(search->checkbox);
+   search->wrap = elm_check_state_get(search->checkbox);
 
    text = elm_object_text_get(search->entry);
    if (!text || !*text)
@@ -75,9 +123,27 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         try_next = EINA_TRUE;
      }
 
+   if (_edi_search_cache_exists(search) &&
+       _edi_search_term_changed(search, text))
+     {
+        _edi_search_cache_reset(search);
+     }
+
    found = ELM_CODE_TEXT_NOT_FOUND;
    EINA_LIST_FOREACH(code->file->lines, item, line)
      {
+        if (!_edi_search_cache_exists(search))
+          {
+             offset = 0;
+             found = elm_code_line_text_strpos(line, text, offset);
+             if (found == ELM_CODE_TEXT_NOT_FOUND)
+               continue;
+
+             // find and store the first occurance of search
+             _edi_search_cache_store(search, found, text, line,
+                elm_code_widget_line_text_column_width_to_position(entry, line, found));
+          }
+
         if (line->number < pos_line)
           continue;
 
@@ -89,15 +155,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         if (found == ELM_CODE_TEXT_NOT_FOUND)
           continue;
 
-        if (!search->first.found)
-          {
-             search->first.found = found;
-             search->first.line = line;
-             search->first.line_number = line->number;
-             search->first.column =
-                elm_code_widget_line_text_column_width_to_position(entry, line, found);
-          }
-
+        // store first occurence of search from cursor position
         search->current_search_line = line->number;
         search->current_search_col =
           elm_code_widget_line_text_column_width_to_position(entry, line, found);
@@ -106,17 +164,21 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 
    search->term_found = found != ELM_CODE_TEXT_NOT_FOUND;
    elm_code_widget_selection_clear(entry);
-   if (!search->term_found && !wrap)
+
+   // nothing found and wrap is disabled
+   if (!search->term_found && !search->wrap)
      return EINA_FALSE;
 
-   if (wrap && !search->term_found && search->first.found)
+   // No history nor term found so return
+   if (search->wrap && !search->term_found && !_edi_search_cache_exists(search))
+     return EINA_FALSE;
+
+   // EOF reached so go to search found before cursor (first inst).
+   if (search->wrap && !search->term_found && _edi_search_cache_exists(search))
      {
         evas_object_show(search->wrapped);
 
-        line = search->first.line;
-        found = search->first.found;
-        search->current_search_line = search->first.line_number;
-        search->current_search_col = search->first.column;
+        _edi_search_cache_use(search, &text, &line, &found);
      }
    else
      evas_object_hide(search->wrapped);
@@ -159,11 +221,11 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
 
    editor = (Edi_Editor *)data;
    // If there is no search term found to replace, then do a new search first.
-   if (search && !search->term_found)
+   if (search && !search->term_found && !_edi_search_cache_exists(search))
      _edi_search_in_entry(editor->entry, search);
 
    // If we found a matching searched term the go ahead and replace it if appropriate.
-   if (search->term_found)
+   if (search->term_found || (_edi_search_cache_exists(search) && search->wrap))
      {
         if (search->current_search_line)
           {
@@ -178,6 +240,10 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
              elm_code_line_text_insert(line, position, replace, strlen(replace));
              search->current_search_line = 0;
           }
+
+        if (_edi_search_cache_exists(search))
+          _edi_search_cache_reset(search);
+
         _edi_search_in_entry(editor->entry, search);
      }
 
