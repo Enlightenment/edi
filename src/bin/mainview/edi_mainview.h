@@ -38,6 +38,15 @@ extern "C" {
 void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
 
 /**
+ * Delete a mainview by its path
+ * @param parh The path of the file associated with tab to close.
+ *
+ * @ingroup UI
+ */
+void edi_mainview_item_close_path(const char *path);
+
+
+/**
  * @}
  *
  *

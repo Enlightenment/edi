@@ -14,6 +14,7 @@
 
 #include "edi_filepanel.h"
 #include "edi_content_provider.h"
+#include "mainview/edi_mainview.h"
 
 #include "edi_private.h"
 
@@ -118,6 +119,17 @@ _item_menu_open_as_image_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED
 }
 
 static void
+_item_menu_del_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   const char *filename = _menu_cb_path;
+
+   edi_mainview_item_close_path(filename);
+
+   ecore_file_unlink(filename);
+}
+
+static void
 _item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                         void *ev EINA_UNUSED)
 {
@@ -155,6 +167,7 @@ _item_menu_create(Evas_Object *win)
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb);
+   menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete", _item_menu_del_cb, NULL);
 }
 
 static void
