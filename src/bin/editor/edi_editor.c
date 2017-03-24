@@ -30,18 +30,112 @@ typedef struct
    Edi_Location end;
 } Edi_Range;
 
+static void
+_edi_editor_file_change_reload_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Edi_Editor *editor;
+   const char *filename;
+   Elm_Code *code;
+
+   editor = (Edi_Editor *)data;
+   if (!editor) return;
+
+   code = elm_code_widget_code_get(editor->entry);
+   filename = elm_code_file_path_get(code->file);
+
+   edi_mainview_close();
+   edi_mainview_open_path(filename);
+
+   evas_object_del(editor->popup);
+}
+
+static void
+_edi_editor_file_change_ignore_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)data;
+   if (!editor) return;
+
+   edi_editor_save(editor);
+   editor->save_time = time(NULL);
+   evas_object_del(editor->popup);
+}
+
+static void
+_edi_editor_file_change_popup(Edi_Editor *editor)
+{
+   Evas_Object *box, *table;
+   Evas_Object *label, *bt_reload, *bt_ignore;
+
+   editor->popup = elm_popup_add(editor->entry);
+   elm_popup_scrollable_set(editor->popup, EINA_TRUE);
+   elm_object_part_text_set(editor->popup, "title,text", "File has changed...");
+   evas_object_size_hint_align_set(editor->popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(editor->popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(editor->popup);
+
+   box = elm_box_add(editor->popup);
+   label = elm_label_add(editor->popup);
+   elm_object_text_set(label, "File has changed on disk.");
+   evas_object_show(label); 
+   elm_box_pack_end(box, label);
+
+   table = elm_table_add(editor->popup);
+   bt_reload = elm_button_add(editor->popup);
+   elm_object_text_set(bt_reload, "Reload");
+   elm_table_pack(table, bt_reload, 0, 0, 1, 1);
+   evas_object_smart_callback_add(bt_reload, "clicked", _edi_editor_file_change_reload_cb, editor);
+   evas_object_show(bt_reload);
+
+   bt_ignore = elm_button_add(editor->popup);
+   elm_object_text_set(bt_ignore, "Ignore");
+   elm_table_pack(table, bt_ignore, 1, 0, 1, 1);
+   evas_object_smart_callback_add(bt_ignore, "clicked", _edi_editor_file_change_ignore_cb, editor);
+
+   elm_box_pack_end(box, table);
+   evas_object_show(bt_ignore);
+   elm_object_content_set(editor->popup, box);
+   evas_object_show(table);
+   evas_object_resize(editor->popup, 200 * elm_config_scale_get(), 200 * elm_config_scale_get());
+}
+
 void
 edi_editor_save(Edi_Editor *editor)
 {
+   Elm_Code *code;
+   const char *filename;
+   time_t mtime;
+
    if (!editor->modified)
      return;
 
-   editor->save_time = time(NULL);
+   code = elm_code_widget_code_get(editor->entry);
+
+   filename = elm_code_file_path_get(code->file);
+
+   mtime = ecore_file_mod_time(filename);
+  
+   if ((editor->save_time) && (editor->save_time < mtime)) 
+     {
+        ecore_timer_del(editor->save_timer);
+        editor->save_timer = NULL;
+        _edi_editor_file_change_popup(editor);
+        editor->modified = EINA_FALSE;
+        return; 
+     }
+
    edi_mainview_save();
 
+   editor->save_time = ecore_file_mod_time(filename);
+
    editor->modified = EINA_FALSE;
-   ecore_timer_del(editor->save_timer);
-   editor->save_timer = NULL;
+
+   if (editor->save_timer)
+     {
+        ecore_timer_del(editor->save_timer);
+        editor->save_timer = NULL;
+     }
 
    if (edi_language_provider_has(editor))
      edi_language_provider_get(editor)->refresh(editor);
@@ -53,8 +147,11 @@ _edi_editor_autosave_cb(void *data)
    Edi_Editor *editor;
 
    editor = (Edi_Editor *)data;
+   if (!editor)
+     return ECORE_CALLBACK_CANCEL;
 
    edi_editor_save(editor);
+
    return ECORE_CALLBACK_CANCEL;
 }
 
@@ -1008,6 +1105,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
         code->file->mime = "text/x-eolian";
         elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
      }
+
+   editor->save_time = ecore_file_mod_time(item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);

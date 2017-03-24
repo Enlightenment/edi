@@ -42,6 +42,7 @@ struct _Edi_Editor
    Evas_Object *suggest_bg; /**< The autosuggest background */
    Evas_Object *suggest_genlist; /**< The autosuggest genlist */
    Evas_Object *doc_popup; /**< The popup for documentation */
+   Evas_Object *popup;
    Eina_List *undo_stack; /**< The list of operations that can be undone */
 
    /* Private */
