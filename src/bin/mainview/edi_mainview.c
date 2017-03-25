@@ -798,5 +798,6 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_show(txt);
    elm_object_content_set(scroll, txt);
 
+   _welcome_panel = scroll;
    _edi_mainview_view_show(scroll);
 }
