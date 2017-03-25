@@ -727,7 +727,7 @@ edi_mainview_goto_popup_show()
 void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
-   Evas_Object *box, *txt, *nf, *tabs, *tab, *bg, *pad, *scr;
+   Evas_Object *box, *scroll, *txt, *nf, *tabs, *tab, *bg, *pad, *scr;
 
    _main_win = win;
 
@@ -786,12 +786,17 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_show(nf);
    _content_frame = nf;
 
-   txt = elm_label_add(parent);
-   elm_object_text_set(txt, "Welcome - click on a file to edit");
+   scroll = elm_scroller_add(parent);
+   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(scroll);
+
+   txt = elm_label_add(scroll);
+   elm_object_text_set(txt, "<hilight>Welcome</hilight><br><br>Click on any file to edit.");
    evas_object_size_hint_weight_set(txt, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
+   elm_object_content_set(scroll, txt);
 
-   elm_box_pack_end(_content_frame, txt);
-   _welcome_panel = _current_view = txt;
+   _edi_mainview_view_show(scroll);
 }
