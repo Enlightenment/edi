@@ -632,15 +632,23 @@ edi_mainview_search()
 }
 
 void
-edi_mainview_goto(int line)
+edi_mainview_goto(int number)
 {
    Edi_Editor *editor;
+   Elm_Code *code;
+   Elm_Code_Line *line;
 
    editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
-   if (!editor || line <= 0)
+   if (!editor || number <= 0)
      return;
 
-   elm_code_widget_cursor_position_set(editor->entry, line, 1);
+   code = elm_code_widget_code_get(editor->entry);
+
+   line = elm_code_file_line_get(code->file, number);
+   if (!line)
+     return;
+
+   elm_code_widget_cursor_position_set(editor->entry, number, 1);
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
