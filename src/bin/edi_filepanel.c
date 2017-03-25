@@ -182,6 +182,8 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
    sd = elm_object_item_data_get(it);
 
+   if (!sd) return;
+
    if (ev->button == 1 && it)
      {
         if (ev->flags == EVAS_BUTTON_DOUBLE_CLICK && elm_genlist_item_type_get(it) == ELM_GENLIST_ITEM_TREE)
@@ -191,6 +193,8 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 
    if (sd->isdir)
      return;
+
+   elm_object_item_focus_set(it, EINA_TRUE);
 
    if (!menu)
      _item_menu_create(_main_win);
