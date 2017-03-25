@@ -9,6 +9,7 @@ This project is in heavy development, we are currenty working towards the
 * Integrated console
 * notepad, emacs and vim and editing modes (key bindings)
 * Cross reference for c, c++ and some scripting language
+* Support for EditorConfig - http://editorconfig.org/
 
 The next phase is "Basic IDE" and it, along with other future phases
 are documented online at https://phab.enlightenment.org/w/projects/edi/
