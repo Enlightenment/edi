@@ -130,11 +130,12 @@ _item_menu_del_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj,
                         void *ev EINA_UNUSED)
 {
    eina_stringshare_del(_menu_cb_path);
    _menu_cb_path = NULL;
+   evas_object_del(obj);
 }
 
 static void
@@ -171,6 +172,50 @@ _item_menu_create(Evas_Object *win)
 }
 
 static void
+_item_menu_open_terminal_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                   void *event_info EINA_UNUSED)
+{
+   const char *format;
+   char *cmd;
+   int cmdlen;
+
+   format = "terminology -d=\"%s\"";
+
+   if (!ecore_file_is_dir(_menu_cb_path))
+     return;
+
+   cmdlen = strlen(_menu_cb_path) + strlen(format) + 1;
+   cmd = malloc(sizeof(char) * cmdlen);
+   snprintf(cmd, cmdlen, format, _menu_cb_path);
+
+   ecore_exe_run(cmd, NULL);
+   free(cmd);
+}
+
+static void
+_item_menu_rmdir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   const char *path = _menu_cb_path;
+   if (!ecore_file_is_dir(path))
+     return;
+
+   ecore_file_recursive_rm(path);
+}
+
+static void
+_item_menu_dir_create(Evas_Object *win)
+{
+   menu = elm_menu_add(win);
+   evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
+
+   if (ecore_file_app_installed("terminology"))
+     elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, NULL);
+   if (ecore_file_dir_is_empty(_menu_cb_path))
+     elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, NULL);
+}
+
+static void
 _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
                  void *event_info)
 {
@@ -191,15 +236,15 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
      }
    if (ev->button != 3) return;
 
+   _menu_cb_path = eina_stringshare_add(sd->path);
+
    if (sd->isdir)
-     return;
+     _item_menu_dir_create(_main_win);
+   else
+     _item_menu_create(_main_win);
 
    elm_object_item_focus_set(it, EINA_TRUE);
 
-   if (!menu)
-     _item_menu_create(_main_win);
-
-   _menu_cb_path = eina_stringshare_add(sd->path);
    elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
    evas_object_show(menu);
 }
