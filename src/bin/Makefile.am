@@ -27,6 +27,7 @@ editor/edi_editor.h \
 edi_content_provider.h \
 screens/edi_screens.h \
 edi_filepanel.h \
+edi_file.h \
 edi_logpanel.h \
 edi_consolepanel.h \
 mainview/edi_mainview_item.h \
@@ -44,6 +45,7 @@ screens/edi_about.c \
 screens/edi_settings_font.c \
 screens/edi_settings.c \
 edi_filepanel.c \
+edi_file.c \
 edi_logpanel.c \
 edi_consolepanel.c \
 mainview/edi_mainview_item.c \

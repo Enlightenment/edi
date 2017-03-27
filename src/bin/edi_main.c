@@ -17,6 +17,7 @@
 #include "Edi.h"
 #include "edi_config.h"
 #include "edi_filepanel.h"
+#include "edi_file.h"
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "mainview/edi_mainview.h"
@@ -41,7 +42,7 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_new_popup, *_edi_message_popup;
+static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_message_popup;
 int _edi_log_dom = -1;
 
 static void
@@ -487,80 +488,19 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 }
 
 static void
-_tb_new_create_cb(void *data,
-                             Evas_Object *obj EINA_UNUSED,
-                             void *event_info EINA_UNUSED)
+_tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
-   const char *selected, *name;
-   char *path;
-   FILE *fileid;
-
-   name = elm_entry_entry_get((Evas_Object *) data);
-   if (!name || strlen(name) == 0)
-     {
-        _edi_message_open("Please enter a file name.");
-        return;
-     }
+   const char *path, *selected;
 
    selected = edi_filepanel_selected_path_get(_edi_filepanel);
    if (selected && ecore_file_is_dir(selected))
-     path = edi_path_append(selected, name);
+     path = selected;
    else
-     path = edi_project_file_path_get(name);
+     path = edi_project_get();
 
-   fileid = fopen(path, "w");
-   if (!fileid)
-     _edi_message_open("Unable to write file.");
-   else
-     edi_mainview_open_path(path);
-
-   evas_object_del(_edi_new_popup);
-   free((char*)path);
-}
-
-static void
-_edi_file_new()
-{
-   Evas_Object *popup, *box, *input, *button;
-
-   popup = elm_popup_add(_edi_main_win);
-   _edi_new_popup = popup;
-   elm_object_part_text_set(popup, "title,text",
-                            "Enter new file name");
-
-   box = elm_box_add(popup);
-   elm_box_horizontal_set(box, EINA_FALSE);
-   elm_object_content_set(popup, box);
-
-   input = elm_entry_add(box);
-   elm_entry_single_line_set(input, EINA_TRUE);
-   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(input);
-   elm_box_pack_end(box, input);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
-   elm_object_part_content_set(popup, "button1", button);
-   evas_object_smart_callback_add(button, "clicked",
-                                       _edi_popup_cancel_cb, _edi_new_popup);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "create");
-   elm_object_part_content_set(popup, "button2", button);
-   evas_object_smart_callback_add(button, "clicked",
-                                       _tb_new_create_cb, input);
-
-   evas_object_show(popup);
-   elm_object_focus_set(input, EINA_TRUE);
-}
-
-static void
-_tb_new_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
-{
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
 
-   _edi_file_new();
+   edi_file_create_file(_edi_main_win, path);
 }
 
 static void
@@ -691,7 +631,29 @@ static void
 _edi_menu_new_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                  void *event_info EINA_UNUSED)
 {
-   _edi_file_new();
+   const char *path, *selected;
+
+   selected = edi_filepanel_selected_path_get(_edi_filepanel);
+   if (selected && ecore_file_is_dir(selected))
+     path = selected;
+   else
+     path = edi_project_get();
+
+   edi_file_create_file(_edi_main_win, path);
+}
+
+static void
+_edi_menu_new_dir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                 void *event_info EINA_UNUSED)
+{
+   const char *path, *selected;
+   selected = edi_filepanel_selected_path_get(_edi_filepanel);
+   if (selected && ecore_file_is_dir(selected))
+     path =selected;
+   else
+     path = edi_project_get();
+
+   edi_file_create_dir(_edi_main_win, path);
 }
 
 static void
@@ -839,6 +801,7 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "folder-new", "New Project ...", _edi_menu_project_new_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", "New Directory ...", _edi_menu_new_dir_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-close", "Close", _edi_menu_close_cb, NULL);

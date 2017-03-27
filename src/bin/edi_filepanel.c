@@ -13,6 +13,7 @@
 #include "Edi.h"
 
 #include "edi_filepanel.h"
+#include "edi_file.h"
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
 
@@ -204,11 +205,40 @@ _item_menu_rmdir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_create_file_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   Evas_Object *win = data;
+
+   const char *directory = _menu_cb_path;
+   if (!ecore_file_is_dir(directory))
+     return;
+
+   edi_file_create_file(win, directory);
+}
+
+static void
+_item_menu_create_dir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   Evas_Object *win = data;
+
+   const char *directory = _menu_cb_path;
+
+   if (!ecore_file_is_dir(directory))
+     return;
+
+   edi_file_create_dir(win, directory);
+}
+
+static void
 _item_menu_dir_create(Evas_Object *win)
 {
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
+   elm_menu_item_add(menu, NULL, "document-new", "create file here", _item_menu_create_file_cb, win);
+   elm_menu_item_add(menu, NULL, "folder-new", "create directory here", _item_menu_create_dir_cb, win);
    if (ecore_file_app_installed("terminology"))
      elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, NULL);
    if (ecore_file_dir_is_empty(_menu_cb_path))
