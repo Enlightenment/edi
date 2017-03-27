@@ -721,8 +721,14 @@ const char *
 edi_filepanel_selected_path_get(Evas_Object *obj EINA_UNUSED)
 {
    Elm_Object_Item *it;
+   Edi_Dir_Data *sd;
 
    it = elm_genlist_selected_item_get(list);
-   return elm_object_item_data_get(it);
+   sd = elm_object_item_data_get(it);
+
+   if (!sd)
+     return NULL;
+
+   return sd->path;
 }
 
