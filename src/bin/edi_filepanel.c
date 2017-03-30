@@ -32,7 +32,7 @@ static Eina_Hash *_list_items;
 static edi_filepanel_item_clicked_cb _open_cb;
 
 static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
-static const char *_menu_cb_path, *_root_path;
+static const char *_root_path;
 static regex_t _filter_regex;
 static Eina_Bool _filter_set = EINA_FALSE;
 static Edi_Dir_Data *_root_dir;
@@ -63,85 +63,101 @@ _file_path_hidden(const char *path, Eina_Bool filter)
 }
 
 static void
-_item_menu_open_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_cb(void *data, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
-   if (ecore_file_is_dir(_menu_cb_path))
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   if (sd->isdir)
      return;
 
-   _open_cb(_menu_cb_path, NULL, EINA_FALSE);
+   _open_cb(sd->path, NULL, EINA_FALSE);
 }
 
 static void
-_item_menu_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                   void *event_info EINA_UNUSED)
+_item_menu_open_window_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                          void *event_info EINA_UNUSED)
 {
-   if (ecore_file_is_dir(_menu_cb_path))
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   if (sd->isdir)
      return;
 
-   _open_cb(_menu_cb_path, NULL, EINA_TRUE);
+   _open_cb(sd->path, NULL, EINA_TRUE);
 }
 
 static void
-_item_menu_xdgopen_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_xdgopen_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
    char *cmd;
    int cmdlen;
    const char *format = "xdg-open \"%s\"";
+   Edi_Dir_Data *sd;
 
-   cmdlen = strlen(format) + strlen(_menu_cb_path) - 1;
+   sd = data;
+   cmdlen = strlen(format) + strlen(sd->path) - 1;
    cmd = malloc(sizeof(char) * cmdlen);
-   snprintf(cmd, cmdlen, format, _menu_cb_path);
+   snprintf(cmd, cmdlen, format, sd->path);
 
    ecore_exe_run(cmd, NULL);
    free(cmd);
 }
 
 static void
-_item_menu_open_as_text_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_as_text_cb(void *data, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
-   _open_cb(_menu_cb_path, "text", EINA_FALSE);
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   _open_cb(sd->path, "text", EINA_FALSE);
 }
 
 static void
-_item_menu_open_as_code_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_as_code_cb(void *data, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
-   _open_cb(_menu_cb_path, "code", EINA_FALSE);
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   _open_cb(sd->path, "code", EINA_FALSE);
 }
 
 static void
-_item_menu_open_as_image_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_as_image_cb(void *data, Evas_Object *obj EINA_UNUSED,
                             void *event_info EINA_UNUSED)
 {
-   _open_cb(_menu_cb_path, "image", EINA_FALSE);
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   _open_cb(sd->path, "image", EINA_FALSE);
 }
 
 static void
-_item_menu_del_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   const char *filename = _menu_cb_path;
+   Edi_Dir_Data *sd;
 
-   edi_mainview_item_close_path(filename);
+   sd = data;
+   edi_mainview_item_close_path(sd->path);
 
-   ecore_file_unlink(filename);
+   ecore_file_unlink(sd->path);
 }
 
 static void
 _item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj,
                         void *ev EINA_UNUSED)
 {
-   eina_stringshare_del(_menu_cb_path);
-   _menu_cb_path = NULL;
    evas_object_del(obj);
 }
 
 static void
 _item_menu_filetype_create(Evas_Object *menu, Elm_Object_Item *parent, const char *type,
-                           Evas_Smart_Cb func)
+                           Evas_Smart_Cb func, Edi_Dir_Data *sd)
 {
    Edi_Content_Provider *provider;
 
@@ -149,100 +165,103 @@ _item_menu_filetype_create(Evas_Object *menu, Elm_Object_Item *parent, const cha
    if (!provider)
      return;
 
-   elm_menu_item_add(menu, parent, provider->icon, provider->id, func, NULL);
+   elm_menu_item_add(menu, parent, provider->icon, provider->id, func, sd);
 }
 
 static void
-_item_menu_create(Evas_Object *win)
+_item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
 {
    Elm_Object_Item *menu_it;
 
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, NULL);
-   elm_menu_item_add(menu, NULL, "window-new", "open new window", _item_menu_open_window_cb, NULL);
+   elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, sd);
+   elm_menu_item_add(menu, NULL, "window-new", "open new window", _item_menu_open_window_cb, sd);
 
    menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
-                               _item_menu_xdgopen_cb, NULL);
+                               _item_menu_xdgopen_cb, sd);
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
-   _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb);
-   _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb);
-   _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb);
-   menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete", _item_menu_del_cb, NULL);
+   _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
+   _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
+   _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete", _item_menu_del_cb, sd);
 }
 
 static void
-_item_menu_open_terminal_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_open_terminal_cb(void *data, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
    const char *format;
    char *cmd;
    int cmdlen;
+   Edi_Dir_Data *sd;
 
+   sd = data;
    format = "terminology -d=\"%s\"";
 
-   if (!ecore_file_is_dir(_menu_cb_path))
+   if (!sd->isdir)
      return;
 
-   cmdlen = strlen(_menu_cb_path) + strlen(format) + 1;
+   cmdlen = strlen(sd->path) + strlen(format) + 1;
    cmd = malloc(sizeof(char) * cmdlen);
-   snprintf(cmd, cmdlen, format, _menu_cb_path);
+   snprintf(cmd, cmdlen, format, sd->path);
 
    ecore_exe_run(cmd, NULL);
    free(cmd);
 }
 
 static void
-_item_menu_rmdir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_rmdir_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   const char *path = _menu_cb_path;
-   if (!ecore_file_is_dir(path))
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   if (!sd->isdir)
      return;
 
-   ecore_file_recursive_rm(path);
+   ecore_file_recursive_rm(sd->path);
 }
 
 static void
-_item_menu_create_file_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_item_menu_create_file_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   Evas_Object *win = data;
+   Edi_Dir_Data *sd;
 
-   const char *directory = _menu_cb_path;
-   if (!ecore_file_is_dir(directory))
+   sd = data;
+   if (!sd->isdir)
      return;
 
-   edi_file_create_file(win, directory);
+   edi_file_create_file(_main_win, sd->path);
 }
 
 static void
 _item_menu_create_dir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   Evas_Object *win = data;
+   Edi_Dir_Data *sd;
 
-   const char *directory = _menu_cb_path;
-
-   if (!ecore_file_is_dir(directory))
+   sd = data;
+   if (!sd->isdir)
      return;
 
-   edi_file_create_dir(win, directory);
+   edi_file_create_dir(_main_win, sd->path);
 }
 
 static void
-_item_menu_dir_create(Evas_Object *win)
+_item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
 {
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, "document-new", "create file here", _item_menu_create_file_cb, win);
-   elm_menu_item_add(menu, NULL, "folder-new", "create directory here", _item_menu_create_dir_cb, win);
+   elm_menu_item_add(menu, NULL, "document-new", "create file here", _item_menu_create_file_cb, sd);
+   elm_menu_item_add(menu, NULL, "folder-new", "create directory here", _item_menu_create_dir_cb, sd);
    if (ecore_file_app_installed("terminology"))
-     elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, NULL);
-   if (ecore_file_dir_is_empty(_menu_cb_path))
-     elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, NULL);
+     elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, sd);
+   if (ecore_file_dir_is_empty(sd->path))
+     elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, sd);
 }
 
 static void
@@ -266,12 +285,10 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
      }
    if (ev->button != 3) return;
 
-   _menu_cb_path = eina_stringshare_add(sd->path);
-
    if (sd->isdir)
-     _item_menu_dir_create(_main_win);
+     _item_menu_dir_create(_main_win, sd);
    else
-     _item_menu_create(_main_win);
+     _item_menu_create(_main_win, sd);
 
    elm_object_item_focus_set(it, EINA_TRUE);
 
