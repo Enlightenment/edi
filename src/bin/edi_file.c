@@ -6,6 +6,21 @@
 static Evas_Object *_parent_obj, *_popup, *_popup_dir, *_edi_file_message_popup;
 static const char *_directory_path;
 
+Eina_Bool
+edi_file_path_hidden(const char *path)
+{
+   Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+   if (provider && provider->file_hidden_is(path))
+     return EINA_TRUE;
+
+   if (ecore_file_file_get(path)[0] == '.')
+     return EINA_TRUE;
+
+   return EINA_FALSE;
+}
+
 static void
 _edi_file_message_close_cb(void *data EINA_UNUSED,
                      Evas_Object *obj EINA_UNUSED,

@@ -45,14 +45,9 @@ _file_listing_empty(Edi_Dir_Data *dir, Elm_Object_Item *parent_it);
 static Eina_Bool
 _file_path_hidden(const char *path, Eina_Bool filter)
 {
-   Edi_Build_Provider *provider;
    const char *relative;
 
-   provider = edi_build_provider_for_project_get();
-   if (provider && provider->file_hidden_is(path))
-     return EINA_TRUE;
-
-   if (ecore_file_file_get(path)[0] == '.')
+   if (edi_file_path_hidden(path))
      return EINA_TRUE;
 
    if (!filter || !_filter_set)

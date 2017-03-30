@@ -178,6 +178,13 @@ void edi_mainview_goto(int line);
 void edi_mainview_goto_popup_show();
 
 /**
+ * Present a popup that will initiate a project search.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_project_search_popup_show();
+
+/**
  * @}
  *
  *

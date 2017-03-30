@@ -13,12 +13,15 @@
 
 #include "editor/edi_editor.h"
 #include "edi_content_provider.h"
+#include "../edi_searchpanel.h"
 
 #include "edi_private.h"
 #include "edi_config.h"
 
 static Evas_Object *_content_frame, *_current_view, *tb, *_main_win, *_welcome_panel, *_tab_scroller;
 static Evas_Object *_edi_mainview_choose_popup, *_edi_mainview_goto_popup;
+static Evas_Object *_edi_mainview_search_project_popup;
+
 static Edi_Path_Options *_edi_mainview_choose_options;
 
 static Eina_List *_edi_mainview_items = NULL;
@@ -719,6 +722,66 @@ edi_mainview_goto_popup_show()
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_goto_popup_go_cb, input);
+
+   evas_object_show(popup);
+   elm_object_focus_set(input, EINA_TRUE);
+}
+
+static void
+_edi_mainview_project_search_popup_cancel_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   evas_object_del(_edi_mainview_search_project_popup);
+}
+
+static void
+_edi_mainview_project_search_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   const char *text;
+
+   text = elm_entry_entry_get((Evas_Object *) data);
+   if (!text || strlen(text) == 0) return;
+
+   edi_searchpanel_find(text);
+   evas_object_del(_edi_mainview_search_project_popup);
+}
+
+void
+edi_mainview_project_search_popup_show(void)
+{
+   Evas_Object *popup, *box, *input, *button;
+
+   popup = elm_popup_add(_main_win);
+   _edi_mainview_search_project_popup = popup;
+   elm_object_part_text_set(popup, "title,text",
+                            "Search for");
+
+   box = elm_box_add(popup);
+   elm_box_horizontal_set(box, EINA_FALSE);
+   elm_object_content_set(popup, box);
+
+   input = elm_entry_add(box);
+   elm_entry_single_line_set(input, EINA_TRUE);
+   evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_goto_popup_key_up_cb, NULL);
+   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(input);
+   elm_box_pack_end(box, input);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "cancel");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _edi_mainview_project_search_popup_cancel_cb, NULL);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "search");
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                       _edi_mainview_project_search_cb, input);
 
    evas_object_show(popup);
    elm_object_focus_set(input, EINA_TRUE);

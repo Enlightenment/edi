@@ -23,6 +23,15 @@ extern "C" {
  */
 
 /**
+ * Check the path is not hidden according to project rules.
+ * 
+ * @param path The file path to check.
+ * @ingroup Lookup
+ */
+
+Eina_Bool edi_file_path_hidden(const char *path);
+
+/**
  * Create a file add dialogue and add it to the parent obj.
  *
  * @param parent The object into which the UI will load.
