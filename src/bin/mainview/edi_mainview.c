@@ -787,11 +787,37 @@ edi_mainview_project_search_popup_show(void)
    elm_object_focus_set(input, EINA_TRUE);
 }
 
+static void
+_edi_mainview_next_clicked_cb(void *data EINA_UNUSED,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   int x, y, w, h;
+   Evas_Object *scroller = _tab_scroller;
+
+   elm_scroller_region_get(scroller, &x, &y, &w, &h);
+   x += w * 0.8;
+   elm_scroller_region_bring_in(scroller, x, y, w, h);
+}
+
+static void
+_edi_mainview_prev_clicked_cb(void *data EINA_UNUSED,
+                             Evas_Object *obj EINA_UNUSED,
+                             void *event_info EINA_UNUSED)
+{
+   int x, y, w, h;
+   Evas_Object *scroller = _tab_scroller;
+
+   elm_scroller_region_get(scroller, &x, &y, &w, &h);
+   x -= w * 0.8;
+   elm_scroller_region_bring_in(scroller, x, y, w, h);
+}
+
 void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
    Evas_Object *box, *scroll, *txt, *nf, *tabs, *tab, *bg, *pad, *scr;
-
+   Evas_Object *next, *prev, *ico_next, *ico_prev;
    _main_win = win;
 
    box = elm_box_add(parent);
@@ -811,6 +837,29 @@ edi_mainview_add(Evas_Object *parent, Evas_Object *win)
    evas_object_size_hint_align_set(bg, 0.0, EVAS_HINT_FILL);
    evas_object_show(bg);
    elm_table_pack(tabs, bg, 0, 0, 1, 1);
+
+   next = elm_button_add(tabs);
+   evas_object_size_hint_weight_set(next, 0, 0);
+   evas_object_size_hint_align_set(next, 0, EVAS_HINT_FILL);
+   elm_table_pack(tabs, next, 2, 0, 1, 1);
+   evas_object_smart_callback_add(next, "clicked",
+                                       _edi_mainview_next_clicked_cb, NULL);
+
+   ico_next = elm_icon_add(next);
+   elm_icon_standard_set(ico_next, "go-next");
+   elm_object_part_content_set(next, "icon", ico_next);
+   evas_object_show(next);
+
+   prev = elm_button_add(tabs);
+   evas_object_size_hint_weight_set(prev, 0, 0);
+   evas_object_size_hint_align_set(prev, 0, EVAS_HINT_FILL);
+   elm_table_pack(tabs, prev, 1, 0, 1, 1);
+   evas_object_smart_callback_add(prev, "clicked",
+                                       _edi_mainview_prev_clicked_cb, NULL);
+   ico_prev = elm_icon_add(prev);
+   elm_icon_standard_set(ico_prev, "go-previous");
+   elm_object_part_content_set(prev, "icon", ico_prev);
+   evas_object_show(prev);
 
    tab = elm_button_add(tabs);
    evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
