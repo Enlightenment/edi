@@ -21,17 +21,6 @@ static Ecore_Thread *_search_thread = NULL;
 static Eina_Bool _searching = EINA_FALSE;
 static char *_search_text = NULL;
 
-static void
-_edi_searchpanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
-{
-   Elm_Code_Line *line;
-
-   line = (Elm_Code_Line *)event->info;
-
-   if (line->data)
-     line->status = ELM_CODE_STATUS_TYPE_ERROR;
-}
-
 static Eina_Bool
 _edi_searchpanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
@@ -46,73 +35,85 @@ _edi_searchpanel_line_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
    Elm_Code_Line *line;
    const char *content;
    unsigned int length;
-   char *filename, *filename_end;
-   char *line_start, *line_end;
-   Eina_Bool success = EINA_FALSE;
+   int numlen;
+   char *path, *filename_end;
+   char *line_start, *line_end, *numstr;
 
-   filename_end = line_start = line_end = NULL;
+   line = (Elm_Code_Line *) event->info;
+   filename_end = line_start = NULL;
 
-   line = (Elm_Code_Line *)event->info;
-   if (!line) return;
+   path = strdup(line->data);
+   if (!path) return;
+
    content = elm_code_line_text_get(line, &length);
-   if (!content) return;
+   if (!content)
+     return;
 
-   filename = strdup(content);
-   if (!filename) return;
+   filename_end = strchr(content, ':');
+   if (!filename_end)
+     return;
 
-   filename_end = strchr(filename, ':');
-   if (filename_end)
-     line_start = filename_end + 1;
-   if (line_start)
-     line_end = strchr(line_start, ' ');
-   if (line_end)
-     {
-        *filename_end = '\0';
-        *line_end = '\0';
-        success = EINA_TRUE;
-     }
+   line_start = filename_end + 1;
+   line_end = strchr(line_start, ' ');
+   if (!line_end)
+     return;
 
-   if (success)
-     {
-        edi_mainview_open_path(filename);
-        edi_mainview_goto(atoi(line_start));
-     }
-   
-   free(filename);
+   numlen = line_end - line_start;
+   numstr = malloc((numlen + 1) * sizeof(char));
+   strncpy(numstr, line_start, numlen);
+   numstr[numlen] = '\0';
+
+   edi_mainview_open_path(path);
+   edi_mainview_goto(atoi(numstr));
+
+   free(numstr);
 }
 
-void _edi_searchpanel_search_project_file(const char *filename, const char *search_term)
+char *
+_edi_searchpanel_line_render(Elm_Code_Line *line, const char *path)
 {
-   Elm_Code *code;
-   Elm_Code_File *code_file; 
-   Eina_List *item;
-   Elm_Code_Line *line;
    unsigned int len;
    const char *text;
-   char *tmp;
+
    static char buf[1024];
    static char data[1024];
 
+   text = elm_code_line_text_get(line, &len);
+   if (!text)
+     return NULL;
+
+   len++;
+   if (len > sizeof(data))
+     len = sizeof(data);
+
+   snprintf(data, len, "%s", text);
+   snprintf(buf, sizeof(buf), "%s:%d -> %s", ecore_file_file_get(path), line->number, data);
+
+   return strdup(buf);
+}
+
+void
+_edi_searchpanel_search_project_file(const char *path, const char *search_term, Elm_Code *logger)
+{
+   Elm_Code *code;
+   Elm_Code_File *code_file;
+   Eina_List *item;
+   Elm_Code_Line *line;
+   char *text;
+
    code = elm_code_create();
-   code_file = elm_code_file_open(code, filename);
+   code_file = elm_code_file_open(code, path);
 
    EINA_LIST_FOREACH(code->file->lines, item, line)
      {
         int found = elm_code_line_text_strpos(line, search_term, 0);
-        if (found != ELM_CODE_TEXT_NOT_FOUND) 
+        if (found != ELM_CODE_TEXT_NOT_FOUND)
           {
-             text = elm_code_line_text_get(line, &len);
-             if (text)
-               {
-                  if (line->length >= sizeof(data))
-                    len = sizeof(data);
-                  else
-                    len = line->length + 1;
-                  snprintf(data, len, "%s", text);
-                  snprintf(buf, sizeof(buf), "%s:%d -> %s", filename, line->number, data);
-                  tmp = strdup(buf);
-                  ecore_thread_feedback(_search_thread, tmp);
-               }
+             text = _edi_searchpanel_line_render(line, path);
+             ecore_thread_main_loop_begin();
+             elm_code_file_line_append(logger->file, text, strlen(text), strdup(path));
+             ecore_thread_main_loop_end();
+             free(text);
           }
      }
 
@@ -139,7 +140,7 @@ _file_ignore(const char *filename)
 }
 
 void
-_edi_searchpanel_search_project(const char *directory, const char *search_term)
+_edi_searchpanel_search_project(const char *directory, const char *search_term, Elm_Code *logger)
 {
    Eina_List *files, *item;
    char *file;
@@ -155,23 +156,14 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term)
         if (!edi_file_path_hidden(path))
           {
              if (ecore_file_is_dir(path))
-               _edi_searchpanel_search_project(path, search_term);
+               _edi_searchpanel_search_project(path, search_term, logger);
              else
-               _edi_searchpanel_search_project_file(path, search_term);
+               _edi_searchpanel_search_project_file(path, search_term, logger);
           }
 
         free (path);
         if (ecore_thread_check(_search_thread)) return;
      }
-}
-
-static void
-_search_feedback_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED, void *msg)
-{
-   char *text = msg;
-
-   elm_code_file_line_append(_elm_code->file, text, strlen(text), NULL);
-   free(text);
 }
 
 static void
@@ -195,12 +187,13 @@ _search_begin_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 
    _searching = EINA_TRUE;
 
-   _edi_searchpanel_search_project(path, _search_text);
+   _edi_searchpanel_search_project(path, _search_text, _elm_code);
 
    if (ecore_thread_check(_search_thread)) return;
 }
 
-void edi_searchpanel_find(const char *text)
+void
+edi_searchpanel_find(const char *text)
 {
    const char *path;
 
@@ -215,12 +208,13 @@ void edi_searchpanel_find(const char *text)
 
    elm_code_file_clear(_elm_code->file);
 
-   _search_thread = ecore_thread_feedback_run(_search_begin_cb, _search_feedback_cb,
+   _search_thread = ecore_thread_feedback_run(_search_begin_cb, NULL,
                                       _search_end_cb, _search_cancel_cb,
                                       path, EINA_FALSE);
 }
 
-void edi_searchpanel_add(Evas_Object *parent)
+void
+edi_searchpanel_add(Evas_Object *parent)
 {
    Elm_Code_Widget *widget;
    Elm_Code *code;
@@ -228,7 +222,6 @@ void edi_searchpanel_add(Evas_Object *parent)
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
-   efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_searchpanel_line_cb, NULL);
    efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_searchpanel_line_clicked_cb, NULL);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -248,8 +241,7 @@ _edi_taskspanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
 
    line = (Elm_Code_Line *)event->info;
 
-   if (line->data)
-     line->status = ELM_CODE_STATUS_TYPE_ERROR;
+   line->status = ELM_CODE_STATUS_TYPE_TODO;
 }
 
 static Eina_Bool
@@ -263,28 +255,20 @@ _edi_taskspanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, 
 #define _edi_taskspanel_line_clicked_cb _edi_searchpanel_line_clicked_cb
 
 static void
-_tasks_feedback_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED, void *msg)
-{
-   char *text = msg;
-
-   elm_code_file_line_append(_tasks_code->file, text, strlen(text), NULL);
-   free(text);
-}
-
-static void
 _tasks_begin_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    const char *path = data;
 
-   _edi_searchpanel_search_project(path, "TODO");
+   _edi_searchpanel_search_project(path, "TODO", _tasks_code);
    if (ecore_thread_check(_search_thread)) return;
-   _edi_searchpanel_search_project(path, "FIXME");
+   _edi_searchpanel_search_project(path, "FIXME", _tasks_code);
    if (ecore_thread_check(_search_thread)) return;
-   _edi_searchpanel_search_project(path, "XXX");
+   _edi_searchpanel_search_project(path, "XXX", _tasks_code);
    if (ecore_thread_check(_search_thread)) return;
 }
 
-void edi_taskspanel_find(void)
+void
+edi_taskspanel_find(void)
 {
    const char *path;
    if (_searching) return;
@@ -293,12 +277,13 @@ void edi_taskspanel_find(void)
 
    path = edi_project_get();
 
-   _search_thread = ecore_thread_feedback_run(_tasks_begin_cb, _tasks_feedback_cb,
+   _search_thread = ecore_thread_feedback_run(_tasks_begin_cb, NULL,
                                              _search_end_cb, _search_cancel_cb,
                                              path, EINA_FALSE);
 }
 
-void edi_taskspanel_add(Evas_Object *parent)
+void
+edi_taskspanel_add(Evas_Object *parent)
 {
    Elm_Code_Widget *widget;
    Elm_Code *code;
