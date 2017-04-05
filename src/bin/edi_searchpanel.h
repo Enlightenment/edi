@@ -22,12 +22,6 @@ extern "C" {
  *
  */
 
-/**
- * Show the Edi searchpanel - animating on to screen if required.
- *
- * @ingroup UI
- */
-void edi_searchpanel_show();
 
 /**
  * Initialize a new Edi searchpanel and add it to the parent panel.
@@ -39,6 +33,13 @@ void edi_searchpanel_show();
 void edi_searchpanel_add(Evas_Object *parent);
 
 /**
+ * Show the Edi searchpanel - animating on to screen if required.
+ *
+ * @ingroup UI
+ */
+void edi_searchpanel_show();
+
+/**
  * Search in project for text and print results to the panel.
  * 
  * @param text The search string to use when parsing project files.
@@ -46,6 +47,28 @@ void edi_searchpanel_add(Evas_Object *parent);
  * @ingroup UI
  */
 void edi_searchpanel_find(const char *text);
+
+/**
+ * Initialise a new Edi taskspanel and add it to the parent pane.
+ *
+ * @ingroup UI
+ */
+void edi_taskspanel_add(Evas_Object *parent);
+
+/**
+ * Show the Edi taskspanel - animating on to the screen if require.
+ *
+ * @ingroup UI
+ */
+void edi_taskspanel_show();
+
+/**
+ * Find known labels in the text e.g. FIXME/TODO and print result to
+ * the panel.
+ *
+ * @ingroup UI
+ */
+void edi_taskspanel_find();
 
 /**
  * @}

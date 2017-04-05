@@ -745,6 +745,7 @@ _edi_mainview_project_search_cb(void *data,
    text = elm_entry_entry_get((Evas_Object *) data);
    if (!text || strlen(text) == 0) return;
 
+   edi_searchpanel_show();
    edi_searchpanel_find(text);
    evas_object_del(_edi_mainview_search_project_popup);
 }

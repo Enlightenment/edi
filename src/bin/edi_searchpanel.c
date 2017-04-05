@@ -14,8 +14,8 @@
 
 #include "edi_private.h"
 
-static Evas_Object *_info_widget;
-static Elm_Code *_elm_code;
+static Evas_Object *_info_widget, *_tasks_widget;
+static Elm_Code *_elm_code, *_tasks_code;
 
 static Ecore_Thread *_search_thread = NULL;
 static Eina_Bool _searching = EINA_FALSE;
@@ -81,7 +81,7 @@ _edi_searchpanel_line_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
    free(filename);
 }
 
-void _edi_searchpanel_project_search_file(const char *filename)
+void _edi_searchpanel_search_project_file(const char *filename, const char *search_term)
 {
    Elm_Code *code;
    Elm_Code_File *code_file; 
@@ -98,7 +98,7 @@ void _edi_searchpanel_project_search_file(const char *filename)
 
    EINA_LIST_FOREACH(code->file->lines, item, line)
      {
-        int found = elm_code_line_text_strpos(line, _search_text, 0);
+        int found = elm_code_line_text_strpos(line, search_term, 0);
         if (found != ELM_CODE_TEXT_NOT_FOUND) 
           {
              text = elm_code_line_text_get(line, &len);
@@ -129,6 +129,7 @@ _file_ignore(const char *filename)
         eina_str_has_extension(filename, ".JPG")   ||
         eina_str_has_extension(filename, ".JPEG" ) ||
         eina_str_has_extension(filename, ".bmp")   ||
+        eina_str_has_extension(filename, ".tgv")   ||
         eina_str_has_extension(filename, ".eet")   ||
         eina_str_has_extension(filename, ".edj")
        ))
@@ -138,7 +139,7 @@ _file_ignore(const char *filename)
 }
 
 void
-_edi_searchpanel_project_search(const char *directory)
+_edi_searchpanel_search_project(const char *directory, const char *search_term)
 {
    Eina_List *files, *item;
    char *file;
@@ -154,9 +155,9 @@ _edi_searchpanel_project_search(const char *directory)
         if (!edi_file_path_hidden(path))
           {
              if (ecore_file_is_dir(path))
-               _edi_searchpanel_project_search(path);
+               _edi_searchpanel_search_project(path, search_term);
              else
-               _edi_searchpanel_project_search_file(path);
+               _edi_searchpanel_search_project_file(path, search_term);
           }
 
         free (path);
@@ -194,7 +195,7 @@ _search_begin_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 
    _searching = EINA_TRUE;
 
-   _edi_searchpanel_project_search(path);
+   _edi_searchpanel_search_project(path, _search_text);
 
    if (ecore_thread_check(_search_thread)) return;
 }
@@ -213,8 +214,6 @@ void edi_searchpanel_find(const char *text)
    path = edi_project_get();
 
    elm_code_file_clear(_elm_code->file);
-
-   edi_searchpanel_show();
 
    _search_thread = ecore_thread_feedback_run(_search_begin_cb, _search_feedback_cb,
                                       _search_end_cb, _search_cancel_cb,
@@ -240,5 +239,85 @@ void edi_searchpanel_add(Evas_Object *parent)
 
    elm_box_pack_end(parent, widget);
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_searchpanel_config_changed_cb, NULL);
+}
+
+static void
+_edi_taskspanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
+{
+   Elm_Code_Line *line;
+
+   line = (Elm_Code_Line *)event->info;
+
+   if (line->data)
+     line->status = ELM_CODE_STATUS_TYPE_ERROR;
+}
+
+static Eina_Bool
+_edi_taskspanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   elm_code_widget_font_set(_tasks_widget, _edi_project_config->font.name, _edi_project_config->font.size);
+
+   return ECORE_CALLBACK_RENEW;
+}
+
+#define _edi_taskspanel_line_clicked_cb _edi_searchpanel_line_clicked_cb
+
+static void
+_tasks_feedback_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED, void *msg)
+{
+   char *text = msg;
+
+   elm_code_file_line_append(_tasks_code->file, text, strlen(text), NULL);
+   free(text);
+}
+
+static void
+_tasks_begin_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   const char *path = data;
+
+   _edi_searchpanel_search_project(path, "TODO");
+   if (ecore_thread_check(_search_thread)) return;
+   _edi_searchpanel_search_project(path, "FIXME");
+   if (ecore_thread_check(_search_thread)) return;
+   _edi_searchpanel_search_project(path, "XXX");
+   if (ecore_thread_check(_search_thread)) return;
+}
+
+void edi_taskspanel_find(void)
+{
+   const char *path;
+   if (_searching) return;
+
+   elm_code_file_clear(_tasks_code->file);
+
+   path = edi_project_get();
+
+   _search_thread = ecore_thread_feedback_run(_tasks_begin_cb, _tasks_feedback_cb,
+                                             _search_end_cb, _search_cancel_cb,
+                                             path, EINA_FALSE);
+}
+
+void edi_taskspanel_add(Evas_Object *parent)
+{
+   Elm_Code_Widget *widget;
+   Elm_Code *code;
+   code = elm_code_create();
+   widget = elm_code_widget_add(parent, code);
+   elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
+   efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_taskspanel_line_cb, NULL);
+   efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_taskspanel_line_clicked_cb, NULL);
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
+
+   _tasks_code = code;
+   _tasks_widget = widget;
+
+   elm_box_pack_end(parent, widget);
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_taskspanel_config_changed_cb, NULL);
+
+   edi_taskspanel_find();
 }
 

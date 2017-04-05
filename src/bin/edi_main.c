@@ -38,8 +38,8 @@ typedef struct _Edi_Panel_Slide_Effect
 #define COPYRIGHT "Copyright © 2014-2015 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
-static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel;
-static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item;
+static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel;
+static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
@@ -108,6 +108,8 @@ _edi_panel_tab_for_index(int index)
      return _edi_testpanel;
    if (index == 3)
      return _edi_searchpanel;
+   if (index == 4)
+     return _edi_taskspanel;
 
    return _edi_logpanel;
 }
@@ -252,7 +254,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
    if (obj)
      elm_object_focus_set(obj, EINA_FALSE);
 
-   for (c = 0; c <= 3; c++)
+   for (c = 0; c <= 4; c++)
      if (c != index)
        evas_object_hide(_edi_panel_tab_for_index(c));
 
@@ -309,6 +311,13 @@ edi_searchpanel_show()
      elm_toolbar_item_selected_set(_edi_searchpanel_item, EINA_TRUE);
 }
 
+void
+edi_taskspanel_show()
+{
+   if (_edi_selected_bottompanel != _edi_taskspanel_item)
+     elm_toolbar_item_selected_set(_edi_taskspanel_item, EINA_TRUE);
+}
+
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
@@ -328,6 +337,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    _edi_consolepanel = elm_box_add(win);
    _edi_testpanel = elm_box_add(win);
    _edi_searchpanel = elm_box_add(win);
+   _edi_taskspanel = elm_box_add(win);
 
    // add main content
    content_out = elm_box_add(win);
@@ -400,6 +410,8 @@ edi_content_setup(Evas_Object *win, const char *path)
                                                  _edi_toggle_panel, "2");
    _edi_searchpanel_item = elm_toolbar_item_append(tb, "stock_up", "Search",
                                                  _edi_toggle_panel, "3");
+   _edi_taskspanel_item = elm_toolbar_item_append(tb, "stock_up", "Tasks",
+                                                  _edi_toggle_panel, "4");
 
    // add lower panel panes
    logpanels = elm_table_add(logpane);
@@ -427,6 +439,12 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_searchpanel_add(_edi_searchpanel);
    elm_table_pack(logpanels, _edi_searchpanel, 0, 0, 1, 1);
 
+   evas_object_size_hint_weight_set(_edi_taskspanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(_edi_taskspanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   edi_taskspanel_add(_edi_taskspanel);
+   elm_table_pack(logpanels, _edi_taskspanel, 0, 0, 1, 1);
+
    elm_object_part_content_set(logpane, "bottom", logpanels);
 
    if (_edi_project_config->gui.bottomopen)
@@ -446,6 +464,11 @@ edi_content_setup(Evas_Object *win, const char *path)
           {
              elm_toolbar_item_icon_set(_edi_searchpanel_item, "stock_down");
              _edi_selected_bottompanel = _edi_searchpanel_item;
+          }
+        else if (_edi_project_config->gui.bottomtab == 4)
+          {
+             elm_toolbar_item_icon_set(_edi_taskspanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_taskspanel_item;
           }
         else
           {
@@ -774,6 +797,14 @@ _edi_menu_findfile_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_tasks_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_taskspanel_show();
+   edi_taskspanel_find();
+}
+
+static void
 _edi_menu_goto_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
@@ -856,6 +887,7 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "go-jump", "Goto Line ...", _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find", "Find in project ...", _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", "Open Tasks", _edi_menu_tasks_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
