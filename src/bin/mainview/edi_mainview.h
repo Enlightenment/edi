@@ -134,6 +134,27 @@ void edi_mainview_closeall();
 void edi_mainview_undo();
 
 /**
+ * See whether the current view can undo a change.
+ *
+ * @ingroup Content
+ */
+Eina_Bool edi_mainview_can_undo();
+
+/**
+ * Redo the most recent change in the current view.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_redo();
+
+/**
+ * See whether the current view can redo a change.
+ *
+ * @ingroup Content
+ */
+Eina_Bool edi_mainview_can_redo();
+
+/**
  * Cut the current selection into the clipboard.
  *
  * @ingroup Content

@@ -27,6 +27,9 @@ extern int _edi_log_dom;
 #endif
 #define DBG(...) EINA_LOG_DOM_DBG(_edi_log_dom, __VA_ARGS__)
 
+extern int EDI_EVENT_TAB_CHANGED;
+extern int EDI_EVENT_FILE_CHANGED;
+
 #define EDI_CONTENT_SAVE_TIMEOUT 1
 
 #define FONT_PREVIEW " Evas *dostuff(void) {...}"

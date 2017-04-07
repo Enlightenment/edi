@@ -26,6 +26,9 @@
 
 #include "edi_private.h"
 
+int EDI_EVENT_TAB_CHANGED;
+int EDI_EVENT_FILE_CHANGED;
+
 typedef struct _Edi_Panel_Slide_Effect
 {
    double max;
@@ -43,6 +46,7 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
+static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
 static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_message_popup;
 int _edi_log_dom = -1;
 
@@ -574,6 +578,13 @@ _tb_undo_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static void
+_tb_redo_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+   elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
+   edi_mainview_redo();
+}
+
+static void
 _tb_cut_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    elm_toolbar_item_selected_set(elm_toolbar_selected_item_get(obj), EINA_FALSE);
@@ -755,6 +766,13 @@ _edi_menu_undo_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_redo_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info EINA_UNUSED)
+{
+   edi_mainview_redo();
+}
+
+static void
 _edi_menu_cut_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                  void *event_info EINA_UNUSED)
 {
@@ -876,7 +894,8 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "application-exit", "Quit", _edi_menu_quit_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Edit", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-undo", "Undo", _edi_menu_undo_cb, NULL);
+   _edi_menu_undo = elm_menu_item_add(menu, menu_it, "edit-undo", "Undo", _edi_menu_undo_cb, NULL);
+   _edi_menu_redo = elm_menu_item_add(menu, menu_it, "edit-redo", "Redo", _edi_menu_redo_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-cut", "Cut", _edi_menu_cut_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-copy", "Copy", _edi_menu_copy_cb, NULL);
@@ -901,7 +920,7 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "help-about", "About", _edi_menu_about_cb, NULL);
 }
 
-static void
+static Evas_Object *
 _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_Smart_Cb func)
 {
    Evas_Object *content;
@@ -910,6 +929,8 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
    tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
+
+   return content;
 }
 
 static Evas_Object *
@@ -934,7 +955,8 @@ edi_toolbar_setup(Evas_Object *win)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "edit-undo", "Undo", _tb_undo_cb);
+   _edi_toolbar_undo = _edi_toolbar_item_add(tb, "edit-undo", "Undo", _tb_undo_cb);
+   _edi_toolbar_redo = _edi_toolbar_item_add(tb, "edit-redo", "Redo", _tb_redo_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
@@ -1011,6 +1033,21 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 }
 
 static void
+_edi_icon_update()
+{
+   Eina_Bool can_undo, can_redo = EINA_FALSE;
+
+   can_undo = edi_mainview_can_undo();
+   can_redo = edi_mainview_can_redo();
+
+   elm_object_item_disabled_set(_edi_menu_undo, !can_undo);
+   elm_object_item_disabled_set(_edi_menu_redo, !can_redo);
+
+   elm_object_disabled_set(_edi_toolbar_undo, !can_undo);
+   elm_object_disabled_set(_edi_toolbar_redo, !can_redo);
+}
+
+static void
 _edi_toolbar_set_visible(Eina_Bool visible)
 {
    elm_box_unpack(_edi_main_box, _edi_toolbar);
@@ -1027,6 +1064,20 @@ static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   return ECORE_CALLBACK_RENEW;
+}
+
+static Eina_Bool
+_edi_tab_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   _edi_icon_update();
+   return ECORE_CALLBACK_RENEW;
+}
+
+static Eina_Bool
+_edi_file_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   _edi_icon_update();
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -1119,7 +1170,11 @@ edi_open(const char *inputpath)
 
    _edi_config_project_add(path);
    _edi_open_tabs();
+   _edi_icon_update();
+
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_config_changed, NULL);
+   ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
+   ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
 
    free(path);
    return EINA_TRUE;
@@ -1253,6 +1308,9 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    elm_app_compile_lib_dir_set(PACKAGE_LIB_DIR);
    elm_app_compile_data_dir_set(PACKAGE_DATA_DIR);
    elm_app_info_set(elm_main, "edi", "images/edi.png");
+
+   EDI_EVENT_TAB_CHANGED = ecore_event_type_new();
+   EDI_EVENT_FILE_CHANGED = ecore_event_type_new();
 
    if (!project_path)
      {

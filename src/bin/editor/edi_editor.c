@@ -658,6 +658,12 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
 }
 
 static void
+_edit_file_changed(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
+}
+
+static void
 _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
    Edi_Language_Provider *provider;
@@ -708,6 +714,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
    _edit_cursor_moved(position, editor->entry, NULL);
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
+   evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, position);
 }
 
 #if HAVE_LIBCLANG

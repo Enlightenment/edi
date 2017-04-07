@@ -142,6 +142,8 @@ edi_mainview_item_select(Edi_Mainview_Item *item)
         evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
         elm_scroller_region_bring_in(_tab_scroller, region_x, 0, tabw, 0);
      }
+
+   ecore_event_add(EDI_EVENT_TAB_CHANGED, NULL, NULL, NULL);
 }
 
 static void
@@ -588,6 +590,43 @@ edi_mainview_undo()
 
    if (editor)
      elm_code_widget_undo(editor->entry);
+}
+
+Eina_Bool
+edi_mainview_can_undo()
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
+
+   if (!editor)
+     return EINA_FALSE;
+
+   return elm_code_widget_can_undo_get(editor->entry);
+}
+
+void
+edi_mainview_redo()
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
+
+   if (editor)
+     elm_code_widget_redo(editor->entry);
+}
+
+Eina_Bool
+edi_mainview_can_redo()
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
+
+   if (!editor)
+     return EINA_FALSE;
+
+   return elm_code_widget_can_redo_get(editor->entry);
 }
 
 void
