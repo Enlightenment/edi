@@ -29,6 +29,7 @@ extern int _edi_log_dom;
 
 extern int EDI_EVENT_TAB_CHANGED;
 extern int EDI_EVENT_FILE_CHANGED;
+extern int EDI_EVENT_FILE_SAVED;
 
 #define EDI_CONTENT_SAVE_TIMEOUT 1
 
