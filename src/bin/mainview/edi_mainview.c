@@ -543,8 +543,11 @@ edi_mainview_save()
    if (!editor)
      return;
 
+   editor->modified = EINA_FALSE;
+
    code = elm_code_widget_code_get(editor->entry);
    elm_code_file_save(code->file);
+   ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
 }
 
 void
@@ -627,6 +630,18 @@ edi_mainview_can_redo()
      return EINA_FALSE;
 
    return elm_code_widget_can_redo_get(editor->entry);
+}
+
+Eina_Bool
+edi_mainview_modified()
+{
+   Edi_Editor *editor;
+
+   editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
+   if (!editor)
+     return EINA_FALSE;
+
+   return editor->modified;
 }
 
 void

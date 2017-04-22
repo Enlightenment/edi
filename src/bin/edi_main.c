@@ -28,6 +28,7 @@
 
 int EDI_EVENT_TAB_CHANGED;
 int EDI_EVENT_FILE_CHANGED;
+int EDI_EVENT_FILE_SAVED;
 
 typedef struct _Edi_Panel_Slide_Effect
 {
@@ -47,6 +48,7 @@ static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
 static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
+static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_message_popup;
 int _edi_log_dom = -1;
 
@@ -882,7 +884,7 @@ _edi_menu_setup(Evas_Object *obj)
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
    elm_menu_item_add(menu, menu_it, "folder-new", "New Directory ...", _edi_menu_new_dir_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
+   _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-close", "Close", _edi_menu_close_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-close", "Close all", _edi_menu_closeall_cb, NULL);
@@ -947,7 +949,7 @@ edi_toolbar_setup(Evas_Object *win)
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
 
    _edi_toolbar_item_add(tb, "document-new", "New File", _tb_new_cb);
-   _edi_toolbar_item_add(tb, "document-save", "Save", _tb_save_cb);
+   _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", "Save", _tb_save_cb);
    _edi_toolbar_item_add(tb, "document-close", "Close", _tb_close_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
@@ -1033,10 +1035,15 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 static void
 _edi_icon_update()
 {
-   Eina_Bool can_undo, can_redo = EINA_FALSE;
+   Eina_Bool modified, can_undo, can_redo = EINA_FALSE;
 
    can_undo = edi_mainview_can_undo();
    can_redo = edi_mainview_can_redo();
+
+   modified = edi_mainview_modified();
+
+   elm_object_item_disabled_set(_edi_menu_save, !modified);
+   elm_object_disabled_set(_edi_toolbar_save, !modified);
 
    elm_object_item_disabled_set(_edi_menu_undo, !can_undo);
    elm_object_item_disabled_set(_edi_menu_redo, !can_redo);
@@ -1076,6 +1083,14 @@ static Eina_Bool
 _edi_file_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    _edi_icon_update();
+   return ECORE_CALLBACK_RENEW;
+}
+
+static Eina_Bool
+_edi_file_saved(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   elm_object_item_disabled_set(_edi_menu_save, EINA_TRUE);
+   elm_object_disabled_set(_edi_toolbar_save, EINA_TRUE);
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -1185,6 +1200,7 @@ edi_open(const char *inputpath)
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_config_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
+   ecore_event_handler_add(EDI_EVENT_FILE_SAVED, _edi_file_saved, NULL);
 
    free(path);
    return EINA_TRUE;
@@ -1321,6 +1337,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
 
    EDI_EVENT_TAB_CHANGED = ecore_event_type_new();
    EDI_EVENT_FILE_CHANGED = ecore_event_type_new();
+   EDI_EVENT_FILE_SAVED = ecore_event_type_new();
 
    if (!project_path)
      {

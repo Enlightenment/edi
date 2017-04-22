@@ -134,6 +134,13 @@ void edi_mainview_closeall();
 void edi_mainview_undo();
 
 /**
+ * Return if editor has been modified
+ *
+ * @ingroup Content
+ */
+Eina_Bool edi_mainview_modified();
+
+/**
  * See whether the current view can undo a change.
  *
  * @ingroup Content
