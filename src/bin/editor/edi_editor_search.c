@@ -229,7 +229,7 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
           {
              elm_code_widget_selection_delete(editor->entry);
              replace = elm_object_text_get(search->replace_entry);
-             elm_code_widget_text_at_cursor_insert(editor->entry, replace, strlen(replace));
+             elm_code_widget_text_at_cursor_insert(editor->entry, replace);
 
              search->current_search_line = 0;
           }
