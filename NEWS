@@ -1,4 +1,34 @@
 =======
+Edi 0.5
+=======
+
+Features:
+
+  * Add support for compile command databases with clang
+  * Add Undo/Redo support
+  * Add support for basic python projects
+  * Syntax highlighting support now includes python
+  * Add inline documentation lookup using libclang
+  * Add code autosuggest using libclang
+  * Add wrap-around in search
+  * Add double click to expand/contract in the file panel
+  * Add delete and open directory in terminal menu options in file panel
+  * Add a TODO/FIXME listing panel
+  * Add search in project
+
+Bug fixes:
+
+  * Fix issues with OpenBSD
+  * filepanel: Don't filter folders when searching for files
+  * Fix duplicate files in file listing panel
+  * Reset search term when activating search
+  * Improve portability of project creation
+  * Add pkgbuild support for libedi
+  * Fix tab bar to be more like tabs
+  * Fix various stability issues
+
+
+=======
 Edi 0.4
 =======
 
