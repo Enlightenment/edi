@@ -501,34 +501,10 @@ _edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
    evas_object_del((Evas_Object *)data);
 }
 
-static void
-_edi_launcher_run(Edi_Project_Config_Launch *launch)
+void
+edi_launcher_config_missing()
 {
    Evas_Object *popup, *button;
-   char *full_cmd;
-   int full_len;
-
-   if (_edi_project_config->launch.path)
-     {
-       if (!_edi_project_config->launch.args)
-         {
-            ecore_exe_run(launch->path, NULL);
-
-            return;
-         }
-       else
-         {
-            full_len = strlen(_edi_project_config->launch.path)
-                              + strlen(_edi_project_config->launch.path);
-            full_cmd = malloc(sizeof(char) * (full_len + 1));
-            snprintf(full_cmd, full_len + 2, "%s %s", _edi_project_config->launch.path,
-                     _edi_project_config->launch.args);
-            ecore_exe_run(full_cmd, NULL);
-
-            free(full_cmd);
-            return;
-         }
-     }
 
    popup = elm_popup_add(_edi_main_win);
    elm_object_part_text_set(popup, "title,text", "Unable to launch");
@@ -540,6 +516,32 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
    evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
 
    evas_object_show(popup);
+}
+
+static void
+_edi_launcher_run(Edi_Project_Config_Launch *launch)
+{
+   char *full_cmd;
+   int full_len;
+
+   if (!_edi_project_config->launch.path)
+     {
+        edi_launcher_config_missing();
+        return;
+     }
+
+   if (!_edi_project_config->launch.args)
+     {
+        ecore_exe_run(launch->path, NULL);
+        return;
+     }
+
+   full_len = strlen(_edi_project_config->launch.path) + strlen(_edi_project_config->launch.path);
+   full_cmd = malloc(sizeof(char) * (full_len + 1));
+   snprintf(full_cmd, full_len + 2, "%s %s", _edi_project_config->launch.path, _edi_project_config->launch.args);
+   ecore_exe_run(full_cmd, NULL);
+
+   free(full_cmd);
 }
 
 static void

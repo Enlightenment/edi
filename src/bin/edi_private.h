@@ -43,4 +43,6 @@ void edi_open_url();
 
 Eina_Bool edi_noproject();
 
+void edi_launcher_config_missing();
+
 #endif
