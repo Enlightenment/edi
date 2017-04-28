@@ -21,6 +21,7 @@
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "edi_searchpanel.h"
+#include "edi_debugpanel.h"
 #include "mainview/edi_mainview.h"
 #include "screens/edi_screens.h"
 
@@ -42,8 +43,8 @@ typedef struct _Edi_Panel_Slide_Effect
 #define COPYRIGHT "Copyright © 2014-2015 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
-static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel;
-static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item;
+static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel, *_edi_debugpanel;
+static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item, *_edi_debugpanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
@@ -116,6 +117,8 @@ _edi_panel_tab_for_index(int index)
      return _edi_searchpanel;
    if (index == 4)
      return _edi_taskspanel;
+   if (index == 5)
+     return _edi_debugpanel;
 
    return _edi_logpanel;
 }
@@ -260,7 +263,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
    if (obj)
      elm_object_focus_set(obj, EINA_FALSE);
 
-   for (c = 0; c <= 4; c++)
+   for (c = 0; c <= 5; c++)
      if (c != index)
        evas_object_hide(_edi_panel_tab_for_index(c));
 
@@ -324,6 +327,13 @@ edi_taskspanel_show()
      elm_toolbar_item_selected_set(_edi_taskspanel_item, EINA_TRUE);
 }
 
+void
+edi_debugpanel_show()
+{
+   if (_edi_selected_bottompanel != _edi_debugpanel_item)
+     elm_toolbar_item_selected_set(_edi_debugpanel_item, EINA_TRUE);
+}
+
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
@@ -344,6 +354,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    _edi_testpanel = elm_box_add(win);
    _edi_searchpanel = elm_box_add(win);
    _edi_taskspanel = elm_box_add(win);
+   _edi_debugpanel = elm_box_add(win);
 
    // add main content
    content_out = elm_box_add(win);
@@ -418,6 +429,8 @@ edi_content_setup(Evas_Object *win, const char *path)
                                                  _edi_toggle_panel, "3");
    _edi_taskspanel_item = elm_toolbar_item_append(tb, "stock_up", "Tasks",
                                                   _edi_toggle_panel, "4");
+   _edi_debugpanel_item = elm_toolbar_item_append(tb, "stock_up", "Debug",
+                                                  _edi_toggle_panel, "5");
 
    // add lower panel panes
    logpanels = elm_table_add(logpane);
@@ -451,6 +464,12 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_taskspanel_add(_edi_taskspanel);
    elm_table_pack(logpanels, _edi_taskspanel, 0, 0, 1, 1);
 
+   edi_debugpanel_add(_edi_debugpanel);
+   elm_table_pack(logpanels, _edi_debugpanel, 0, 0, 1, 1);
+
+   evas_object_size_hint_weight_set(_edi_debugpanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(_edi_debugpanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
    elm_object_part_content_set(logpane, "bottom", logpanels);
 
    if (_edi_project_config->gui.bottomopen)
@@ -475,6 +494,11 @@ edi_content_setup(Evas_Object *win, const char *path)
           {
              elm_toolbar_item_icon_set(_edi_taskspanel_item, "stock_down");
              _edi_selected_bottompanel = _edi_taskspanel_item;
+          }
+        else if (_edi_project_config->gui.bottomtab == 5)
+          {
+             elm_toolbar_item_icon_set(_edi_debugpanel_item, "stock_down");
+             _edi_selected_bottompanel = _edi_debugpanel_item;
           }
         else
           {
@@ -663,10 +687,10 @@ _tb_run_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSE
 }
 
 static void
-_tb_clean_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+_tb_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   if (_edi_build_prep(obj))
-     edi_builder_clean();
+   edi_debugpanel_show();
+   edi_debugpanel_start();
 }
 
 static void
@@ -759,7 +783,7 @@ static void
 _edi_menu_quit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
-   elm_exit();
+   edi_close();
 }
 
 static void
@@ -862,6 +886,14 @@ _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   edi_debugpanel_show();
+   edi_debugpanel_start();
+}
+
+static void
 _edi_menu_website_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
@@ -914,6 +946,7 @@ _edi_menu_setup(Evas_Object *obj)
    elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-record", "Test", _edi_menu_test_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-playback-start", "Run", _edi_menu_run_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "utilities-terminal", "Debug", _edi_menu_debug_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
@@ -979,7 +1012,7 @@ edi_toolbar_setup(Evas_Object *win)
    _edi_toolbar_item_add(tb, "system-run", "Build", _tb_build_cb);
    _edi_toolbar_item_add(tb, "media-record", "Test", _tb_test_cb);
    _edi_toolbar_item_add(tb, "media-playback-start", "Run", _tb_run_cb);
-   _edi_toolbar_item_add(tb, "edit-clear", "Clean", _tb_clean_cb);
+   _edi_toolbar_item_add(tb, "utilities-terminal", "Debug", _tb_debug_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
@@ -1125,6 +1158,12 @@ _edi_open_tabs()
      }
 }
 
+static void
+_win_delete_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
+{
+   edi_close();
+}
+
 Eina_Bool
 edi_open(const char *inputpath)
 {
@@ -1199,6 +1238,8 @@ edi_open(const char *inputpath)
    _edi_open_tabs();
    _edi_icon_update();
 
+   evas_object_smart_callback_add(win, "delete,request", _win_delete_cb, NULL);
+
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_config_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
@@ -1222,6 +1263,7 @@ edi_open_file(const char *filepath)
 void
 edi_close()
 {
+   edi_debugpanel_stop();
    elm_exit();
 }
 

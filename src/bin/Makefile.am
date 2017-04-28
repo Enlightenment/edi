@@ -31,6 +31,7 @@ edi_file.h \
 edi_logpanel.h \
 edi_searchpanel.h \
 edi_consolepanel.h \
+edi_debugpanel.h \
 mainview/edi_mainview_item.h \
 mainview/edi_mainview.h
 
@@ -50,6 +51,7 @@ edi_file.c \
 edi_logpanel.c \
 edi_searchpanel.c \
 edi_consolepanel.c \
+edi_debugpanel.c \
 mainview/edi_mainview_item.c \
 mainview/edi_mainview.c \
 edi_main.c \
