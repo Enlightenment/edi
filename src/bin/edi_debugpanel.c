@@ -262,28 +262,35 @@ _edi_debugpanel_bt_sigterm_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUS
 }
 
 static void
-_edi_debugpanel_bt_sigint_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
+_edi_debugpanel_icons_update(int state)
 {
-   pid_t pid;
-   int state;
    Evas_Object *ico_int;
-
-   pid = _edi_debug_process_id(&state);
-   if (pid <= 0) return;
 
    ico_int = elm_icon_add(_button_int);
 
    if (state == DEBUG_PROCESS_ACTIVE)
-     {
-        kill(pid, SIGINT);
-        elm_icon_standard_set(ico_int, "media-playback-start");
-     }
+     elm_icon_standard_set(ico_int, "media-playback-pause");
    else
-     {
-        ecore_exe_send(_debug_exe, "c\n", 2);
-        elm_icon_standard_set(ico_int, "media-playback-pause");
-     }
+     elm_icon_standard_set(ico_int, "media-playback-start");
+
    elm_object_part_content_set(_button_int, "icon", ico_int);
+}
+
+static void
+_edi_debugpanel_bt_sigint_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
+{
+   pid_t pid;
+   int state;
+
+   pid = _edi_debug_process_id(&state);
+   if (pid <= 0) return;
+
+   if (state == DEBUG_PROCESS_ACTIVE)
+     kill(pid, SIGINT);
+   else
+     ecore_exe_send(_debug_exe, "c\n", 2);
+
+    _edi_debugpanel_icons_update(state);
 }
 
 static void
@@ -301,7 +308,8 @@ _edi_debugpanel_button_start_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UN
 static Eina_Bool
 _edi_debug_active_check_cb(void *data EINA_UNUSED)
 {
-   int pid = ecore_exe_pid_get(_debug_exe);
+   int state, pid = ecore_exe_pid_get(_debug_exe);
+
    if (pid == -1)
      {
         if (_debug_exe) ecore_exe_free(_debug_exe);
@@ -311,6 +319,12 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
         elm_object_disabled_set(_button_int, EINA_TRUE);
         elm_object_disabled_set(_button_term, EINA_TRUE);
      }
+   else
+     {
+        if (_edi_debug_process_id(&state) > 0)
+          _edi_debugpanel_icons_update(state);
+     }
+
    return ECORE_CALLBACK_RENEW;
 }
 
