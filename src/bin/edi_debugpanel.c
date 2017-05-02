@@ -161,7 +161,7 @@ _edi_debug_process_id(int *state)
         child_pid = kp.ki_pid;
         if (state)
           {
-             if (kp.ki_stat == 3)
+             if (kp.ki_stat == SRUN || kp.ki_stat == SSLEEP)
                *state = DEBUG_PROCESS_ACTIVE;
              else
                *state = DEBUG_PROCESS_SLEEPING;
@@ -217,7 +217,7 @@ _edi_debug_process_id(int *state)
                          {
                             if (state)
                               {
-                                 if (p[0] == 'S')
+                                 if (p[0] == 'S' || p[0] == 'R')
                                    *state = DEBUG_PROCESS_ACTIVE;
                                  else
                                    *state = DEBUG_PROCESS_SLEEPING;
