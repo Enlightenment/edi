@@ -2,6 +2,12 @@
 # include "config.h"
 #endif
 
+#if defined(__FreeBSD__) || defined(_DragonFly__) || defined (__MacOSX__) || \
+   (defined (__MACH__) && defined (__APPLE__))
+ #include <unistd.h>
+ #include <sys/sysctl.h>
+ #include <sys/user.h>
+#endif
 #include <Eo.h>
 #include <Eina.h>
 #include <Elementary.h>
@@ -15,6 +21,9 @@ static Ecore_Exe *_debug_exe = NULL;
 static Evas_Object *_info_widget, *_entry_widget, *_button_start, *_button_quit;
 static Evas_Object *_button_int, *_button_term;
 static Elm_Code *_debug_output;
+
+#define DEBUG_PROCESS_SLEEPING 0
+#define DEBUG_PROCESS_ACTIVE 1
 
 static void
 _edi_debugpanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
@@ -65,9 +74,6 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
            }
     }
 
-    // FIXME: elm_code reneder hack
-    elm_code_callback_fire(_debug_output->file->parent, &ELM_CODE_EVENT_FILE_LOAD_DONE, _debug_output->file);
-
     return ECORE_CALLBACK_DONE;
 } 
 
@@ -104,17 +110,72 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
      }
 }
 
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__MacOSX__) || \
+   (defined (__MACH__) && defined (__APPLE__))
+static long int
+_sysctlfromname(const char *name, void *mib, int depth, size_t *len)
+{
+   long int result;
+
+   if (sysctlnametomib(name, mib, len) < 0) return -1;
+   *len = sizeof(result);
+   if (sysctl(mib, depth, &result, len, NULL, 0) < 0) return -1;
+
+   return result;
+}
+#endif
+
 /* Get the process ID of the child process being debugged in *our* session */
 static int
-_edi_debug_process_id(void)
+_edi_debug_process_id(int *state)
 {
+   const char *program_name;
+   int my_pid, child_pid = -1;
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__MacOSX__) || \
+   (defined (__MACH__) && defined (__APPLE__))
+   struct kinfo_proc kp;
+   int mib[4];
+   size_t len;
+   int max_pid, i;
+
+   if (!_edi_project_config->launch.path) return -1;
+
+   if (!_debug_exe) return -1;
+
+   len = sizeof(max_pid);
+   max_pid = _sysctlfromname("kern.lastpid", mib, 2, &len);
+
+   my_pid = ecore_exe_pid_get(_debug_exe);
+
+   if (sysctlnametomib("kern.proc.pid", mib, &len) < 0) return -1;
+
+   program_name = ecore_file_file_get(_edi_project_config->launch.path);
+
+   for (i = my_pid; i <= max_pid; i++)
+     {
+        mib[3] = i;
+        len = sizeof(kp);
+        sysctl(mib, 4, &kp, &len, NULL, 0);
+        if (kp.ki_ppid != my_pid) continue;
+        if (strcmp(program_name, kp.ki_comm)) continue;
+        child_pid = kp.ki_pid;
+        if (state)
+          {
+             if (kp.ki_stat == 3)
+               *state = DEBUG_PROCESS_ACTIVE;
+             else
+               *state = DEBUG_PROCESS_SLEEPING;
+          }
+        break;
+     }
+#else
    Eina_List *files, *l;
-   const char *program_name, *temp_name;
+   const char *temp_name;
    char path[PATH_MAX];
    char buf[4096];
    char  *p, *name, *end;
    FILE *f;
-   int count, my_pid, parent_pid, pid, child_pid = -1;
+   int count, parent_pid, pid;
 
    if (!_edi_project_config->launch.path)
      return -1;
@@ -151,7 +212,17 @@ _edi_debug_process_id(void)
                   p = buf;
                   while (*p++ != '\0')
                     {
-                       if (*p++ == ' ') count++;
+                       if (p[0] == ' ') { count++; p++; }
+                       if (count == 2)
+                         {
+                            if (state)
+                              {
+                                 if (p[0] == 'S')
+                                   *state = DEBUG_PROCESS_ACTIVE;
+                                 else
+                                   *state = DEBUG_PROCESS_SLEEPING;
+                              }
+                         }
                        if (count == 3) break;
                     }
                   end = strchr(p, ' ');
@@ -170,7 +241,7 @@ _edi_debug_process_id(void)
 
    if (files)
      eina_list_free(files);
-
+#endif
    return child_pid;
 }
 
@@ -178,9 +249,14 @@ static void
 _edi_debugpanel_bt_sigterm_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    pid_t pid;
+   Evas_Object *ico_int;
 
-   pid = _edi_debug_process_id();
+   pid = _edi_debug_process_id(NULL);
    if (pid <= 0) return;
+
+   ico_int = elm_icon_add(_button_int);
+   elm_icon_standard_set(ico_int, "media-playback-pause");
+   elm_object_part_content_set(_button_int, "icon", ico_int);
 
    kill(pid, SIGTERM);
 }
@@ -189,11 +265,25 @@ static void
 _edi_debugpanel_bt_sigint_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    pid_t pid;
+   int state;
+   Evas_Object *ico_int;
 
-   pid = _edi_debug_process_id();
+   pid = _edi_debug_process_id(&state);
    if (pid <= 0) return;
 
-   kill(pid, SIGINT);
+   ico_int = elm_icon_add(_button_int);
+
+   if (state == DEBUG_PROCESS_ACTIVE)
+     {
+        kill(pid, SIGINT);
+        elm_icon_standard_set(ico_int, "media-playback-start");
+     }
+   else
+     {
+        ecore_exe_send(_debug_exe, "c\n", 2);
+        elm_icon_standard_set(ico_int, "media-playback-pause");
+     }
+   elm_object_part_content_set(_button_int, "icon", ico_int);
 }
 
 static void
@@ -266,6 +356,7 @@ void edi_debugpanel_start(void)
                                         ECORE_EXE_PIPE_READ, NULL);
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _debugpanel_stdout_handler, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _debugpanel_stdout_handler, NULL);
 
    elm_object_disabled_set(_button_int, EINA_FALSE);
    elm_object_disabled_set(_button_term, EINA_FALSE);
@@ -323,7 +414,7 @@ void edi_debugpanel_add(Evas_Object *parent)
    ico_int = elm_icon_add(parent);
    elm_icon_standard_set(ico_int, "media-playback-pause");
    elm_object_part_content_set(bt_int, "icon", ico_int);
-   elm_object_tooltip_text_set(bt_int, "Send SIGINT");
+   elm_object_tooltip_text_set(bt_int, "Start/Stop Process");
    elm_object_disabled_set(bt_int, EINA_TRUE);
    evas_object_smart_callback_add(bt_int, "clicked", _edi_debugpanel_bt_sigint_cb, NULL);
    evas_object_show(bt_int);
