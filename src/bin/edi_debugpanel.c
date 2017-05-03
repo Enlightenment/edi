@@ -2,9 +2,9 @@
 # include "config.h"
 #endif
 
-#if defined(__FreeBSD__) || defined(_DragonFly__) || defined (__MacOSX__) || \
-   (defined (__MACH__) && defined (__APPLE__))
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
  #include <unistd.h>
+ #include <sys/types.h>
  #include <sys/sysctl.h>
  #include <sys/user.h>
 #endif
@@ -110,8 +110,8 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
      }
 }
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__MacOSX__) || \
-   (defined (__MACH__) && defined (__APPLE__))
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
+
 static long int
 _sysctlfromname(const char *name, void *mib, int depth, size_t *len)
 {
@@ -131,8 +131,7 @@ _edi_debug_process_id(int *state)
 {
    const char *program_name;
    int my_pid, child_pid = -1;
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__MacOSX__) || \
-   (defined (__MACH__) && defined (__APPLE__))
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
    struct kinfo_proc kp;
    int mib[4];
    size_t len;
@@ -156,6 +155,7 @@ _edi_debug_process_id(int *state)
         mib[3] = i;
         len = sizeof(kp);
         sysctl(mib, 4, &kp, &len, NULL, 0);
+#if defined(__FreeBSD__) || defined(__DragonFly__)
         if (kp.ki_ppid != my_pid) continue;
         if (strcmp(program_name, kp.ki_comm)) continue;
         child_pid = kp.ki_pid;
@@ -166,6 +166,18 @@ _edi_debug_process_id(int *state)
              else
                *state = DEBUG_PROCESS_SLEEPING;
           }
+#else
+        if (kp.kp_proc.p_oppid != my_pid) continue;
+        if (strcmp(program_name, kp.kp_proc.p_comm)) continue;
+        child_pid = kp.kp_proc.p_pid;
+        if (state)
+          {
+             if (kp.kp_proc.p_stat == SRUN || kp.kp_proc.p_stat == SSLEEP)
+               *state = DEBUG_PROCESS_ACTIVE;
+             else
+               *state = DEBUG_PROCESS_SLEEPING;
+          }
+#endif
         break;
      }
 #else
