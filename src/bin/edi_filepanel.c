@@ -108,6 +108,7 @@ _item_menu_open_as_text_cb(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Dir_Data *sd;
 
    sd = data;
+   edi_mainview_item_close_path(sd->path);
    _open_cb(sd->path, "text", EINA_FALSE);
 }
 
@@ -118,6 +119,7 @@ _item_menu_open_as_code_cb(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Dir_Data *sd;
 
    sd = data;
+   edi_mainview_item_close_path(sd->path);
    _open_cb(sd->path, "code", EINA_FALSE);
 }
 
