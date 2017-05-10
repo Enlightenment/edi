@@ -365,7 +365,7 @@ void edi_debugpanel_start(void)
    char cmd[1024];
    char *args;
    int len;
-   const char *fmt = "set args %s\n";
+   const char *mime, *fmt = "set args %s\n";
 
    if (!_edi_project_config->launch.path)
      {
@@ -375,7 +375,11 @@ void edi_debugpanel_start(void)
 
    if (_debug_exe) return;
 
-   snprintf(cmd, sizeof(cmd), "gdb %s", _edi_project_config->launch.path);
+   mime = efreet_mime_type_get(_edi_project_config->launch.path);
+   if (!strcmp(mime, "application/x-shellscript"))
+     snprintf(cmd, sizeof(cmd), "libtool --mode execute gdb %s", _edi_project_config->launch.path);
+   else
+     snprintf(cmd, sizeof(cmd), "gdb %s", _edi_project_config->launch.path);
 
    _debug_exe = ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_WRITE |
                                         ECORE_EXE_PIPE_ERROR |
