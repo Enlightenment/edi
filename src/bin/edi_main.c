@@ -21,6 +21,7 @@
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "edi_searchpanel.h"
+#include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
 #include "screens/edi_screens.h"
 
@@ -1316,7 +1317,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
      {
-        EINA_LOG_CRIT("Could not parse arguments.");
+        CRIT("Could not parse arguments.");
         goto end;
      }
    else if (quit_option)
@@ -1348,6 +1349,14 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      }
    else if (!ecore_file_is_dir(project_path))
      {
+        const char *mime;
+
+        mime = efreet_mime_type_get(project_path);
+        if (!edi_content_provider_for_mime_get(mime))
+          {
+             fprintf(stderr, "Could not open file of unsupported mime type (%s)\n", mime);
+             goto end;
+          }
         edi_open_file(project_path);
      }
    else if (!(edi_open(project_path)))
