@@ -128,11 +128,14 @@ _file_ignore(const char *filename)
         eina_str_has_extension(filename, ".jpg")   ||
         eina_str_has_extension(filename, ".jpeg")  ||
         eina_str_has_extension(filename, ".JPG")   ||
-        eina_str_has_extension(filename, ".JPEG" ) ||
+        eina_str_has_extension(filename, ".JPEG")  ||
         eina_str_has_extension(filename, ".bmp")   ||
         eina_str_has_extension(filename, ".tgv")   ||
         eina_str_has_extension(filename, ".eet")   ||
-        eina_str_has_extension(filename, ".edj")
+        eina_str_has_extension(filename, ".edj")   ||
+        eina_str_has_extension(filename, ".gz")    ||
+        eina_str_has_extension(filename, ".bz2")   ||
+        eina_str_has_extension(filename, ".zip")
        ))
      return EINA_TRUE;
 
