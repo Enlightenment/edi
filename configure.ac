@@ -71,7 +71,7 @@ EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 ### Checks for libraries
 
-requirements_pc_edi="eina >= 1.19.0 evas >= 1.19.0 ecore >= 1.19.0 edje >= 1.19.0 eo >= 1.19.0 elementary >= 1.19.99 eio >= 1.19.0"
+requirements_pc_edi="eina >= 1.19.0 evas >= 1.19.0 ecore >= 1.19.0 edje >= 1.19.0 eo >= 1.19.0 elementary >= 1.19.1 eio >= 1.19.0"
 AC_SUBST([requirements_pc_edi])
 PKG_CHECK_MODULES([EFL], [${requirements_pc_edi}])
 
