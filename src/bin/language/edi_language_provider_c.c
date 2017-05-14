@@ -154,6 +154,29 @@ _edi_language_c_mime_name(const char *mime)
    return NULL;
 }
 
+const char *
+_edi_language_c_snippet_get(const char *key)
+{
+   if (!strcmp(key, "ret"))
+     return "return";
+   if (!strcmp(key, "if"))
+     return
+"if ()" \
+"  {" \
+"  }";
+   if (!strcmp(key, "ifel"))
+     return
+"if ()" \
+"  {" \
+"  }" \
+"else" \
+"  {" \
+"  }";
+
+   return NULL;
+}
+
+
 #if HAVE_LIBCLANG
 char *
 _edi_suggest_c_detail_get(Edi_Editor *editor, const char *term_str,

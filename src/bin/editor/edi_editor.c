@@ -581,6 +581,30 @@ _suggest_popup_setup(Edi_Editor *editor)
 }
 
 static void
+_edi_editor_snippet_insert(Edi_Editor *editor, Evas_Event_Key_Down *ev)
+{
+   char *key;
+   const char *snippet;
+   unsigned int row, col;
+   Edi_Language_Provider *provider;
+
+   provider = edi_language_provider_get(editor);
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   key = _edi_editor_current_word_get(editor, row, col);
+   snippet = provider->snippet_get(key);
+
+   if (!snippet)
+     return;
+
+   elm_code_widget_selection_select_word(editor->entry, row, col);
+   elm_code_widget_selection_delete(editor->entry);
+   elm_code_widget_text_at_cursor_insert(editor->entry, snippet);
+
+   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   free(key);
+}
+
+static void
 _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
                    Evas_Object *obj EINA_UNUSED, void *event)
 {
@@ -635,9 +659,11 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
      }
 
-   if (edi_language_provider_has(editor))
+   if ((!alt) && (!ctrl))
      {
-        if ((!alt) && (!ctrl))
+        if (!strcmp(ev->key, "Tab") && edi_language_provider_has(editor))
+          _edi_editor_snippet_insert(editor, ev);
+        else if (edi_language_provider_has(editor))
           _suggest_popup_key_down_cb(editor, ev->key, ev->string);
      }
 }
