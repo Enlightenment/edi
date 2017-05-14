@@ -78,7 +78,7 @@ _edi_editor_file_change_popup(Edi_Editor *editor)
    box = elm_box_add(editor->popup);
    label = elm_label_add(editor->popup);
    elm_object_text_set(label, "File has changed on disk.");
-   evas_object_show(label); 
+   evas_object_show(label);
    elm_box_pack_end(box, label);
 
    table = elm_table_add(editor->popup);
@@ -115,14 +115,14 @@ edi_editor_save(Edi_Editor *editor)
    filename = elm_code_file_path_get(code->file);
 
    mtime = ecore_file_mod_time(filename);
-  
-   if ((editor->save_time) && (editor->save_time < mtime)) 
+
+   if ((editor->save_time) && (editor->save_time < mtime))
      {
         ecore_timer_del(editor->save_timer);
         editor->save_timer = NULL;
         _edi_editor_file_change_popup(editor);
         editor->modified = EINA_FALSE;
-        return; 
+        return;
      }
 
    edi_mainview_save();
