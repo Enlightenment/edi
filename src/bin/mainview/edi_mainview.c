@@ -19,10 +19,8 @@
 #include "edi_config.h"
 
 static Evas_Object *_content_frame, *_current_view, *tb, *_main_win, *_welcome_panel, *_tab_scroller;
-static Evas_Object *_edi_mainview_choose_popup, *_edi_mainview_goto_popup;
+static Evas_Object *_edi_mainview_goto_popup;
 static Evas_Object *_edi_mainview_search_project_popup;
-
-static Edi_Path_Options *_edi_mainview_choose_options;
 
 static Eina_List *_edi_mainview_items = NULL;
 
@@ -331,75 +329,26 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 }
 
 static void
-_edi_mainview_choose_type_tab_cb(void *data,
-                             Evas_Object *obj EINA_UNUSED,
-                             void *event_info EINA_UNUSED)
+_edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
 {
-   evas_object_del(_edi_mainview_choose_popup);
-
-   _edi_mainview_choose_options->type = (const char *) data;
-   _edi_config_mime_add(efreet_mime_type_get(_edi_mainview_choose_options->path), _edi_mainview_choose_options->type);
-   edi_mainview_open(_edi_mainview_choose_options);
+   evas_object_del((Evas_Object *) data);
 }
 
 static void
-_edi_mainview_choose_type_win_cb(void *data,
-                             Evas_Object *obj EINA_UNUSED,
-                             void *event_info EINA_UNUSED)
+_edi_mainview_mime_content_safe_popup(void)
 {
-   evas_object_del(_edi_mainview_choose_popup);
-
-   _edi_mainview_choose_options->type = (const char *) data;
-   _edi_config_mime_add(efreet_mime_type_get(_edi_mainview_choose_options->path), _edi_mainview_choose_options->type);
-   edi_mainview_open_window(_edi_mainview_choose_options);
-
-}
-
-static void
-_edi_mainview_choose_type_close_cb(void *data EINA_UNUSED,
-                                   Evas_Object *obj EINA_UNUSED,
-                                   void *event_info EINA_UNUSED)
-{
-   evas_object_del(_edi_mainview_choose_popup);
-}
-
-static void
-_edi_mainview_filetype_create(Evas_Object *popup, const char *type, void *cb)
-{
-   Edi_Content_Provider *provider;
-   Evas_Object *icon;
-
-   provider = edi_content_provider_for_id_get(type);
-   if (!provider)
-     return;
-
-   icon = elm_icon_add(popup);
-   elm_icon_standard_set(icon, provider->icon);
-   elm_popup_item_append(popup, type, icon, cb, type);
-}
-
-static void
-_edi_mainview_choose_type(Evas_Object *parent EINA_UNUSED, Edi_Path_Options *options, void *cb)
-{
-   Evas_Object *popup, *cancel;
+   Evas_Object *popup, *button;
 
    popup = elm_popup_add(_main_win);
-   _edi_mainview_choose_popup = popup;
-   _edi_mainview_choose_options = options;
-
-   // popup title
    elm_object_part_text_set(popup, "title,text",
-                            "Unrecognised file type");
+                                   "Unrecognised file type");
+   elm_object_text_set(popup, "To force open, select this file in the file browser, and use \"open as\" menu options.");
 
-   _edi_mainview_filetype_create(popup, "text", cb);
-   _edi_mainview_filetype_create(popup, "code", cb);
-   _edi_mainview_filetype_create(popup, "image", cb);
-
-   cancel = elm_button_add(popup);
-   elm_object_text_set(cancel, "cancel");
-   elm_object_part_content_set(popup, "button1", cancel);
-   evas_object_smart_callback_add(cancel, "clicked",
-                                       _edi_mainview_choose_type_close_cb, NULL);
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "OK");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
 
    evas_object_show(popup);
 }
@@ -419,7 +368,7 @@ _edi_mainview_tab_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    provider = edi_content_provider_for_mime_get(mime);
    if (!provider)
      {
-        _edi_mainview_choose_type(_content_frame, options, _edi_mainview_choose_type_tab_cb);
+        _edi_mainview_mime_content_safe_popup();
         return;
      }
 
@@ -442,7 +391,7 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    provider = edi_content_provider_for_mime_get(mime);
    if (!provider)
      {
-        _edi_mainview_choose_type(_content_frame, options, _edi_mainview_choose_type_win_cb);
+        _edi_mainview_mime_content_safe_popup();
         return;
      }
 
