@@ -135,6 +135,8 @@ _file_ignore(const char *filename)
         eina_str_has_extension(filename, ".edj")   ||
         eina_str_has_extension(filename, ".gz")    ||
         eina_str_has_extension(filename, ".bz2")   ||
+        eina_str_has_extension(filename, ".xz")    ||
+        eina_str_has_extension(filename, ".lzma")  ||
         eina_str_has_extension(filename, ".zip")
        ))
      return EINA_TRUE;
