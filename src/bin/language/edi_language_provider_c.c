@@ -123,6 +123,8 @@ _edi_language_c_add(Edi_Editor *editor)
 {
 #if HAVE_LIBCLANG
    _clang_autosuggest_setup(editor);
+#else
+   (void) editor;
 #endif
 }
 
@@ -132,6 +134,8 @@ _edi_language_c_refresh(Edi_Editor *editor)
 #if HAVE_LIBCLANG
    _clang_autosuggest_dispose(editor);
    _clang_autosuggest_setup(editor);
+#else
+   (void) editor;
 #endif
 }
 
@@ -140,6 +144,8 @@ _edi_language_c_del(Edi_Editor *editor)
 {
 #if HAVE_LIBCLANG
    _clang_autosuggest_dispose(editor);
+#else
+   (void) editor;
 #endif
 }
 
@@ -288,6 +294,8 @@ _edi_language_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
         list = eina_list_append(list, suggest_it);
      }
    clang_disposeCodeCompleteResults(res);
+#else
+   (void) editor; (void) row; (void) col;
 #endif
 
    return list;
@@ -500,7 +508,10 @@ _edi_language_c_lookup_doc(Edi_Editor *editor, unsigned int row, unsigned int co
    _edi_doc_dump(doc, comment, doc->detail);
    _edi_doc_title_get(cursor, doc->title);
    _edi_doc_trim(doc->detail);
+#else
+   (void) editor; (void) row; (void) col;
 #endif
+
    return doc;
 }
 
