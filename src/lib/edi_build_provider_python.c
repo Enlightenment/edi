@@ -26,7 +26,7 @@ _relative_path_exists(const char *base, const char *relative)
 static Eina_Bool
 _python_project_supported(const char *path)
 {
-   return _relative_path_exists(path, "requirements.txt");
+   return _relative_path_exists(path, "setup.py");
 }
 
 static Eina_Bool
