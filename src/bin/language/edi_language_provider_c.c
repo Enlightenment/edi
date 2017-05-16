@@ -167,16 +167,16 @@ _edi_language_c_snippet_get(const char *key)
      return "return";
    if (!strcmp(key, "if"))
      return
-"if ()" \
-"  {" \
+"if ()\n" \
+"  {\n" \
 "  }";
    if (!strcmp(key, "ifel"))
      return
-"if ()" \
-"  {" \
-"  }" \
-"else" \
-"  {" \
+"if ()\n" \
+"  {\n" \
+"  }\n" \
+"else\n" \
+"  {\n" \
 "  }";
 
    return NULL;
