@@ -90,9 +90,13 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
    else
      {
         id = _edi_config_mime_search(mime);
-
         if (!id)
-          return NULL;
+          {
+             if (!strncasecmp(mime, "text/", 5))
+               id = "text";
+             else
+               return NULL;
+          }
      }
 
    return edi_content_provider_for_id_get(id);
