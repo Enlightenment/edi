@@ -10,10 +10,18 @@
 
 #include "edi_private.h"
 
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__NetBSD__)
+ #define MAKE_COMMAND " gmake"
+#else
+ #define MAKE_COMMAND " make"
+#endif
+
+
 static Eina_Bool
 _make_project_supported(const char *path)
 {
    return edi_path_relative_exists(path, "Makefile") ||
+          edi_path_relative_exists(path, "makefile") ||
           edi_path_relative_exists(path, "configure") ||
           edi_path_relative_exists(path, "autogen.sh");
 }
@@ -37,7 +45,7 @@ static void
 _make_build_make(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run(BEAR_COMMAND " make", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(BEAR_COMMAND MAKE_COMMAND, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -46,7 +54,7 @@ static void
 _make_build_configure(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./configure && " BEAR_COMMAND " make",
+   ecore_exe_pipe_run("./configure && " BEAR_COMMAND MAKE_COMMAND,
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -56,7 +64,7 @@ static void
 _make_build_autogen(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND " make",
+   ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND MAKE_COMMAND,
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -65,7 +73,7 @@ _make_build_autogen(void)
 static void
 _make_build(void)
 {
-   if (edi_project_file_exists("Makefile"))
+   if (edi_project_file_exists("Makefile") || edi_project_file_exists("makefile"))
      _make_build_make();
    else if (edi_project_file_exists("configure"))
      _make_build_configure();
