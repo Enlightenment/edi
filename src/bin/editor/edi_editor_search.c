@@ -215,8 +215,6 @@ static void
 _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
 {
    Edi_Editor *editor;
-   Elm_Code *code;
-   Elm_Code_Line *line;
    const char *replace;
 
    editor = (Edi_Editor *)data;
@@ -229,15 +227,10 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
      {
         if (search->current_search_line)
           {
-             unsigned int position;
-             code = elm_code_widget_code_get(editor->entry);
-
              elm_code_widget_selection_delete(editor->entry);
              replace = elm_object_text_get(search->replace_entry);
+             elm_code_widget_text_at_cursor_insert(editor->entry, replace);
 
-             line = elm_code_file_line_get(code->file, search->current_search_line);
-             position = elm_code_widget_line_text_position_for_column_get(editor->entry, line, search->current_search_col);
-             elm_code_line_text_insert(line, position, replace, strlen(replace));
              search->current_search_line = 0;
           }
 
