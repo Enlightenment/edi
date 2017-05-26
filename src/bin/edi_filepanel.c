@@ -273,7 +273,16 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
    sd = elm_object_item_data_get(it);
 
-   if (!sd) return;
+   if (!sd)
+     {
+        sd = malloc(sizeof(Edi_Dir_Data));
+        if (!sd)
+          return;
+
+        sd->path = edi_project_get();
+        sd->isdir = EINA_TRUE;
+        _item_menu_dir_create(_main_win, sd);
+     }
 
    if (ev->button == 1 && it)
      {
