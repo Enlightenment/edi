@@ -1,3 +1,18 @@
+---------
+Edi 0.5.1
+---------
+
+Features:
+
+  * menu: Indicate saved status in menu and toolbar
+  * cmdline: don't try to open unknown file types
+
+Bug fixes:
+
+  * Fix issue where replaced text could not be undone
+  * Fix python project detection
+
+
 =======
 Edi 0.5
 =======
