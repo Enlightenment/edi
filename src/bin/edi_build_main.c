@@ -157,13 +157,6 @@ main(int argc, char **argv)
    getcwd(path, PATH_MAX);
    edi_project_set(path);
 
-   if (!edi_builder_can_build())
-     {
-        fprintf(stderr, "Cowardly refusing to build unknown project type.\n");
-        ecore_shutdown();
-        goto exit;
-     }
-
    if (args < argc)
      build_type = argv[args];
    if (!build_type)
@@ -182,6 +175,13 @@ main(int argc, char **argv)
 
         ecore_main_loop_begin();
         goto end;
+     }
+
+   if (!edi_builder_can_build())
+     {
+        fprintf(stderr, "Cowardly refusing to build unknown project type.\n");
+        ecore_shutdown();
+        goto exit;
      }
 
    provider = edi_build_provider_for_project_get();
