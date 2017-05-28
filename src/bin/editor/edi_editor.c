@@ -421,7 +421,7 @@ static void
 _suggest_popup_show(Edi_Editor *editor)
 {
    unsigned int col, row;
-   Evas_Coord cx, cy, cw, ch, sy, sh, ey, eh, bg_x, bg_y;
+   Evas_Coord cx, cy, cw, ch, sh, eh, bg_x, bg_y;
    char *word;
 
    if (!editor->suggest_genlist)
@@ -430,27 +430,25 @@ _suggest_popup_show(Edi_Editor *editor)
    if (elm_genlist_items_count(editor->suggest_genlist) <= 0)
      return;
 
+   if (evas_object_visible_get(editor->suggest_bg))
+     return;
+
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
+   evas_object_geometry_get(editor->suggest_bg, NULL, NULL, NULL, &sh);
+   evas_object_geometry_get(elm_object_top_widget_get(editor->entry),
+                            NULL, NULL, NULL, &eh);
 
    word = _edi_editor_current_word_get(editor, row, col);
 
    bg_x = cx - (strlen(word) + 1) * cw;
    bg_y = cy + ch;
+   if (bg_y + sh > eh)
+     bg_y = cy - sh;
 
    evas_object_move(editor->suggest_bg, bg_x, bg_y);
    evas_object_show(editor->suggest_bg);
-
-   evas_object_geometry_get(editor->suggest_bg, NULL, &sy, NULL, &sh);
-   evas_object_geometry_get(editor->entry, NULL, &ey, NULL, &eh);
-
-   if (sy + sh > ey + eh)
-     {
-        bg_y = cy - sh;
-
-        evas_object_move(editor->suggest_bg, bg_x, bg_y);
-     }
 
    if (!evas_object_key_grab(editor->suggest_genlist, "Return", 0, 0, EINA_TRUE))
      ERR("Failed to grab key - %s", "Return");
