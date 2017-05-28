@@ -1,4 +1,12 @@
 ---------
+Edi 0.5.2
+---------
+
+Bug fixes:
+
+  * Fixed command line project creation outside of existing projects
+
+---------
 Edi 0.5.1
 ---------
 
