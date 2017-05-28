@@ -12,7 +12,7 @@
 
 typedef struct _Edi_Create
 {
-   char *path, *temp, *name;
+   char *path, *temp, *name, *skelfile;
    char *url, *user, *email;
 
    Edi_Create_Cb callback;
@@ -119,6 +119,7 @@ _edi_create_free_data()
    free(create->name);
    free(create->path);
    free(create->temp);
+   free(create->skelfile);
 
    free(create);
 }
@@ -232,7 +233,8 @@ _edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
    char tmpinner[PATH_MAX];
 
    create = (Edi_Create *)data;
-   snprintf(tmpinner, sizeof(tmpinner), "%s/eflproject", create->temp);
+   snprintf(tmpinner, sizeof(tmpinner), "%s/%s", create->temp, create->skelfile);
+   tmpinner[strlen(tmpinner) - 7] = '\0'; // strip extensin
 
    ecore_event_handler_del(create->handler);
 
@@ -247,25 +249,26 @@ _edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
 }
 
 EAPI void
-edi_create_efl_project(const char *parentdir, const char *name, const char *url,
-                   const char *user, const char *email, Edi_Create_Cb func)
+edi_create_efl_project(const char *skelpath, const char *parentdir,
+                       const char *name, const char *url, const char *user,
+                       const char *email, Edi_Create_Cb func)
 {
-   char *source, *cmd, *extract;
+   char *cmd, *extract;
    char tmp[PATH_MAX], dest[PATH_MAX];
    Edi_Create *data;
    Ecore_Event_Handler *handler;
 
-   source = PACKAGE_DATA_DIR "/skeleton/eflproject.tar.gz";
    extract = "tar zxf %s -C %s";
    snprintf(tmp, sizeof(tmp), "%s/edi_%s", eina_environment_tmp_get(), name);
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);
-   DBG("Extracting project files from %s\n", source);
+   DBG("Extracting project files from %s\n", skelpath);
 
    data = calloc(1, sizeof(Edi_Create));
    data->path = strdup(dest);
    data->name = strdup(name);
+   data->skelfile = strdup(ecore_file_file_get(skelpath));
 
    data->url = strdup(url);
    data->user = strdup(user);
@@ -280,8 +283,8 @@ edi_create_efl_project(const char *parentdir, const char *name, const char *url,
         return;
      }
 
-   cmd = malloc(sizeof(char) * (strlen(extract) + strlen(source) + strlen(tmp) + 1));
-   sprintf(cmd, extract, source, tmp);
+   cmd = malloc(sizeof(char) * (strlen(extract) + strlen(skelpath) + strlen(tmp) + 1));
+   sprintf(cmd, extract, skelpath, tmp);
 
    data->temp = strdup(tmp);
    handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_extract_done, data);

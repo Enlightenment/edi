@@ -28,8 +28,9 @@ typedef void (*Edi_Create_Cb)(const char *path, Eina_Bool success);
  * @ingroup Creation
  */
 EAPI void
-edi_create_efl_project(const char *parentdir, const char *name, const char *url,
-                       const char *user, const char *email, Edi_Create_Cb func);
+edi_create_efl_project(const char *skelpath, const char *parentdir,
+                       const char *name, const char *url, const char *user,
+                       const char *email, Edi_Create_Cb func);
 
 /**
  * @}

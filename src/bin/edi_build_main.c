@@ -111,7 +111,8 @@ static void
 _edi_build_create_start(int argc, int arg0, char **argv)
 {
    elm_init(argc, argv);
-   edi_create_efl_project(argv[arg0+1], argv[arg0+2], argv[arg0+3], argv[arg0+4], argv[arg0+5],
+   edi_create_efl_project(argv[arg0 + 1], argv[arg0 + 2], argv[arg0 + 3],
+                          argv[arg0 + 4], argv[arg0 + 5], argv[arg0 + 6],
                           _edi_build_create_done_cb);
 }
 
@@ -164,10 +165,11 @@ main(int argc, char **argv)
 
    if (!strncmp("create", build_type, 6))
      {
-        if (argc - args != 6)
+        if (argc - args != 7)
           {
-             fprintf(stderr, "create requires 5 additional parameters:\n");
-             fprintf(stderr, "  parent_path, project_name, project_url, creator_name, creator_email\n");
+             fprintf(stderr, "create requires 6 additional parameters:\n");
+             fprintf(stderr, "  skeleton, parent_path, project_name, "
+                             "project_url, creator_name, creator_email\n");
              goto end;
           }
 

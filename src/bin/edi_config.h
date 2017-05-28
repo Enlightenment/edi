@@ -91,6 +91,7 @@ extern Edi_Project_Config *_edi_project_config;
 
 Eina_Bool _edi_config_init(void);
 Eina_Bool _edi_config_shutdown(void);
+const char *_edi_config_dir_get(void);
 
 // Global configuration handling
 

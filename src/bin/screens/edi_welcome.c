@@ -14,11 +14,20 @@
 
 #define _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH 4
 
+typedef struct _Edi_Skeleton
+{
+   const char *name;
+   const char *path;
+   // TODO: add more fields here (taken from skeleton metadata)
+} Edi_Skeleton;
+
+static Eina_List *_available_skeletons = NULL;
+
 static Evas_Object *_welcome_window, *_welcome_naviframe;
 static Evas_Object *_edi_new_popup;
 static Evas_Object *_edi_welcome_list;
 static Evas_Object *_edi_project_box;
-static Evas_Object *_create_inputs[5];
+static Evas_Object *_create_inputs[6];
 
 static Evas_Object *_edi_create_button, *_edi_open_button;
 
@@ -208,20 +217,152 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
    _edi_welcome_project_open(path, EINA_TRUE);
 }
 
+static Edi_Skeleton *
+_edi_skeleton_new(const char *zippath)
+{
+   Edi_Skeleton *skel;
+   char *name, *tarname;
+
+   skel = malloc(sizeof(Edi_Skeleton));
+   if (!skel)
+     return NULL;
+
+   skel->path = eina_stringshare_add(zippath);
+
+   tarname = ecore_file_strip_ext(ecore_file_file_get(zippath));
+   name = ecore_file_strip_ext(tarname);
+   skel->name = eina_stringshare_add(name);
+   free(tarname);
+   free(name);
+
+   // TODO: here we can search for an (optional) metadata file for the skeleton
+   //       and present more info to the user
+
+   return skel;
+}
+
+static void
+_edi_skeleton_free(Edi_Skeleton *skel)
+{
+   if (skel)
+     {
+        eina_stringshare_del(skel->name);
+        eina_stringshare_del(skel->path);
+        free(skel);
+     }
+}
+
+static void
+_edi_skeletons_discover(const char *path)
+{
+   Eina_List *file_list, *l;
+   char fullp[PATH_MAX], *p;
+
+   file_list = ecore_file_ls(path);
+   EINA_LIST_FOREACH(file_list, l, p)
+     {
+        if (eina_str_has_extension(p, ".tar.gz"))
+          {
+             Edi_Skeleton *skel;
+
+             snprintf(fullp, sizeof(fullp), "%s/%s", path, p);
+             skel = _edi_skeleton_new(fullp);
+             if (skel)
+               _available_skeletons = eina_list_append(_available_skeletons, skel);
+          }
+        free(p);
+     }
+   eina_list_free(file_list);
+}
+
+static char *
+_edi_skeleton_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                          const char *part EINA_UNUSED)
+{
+   Edi_Skeleton *skel = data;
+
+   if (skel && skel->name && skel->name[0])
+     return strdup(skel->name);
+   else
+     return NULL;
+}
+
+static void
+_edi_skeleton_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                         void *event_info)
+{
+   Edi_Skeleton *skel = elm_object_item_data_get(event_info);
+
+   elm_object_text_set(obj, skel->name);
+   elm_combobox_hover_end(obj);
+   evas_object_data_set(obj, "selected_skeleton", skel);
+}
+
+static void
+_edi_welcome_project_new_skeleton_combobox_add(const char *text, int row, Evas_Object *parent)
+{
+   Evas_Object *label, *cmbbox;
+   Elm_Genlist_Item_Class *itc;
+   static char user_skeleton_dir[PATH_MAX];
+   Edi_Skeleton *skel;
+   Eina_List *l;
+
+   label = elm_label_add(parent);
+   elm_object_text_set(label, text);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_pack(parent, label, 0, row, 1, 1);
+   evas_object_show(label);
+
+   cmbbox = elm_combobox_add(parent);
+   evas_object_size_hint_weight_set(cmbbox, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(cmbbox, EVAS_HINT_FILL, 0);
+   elm_object_part_text_set(cmbbox, "guide", "Select the project type");
+   elm_object_text_set(cmbbox, "eflproject");
+   elm_table_pack(parent, cmbbox, 1, row, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 1, 1);
+   evas_object_smart_callback_add(cmbbox, "item,pressed",
+                                  _edi_skeleton_pressed_cb, NULL);
+   evas_object_show(cmbbox);
+   _create_inputs[row] = cmbbox;
+
+   EINA_LIST_FREE(_available_skeletons, skel)
+     _edi_skeleton_free(skel);
+
+   snprintf(user_skeleton_dir, sizeof(user_skeleton_dir),
+            "%s/skeleton", _edi_config_dir_get());
+   _edi_skeletons_discover(PACKAGE_DATA_DIR "/skeleton");
+   _edi_skeletons_discover(user_skeleton_dir);
+
+   itc = elm_genlist_item_class_new();
+   itc->item_style = "default";
+   itc->func.text_get = _edi_skeleton_text_get_cb;
+
+   EINA_LIST_FOREACH(_available_skeletons, l, skel)
+     elm_genlist_item_append(cmbbox, itc, skel, NULL,
+                             ELM_GENLIST_ITEM_NONE, NULL, NULL);
+
+   elm_genlist_item_class_free(itc);
+}
+
 static void
 _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *entry;
    const char *path, *name, *user, *email, *url;
+   Edi_Skeleton *skeleton;
 
-   entry = elm_layout_content_get(_create_inputs[0], "elm.swallow.entry");
+   skeleton = evas_object_data_get(_create_inputs[0], "selected_skeleton");
+   entry = elm_layout_content_get(_create_inputs[1], "elm.swallow.entry");
    path = elm_object_text_get(entry);
-   name = elm_object_text_get(_create_inputs[1]);
-   url = elm_object_text_get(_create_inputs[2]);
-   user = elm_object_text_get(_create_inputs[3]);
-   email = elm_object_text_get(_create_inputs[4]);
+   name = elm_object_text_get(_create_inputs[2]);
+   url = elm_object_text_get(_create_inputs[3]);
+   user = elm_object_text_get(_create_inputs[4]);
+   email = elm_object_text_get(_create_inputs[5]);
 
-   edi_create_efl_project(path, name, url, user, email, _edi_welcome_project_new_create_done_cb);
+   if (skeleton && path && path[0] && name && name[0])
+     edi_create_efl_project(skeleton->path, path, name, url, user, email,
+                            _edi_welcome_project_new_create_done_cb);
+   // TODO show something to the user in case of missing fields
 }
 
 static int
@@ -277,6 +418,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    username = getenv("USER");
    if (!username)
      username = getenv("USERNAME");
+   _edi_welcome_project_new_skeleton_combobox_add("Project Type", row++, content);
    _edi_welcome_project_new_directory_row_add("Parent Path", row++, content);
    _edi_welcome_project_new_input_row_add("Project Name", NULL, row++, content);
    _edi_welcome_project_new_input_row_add("Project URL", NULL, row++, content);
