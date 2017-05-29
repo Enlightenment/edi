@@ -23,6 +23,15 @@ _relative_path_exists(const char *base, const char *relative)
    return ret;
 }
 
+static void
+_exec_cmd(const char *cmd)
+{
+   ecore_exe_pipe_run(cmd,
+                      ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                      ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                      ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+}
+
 static Eina_Bool
 _python_project_supported(const char *path)
 {
@@ -42,14 +51,32 @@ _python_file_hidden_is(const char *file)
 }
 
 static void
+_python_build(void)
+{
+   if (chdir(edi_project_get()) == 0)
+     _exec_cmd("./setup.py build");
+}
+
+static void
 _python_test(void)
 {
-   chdir(edi_project_get());
-   ecore_exe_pipe_run("python -m unittest", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+   if (chdir(edi_project_get()) == 0)
+     _exec_cmd("./setup.py test");
+}
+
+static void
+_python_clean(void)
+{
+   if (chdir(edi_project_get()) == 0)
+     _exec_cmd("./setup.py clean --all");
 }
 
 Edi_Build_Provider _edi_build_provider_python =
-   {"python", _python_project_supported, _python_file_hidden_is,
-     NULL, _python_test, NULL};
+   {
+      "python",
+      _python_project_supported,
+      _python_file_hidden_is,
+      _python_build,
+      _python_test,
+      _python_clean
+   };
