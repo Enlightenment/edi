@@ -7,7 +7,7 @@
 #include "Edi.h"
 #include "edi_suite.h"
 
-#define COPYRIGHT "Copyright © 2014 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © 2014-2017 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static const struct {
    const char *name;
@@ -15,6 +15,7 @@ static const struct {
 } tests[] = {
   { "basic", edi_test_basic },
   { "path", edi_test_path },
+  { "exe", edi_test_exe },
   { "content_provider", edi_test_content_provider },
   { "language_provider", edi_test_language_provider },
   { "language_provider_c", edi_test_language_provider_c }

@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <libgen.h>
 
+#include <Eina.h>
+#include <Ecore.h>
 #include <Ecore_File.h>
 
 #include "Edi.h"
@@ -24,6 +26,7 @@ edi_init(void)
    if (_edi_init > 1) return _edi_init;
 
    eina_init();
+   ecore_init();
 
    _edi_lib_log_dom = eina_log_domain_register("edi-lib", EINA_COLOR_CYAN);
    if (_edi_lib_log_dom < 0)
@@ -40,6 +43,7 @@ edi_init(void)
    return _edi_init;
 
    shutdown_eina:
+   ecore_shutdown();
    eina_shutdown();
    _edi_init--;
 

@@ -9,6 +9,7 @@ clang_include = '$(CLANG_INCLUDE)'
 
 edi_suite_SOURCES = \
 edi_test_path.c \
+edi_test_exe.c \
 edi_test_content_provider.c \
 edi_test_language_provider.c \
 edi_test_language_provider_c.c \

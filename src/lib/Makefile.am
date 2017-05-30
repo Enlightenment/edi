@@ -16,6 +16,7 @@ edi_build_provider.h \
 edi_builder.h \
 edi_create.h \
 edi_path.h \
+edi_exe.h \
 Edi.h
 includesdir = $(includedir)/edi-@VMAJ@
 
@@ -28,6 +29,7 @@ edi_build_provider.c \
 edi_builder.c \
 edi_create.c \
 edi_path.c \
+edi_exe.c \
 edi.c
 libedi_la_LIBADD = @EFL_LIBS@ -lm
 libedi_la_LDFLAGS = -no-undefined @EFL_LTLIBRARY_FLAGS@
