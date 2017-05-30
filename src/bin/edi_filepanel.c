@@ -16,7 +16,7 @@
 #include "edi_file.h"
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
-
+#include "screens/edi_file_screens.h"
 #include "edi_private.h"
 
 typedef struct _Edi_Dir_Data
@@ -134,6 +134,15 @@ _item_menu_open_as_image_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_rename_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   Edi_Dir_Data *sd = data;
+
+   edi_file_screens_rename(_main_win, sd->path);
+}
+
+static void
 _item_menu_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
@@ -182,6 +191,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "document-save-as", "rename", _item_menu_rename_cb, sd);
    menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete", _item_menu_del_cb, sd);
 }
 
@@ -231,7 +241,7 @@ _item_menu_create_file_cb(void *data, Evas_Object *obj EINA_UNUSED,
    if (!sd->isdir)
      return;
 
-   edi_file_create_file(_main_win, sd->path);
+   edi_file_screens_create_file(_main_win, sd->path);
 }
 
 static void
@@ -244,7 +254,7 @@ _item_menu_create_dir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    if (!sd->isdir)
      return;
 
-   edi_file_create_dir(_main_win, sd->path);
+   edi_file_screens_create_dir(_main_win, sd->path);
 }
 
 static void
@@ -257,8 +267,13 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    elm_menu_item_add(menu, NULL, "folder-new", "create directory here", _item_menu_create_dir_cb, sd);
    if (ecore_file_app_installed("terminology"))
      elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, sd);
-   if (ecore_file_dir_is_empty(sd->path))
-     elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, sd);
+
+   if (strcmp(sd->path, edi_project_get()))
+     {
+        elm_menu_item_add(menu, NULL, "document-save-as", "rename", _item_menu_rename_cb, sd);
+        if (ecore_file_dir_is_empty(sd->path))
+          elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, sd);
+     }
 }
 
 static void

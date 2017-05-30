@@ -26,6 +26,7 @@ language/edi_language_provider.h \
 editor/edi_editor.h \
 edi_content_provider.h \
 screens/edi_screens.h \
+screens/edi_file_screens.h \
 edi_filepanel.h \
 edi_file.h \
 edi_logpanel.h \
@@ -46,6 +47,7 @@ screens/edi_welcome.c \
 screens/edi_about.c \
 screens/edi_settings_font.c \
 screens/edi_settings.c \
+screens/edi_file_screens.c \
 edi_filepanel.c \
 edi_file.c \
 edi_logpanel.c \

@@ -18,7 +18,7 @@ extern "C" {
  *
  * @{
  *
- * Management of file/dir creation with the UI
+ * Management of file/dir actions. 
  *
  */
 
@@ -31,25 +31,6 @@ extern "C" {
 
 Eina_Bool edi_file_path_hidden(const char *path);
 
-/**
- * Create a file add dialogue and add it to the parent obj.
- *
- * @param parent The object into which the UI will load.
- * @param directory The directory root of which file is created.
- * @ingroup UI
- */
-
-void edi_file_create_file(Evas_Object *parent, const char *directory);
-
-/**
- * Create a directory add dialogue and add it to the parent obj.
- *
- * @param parent The object into which the UI will load.
- * @param directory The directory root of which directory is created.
- * @ingroup UI
- */
-
-void edi_file_create_dir(Evas_Object *parent, const char *directory);
 /**
  * @}
  */
