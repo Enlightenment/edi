@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=${Edi_Name}
+Name[fr]=${Edi_Name}
+GenericName=${Edi_Name}
+Comment=Efl Application ${Edi_Name}
+Icon=${edi_name}
+TryExec=${edi_name}
+Exec=${edi_name}
+Categories=Development;Utility;
