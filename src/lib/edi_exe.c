@@ -17,8 +17,10 @@ edi_exe_wait(const char *command)
    int exit;
 
    ecore_thread_main_loop_begin();
-   exe = ecore_exe_pipe_run(command, ECORE_EXE_USE_SH |
-                            ECORE_EXE_PIPE_WRITE, NULL);
+   exe = ecore_exe_pipe_run(command,
+                            ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                            ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                            ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
    pid = ecore_exe_pid_get(exe);
    ecore_thread_main_loop_end();
 
