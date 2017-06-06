@@ -252,6 +252,21 @@ _edi_skeleton_free(Edi_Skeleton *skel)
      }
 }
 
+static Edi_Skeleton *
+_edi_skeleton_from_name(const char *name)
+{
+   Eina_List *l;
+   Edi_Skeleton *skel;
+
+   EINA_LIST_FOREACH(_available_skeletons, l, skel)
+     {
+        if (!strcmp(skel->name, name))
+          return skel;
+     }
+
+   return NULL;
+}
+
 static void
 _edi_skeletons_discover(const char *path)
 {
@@ -295,7 +310,6 @@ _edi_skeleton_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
    elm_object_text_set(obj, skel->name);
    elm_combobox_hover_end(obj);
-   evas_object_data_set(obj, "selected_skeleton", skel);
 }
 
 static void
@@ -303,6 +317,7 @@ _edi_welcome_project_new_skeleton_combobox_add(const char *text, int row, Evas_O
 {
    Evas_Object *label, *cmbbox;
    Elm_Genlist_Item_Class *itc;
+   Elm_Object_Item *item;
    static char user_skeleton_dir[PATH_MAX];
    Edi_Skeleton *skel;
    Eina_List *l;
@@ -338,8 +353,12 @@ _edi_welcome_project_new_skeleton_combobox_add(const char *text, int row, Evas_O
    itc->func.text_get = _edi_skeleton_text_get_cb;
 
    EINA_LIST_FOREACH(_available_skeletons, l, skel)
-     elm_genlist_item_append(cmbbox, itc, skel, NULL,
-                             ELM_GENLIST_ITEM_NONE, NULL, NULL);
+     {
+        item = elm_genlist_item_append(cmbbox, itc, skel, NULL,
+                                       ELM_GENLIST_ITEM_NONE, NULL, NULL);
+        if (!strcmp(skel->name, "eflproject"))
+          elm_genlist_item_selected_set(item, EINA_TRUE);
+     }
 
    elm_genlist_item_class_free(itc);
 }
@@ -350,8 +369,10 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    Evas_Object *entry;
    const char *path, *name, *user, *email, *url;
    Edi_Skeleton *skeleton;
+   Elm_Object_Item *item;
 
-   skeleton = evas_object_data_get(_create_inputs[0], "selected_skeleton");
+   item = elm_genlist_selected_item_get(_create_inputs[0]);
+   skeleton = elm_object_item_data_get(item);
    entry = elm_layout_content_get(_create_inputs[1], "elm.swallow.entry");
    path = elm_object_text_get(entry);
    name = elm_object_text_get(_create_inputs[2]);
