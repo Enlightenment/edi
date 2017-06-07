@@ -13,18 +13,18 @@ extern "C" {
 typedef int (scm_fn_add)(const char *path);
 typedef int (scm_fn_mod)(const char *path);
 typedef int (scm_fn_del)(const char *path);
-typedef int (scm_fn_credits)(const char *name, const char *email);
 typedef int (scm_fn_move)(const char *src, const char *dest);
 typedef int (scm_fn_commit)(const char *message);
-typedef int (scm_fn_remote_add)(const char *remote_url);
 typedef int (scm_fn_status)(void);
 typedef int (scm_fn_push)(void);
 typedef int (scm_fn_pull)(void);
 typedef int (scm_fn_stash)(void);
 
+typedef int (scm_fn_remote_add)(const char *remote_url);
 typedef const char * (scm_fn_remote_name)(void);
 typedef const char * (scm_fn_remote_email)(void);
 typedef const char * (scm_fn_remote_url)(void);
+typedef int (scm_fn_credentials)(const char *name, const char *email);
 
 typedef struct _Edi_Scm_Engine
 {
@@ -32,12 +32,6 @@ typedef struct _Edi_Scm_Engine
    const char     *directory;
    const char     *path;
 
-   scm_fn_remote_add *remote_add;
-   const char        *remote_url;
-   const char        *remote_name;
-   const char        *remote_email;
-
-   scm_fn_credits *credits;
    scm_fn_add     *file_add;
    scm_fn_mod     *file_mod;
    scm_fn_del     *file_del;
@@ -48,9 +42,11 @@ typedef struct _Edi_Scm_Engine
    scm_fn_pull    *pull;
    scm_fn_stash   *stash;
 
-   scm_fn_remote_name  *_remote_name_get;
-   scm_fn_remote_email *_remote_email_get;
-   scm_fn_remote_url   *_remote_url_get;
+   scm_fn_remote_add   *remote_add;
+   scm_fn_remote_name  *remote_name_get;
+   scm_fn_remote_email *remote_email_get;
+   scm_fn_remote_url   *remote_url_get;
+   scm_fn_credentials  *credentials_set;
 } Edi_Scm_Engine;
 
 /**
@@ -150,7 +146,7 @@ int edi_scm_move(const char *src, const char *dest);
  *
  * @ingroup Scm
  */
-int edi_scm_credits(const char *user, const char *email);
+int edi_scm_credentials_set(const char *user, const char *email);
 
 /**
  * Push to SCM remote repository.

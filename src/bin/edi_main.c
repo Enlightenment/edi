@@ -988,7 +988,7 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
         return;
      }
 
-   edi_scm_credits(_edi_project_config->user_fullname, _edi_project_config->user_email);
+   edi_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
    edi_scm_screens_commit(_edi_main_win);
 }
 
@@ -1028,7 +1028,6 @@ _edi_menu_scm_push_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
         return;
      }
 
-   edi_scm_credits(_edi_project_config->user_fullname, _edi_project_config->user_email);
    edi_consolepanel_clear();
    edi_consolepanel_show();
    edi_scm_push();

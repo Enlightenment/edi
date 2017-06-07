@@ -504,7 +504,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(label);
 
    entry_remote = elm_entry_add(hbox);
-   elm_object_text_set(entry_remote, engine->remote_url);
+   elm_object_text_set(entry_remote, engine->remote_url_get());
    elm_object_disabled_set(entry_remote, edi_scm_remote_enabled());
    evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_remote, EVAS_HINT_FILL, EVAS_HINT_FILL);

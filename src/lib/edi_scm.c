@@ -205,63 +205,50 @@ _edi_scm_git_remote_add(const char *remote_url)
 static const char *
 _edi_scm_git_remote_name_get(void)
 {
-   char *fullname;
+   static char *_remote_name;
    Edi_Scm_Engine *engine = _edi_scm_global_object;
 
    if (!engine)
      return NULL;
 
-   if (!engine->remote_name)
-     {
-        fullname = _edi_scm_exec_response("git config --get user.name");
-        if (fullname)
-          {
-             engine->remote_name = eina_stringshare_add(fullname);
-             free(fullname);
-          }
-     }
+   if (!_remote_name)
+     _remote_name = _edi_scm_exec_response("git config --get user.name");
 
-   return engine->remote_name;
+   return _remote_name;
 }
 
 static const char *
 _edi_scm_git_remote_email_get(void)
 {
-   char *email;
+   static char *_remote_email;
    Edi_Scm_Engine *engine = _edi_scm_global_object;
 
    if (!engine)
      return NULL;
 
-   if (!engine->remote_email)
-     {
-        email = _edi_scm_exec_response("git config --get user.email");
-        if (email)
-          {
-             engine->remote_email = eina_stringshare_add(email);
-             free(email);
-          }
-     }
+   if (!_remote_email)
+     _remote_email = _edi_scm_exec_response("git config --get user.email");
 
-   return engine->remote_email;
+   return _remote_email;
 }
 
 static const char *
 _edi_scm_git_remote_url_get(void)
 {
+   static char *_remote_url;
    Edi_Scm_Engine *engine = _edi_scm_global_object;
 
    if (!engine)
      return NULL;
 
-   if (!engine->remote_url)
-     engine->remote_url = eina_stringshare_add(_edi_scm_exec_response("git remote get-url origin"));
+   if (!_remote_url)
+     _remote_url = _edi_scm_exec_response("git remote get-url origin");
 
-   return engine->remote_url;
+   return _remote_url;
 }
 
 static int
-_edi_scm_credits(const char *name, const char *email)
+_edi_scm_git_credentials_set(const char *name, const char *email)
 {
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
@@ -300,7 +287,7 @@ edi_scm_remote_enabled(void)
    if (!e)
      return EINA_FALSE;
 
-   return !!e->_remote_url_get();
+   return !!e->remote_url_get();
 }
 
 EAPI Eina_Bool
@@ -334,7 +321,6 @@ edi_scm_shutdown()
    eina_stringshare_del(engine->name);
    eina_stringshare_del(engine->directory);
    eina_stringshare_del(engine->path);
-   eina_stringshare_del(engine->remote_url);
    free(engine);
 
    _edi_scm_global_object = NULL;
@@ -428,11 +414,11 @@ edi_scm_stash(void)
 }
 
 EAPI int
-edi_scm_credits(const char *user, const char *email)
+edi_scm_credentials_set(const char *user, const char *email)
 {
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->credits(user, email);
+   return e->credentials_set(user, email);
 }
 
 static void
@@ -482,7 +468,6 @@ _edi_scm_git_init()
    _edi_scm_global_object = engine = calloc(1, sizeof(Edi_Scm_Engine));
    engine->name       = eina_stringshare_add("git");
    engine->directory  = eina_stringshare_add(".git");
-   engine->credits    = _edi_scm_credits;
    engine->file_add   = _edi_scm_git_file_add;
    engine->file_mod   = _edi_scm_git_file_mod;
    engine->file_del   = _edi_scm_git_file_del;
@@ -492,11 +477,12 @@ _edi_scm_git_init()
    engine->pull       = _edi_scm_git_pull;
    engine->push       = _edi_scm_git_push;
    engine->stash      = _edi_scm_git_stash;
-   engine->remote_add = _edi_scm_git_remote_add;
 
-   engine->_remote_name_get = _edi_scm_git_remote_name_get;
-   engine->_remote_email_get = _edi_scm_git_remote_email_get;
-   engine->_remote_url_get = _edi_scm_git_remote_url_get;
+   engine->remote_add       = _edi_scm_git_remote_add;
+   engine->remote_name_get  = _edi_scm_git_remote_name_get;
+   engine->remote_email_get = _edi_scm_git_remote_email_get;
+   engine->remote_url_get   = _edi_scm_git_remote_url_get;
+   engine->credentials_set  = _edi_scm_git_credentials_set;
 
    return engine;
 }
