@@ -26,6 +26,7 @@
 #include "mainview/edi_mainview.h"
 #include "screens/edi_screens.h"
 #include "screens/edi_file_screens.h"
+#include "screens/edi_scm_screens.h"
 
 #include "edi_private.h"
 
@@ -51,6 +52,7 @@ static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
 static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
+static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_message_popup;
 int _edi_log_dom = -1;
@@ -521,6 +523,35 @@ edi_content_setup(Evas_Object *win, const char *path)
 }
 
 static void
+_edi_icon_update()
+{
+   Eina_Bool modified, can_scm, can_remote, can_undo, can_redo;
+
+   can_undo = edi_mainview_can_undo();
+   can_redo = edi_mainview_can_redo();
+   can_scm = edi_scm_enabled();
+   can_remote = can_scm && edi_scm_remote_enabled();
+   modified = edi_mainview_modified();
+
+   elm_object_item_disabled_set(_edi_menu_save, !modified);
+   elm_object_disabled_set(_edi_toolbar_save, !modified);
+
+   elm_object_item_disabled_set(_edi_menu_undo, !can_undo);
+   elm_object_item_disabled_set(_edi_menu_redo, !can_redo);
+
+   elm_object_disabled_set(_edi_toolbar_undo, !can_undo);
+   elm_object_disabled_set(_edi_toolbar_redo, !can_redo);
+
+   elm_object_item_disabled_set(_edi_menu_init, can_scm);
+   elm_object_item_disabled_set(_edi_menu_push, !can_remote);
+   elm_object_item_disabled_set(_edi_menu_pull, !can_remote);
+   elm_object_item_disabled_set(_edi_menu_status, !can_scm);
+   elm_object_item_disabled_set(_edi_menu_commit, !can_scm);
+   elm_object_item_disabled_set(_edi_menu_stash, !can_scm);
+
+}
+
+static void
 _edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
@@ -568,6 +599,36 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
    ecore_exe_run(full_cmd, NULL);
 
    free(full_cmd);
+}
+
+static void
+_edi_project_credentials_missing()
+
+{
+   Evas_Object *popup, *button;
+
+   popup = elm_popup_add(_edi_main_win);
+   elm_object_part_text_set(popup, "title,text", "User information");
+   elm_object_text_set(popup, "No user information found, please configure in Settings");
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, "OK");
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
+
+   evas_object_show(popup);
+}
+
+static Eina_Bool
+_edi_project_credentials_check(void)
+{
+   if (!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0)
+     return EINA_FALSE;
+
+   if (!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0)
+     return EINA_FALSE;
+
+   return EINA_TRUE;
 }
 
 static void
@@ -896,6 +957,84 @@ _edi_menu_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_scm_init_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   if (!_edi_project_credentials_check())
+     {
+        _edi_project_credentials_missing();
+        return;
+     }
+
+   if (!ecore_file_app_installed("git"))
+     {
+        edi_scm_screens_binary_missing(_edi_main_win, "git");
+        return;
+     }
+
+   edi_consolepanel_clear();
+   edi_consolepanel_show();
+   edi_scm_git_new();
+   _edi_icon_update();
+}
+
+static void
+_edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   if (!_edi_project_credentials_check())
+     {
+        _edi_project_credentials_missing();
+        return;
+     }
+
+   edi_scm_credits(_edi_project_config->user_fullname, _edi_project_config->user_email);
+   edi_scm_screens_commit(_edi_main_win);
+}
+
+static void
+_edi_menu_scm_stash_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   edi_scm_stash();
+   edi_mainview_refresh_all();
+}
+
+static void
+_edi_menu_scm_status_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   edi_consolepanel_clear();
+   edi_consolepanel_show();
+   edi_scm_status();
+}
+
+static void
+_edi_menu_scm_pull_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   edi_consolepanel_clear();
+   edi_consolepanel_show();
+   edi_scm_pull();
+}
+
+static void
+_edi_menu_scm_push_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   if (!_edi_project_credentials_check())
+     {
+        _edi_project_credentials_missing();
+        return;
+     }
+
+   edi_scm_credits(_edi_project_config->user_fullname, _edi_project_config->user_email);
+   edi_consolepanel_clear();
+   edi_consolepanel_show();
+   edi_scm_push();
+}
+
+static void
 _edi_menu_website_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
@@ -950,6 +1089,15 @@ _edi_menu_setup(Evas_Object *obj)
    elm_menu_item_add(menu, menu_it, "media-playback-start", "Run", _edi_menu_run_cb, NULL);
    elm_menu_item_add(menu, menu_it, "utilities-terminal", "Debug", _edi_menu_debug_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "Project", NULL, NULL);
+   _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", "Init", _edi_menu_scm_init_cb, NULL);
+   _edi_menu_commit = elm_menu_item_add(menu, menu_it, "mail-send", "Commit", _edi_menu_scm_commit_cb, NULL);
+   _edi_menu_stash = elm_menu_item_add(menu, menu_it, "edit-undo", "Stash", _edi_menu_scm_stash_cb, NULL);
+   _edi_menu_status = elm_menu_item_add(menu, menu_it, "dialog-error", "Status", _edi_menu_scm_status_cb, NULL);
+   _edi_menu_push = elm_menu_item_add(menu, menu_it, "go-up", "Push", _edi_menu_scm_push_cb, NULL);
+   _edi_menu_pull = elm_menu_item_add(menu, menu_it, "go-down", "Pull", _edi_menu_scm_pull_cb, NULL);
+
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "go-home", "Website", _edi_menu_website_cb, NULL);
@@ -1067,26 +1215,6 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config->gui.width = w + 1;
    _edi_project_config->gui.height = h + 1;
    _edi_project_config_save();
-}
-
-static void
-_edi_icon_update()
-{
-   Eina_Bool modified, can_undo, can_redo = EINA_FALSE;
-
-   can_undo = edi_mainview_can_undo();
-   can_redo = edi_mainview_can_redo();
-
-   modified = edi_mainview_modified();
-
-   elm_object_item_disabled_set(_edi_menu_save, !modified);
-   elm_object_disabled_set(_edi_toolbar_save, !modified);
-
-   elm_object_item_disabled_set(_edi_menu_undo, !can_undo);
-   elm_object_item_disabled_set(_edi_menu_redo, !can_redo);
-
-   elm_object_disabled_set(_edi_toolbar_undo, !can_undo);
-   elm_object_disabled_set(_edi_toolbar_redo, !can_redo);
 }
 
 static void
@@ -1238,6 +1366,7 @@ edi_open(const char *inputpath)
 
    _edi_config_project_add(path);
    _edi_open_tabs();
+   edi_scm_init();
    _edi_icon_update();
 
    evas_object_smart_callback_add(win, "delete,request", _win_delete_cb, NULL);
@@ -1412,6 +1541,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
  end:
    _edi_log_shutdown();
    elm_shutdown();
+   edi_scm_shutdown();
    edi_shutdown();
 
  config_error:

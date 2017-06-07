@@ -259,6 +259,9 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, launch.args, EET_T_STRING);
 
+   EDI_CONFIG_VAL(D, T, user_fullname, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, user_email, EET_T_STRING);
+
    _edi_config_load();
 
    return EINA_TRUE;

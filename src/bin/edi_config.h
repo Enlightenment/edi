@@ -82,6 +82,8 @@ struct _Edi_Project_Config
 
    Eina_List *tabs;
    Edi_Project_Config_Launch launch;
+   Eina_Stringshare *user_fullname;
+   Eina_Stringshare *user_email;
 };
 
 extern Edi_Config *_edi_config;

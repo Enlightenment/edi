@@ -5,13 +5,14 @@
 #include <Elementary.h>
 #include <Ecore.h>
 
+#include "Edi.h"
 #include "edi_screens.h"
 #include "edi_config.h"
 
 #include "edi_private.h"
 
 static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
-                       *_edi_settings_behaviour;
+                       *_edi_settings_behaviour, *_edi_settings_project;
 
 static void
 _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
@@ -361,6 +362,151 @@ _edi_settings_builds_create(Evas_Object *parent)
 }
 
 static void
+_edi_settings_project_remote_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                void *event EINA_UNUSED)
+{
+   Evas_Object *entry;
+   const char *url;
+
+   entry = (Evas_Object *) obj;
+   url = elm_object_text_get(entry);
+
+   if (!url || strlen(url) == 0)
+     return;
+
+   if (!edi_scm_enabled())
+     return;
+
+   edi_scm_remote_add(elm_object_text_get(entry));
+}
+
+static void
+_edi_settings_project_email_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                             void *event EINA_UNUSED)
+{
+   Evas_Object *entry;
+
+   entry = (Evas_Object *)obj;
+
+   if (_edi_project_config->user_email)
+     eina_stringshare_del(_edi_project_config->user_email);
+
+   _edi_project_config->user_email = eina_stringshare_add(elm_object_text_get(entry));
+   _edi_project_config_save();
+}
+
+static void
+_edi_settings_project_name_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                             void *event EINA_UNUSED)
+{
+   Evas_Object *entry;
+
+   entry = (Evas_Object *)obj;
+
+   if (_edi_project_config->user_fullname)
+     eina_stringshare_del(_edi_project_config->user_fullname);
+
+   _edi_project_config->user_fullname = eina_stringshare_add(elm_object_text_get(entry));
+   _edi_project_config_save();
+}
+
+static Evas_Object *
+_edi_settings_project_create(Evas_Object *parent)
+{
+   Edi_Scm_Engine *engine;
+   Evas_Object *box, *frame, *hbox, *label, *entry_name, *entry_email;
+   Evas_Object *entry_remote;
+   Eina_Strbuf *text;
+
+   frame = _edi_settings_panel_create(parent, "Project");
+   box = elm_object_part_content_get(frame, "default");
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, "Author Name: ");
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   entry_name = elm_entry_add(hbox);
+   elm_object_text_set(entry_name, _edi_project_config->user_fullname);
+   evas_object_size_hint_weight_set(entry_name, 0.75, 0.0);
+   evas_object_size_hint_align_set(entry_name, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, entry_name);
+   evas_object_show(entry_name);
+   evas_object_smart_callback_add(entry_name, "changed",
+                                  _edi_settings_project_name_cb, NULL);
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, "Author E-mail: ");
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   entry_email = elm_entry_add(hbox);
+   elm_object_text_set(entry_email, _edi_project_config->user_email);
+   evas_object_size_hint_weight_set(entry_email, 0.75, 0.0);
+   evas_object_size_hint_align_set(entry_email, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, entry_email);
+   evas_object_show(entry_email);
+   evas_object_smart_callback_add(entry_email, "changed",
+                                  _edi_settings_project_email_cb, NULL);
+
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, hbox);
+   evas_object_show(hbox);
+
+   text = eina_strbuf_new();
+   if (edi_scm_enabled())
+     {
+        engine = edi_scm_engine_get();
+        eina_strbuf_append_printf(text, "Remote URL (%s):", engine->name);
+     }
+   else
+     eina_strbuf_append(text, "Remote URL:");
+
+   label = elm_label_add(hbox);
+   elm_object_text_set(label, eina_strbuf_string_get(text));
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   entry_remote = elm_entry_add(hbox);
+   if (edi_scm_remote_enabled())
+     elm_object_text_set(entry_remote, engine->remote_url);
+
+   evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
+   evas_object_size_hint_align_set(entry_remote, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, entry_remote);
+   evas_object_show(entry_remote);
+   evas_object_smart_callback_add(entry_remote, "changed",
+                                  _edi_settings_project_remote_cb, NULL);
+
+   eina_strbuf_free(text);
+
+   return frame;
+}
+
+static void
 _edi_settings_behaviour_autosave_cb(void *data EINA_UNUSED, Evas_Object *obj,
                                     void *event EINA_UNUSED)
 {
@@ -452,6 +598,9 @@ edi_settings_show(Evas_Object *mainwin)
    evas_object_size_hint_align_set(naviframe, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, naviframe, 1, 0, 4, 5);
 
+   _edi_settings_project = elm_naviframe_item_push(naviframe, "", NULL, NULL,
+                                                  _edi_settings_project_create(naviframe), NULL);
+   elm_naviframe_item_title_enabled_set(_edi_settings_project, EINA_FALSE, EINA_FALSE);
    _edi_settings_display = elm_naviframe_item_push(naviframe, "", NULL, NULL,
                                                    _edi_settings_display_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_display, EINA_FALSE, EINA_FALSE);
@@ -462,7 +611,8 @@ edi_settings_show(Evas_Object *mainwin)
                                                    _edi_settings_behaviour_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
 
-   elm_toolbar_item_append(tb, NULL, "Project", NULL, NULL);
+
+   elm_toolbar_item_append(tb, "applications-development", "Project",_edi_settings_category_cb, _edi_settings_project);
    default_it = elm_toolbar_item_append(tb, "preferences-desktop", "Display",
                                         _edi_settings_category_cb, _edi_settings_display);
    elm_toolbar_item_append(tb, "system-run", "Builds",
@@ -470,7 +620,7 @@ edi_settings_show(Evas_Object *mainwin)
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-   elm_toolbar_item_append(tb, NULL, "Global", NULL, NULL);
+   elm_toolbar_item_append(tb, "application-internet", "Global", NULL, NULL);
    elm_toolbar_item_append(tb, "preferences-other", "Behaviour",
                            _edi_settings_category_cb, _edi_settings_behaviour);
    elm_toolbar_item_selected_set(default_it, EINA_TRUE);

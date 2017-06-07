@@ -155,6 +155,29 @@ _item_menu_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_scm_add_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   Edi_Dir_Data *sd;
+
+   sd = data;
+
+   edi_scm_add(sd->path);
+}
+
+static void
+_item_menu_scm_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   Edi_Dir_Data *sd;
+
+   sd = data;
+   edi_mainview_item_close_path(sd->path);
+
+   edi_scm_del(sd->path);
+}
+
+static void
 _item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj,
                         void *ev EINA_UNUSED)
 {
@@ -191,8 +214,19 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
-   menu_it = elm_menu_item_add(menu, NULL, "document-save-as", "rename", _item_menu_rename_cb, sd);
-   menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete", _item_menu_del_cb, sd);
+
+   if (edi_scm_enabled())
+     {
+        menu_it = elm_menu_item_add(menu, NULL, NULL, "source control", NULL, NULL);
+        elm_menu_item_add(menu, menu_it, "document-save-as", "add changes", _item_menu_scm_add_cb, sd);
+        elm_menu_item_add(menu, menu_it, "document-save-as", "rename file", _item_menu_rename_cb, sd);
+        elm_menu_item_add(menu, menu_it, "edit-delete", "delete file", _item_menu_scm_del_cb, sd);
+     }
+   else
+     {
+        menu_it = elm_menu_item_add(menu, NULL, "document-save-as", "rename file", _item_menu_rename_cb, sd);
+        menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete file", _item_menu_del_cb, sd);
+     }
 }
 
 static void

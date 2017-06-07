@@ -151,7 +151,11 @@ _edi_file_screens_rename_cb(void *data,
      {
         if (!ecore_file_is_dir(existing_path))
           edi_mainview_item_close_path(existing_path);
-        ecore_file_mv(existing_path, path);
+
+        if (!edi_scm_enabled())
+          ecore_file_mv(existing_path, path);
+        else
+          edi_scm_move(existing_path, path);
      }
 
    evas_object_del(_popup);

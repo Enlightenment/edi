@@ -29,7 +29,25 @@ edi_exe_wait(const char *command)
    ecore_thread_main_loop_begin();
    ecore_exe_free(exe);
    ecore_thread_main_loop_end();
-
    return exit;
 }
 
+EAPI char *
+edi_exe_response(const char *command)
+{
+   FILE *p;
+   char buf[8192];
+
+   p = popen(command, "r");
+   if (!p)
+     return NULL;
+
+   buf[0] = '\0';
+   fgets(buf, sizeof(buf), p);
+
+   pclose(p);
+
+   if (strlen(buf) <= 1) return NULL;
+
+   return strndup(buf, strlen(buf) - 1);
+}

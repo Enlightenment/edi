@@ -38,6 +38,7 @@ extern "C" {
 #include <edi_builder.h>
 #include <edi_path.h>
 #include <edi_exe.h>
+#include <edi_scm.h>
 
 /**
  * @file

@@ -31,6 +31,16 @@ extern "C" {
 EAPI int edi_exe_wait(const char *command);
 
 /**
+ * Run an executable command and return command string.
+ *
+ * @param command The command to execute in a child process.
+ * @return The output string of the command.
+ *
+ * @ingroup Exe
+ */
+EAPI char *edi_exe_response(const char *command);
+
+/**
  * @}
  */
 

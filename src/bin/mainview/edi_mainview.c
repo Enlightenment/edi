@@ -466,19 +466,52 @@ edi_mainview_open_window(Edi_Path_Options *options)
 }
 
 void
+edi_mainview_close_all(void)
+{
+   Eina_List *item;
+   Edi_Mainview_Item *it;
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (it)
+          _edi_mainview_item_close(it);
+     }
+}
+
+void
+edi_mainview_refresh_all(void)
+{
+   Eina_List *item;
+   Edi_Mainview_Item *it;
+   char *path;
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (it)
+          {
+             path = strdup(it->path);
+             _edi_mainview_item_close(it);
+             if (ecore_file_exists(path))
+               edi_mainview_open_path(path);
+             free(path);
+          }
+     }
+}
+
+void
 edi_mainview_item_close_path(const char *path)
 {
    Eina_List *item;
    Edi_Mainview_Item *it;
 
    EINA_LIST_FOREACH(_edi_mainview_items, item, it)
-    {
-       if (it && !strcmp(it->path, path))
-         {
+     {
+        if (it && !strcmp(it->path, path))
+          {
              _edi_mainview_item_close(it);
              return;
-         }
-    }
+          }
+     }
 }
 
 void
