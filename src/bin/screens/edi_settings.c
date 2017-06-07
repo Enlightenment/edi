@@ -414,11 +414,16 @@ static Evas_Object *
 _edi_settings_project_create(Evas_Object *parent)
 {
    Edi_Scm_Engine *engine = NULL;
-   Evas_Object *box, *frame, *hbox, *label, *entry_name, *entry_email;
+   Evas_Object *box, *frames, *frame, *hbox, *label, *entry_name, *entry_email;
    Evas_Object *entry_remote;
    Eina_Strbuf *text;
 
-   frame = _edi_settings_panel_create(parent, "Project");
+   frames = elm_box_add(parent);
+   frame = _edi_settings_panel_create(frames, "Project Settings");
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(frames, frame);
+   evas_object_show(frame);
    box = elm_object_part_content_get(frame, "default");
 
    hbox = elm_box_add(parent);
@@ -467,6 +472,22 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_smart_callback_add(entry_email, "changed",
                                   _edi_settings_project_email_cb, NULL);
 
+   if (!edi_scm_enabled())
+     return frames;
+
+   engine = edi_scm_engine_get();
+   text = eina_strbuf_new();
+   eina_strbuf_append(text, "Source Control");
+   eina_strbuf_append_printf(text, " (%s)", engine->name);
+
+   frame = _edi_settings_panel_create(frames, eina_strbuf_string_get(text));
+   eina_strbuf_free(text);
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(frames, frame);
+   evas_object_show(frame);
+   box = elm_object_part_content_get(frame, "default");
+
    hbox = elm_box_add(parent);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
@@ -474,26 +495,15 @@ _edi_settings_project_create(Evas_Object *parent)
    elm_box_pack_end(box, hbox);
    evas_object_show(hbox);
 
-   text = eina_strbuf_new();
-   if (edi_scm_enabled())
-     {
-        engine = edi_scm_engine_get();
-        eina_strbuf_append_printf(text, "Remote URL (%s):", engine->name);
-     }
-   else
-     eina_strbuf_append(text, "Remote URL:");
-
    label = elm_label_add(hbox);
-   elm_object_text_set(label, eina_strbuf_string_get(text));
+   elm_object_text_set(label, "Remote URL:");
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
 
    entry_remote = elm_entry_add(hbox);
-   elm_object_disabled_set(entry_remote, !engine);
-   if (engine)
-     elm_object_text_set(entry_remote, engine->remote_url);
+   elm_object_text_set(entry_remote, engine->remote_url);
 
    evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_remote, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -502,9 +512,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_smart_callback_add(entry_remote, "changed",
                                   _edi_settings_project_remote_cb, NULL);
 
-   eina_strbuf_free(text);
-
-   return frame;
+   return frames;
 }
 
 static void
