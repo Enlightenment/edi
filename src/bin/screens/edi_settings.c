@@ -374,10 +374,11 @@ _edi_settings_project_remote_cb(void *data EINA_UNUSED, Evas_Object *obj,
    if (!url || strlen(url) == 0)
      return;
 
-   if (!edi_scm_enabled())
+   if (!edi_scm_enabled() || edi_scm_remote_enabled())
      return;
 
    edi_scm_remote_add(elm_object_text_get(entry));
+   elm_object_disabled_set(entry, EINA_TRUE);
 }
 
 static void
@@ -504,7 +505,7 @@ _edi_settings_project_create(Evas_Object *parent)
 
    entry_remote = elm_entry_add(hbox);
    elm_object_text_set(entry_remote, engine->remote_url);
-
+   elm_object_disabled_set(entry_remote, edi_scm_remote_enabled());
    evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_remote, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, entry_remote);

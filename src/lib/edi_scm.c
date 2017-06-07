@@ -152,22 +152,7 @@ _edi_scm_git_commit(const char *message)
 static int
 _edi_scm_git_push(void)
 {
-   int code;
-   Eina_Strbuf *command = eina_strbuf_new();
-
-   eina_strbuf_append(command, "git push");
-
-   code = _edi_scm_exec(eina_strbuf_string_get(command));
-   if (code != 0)
-     {
-        eina_strbuf_reset(command);
-        eina_strbuf_append(command, "git push --set-upstream origin master");
-        code = _edi_scm_exec(eina_strbuf_string_get(command));
-     }
-
-   eina_strbuf_free(command);
-
-   return code;
+   return _edi_scm_exec("git push");
 }
 
 static int
@@ -206,17 +191,13 @@ _edi_scm_git_remote_add(const char *remote_url)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append(command, "git remote rm origin");
-
-   code = _edi_scm_exec(eina_strbuf_string_get(command));
-
-   eina_strbuf_reset(command);
-
    eina_strbuf_append_printf(command, "git remote add origin %s", remote_url);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
-
    eina_strbuf_free(command);
+
+   if (code == 0)
+     code = _edi_scm_exec("git push --set-upstream origin master");
 
    return code;
 }
