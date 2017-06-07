@@ -268,25 +268,13 @@ _edi_scm_git_remote_email_get(void)
 static const char *
 _edi_scm_git_remote_url_get(void)
 {
-   char *remote;
-   Eina_Strbuf *command;
    Edi_Scm_Engine *engine = _edi_scm_global_object;
 
    if (!engine)
      return NULL;
 
    if (!engine->remote_url)
-     {
-        remote = _edi_scm_exec_response("git remote");
-        if (remote)
-          {
-             command = eina_strbuf_new();
-             eina_strbuf_append_printf(command, "git remote get-url %s", remote);
-             engine->remote_url = eina_stringshare_add(_edi_scm_exec_response(eina_strbuf_string_get(command)));
-             eina_strbuf_free(command);
-             free(remote);
-          }
-     }
+     engine->remote_url = eina_stringshare_add(_edi_scm_exec_response("git remote get-url origin"));
 
    return engine->remote_url;
 }

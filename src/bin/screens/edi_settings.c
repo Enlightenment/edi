@@ -413,7 +413,7 @@ _edi_settings_project_name_cb(void *data EINA_UNUSED, Evas_Object *obj,
 static Evas_Object *
 _edi_settings_project_create(Evas_Object *parent)
 {
-   Edi_Scm_Engine *engine;
+   Edi_Scm_Engine *engine = NULL;
    Evas_Object *box, *frame, *hbox, *label, *entry_name, *entry_email;
    Evas_Object *entry_remote;
    Eina_Strbuf *text;
@@ -491,7 +491,8 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(label);
 
    entry_remote = elm_entry_add(hbox);
-   if (edi_scm_remote_enabled())
+   elm_object_disabled_set(entry_remote, !engine);
+   if (engine)
      elm_object_text_set(entry_remote, engine->remote_url);
 
    evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
