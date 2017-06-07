@@ -45,15 +45,13 @@ _edi_scm_screens_commit_cb(void *data,
                            Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
-   Edi_Scm_Engine *e;
+   Edi_Scm_Engine *engine;
    const char *message;
 
-   e = edi_scm_engine_get();
-   if (!e) 
-     {
-        _edi_scm_screens_message_open("SCM engine is not available.");
-        return;
-     }
+   engine = edi_scm_engine_get();
+   // engine has been checked before now
+   if (!engine)
+     return;
 
    message = elm_entry_entry_get((Evas_Object *) data);
    if (!message || strlen(message) == 0)
@@ -72,20 +70,41 @@ _edi_scm_screens_commit_cb(void *data,
 void
 edi_scm_screens_commit(Evas_Object *parent)
 {
-   Evas_Object *popup, *box, *input, *button;
+   Evas_Object *popup, *box, *label, *input, *button;
+   Eina_Strbuf *user;
+   Edi_Scm_Engine *engine;
+
+   engine= edi_scm_engine_get();
+   if (!engine)
+     {
+        _edi_scm_screens_message_open("SCM engine is not available.");
+        return;
+     }
 
    _parent_obj = parent;
    _popup = popup = elm_popup_add(parent);
-   
+
    elm_object_part_text_set(popup, "title,text",
-                                     "Enter commit message");
+                                     "Commit Changes");
    box = elm_box_add(popup);
    elm_box_horizontal_set(box, EINA_FALSE);
    elm_object_content_set(popup, box);
 
+   label = elm_label_add(box);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(label);
+   elm_box_pack_end(box, label);
+
+   user = eina_strbuf_new();
+   eina_strbuf_append_printf(user, "Author <b>%s</b> &lt;%s&gt;<br>",
+                             engine->remote_name_get(), engine->remote_email_get());
+   elm_object_text_set(label, eina_strbuf_string_get(user));
+   eina_strbuf_free(user);
+
    input = elm_entry_add(box);
-   elm_entry_single_line_set(input, EINA_TRUE);
    elm_entry_editable_set(input, EINA_TRUE);
+   elm_object_text_set(input, "Enter commit summary<br><br>And change details");
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
@@ -99,7 +118,7 @@ edi_scm_screens_commit(Evas_Object *parent)
 
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
-   elm_object_text_set(button, "commit message");
+   elm_object_text_set(button, "commit");
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_commit_cb, input);
