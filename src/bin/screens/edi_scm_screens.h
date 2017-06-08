@@ -14,7 +14,7 @@ extern "C" {
 
 /**
  * @brief Scm management functions.
- * @defgroup Scm 
+ * @defgroup Scm
  *
  * @{
  *
@@ -39,6 +39,13 @@ void edi_scm_screens_commit(Evas_Object *parent);
  * @ingroup Scm
  */
 void edi_scm_screens_binary_missing(Evas_Object *parent, const char *binary);
+
+/**
+ * Load an avatar image to a given elm_image object.
+ *
+ * @ingroup Scm
+ */
+void edi_scm_screens_avatar_load(Evas_Object *image, const char *email);
 
 /**
  * @}

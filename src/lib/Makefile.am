@@ -30,6 +30,8 @@ edi_build_provider.c \
 edi_builder.c \
 edi_create.c \
 edi_path.c \
+md5.h \
+md5.c \
 edi_scm.c \
 edi_exe.c \
 edi.c

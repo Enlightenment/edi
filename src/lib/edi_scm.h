@@ -199,6 +199,15 @@ Eina_Bool edi_scm_enabled(void);
 Eina_Bool edi_scm_remote_enabled(void);
 
 /**
+ * Get the URL to an avatar image for the user (based on email).
+ *
+ * @return An allocated string containing the URL or NULL if no email
+ *
+ * @ingroup Scm
+ */
+const char *edi_scm_avatar_url_get(const char *email);
+
+/**
  * @}
  */
 

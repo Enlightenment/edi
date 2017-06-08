@@ -5,12 +5,14 @@
 #include <Eina.h>
 #include <Ecore.h>
 #include <Ecore_File.h>
+#include <Ethumb.h>
 
 #include "Edi.h"
 #include "edi_private.h"
-#include <edi_exe.h>
+#include "edi_exe.h"
 #include "edi_path.h"
 #include "edi_scm.h"
+#include "md5.h"
 
 Edi_Scm_Engine *_edi_scm_global_object = NULL;
 
@@ -494,5 +496,39 @@ edi_scm_init(void)
      return _edi_scm_git_init();
 
    return NULL;
+}
+
+EAPI const char *
+edi_scm_avatar_url_get(const char *email)
+{
+   int n;
+   char *id;
+   const char *url;
+   MD5_CTX ctx;
+   char md5out[(2 * MD5_HASHBYTES) + 1];
+   unsigned char hash[MD5_HASHBYTES];
+   static const char hex[] = "0123456789abcdef";
+
+   if (!email || strlen(email) == 0)
+     return NULL;
+
+   id = strdup(email);
+   eina_str_tolower(&id);
+
+   MD5Init(&ctx);
+   MD5Update(&ctx, (unsigned char const*)id, (unsigned)strlen(id));
+   MD5Final(hash, &ctx);
+
+   for (n = 0; n < MD5_HASHBYTES; n++)
+     {
+        md5out[2 * n] = hex[hash[n] >> 4];
+        md5out[2 * n + 1] = hex[hash[n] & 0x0f];
+     }
+   md5out[2 * MD5_HASHBYTES] = '\0';
+
+   url = eina_stringshare_printf("http://www.gravatar.com/avatar/%s", md5out);
+
+   free(id);
+   return url;
 }
 
