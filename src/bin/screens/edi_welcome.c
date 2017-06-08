@@ -538,13 +538,13 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
         free(display);
      }
 
-   elm_box_pack_end(box, list);
+   elm_object_content_set(box, list);
    evas_object_show(list);
 }
 
 Evas_Object *edi_welcome_show()
 {
-   Evas_Object *win, *hbx, *box, *button, *label, *image, *naviframe;
+   Evas_Object *win, *hbx, *box, *button, *icon, *frame, *image, *naviframe;
    Elm_Object_Item *item;
    char buf[PATH_MAX];
 
@@ -567,21 +567,15 @@ Evas_Object *edi_welcome_show()
    evas_object_show(hbx);
 
    /* Existing projects area */
-   box = elm_box_add(hbx);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbx, box);
-   evas_object_show(box);
+   frame = elm_frame_add(hbx);
+   elm_object_text_set(frame, "Recent Projects:");
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbx, frame);
+   evas_object_show(frame);
 
-   label = elm_label_add(box);
-   elm_object_text_set(label, "Recent Projects:");
-   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, label);
-   evas_object_show(label);
-
-   _edi_project_box = box;
-   _edi_welcome_add_recent_projects(box);
+   _edi_project_box = frame;
+   _edi_welcome_add_recent_projects(frame);
 
    /* New project area */
    box = elm_box_add(hbx);
@@ -599,16 +593,24 @@ Evas_Object *edi_welcome_show()
    evas_object_show(image);
 
    button = elm_button_add(box);
+   evas_object_size_hint_align_set(button, EVAS_HINT_FILL, 0.0);
    _edi_open_button = button;
    elm_object_text_set(button, "Open Existing Project");
+   icon = elm_icon_add(button);
+   elm_icon_standard_set(icon, "folder");
+   elm_object_part_content_set(button, "icon", icon);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_welcome_project_choose_cb, NULL);
    elm_box_pack_end(box, button);
    evas_object_show(button);
 
    button = elm_button_add(box);
+   evas_object_size_hint_align_set(button, EVAS_HINT_FILL, 0.0);
    _edi_create_button = button;
    elm_object_text_set(button, "Create New Project");
+   icon = elm_icon_add(button);
+   elm_icon_standard_set(icon, "folder-new");
+   elm_object_part_content_set(button, "icon", icon);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_welcome_project_new_cb, naviframe);
    elm_box_pack_end(box, button);
