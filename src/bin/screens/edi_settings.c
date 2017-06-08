@@ -443,6 +443,8 @@ _edi_settings_project_create(Evas_Object *parent)
 
    entry_name = elm_entry_add(hbox);
    elm_object_text_set(entry_name, _edi_project_config->user_fullname);
+   elm_entry_single_line_set(entry_name, EINA_TRUE);
+   elm_entry_scrollable_set(entry_name, EINA_TRUE);
    evas_object_size_hint_weight_set(entry_name, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_name, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, entry_name);
@@ -466,6 +468,8 @@ _edi_settings_project_create(Evas_Object *parent)
 
    entry_email = elm_entry_add(hbox);
    elm_object_text_set(entry_email, _edi_project_config->user_email);
+   elm_entry_single_line_set(entry_email, EINA_TRUE);
+   elm_entry_scrollable_set(entry_email, EINA_TRUE);
    evas_object_size_hint_weight_set(entry_email, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_email, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, entry_email);
@@ -505,6 +509,8 @@ _edi_settings_project_create(Evas_Object *parent)
 
    entry_remote = elm_entry_add(hbox);
    elm_object_text_set(entry_remote, engine->remote_url_get());
+   elm_entry_single_line_set(entry_remote, EINA_TRUE);
+   elm_entry_scrollable_set(entry_remote, EINA_TRUE);
    elm_object_disabled_set(entry_remote, edi_scm_remote_enabled());
    evas_object_size_hint_weight_set(entry_remote, 0.75, 0.0);
    evas_object_size_hint_align_set(entry_remote, EVAS_HINT_FILL, EVAS_HINT_FILL);
