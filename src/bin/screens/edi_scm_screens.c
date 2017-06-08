@@ -186,14 +186,12 @@ void _edi_scm_screens_avatar_download_complete(void *data, const char *file,
         return;
      }
 
-   // TODO figure why this crashes
-   //elm_image_file_set(image, file, NULL);
+   elm_image_file_set(image, file, NULL);
 }
 
 void edi_scm_screens_avatar_load(Evas_Object *image, const char *email)
 {
    const char *tmp, *cache, *cachedir, *cacheparentdir;
-   Ecore_File_Download_Job *job;
 
    cache = _edi_scm_avatar_cache_path_get(email);
    if (ecore_file_exists(cache))
@@ -206,23 +204,16 @@ void edi_scm_screens_avatar_load(Evas_Object *image, const char *email)
    cachedir = strdup(tmp);
    cacheparentdir = dirname((char *) tmp);
    if (!ecore_file_exists(cacheparentdir) && !ecore_file_mkdir(cacheparentdir))
-     {
-        free((char *)tmp);
-        free((char *)cachedir);
-        return;
-     }
+     goto clear;
 
-   free((char *)tmp);
    if (!ecore_file_exists(cachedir) && !ecore_file_mkdir(cachedir))
-     {
-        free((char *)cachedir);
-        return;
-     }
-
-   free((char *)cachedir);
+     goto clear;
 
    ecore_file_download(edi_scm_avatar_url_get(email), cache,
                        _edi_scm_screens_avatar_download_complete, NULL,
-                       image, &job);
+                       image, NULL);
+
+clear:
+   free((char *)cachedir);
 }
 
