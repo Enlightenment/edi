@@ -75,7 +75,7 @@ edi_about_show(Evas_Object *mainwin)
    elm_box_pack_end(vbox, elm_box_add(vbox));
 
    text = elm_label_add(box);
-   elm_object_text_set(text, "<br>EDI is an IDE designed to get people into coding for Linux.<br>" \
+   elm_object_text_set(text, "<br>EDI is an IDE designed to get people into coding for Unix.<br>" \
                              "It's based on the <b>EFL</b> and written completely natively<br>" \
                              "to provide a <i>reponsive</i> and <i>beautiful</i> UI.<br>");
    evas_object_size_hint_weight_set(text, EVAS_HINT_EXPAND, 0.0);
