@@ -41,7 +41,7 @@ _edi_settings_panel_create(Evas_Object *parent, const char *title)
    evas_object_show(box);
 
    frame = elm_frame_add(parent);
-   elm_object_part_text_set(frame, "default", title);
+   elm_object_text_set(frame, title);
    elm_object_part_content_set(frame, "default", box);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
