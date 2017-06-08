@@ -171,14 +171,20 @@ edi_scm_screens_binary_missing(Evas_Object *parent, const char *binary)
 const char *
 _edi_scm_avatar_cache_path_get(const char *email)
 {
-   return eina_stringshare_printf("%s/%s/avatars/%s.png", efreet_cache_home_get(),
+   return eina_stringshare_printf("%s/%s/avatars/%s.jpeg", efreet_cache_home_get(),
                                   PACKAGE_NAME, email);
 }
 
 void _edi_scm_screens_avatar_download_complete(void *data, const char *file,
-                                               EINA_UNUSED int status)
+                                               int status)
 {
    Evas_Object *image = data;
+
+   if (status != 200)
+     {
+        ecore_file_remove(file);
+        return;
+     }
 
    // TODO figure why this crashes
    //elm_image_file_set(image, file, NULL);
