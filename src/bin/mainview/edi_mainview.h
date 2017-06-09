@@ -210,7 +210,17 @@ void edi_mainview_search();
  *
  * @ingroup Content
  */
-void edi_mainview_goto(int line);
+void edi_mainview_goto(unsigned int line);
+
+/**
+ * Go to a requested line, column position in the current view's contents.
+ *
+ * @param row the line number (1 based) to scroll to
+ * @param col the column position (1 based) to scroll to
+ *
+ * @ingroup Content
+ */
+void edi_mainview_goto_position(unsigned int row, unsigned int col);
 
 /**
  * Present a popup that will initiate a goto in the current view.

@@ -324,7 +324,12 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
      elm_object_focus_set(editor->entry, EINA_TRUE);
 
    if (options->line)
-     edi_mainview_goto(options->line);
+     {
+        if (options->character > 1)
+          edi_mainview_goto_position(options->line, options->character);
+        else
+          edi_mainview_goto(options->line);
+     }
 
    _edi_project_config_tab_add(options->path, options->type, EINA_FALSE);
 }
@@ -482,7 +487,12 @@ edi_mainview_open(Edi_Path_Options *options)
      {
         edi_mainview_item_select(it);
         if (options->line)
-           edi_mainview_goto(options->line);
+          {
+             if (options->character > 1)
+               edi_mainview_goto_position(options->line, options->character);
+             else
+               edi_mainview_goto(options->line);
+          }
         return;
      }
 
@@ -735,23 +745,21 @@ edi_mainview_search()
 }
 
 void
-edi_mainview_goto(int number)
+edi_mainview_goto(unsigned int number)
+{
+   edi_mainview_goto_position(number, 1);
+}
+
+void
+edi_mainview_goto_position(unsigned int row, unsigned int col)
 {
    Edi_Editor *editor;
-   Elm_Code *code;
-   Elm_Code_Line *line;
 
    editor = (Edi_Editor *)evas_object_data_get(_current_view, "editor");
-   if (!editor || number <= 0)
+   if (!editor || row <= 0 || col <= 0)
      return;
 
-   code = elm_code_widget_code_get(editor->entry);
-
-   line = elm_code_file_line_get(code->file, number);
-   if (!line)
-     return;
-
-   elm_code_widget_cursor_position_set(editor->entry, number, 1);
+   elm_code_widget_cursor_position_set(editor->entry, row, col);
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
