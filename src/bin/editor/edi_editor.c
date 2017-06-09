@@ -1159,9 +1159,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    (void)!evas_object_key_grab(widget, "g", ctrl, shift | alt, 1);
    (void)!evas_object_key_grab(widget, "space", ctrl, shift | alt, 1);
 
-   evas_object_data_set(vbox, "editor", editor);
+   evas_object_data_set(item->view, "editor", editor);
    ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
-   evas_object_event_callback_add(vbox, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
+   evas_object_event_callback_add(item->view, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
    if (edi_language_provider_has(editor))
      {

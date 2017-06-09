@@ -37,12 +37,28 @@ edi_mainview_item_current_get()
    EINA_LIST_FOREACH(_edi_mainview_items, item, it)
      {
         if (it && it->view == _current_view)
-          {
-             return it;
-          }
+          return it;
      }
 
    return NULL;
+}
+
+unsigned int
+edi_mainview_item_current_tab_get()
+{
+   Eina_List *item;
+   Edi_Mainview_Item *it;
+   unsigned int i = 0;
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (!it->win)
+          i++;
+        if (it && it->view == _current_view)
+          break;
+     }
+
+   return i;
 }
 
 static void
@@ -101,7 +117,6 @@ edi_mainview_item_next()
 
    EINA_LIST_FOREACH(_edi_mainview_items, item, it)
      {
-
         if (it && open_next)
           {
              edi_mainview_item_select(it);
@@ -111,6 +126,44 @@ edi_mainview_item_next()
         if (it && it->view == _current_view)
           open_next = EINA_TRUE;
      }
+}
+
+void
+edi_mainview_tab_select(unsigned int id)
+{
+   Eina_List *item;
+   Edi_Mainview_Item *it;
+   unsigned int i = 0;
+
+   EINA_LIST_FOREACH(_edi_mainview_items, item, it)
+     {
+        if (!it->win)
+          i++;
+        if (i == id)
+          edi_mainview_item_select(it);
+     }
+}
+
+static void
+_content_load(Edi_Mainview_Item *item)
+{
+   Edi_Content_Provider *provider;
+   Evas_Object *child;
+
+   provider = edi_content_provider_for_id_get(item->editortype);
+   if (!provider)
+     {
+        ERR("No content provider found for type %s", item->editortype);
+        return;
+     }
+   child = provider->content_ui_add(item->container, item);
+
+   evas_object_size_hint_weight_set(child, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(child, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(item->container, child);
+   evas_object_show(child);
+
+   item->loaded = EINA_TRUE;
 }
 
 void
@@ -134,11 +187,16 @@ edi_mainview_item_select(Edi_Mainview_Item *item)
              total_w += w;
           }
 
+        if (!item->loaded)
+          _content_load(item);
+
         _edi_mainview_view_show(item->view);
         elm_object_signal_emit(item->tab, "mouse,down,1", "base");
 
         evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
         elm_scroller_region_bring_in(_tab_scroller, region_x, 0, tabw, 0);
+        _edi_project_config->current_tab = edi_mainview_item_current_tab_get();
+        _edi_project_config_save();
      }
 
    ecore_event_add(EDI_EVENT_TAB_CHANGED, NULL, NULL, NULL);
@@ -193,7 +251,7 @@ _get_item_for_path(const char *path)
 }
 
 static Edi_Mainview_Item *
-_edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item *tab, Elm_Object_Item *view,
+_edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item *tab,
                        Evas_Object *win)
 {
    Edi_Mainview_Item *item;
@@ -203,7 +261,6 @@ _edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item
    item->editortype = path->type;
    item->mimetype = mime;
    item->tab = tab;
-   item->view = view;
    item->win = win;
 
    _edi_mainview_items = eina_list_append(_edi_mainview_items, item);
@@ -214,13 +271,17 @@ _edi_mainview_item_add(Edi_Path_Options *path, const char *mime, Elm_Object_Item
 static Evas_Object *
 _edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
 {
-   Edi_Content_Provider *provider;
+   Evas_Object *container;
 
-   provider = edi_content_provider_for_id_get(item->editortype);
-   if (!provider)
-     return NULL;
+   container = elm_box_add(parent);
+   evas_object_size_hint_weight_set(container, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(container, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(container);
 
-   return provider->content_ui_add(parent, item);
+   item->loaded = EINA_FALSE;
+   item->container = container;
+
+   return container;
 }
 
 static void
@@ -229,12 +290,9 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    Evas_Object *content, *tab;//, *icon;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
-//   Edi_Content_Provider *provider;
 
-   item = _edi_mainview_item_add(options, mime, NULL, NULL, NULL);
-//   provider = edi_content_provider_for_id_get(item->editortype);
+   item = _edi_mainview_item_add(options, mime, NULL, NULL);
    content = _edi_mainview_content_create(item, _content_frame);
-
    _edi_mainview_view_show(content);
    item->view = content;
 
@@ -256,7 +314,9 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    evas_object_show(tab);
    elm_box_recalculate(tb);
    item->tab = tab;
-   edi_mainview_item_select(item);
+
+   if (!options->background)
+     edi_mainview_item_select(item);
 
    // Set focus on the newly opening window so that one can just start typing
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
@@ -266,7 +326,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
    if (options->line)
      edi_mainview_goto(options->line);
 
-   _edi_project_config_tab_add(options->path, EINA_FALSE);
+   _edi_project_config_tab_add(options->path, options->type, EINA_FALSE);
 }
 
 static void
@@ -311,11 +371,12 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
 
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_mainview_win_exit, NULL);
-   item = _edi_mainview_item_add(options, mime, NULL, NULL, win);
+   item = _edi_mainview_item_add(options, mime, NULL, win);
    evas_object_data_set(win, "edi_mainview_item", item);
 
    content = _edi_mainview_content_create(item, win);
    elm_win_resize_object_add(win, content);
+   _content_load(item);
 
    // Set focus on the newly opening window so that one can just start typing
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
@@ -325,7 +386,7 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
 
-   _edi_project_config_tab_add(options->path, EINA_TRUE);
+   _edi_project_config_tab_add(options->path, options->type, EINA_TRUE);
 }
 
 static void
@@ -803,7 +864,7 @@ edi_mainview_project_search_popup_show(void)
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
    evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_goto_popup_key_up_cb, NULL);
-   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
    elm_box_pack_end(box, input);

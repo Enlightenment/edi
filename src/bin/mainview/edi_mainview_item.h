@@ -32,7 +32,8 @@ typedef struct _Edi_Mainview_Item
 
    /* Private */
 
-   /* Add new members here. */
+   Evas_Object *container; /**< The visual container that the item will display within */
+   Eina_Bool loaded;
 } Edi_Mainview_Item;
 
 #ifdef __cplusplus

@@ -48,6 +48,7 @@ struct _Edi_Config
 struct _Edi_Project_Config_Tab
 {
    const char *path;
+   const char *type;
    Eina_Bool windowed;
 };
 
@@ -81,6 +82,7 @@ struct _Edi_Project_Config
      } gui;
 
    Eina_List *tabs;
+   unsigned int current_tab;
    Edi_Project_Config_Launch launch;
    Eina_Stringshare *user_fullname;
    Eina_Stringshare *user_email;
@@ -111,7 +113,8 @@ const char* _edi_config_mime_search(const char *mime);
 void _edi_project_config_load(void);
 void _edi_project_config_save(void);
 
-void _edi_project_config_tab_add(const char *path, Eina_Bool windowed);
+void _edi_project_config_tab_add(const char *path, const char *type,
+                                 Eina_Bool windowed);
 void _edi_project_config_tab_remove(const char *path);
 
 #ifdef __cplusplus

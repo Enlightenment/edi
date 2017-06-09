@@ -1262,6 +1262,7 @@ void
 _edi_open_tabs()
 {
    Edi_Project_Config_Tab *tab;
+   Edi_Path_Options *options;
    Eina_List *tabs, *list;
    char *path;
 
@@ -1274,10 +1275,13 @@ _edi_open_tabs()
         else
           path = edi_path_append(edi_project_get(), tab->path);
 
+        options = edi_path_options_create(path);
+        options->type = eina_stringshare_add(tab->type);
+        options->background = EINA_TRUE;
         if (tab->windowed)
-          edi_mainview_open_window_path(eina_stringshare_add(path));
+          edi_mainview_open_window(options);
         else
-          edi_mainview_open_path(eina_stringshare_add(path));
+          edi_mainview_open(options);
         free(path);
      }
 
@@ -1285,6 +1289,9 @@ _edi_open_tabs()
      {
         free(tab);
      }
+
+   if (_edi_project_config->current_tab != 0)
+     edi_mainview_tab_select(_edi_project_config->current_tab);
 }
 
 static void

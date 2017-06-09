@@ -267,6 +267,8 @@ void edi_mainview_item_prev();
  */
 void edi_mainview_item_next();
 
+void edi_mainview_tab_select(unsigned int id);
+
 /**
  * @}
  *

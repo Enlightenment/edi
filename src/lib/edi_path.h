@@ -15,6 +15,7 @@ typedef struct _Edi_Path_Options
    const char *path;
    const char *type;
    int line, character;
+   Eina_Bool background;
 } Edi_Path_Options;
 
 /**

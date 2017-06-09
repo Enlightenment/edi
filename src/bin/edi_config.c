@@ -132,6 +132,7 @@ _edi_project_config_cb_free(void)
    EINA_LIST_FREE(_edi_project_config->tabs, tab)
      {
         if (tab->path) eina_stringshare_del(tab->path);
+        if (tab->type) eina_stringshare_del(tab->type);
         free(tab);
      }
 
@@ -231,6 +232,7 @@ _edi_config_init(void)
    #define T Edi_Project_Config_Tab
    #define D _edi_proj_cfg_tab_edd
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, type, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, windowed, EET_T_UCHAR);
 
    _edi_proj_cfg_edd = EDI_CONFIG_DD_NEW("Project_Config", Edi_Project_Config);
@@ -256,6 +258,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.tab_inserts_spaces, EET_T_UCHAR);
 
    EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
+   EDI_CONFIG_VAL(D, T, current_tab, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, launch.args, EET_T_STRING);
 
@@ -499,7 +502,8 @@ _edi_project_config_save()
 }
 
 void
-_edi_project_config_tab_add(const char *path, Eina_Bool windowed)
+_edi_project_config_tab_add(const char *path, const char *type,
+                            Eina_Bool windowed)
 {
    Edi_Project_Config_Tab *tab;
    Eina_List *list, *next;
@@ -518,6 +522,7 @@ _edi_project_config_tab_add(const char *path, Eina_Bool windowed)
    else
      tab->path = eina_stringshare_add(path);
 
+   tab->type = eina_stringshare_add(type);
    tab->windowed = windowed;
    _edi_project_config->tabs = eina_list_append(_edi_project_config->tabs, tab);
    _edi_project_config_save_no_notify();
@@ -542,5 +547,7 @@ _edi_project_config_tab_remove(const char *path)
    _edi_project_config_save_no_notify();
 
    eina_stringshare_del(tab->path);
+   if (tab->type)
+     eina_stringshare_del(tab->type);
    free(tab);
 }
