@@ -76,9 +76,22 @@ void edi_scm_shutdown();
 /**
  * Set up a new git repository for the current project.
  *
+ * @return The status code of the init command.
+ *
  * @ingroup Scm
  */
 EAPI int edi_scm_git_new(void);
+
+/**
+ * Clone an existing git repository from the provided url.
+ *
+ * @param url the URL to clone from.
+ * @param dir the new directory that will be created to clone into
+ * @return The status code of the clone command.
+ *
+ * @ingroup Scm
+ */
+EAPI int edi_scm_git_clone(const char *url, const char *dir);
 
 /**
  * Get a pointer to the SCM engine in use.

@@ -61,6 +61,19 @@ edi_scm_git_new(void)
    return _edi_scm_exec("git init .");
 }
 
+EAPI int
+edi_scm_git_clone(const char *url, const char *dir)
+{
+   int code;
+   Eina_Strbuf *command = eina_strbuf_new();
+
+   eina_strbuf_append_printf(command, "git clone '%s' '%s'", url, dir);
+   code = edi_exe_wait(eina_strbuf_string_get(command));
+
+   eina_strbuf_free(command);
+   return code;
+}
+
 static int
 _edi_scm_git_file_add(const char *path)
 {
