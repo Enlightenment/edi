@@ -91,6 +91,8 @@ _edi_consolepanel_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
    unsigned int length;
 
    line = (Elm_Code_Line *)event->info;
+   if (!line->data)
+     return;
    content = elm_code_line_text_get(line, &length);
 
    terminated = malloc(sizeof(char) * (length + 1));

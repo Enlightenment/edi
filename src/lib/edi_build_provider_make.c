@@ -13,7 +13,7 @@
 #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__NetBSD__)
  #define MAKE_COMMAND " gmake"
 #else
- #define MAKE_COMMAND " make"
+ #define MAKE_COMMAND " make -w"
 #endif
 
 
@@ -85,7 +85,7 @@ static void
 _make_test(void)
 {
    chdir(edi_project_get());
-   ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run("env CK_VERBOSITY=verbose" MAKE_COMMAND " check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
