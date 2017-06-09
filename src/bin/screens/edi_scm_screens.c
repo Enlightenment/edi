@@ -149,14 +149,17 @@ edi_scm_screens_commit(Evas_Object *parent)
 void
 edi_scm_screens_binary_missing(Evas_Object *parent, const char *binary)
 {
-   Evas_Object *popup, *button;
+   Evas_Object *popup, *label, *button;
    Eina_Strbuf *text = eina_strbuf_new();
 
    eina_strbuf_append_printf(text, "No %s binary found, please install %s.", binary, binary);
 
    popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text", "SCM: Unable to launch");
-   elm_object_text_set(popup, eina_strbuf_string_get(text));
+   label = elm_label_add(popup);
+   elm_object_text_set(label, eina_strbuf_string_get(text));
+   evas_object_show(label);
+   elm_object_content_set(popup, label);
 
    eina_strbuf_free(text);
 

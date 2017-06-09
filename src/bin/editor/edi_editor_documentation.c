@@ -106,6 +106,7 @@ void
 edi_editor_doc_open(Edi_Editor *editor)
 {
    Edi_Language_Document *doc = NULL;
+   Evas_Object *label;
    const char *detail, *param, *ret, *see;
    char *display;
    int displen;
@@ -133,7 +134,10 @@ edi_editor_doc_open(Edi_Editor *editor)
      {
         elm_popup_timeout_set(editor->doc_popup, 1.5);
         elm_object_style_set(editor->doc_popup, "transparent");
-        elm_object_text_set(editor->doc_popup, "No help available for this term");
+        label = elm_label_add(editor->doc_popup);
+        elm_object_text_set(label, "No help available for this term");
+        evas_object_show(label);
+        elm_object_content_set(editor->doc_popup, label);
         evas_object_show(editor->doc_popup);
         return;
      }

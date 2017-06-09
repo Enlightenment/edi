@@ -399,12 +399,15 @@ _edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
 static void
 _edi_mainview_mime_content_safe_popup(void)
 {
-   Evas_Object *popup, *button;
+   Evas_Object *popup, *label, *button;
 
    popup = elm_popup_add(_main_win);
    elm_object_part_text_set(popup, "title,text",
                                    "Unrecognised file type");
-   elm_object_text_set(popup, "To force open, select this file in the file browser, and use \"open as\" menu options.");
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "To force open, select this file in the file browser, and use \"open as\" menu options.");
+   evas_object_show(label);
+   elm_object_content_set(popup, label);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "OK");

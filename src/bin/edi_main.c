@@ -561,11 +561,15 @@ _edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
 void
 edi_launcher_config_missing()
 {
-   Evas_Object *popup, *button;
+   Evas_Object *popup, *label, *button;
 
    popup = elm_popup_add(_edi_main_win);
    elm_object_part_text_set(popup, "title,text", "Unable to launch");
-   elm_object_text_set(popup, "No launch binary found, please configure in Settings");
+
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "No launch binary found, please configure in Settings");
+   evas_object_show(label);
+   elm_object_content_set(popup, label);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "OK");
@@ -605,11 +609,15 @@ static void
 _edi_project_credentials_missing()
 
 {
-   Evas_Object *popup, *button;
+   Evas_Object *popup, *label, *button;
 
    popup = elm_popup_add(_edi_main_win);
    elm_object_part_text_set(popup, "title,text", "User information");
-   elm_object_text_set(popup, "No user information found, please configure in Settings");
+
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "No user information found, please configure in Settings");
+   evas_object_show(label);
+   elm_object_content_set(popup, label);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "OK");
