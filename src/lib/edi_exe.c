@@ -25,10 +25,6 @@ edi_exe_wait(const char *command)
    ecore_thread_main_loop_end();
 
    waitpid(pid, &exit, 0);
-
-   ecore_thread_main_loop_begin();
-   ecore_exe_free(exe);
-   ecore_thread_main_loop_end();
    return exit;
 }
 

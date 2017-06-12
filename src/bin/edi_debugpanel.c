@@ -324,7 +324,7 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
 
    if (pid == -1)
      {
-        if (_debug_exe) ecore_exe_free(_debug_exe);
+        if (_debug_exe) ecore_exe_quit(_debug_exe);
         _debug_exe = NULL;
         elm_object_disabled_set(_button_quit, EINA_TRUE);
         elm_object_disabled_set(_button_start, EINA_FALSE);
@@ -350,8 +350,6 @@ void edi_debugpanel_stop(void)
    pid = ecore_exe_pid_get(_debug_exe);
    if (pid != -1)
      ecore_exe_quit(_debug_exe);
-
-   if (_debug_exe) ecore_exe_free(_debug_exe);
 
    _debug_exe = NULL;
 
