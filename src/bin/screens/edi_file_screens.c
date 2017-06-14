@@ -187,6 +187,7 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
    elm_entry_editable_set(input, EINA_TRUE);
+   elm_entry_scrollable_set(input, EINA_TRUE);
    elm_object_text_set(input, leaf);
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -227,6 +228,7 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_scrollable_set(input, EINA_TRUE);
    evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
@@ -266,6 +268,7 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_scrollable_set(input, EINA_TRUE);
    evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);

@@ -813,6 +813,7 @@ edi_mainview_goto_popup_show()
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_scrollable_set(input, EINA_TRUE);
    evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_goto_popup_key_up_cb, NULL);
    evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -874,6 +875,7 @@ edi_mainview_project_search_popup_show(void)
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_scrollable_set(input, EINA_TRUE);
    evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_goto_popup_key_up_cb, NULL);
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);

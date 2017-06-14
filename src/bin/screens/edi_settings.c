@@ -172,6 +172,8 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_settings_font_choose_cb, parent);
 
+   elm_object_focus_set(button, EINA_TRUE);
+
    check = elm_check_add(box);
    elm_object_text_set(check, "Display whitespace");
    elm_check_state_set(check, _edi_project_config->gui.show_whitespace);
@@ -324,6 +326,8 @@ _edi_settings_builds_create(Evas_Object *parent)
    evas_object_size_hint_align_set(selector, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, selector);
    evas_object_show(selector);
+
+   elm_object_focus_set(selector, EINA_TRUE);
 
    file = elm_label_add(hbox);
    elm_object_text_set(file, _edi_project_config->launch.path);
@@ -560,6 +564,8 @@ _edi_settings_behaviour_create(Evas_Object *parent)
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_behaviour_autosave_cb, NULL);
    evas_object_show(check);
+
+   elm_object_focus_set(check, EINA_TRUE);
 
    check = elm_check_add(box);
    elm_object_text_set(check, "Trim trailing whitespace");
