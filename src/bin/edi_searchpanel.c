@@ -72,22 +72,28 @@ _edi_searchpanel_line_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
 char *
 _edi_searchpanel_line_render(Elm_Code_Line *line, const char *path)
 {
-   unsigned int len;
+   unsigned int len, trim = 0;
    const char *text;
-
    static char buf[1024];
-   static char data[1024];
+   static char str[1016];
 
    text = elm_code_line_text_get(line, &len);
    if (!text)
      return NULL;
 
-   len++;
-   if (len > sizeof(data))
-     len = sizeof(data);
+   while (trim < len)
+     {
+        if (text[trim] != ' ' && text[trim] != '\t')
+          break;
+        trim++;
+     }
+   text += trim;
+   len -= trim;
+   if (len > sizeof(str) - 1)
+     len = sizeof(str) - 1;
 
-   snprintf(data, len, "%s", text);
-   snprintf(buf, sizeof(buf), "%s:%d -> %s", ecore_file_file_get(path), line->number, data);
+   snprintf(str, len + 1, "%s", text);
+   snprintf(buf, sizeof(buf), "%s:%d ->\t%s", ecore_file_file_get(path), line->number, str);
 
    return strdup(buf);
 }
@@ -130,6 +136,7 @@ _file_ignore(const char *filename)
         eina_str_has_extension(filename, ".JPG")   ||
         eina_str_has_extension(filename, ".JPEG")  ||
         eina_str_has_extension(filename, ".bmp")   ||
+        eina_str_has_extension(filename, ".dds")   ||
         eina_str_has_extension(filename, ".tgv")   ||
         eina_str_has_extension(filename, ".eet")   ||
         eina_str_has_extension(filename, ".edj")   ||
@@ -267,8 +274,6 @@ _tasks_begin_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    _edi_searchpanel_search_project(path, "TODO", _tasks_code);
    if (ecore_thread_check(_search_thread)) return;
    _edi_searchpanel_search_project(path, "FIXME", _tasks_code);
-   if (ecore_thread_check(_search_thread)) return;
-   _edi_searchpanel_search_project(path, "XXX", _tasks_code);
    if (ecore_thread_check(_search_thread)) return;
 }
 

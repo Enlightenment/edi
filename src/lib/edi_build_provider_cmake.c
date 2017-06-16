@@ -31,6 +31,9 @@ _cmake_file_hidden_is(const char *file)
    if (eina_str_has_extension(file, ".a") || eina_str_has_extension(file, ".la"))
      return EINA_TRUE;
 
+   if (!strcmp(ecore_file_file_get(file), "autom4te.cache"))
+     return EINA_TRUE;
+
    return EINA_FALSE;
 }
 
