@@ -322,24 +322,18 @@ _suggest_list_set(Edi_Editor *editor)
 static void
 _suggest_list_selection_insert(Edi_Editor *editor, const char *selection)
 {
-   Elm_Code *code;
-   Elm_Code_Line *line;
    char *word;
    unsigned int wordlen, col, row;
 
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
-   code = elm_code_widget_code_get(editor->entry);
-   line = elm_code_file_line_get(code->file, row);
    word = _edi_editor_current_word_get(editor, row, col);
    wordlen = strlen(word);
    free(word);
 
-   elm_code_line_text_remove(line, col - wordlen - 1, wordlen);
-   elm_code_line_text_insert(line, col - wordlen - 1, selection,
-                             strlen(selection));
-   elm_code_widget_cursor_position_set(editor->entry, row,
-                                       col - wordlen + strlen(selection));
+   elm_code_widget_selection_start(editor->entry, row, col - wordlen);
+   elm_code_widget_selection_end(editor->entry, row, col);
+   elm_code_widget_text_at_cursor_insert(editor->entry, selection);
 }
 
 static void
