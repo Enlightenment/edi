@@ -1056,10 +1056,12 @@ _edi_menu_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_edi_menu_setup(Evas_Object *obj)
+_edi_menu_setup(Evas_Object *win)
 {
-   Evas_Object *menu = obj;
+   Evas_Object *menu;
    Elm_Object_Item *menu_it;
+
+   menu = elm_win_main_menu_get(win);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "File", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "folder-new", "New Project ...", _edi_menu_project_new_cb, NULL);
@@ -1311,7 +1313,7 @@ _win_delete_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *win, *hbx, *vbx, *tb, *content, *menu, *menu_box;
+   Evas_Object *win, *hbx, *vbx, *tb, *content;
    const char *winname;
    char *path;
 
@@ -1330,20 +1332,6 @@ edi_open(const char *inputpath)
    win = elm_win_util_standard_add("main", winname);
    free((char*)winname);
    if (!win) return EINA_FALSE;
-
-   menu_box = elm_box_add(win);
-   elm_box_horizontal_set(menu_box, EINA_TRUE);
-   evas_object_size_hint_weight_set(menu_box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(menu_box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_win_resize_object_add(win, menu_box);
-   evas_object_show(menu_box);
-
-   menu = elm_win_main_menu_get(win);
-   _edi_menu_setup(menu);
-   evas_object_size_hint_weight_set(menu, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(menu, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(menu);
-   elm_box_pack_end(menu_box, menu);
 
    _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
@@ -1367,6 +1355,8 @@ edi_open(const char *inputpath)
    evas_object_size_hint_align_set(vbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(hbx, vbx);
    evas_object_show(vbx);
+
+   _edi_menu_setup(win);
 
    content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
