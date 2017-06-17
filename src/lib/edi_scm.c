@@ -149,6 +149,118 @@ _edi_scm_git_status(void)
    return code;
 }
 
+static Edi_Scm_Status *
+_parse_line(char *line)
+{
+   char *path, *change;
+   Edi_Scm_Status *status;
+
+   change = line;
+   line[2] = '\0';
+   path = line + 3;
+
+   status = malloc(sizeof(Edi_Scm_Status));
+   if (!status)
+     return NULL;
+
+   status->staged = EINA_FALSE;
+
+   if (change[0] == 'A' || change[1] == 'A')
+     {
+        status->change = EDI_SCM_STATUS_ADDED;
+        if (change[0] == 'A') status->staged = EINA_TRUE;
+     }
+   else if (change[0] == 'R' || change[1] == 'R')
+     {
+        status->change = EDI_SCM_STATUS_RENAMED;
+        if (change[0] == 'R') status->staged = EINA_TRUE;
+     }
+   else if (change[0] == 'M' || change[1] == 'M')
+     {
+        status->change = EDI_SCM_STATUS_MODIFIED;
+        if (change[0] == 'M') status->staged = EINA_TRUE;
+     }
+   else if (change[0] == 'D' || change[1] == 'D')
+     {
+        status->change = EDI_SCM_STATUS_DELETED;
+        if (change[0] == 'D') status->staged = EINA_TRUE;
+     }
+   else if (change[0] == '?' && change[1] == '?')
+     {
+        status->change = EDI_SCM_STATUS_UNTRACKED;
+     }
+   else
+        status->change = EDI_SCM_STATUS_UNKNOWN;
+
+   status->path = eina_stringshare_add(path);
+
+   return status;
+}
+
+static Eina_List *
+_edi_scm_git_status_get(void)
+{
+   char *output, *pos, *start, *end;
+   char *line;
+   size_t size;
+   Eina_Strbuf *command;
+   Edi_Scm_Status *status;
+   Eina_List *list = NULL;
+
+   command = eina_strbuf_new();
+
+   eina_strbuf_append(command, "git status --porcelain");
+
+   output = _edi_scm_exec_response(eina_strbuf_string_get(command));
+
+   eina_strbuf_free(command);
+
+   end = NULL;
+
+   pos = output;
+   start = pos;
+
+   while (*pos++)
+     {
+        if (*pos == '\n')
+          end = pos;
+        if (start && end)
+          {
+             size = end - start;
+             line = malloc(size + 1);
+             memcpy(line, start, size);
+             line[size] = '\0';
+
+             status = _parse_line(line);
+             if (status)
+               list = eina_list_append(list, status);
+
+             free(line);
+             start = end + 1;
+             end = NULL;
+          }
+     }
+
+   end = pos;
+   size = end - start;
+   if (size > 1)
+     {
+        line = malloc(size + 1);
+        memcpy(line, start, size);
+        line[size] = '\0';
+
+        status = _parse_line(line);
+        if (status)
+          list = eina_list_append(list, status);
+
+        free(line);
+    }
+
+   free(output);
+
+   return list;
+}
+
 static int
 _edi_scm_git_commit(const char *message)
 {
@@ -365,6 +477,19 @@ edi_scm_move(const char *src, const char *dest)
    return e->move(src, dest);
 }
 
+EAPI Eina_Bool
+edi_scm_status_get(void)
+{
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   e->statuses = e->status_get();
+
+   if (!e->statuses)
+     return EINA_FALSE;
+
+   return EINA_TRUE;
+}
+
 static void
 _edi_scm_commit_thread_cb(void *data, Ecore_Thread *thread)
 {
@@ -481,23 +606,24 @@ _edi_scm_git_init()
      return NULL;
 
    _edi_scm_global_object = engine = calloc(1, sizeof(Edi_Scm_Engine));
-   engine->name       = eina_stringshare_add("git");
-   engine->directory  = eina_stringshare_add(".git");
-   engine->file_add   = _edi_scm_git_file_add;
-   engine->file_mod   = _edi_scm_git_file_mod;
-   engine->file_del   = _edi_scm_git_file_del;
-   engine->move       = _edi_scm_git_file_move;
-   engine->status     = _edi_scm_git_status;
-   engine->commit     = _edi_scm_git_commit;
-   engine->pull       = _edi_scm_git_pull;
-   engine->push       = _edi_scm_git_push;
-   engine->stash      = _edi_scm_git_stash;
+   engine->name = eina_stringshare_add("git");
+   engine->directory = eina_stringshare_add(".git");
+   engine->file_add = _edi_scm_git_file_add;
+   engine->file_mod = _edi_scm_git_file_mod;
+   engine->file_del = _edi_scm_git_file_del;
+   engine->move = _edi_scm_git_file_move;
+   engine->status = _edi_scm_git_status;
+   engine->commit = _edi_scm_git_commit;
+   engine->pull = _edi_scm_git_pull;
+   engine->push = _edi_scm_git_push;
+   engine->stash = _edi_scm_git_stash;
 
-   engine->remote_add       = _edi_scm_git_remote_add;
-   engine->remote_name_get  = _edi_scm_git_remote_name_get;
+   engine->remote_add = _edi_scm_git_remote_add;
+   engine->remote_name_get = _edi_scm_git_remote_name_get;
    engine->remote_email_get = _edi_scm_git_remote_email_get;
-   engine->remote_url_get   = _edi_scm_git_remote_url_get;
-   engine->credentials_set  = _edi_scm_git_credentials_set;
+   engine->remote_url_get = _edi_scm_git_remote_url_get;
+   engine->credentials_set = _edi_scm_git_credentials_set;
+   engine->status_get = _edi_scm_git_status_get;
 
    return engine;
 }

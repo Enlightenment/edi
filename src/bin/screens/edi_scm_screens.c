@@ -75,8 +75,12 @@ void
 edi_scm_screens_commit(Evas_Object *parent)
 {
    Evas_Object *popup, *box, *hbox, *label, *avatar, *input, *button;
-   Eina_Strbuf *user;
+   Evas_Object *list, *icon;
+   Eina_Strbuf *state_text, *user;
+   Eina_List *l;
    Edi_Scm_Engine *engine;
+   Edi_Scm_Status *status;
+   Eina_Bool staged_changes;
 
    engine= edi_scm_engine_get();
    if (!engine)
@@ -121,11 +125,89 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_show(avatar);
    elm_box_pack_end(hbox, avatar);
 
+   label = elm_label_add(box);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(label, "<b>Summary<b>");
+   elm_box_pack_end(box, label);
+   evas_object_show(label);
+
+   list = elm_list_add(box);
+   elm_list_mode_set(list, ELM_LIST_EXPAND);
+   elm_list_select_mode_set(list, ELM_OBJECT_SELECT_MODE_NONE);
+   evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(box, list);
+
+   staged_changes = EINA_FALSE;
+
+   if (edi_scm_status_get())
+     {
+        state_text = eina_strbuf_new();
+        EINA_LIST_FOREACH(engine->statuses, l, status)
+          {
+             icon = elm_icon_add(box);
+             if (status->staged)
+               staged_changes = EINA_TRUE;
+
+             eina_strbuf_append_printf(state_text, "%s ", status->path);
+
+             switch (status->change)
+               {
+                case EDI_SCM_STATUS_ADDED:
+                  elm_icon_standard_set(icon, "document-new");
+                  eina_strbuf_append(state_text, "(add) ");
+                  break;
+                case EDI_SCM_STATUS_MODIFIED:
+                  elm_icon_standard_set(icon, "document-save-as");
+                  eina_strbuf_append(state_text, "(mod) ");
+                  break;
+                case EDI_SCM_STATUS_DELETED:
+                  elm_icon_standard_set(icon, "edit-delete");
+                  eina_strbuf_append(state_text, "(del) ");
+                  break;
+                case EDI_SCM_STATUS_RENAMED:
+                  elm_icon_standard_set(icon, "document-save-as");
+                  eina_strbuf_append(state_text, "(ren) ");
+                  break;
+                case EDI_SCM_STATUS_UNTRACKED:
+                  elm_icon_standard_set(icon, "dialog-question");
+                  eina_strbuf_append(state_text, "(untracked)");
+                  break;
+                default:
+                  elm_icon_standard_set(icon, "text-x-generic");
+               }
+
+             if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
+               eina_strbuf_append(state_text, "- unstaged");
+
+             elm_list_item_append(list, eina_strbuf_string_get(state_text), icon, NULL, NULL, NULL);
+
+             eina_strbuf_reset(state_text);
+
+             eina_stringshare_del(status->path);
+             free(status);
+          }
+        eina_strbuf_free(state_text);
+        eina_list_free(engine->statuses);
+        engine->statuses = NULL;
+     }
+   else
+     {
+        icon = elm_icon_add(box);
+        elm_icon_standard_set(icon, "dialog-information");
+        elm_list_item_append(list, "Nothing to commit.", icon, NULL, NULL, NULL);
+     }
+
+   elm_list_go(list);
+   evas_object_show(list);
+
    input = elm_entry_add(box);
-   elm_entry_editable_set(input, EINA_TRUE);
-   elm_object_text_set(input, "Enter commit summary<br><br>And change details");
+   elm_object_text_set(input, "Enter commit summary<br><br>And change details<br>");
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_entry_editable_set(input, staged_changes);
+   elm_object_style_set(input, "entry");
    evas_object_show(input);
    elm_box_pack_end(box, input);
 
@@ -138,10 +220,10 @@ edi_scm_screens_commit(Evas_Object *parent)
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
    elm_object_text_set(button, "commit");
+   elm_object_disabled_set(button, !staged_changes);
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_commit_cb, input);
-
    evas_object_show(popup);
    elm_object_focus_set(input, EINA_TRUE);
 }

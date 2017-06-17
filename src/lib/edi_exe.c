@@ -33,17 +33,29 @@ edi_exe_response(const char *command)
 {
    FILE *p;
    char buf[8192];
+   Eina_Strbuf *lines;
+   char *out;
+   ssize_t len;
 
    p = popen(command, "r");
    if (!p)
      return NULL;
 
-   buf[0] = '\0';
-   fgets(buf, sizeof(buf), p);
+   lines = eina_strbuf_new();
+
+   while ((fgets(buf, sizeof(buf), p)) != NULL)
+     {
+        eina_strbuf_append_printf(lines, "%s", buf);
+     }
 
    pclose(p);
 
-   if (strlen(buf) <= 1) return NULL;
+   len = eina_strbuf_length_get(lines);
+   eina_strbuf_remove(lines, len - 1, len);
 
-   return strndup(buf, strlen(buf) - 1);
+   out = strdup(eina_strbuf_string_get(lines));
+
+   eina_strbuf_free(lines);
+
+   return out;
 }

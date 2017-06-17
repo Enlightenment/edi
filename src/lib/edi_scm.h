@@ -25,12 +25,30 @@ typedef const char * (scm_fn_remote_name)(void);
 typedef const char * (scm_fn_remote_email)(void);
 typedef const char * (scm_fn_remote_url)(void);
 typedef int (scm_fn_credentials)(const char *name, const char *email);
+typedef Eina_List * (scm_fn_status_get)(void);
+
+typedef enum {
+   EDI_SCM_STATUS_ADDED = 1,
+   EDI_SCM_STATUS_DELETED,
+   EDI_SCM_STATUS_MODIFIED,
+   EDI_SCM_STATUS_RENAMED,
+   EDI_SCM_STATUS_UNTRACKED,
+   EDI_SCM_STATUS_UNKNOWN,
+} Edi_Scm_Status_Code;
+
+typedef struct _Edi_Scm_Status
+{
+   Eina_Stringshare *path;
+   Edi_Scm_Status_Code change;
+   Eina_Bool staged;
+} Edi_Scm_Status;
 
 typedef struct _Edi_Scm_Engine
 {
    const char     *name;
    const char     *directory;
    const char     *path;
+   Eina_List      *statuses;
 
    scm_fn_add     *file_add;
    scm_fn_mod     *file_mod;
@@ -47,6 +65,7 @@ typedef struct _Edi_Scm_Engine
    scm_fn_remote_email *remote_email_get;
    scm_fn_remote_url   *remote_url_get;
    scm_fn_credentials  *credentials_set;
+   scm_fn_status_get   *status_get;
 } Edi_Scm_Engine;
 
 /**
@@ -137,6 +156,13 @@ void edi_scm_commit(const char *message);
  * @ingroup Scm
  */
 void edi_scm_status(void);
+
+/**
+ * Get status of repository.
+ *
+ * @return State whether a change was registered (true/false).
+*/
+Eina_Bool edi_scm_status_get(void);
 
 /**
  * Move from src to dest.
