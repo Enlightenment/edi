@@ -199,6 +199,8 @@ edi_scm_screens_commit(Evas_Object *parent)
         elm_list_item_append(list, "Nothing to commit.", icon, NULL, NULL, NULL);
      }
 
+   elm_scroller_bounce_set(list, EINA_TRUE, EINA_TRUE);
+   elm_scroller_policy_set(list, ELM_SCROLLER_POLICY_AUTO, ELM_SCROLLER_POLICY_ON);
    elm_list_go(list);
    evas_object_show(list);
 
