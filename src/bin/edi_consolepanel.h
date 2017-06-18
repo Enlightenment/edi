@@ -23,7 +23,7 @@ extern "C" {
  */
 
 /**
- * Initialize a new Edi consolepanel and add it to the parent panel.
+ * Initialise a new Edi consolepanel and add it to the parent panel.
  *
  * @param parent The panel into which the panel will be loaded.
  *
@@ -39,7 +39,7 @@ void edi_consolepanel_add(Evas_Object *parent);
 void edi_consolepanel_show();
 
 /**
- * Initialize a new Edi testpanel and add it to the parent panel.
+ * Initialise a new Edi testpanel and add it to the parent panel.
  *
  * @param parent The panel into which the panel will be loaded.
  *

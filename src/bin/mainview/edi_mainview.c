@@ -408,7 +408,7 @@ _edi_mainview_mime_content_safe_popup(void)
 
    popup = elm_popup_add(_main_win);
    elm_object_part_text_set(popup, "title,text",
-                                   "Unrecognised file type");
+                                   "Unrecognized file type");
    label = elm_label_add(popup);
    elm_object_text_set(label, "To force open, select this file in the file browser, and use \"open as\" menu options.");
    evas_object_show(label);

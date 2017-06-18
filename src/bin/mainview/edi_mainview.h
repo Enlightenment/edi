@@ -28,7 +28,7 @@ extern "C" {
  */
 
 /**
- * Initialize a new Edi main view and add it to the parent panel.
+ * Initialise a new Edi main view and add it to the parent panel.
  *
  * @param parent The parent into which the panel will be loaded.
  * @param win The window the panel will be using

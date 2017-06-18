@@ -15,7 +15,7 @@ extern "C" {
 
 /**
  * @typedef Edi_Editor_Suggest_Item
- * A handle for passig a suggest item to the ui and back
+ * A handle for passing a suggest item to the ui and back
  */
 typedef struct _Edi_Language_Suggest_Item
 {
@@ -34,7 +34,7 @@ typedef struct _Edi_Language_Document
 /**
  * @struct Edi_Editor_Suggest_Provider
  * A description of the requirements for a suggestion provider.
- * This handles the set up and teardown of a provider as well as the lookup and
+ * This handles the set up and tear down of a provider as well as the lookup and
  * description lookup functions
  */
 typedef struct _Edi_Language_Provider
@@ -67,7 +67,7 @@ typedef struct _Edi_Language_Provider
 Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor);
 
 /**
- * Query whether a suggest provider is available for the spcified editor session.
+ * Query whether a suggest provider is available for the specified editor session.
  *
  * @param editor the editor session for a file you wish to get a suggestion provider for
  *

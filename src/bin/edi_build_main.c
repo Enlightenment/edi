@@ -197,7 +197,7 @@ main(int argc, char **argv)
        ((ret = _edi_build_action_try(provider, provider->test, "test", build_type)) == EXIT_NOACTION) &&
        ((ret = _edi_build_action_try(provider, provider->build, "build", build_type)) == EXIT_NOACTION))
      {
-        fprintf(stderr, "Unrecognised build type - try build, clean, create or test.\n");
+        fprintf(stderr, "Unrecognized build type - try build, clean, create or test.\n");
         goto end;
      }
    if (ret != EXIT_SUCCESS)

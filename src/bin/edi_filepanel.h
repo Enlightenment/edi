@@ -27,7 +27,7 @@ typedef void (*edi_filepanel_item_clicked_cb)(const char *path,
  */
 
 /**
- * Initialize a new Edi filepanel and add it to the parent panel.
+ * Initialise a new Edi filepanel and add it to the parent panel.
  *
  * @param parent The panel into which the panel will be loaded.
  * @param win The main window of the application.

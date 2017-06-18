@@ -144,7 +144,7 @@ int edi_scm_del(const char *path);
 /**
  * Set commit message for next commit to SCM.
  *
- * @param message The commit mesage to send.
+ * @param message The commit message to send.
  *
  * @ingroup Scm
  */

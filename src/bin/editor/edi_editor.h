@@ -77,7 +77,7 @@ struct _Edi_Editor
  */
 
 /**
- * Initialize a new Edi editor and add it to the parent panel.
+ * Initialise a new Edi editor and add it to the parent panel.
  *
  * @param parent The panel into which the panel will be loaded.
  * @param item The item describing the file to be loaded in the editor.

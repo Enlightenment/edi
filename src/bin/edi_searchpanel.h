@@ -24,7 +24,7 @@ extern "C" {
 
 
 /**
- * Initialize a new Edi searchpanel and add it to the parent panel.
+ * Initialise a new Edi searchpanel and add it to the parent panel.
  *
  * @param parent The panel into which the panel will be loaded.
  *

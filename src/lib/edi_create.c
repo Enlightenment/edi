@@ -250,7 +250,7 @@ _edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
 
    create = (Edi_Create *)data;
    snprintf(tmpinner, sizeof(tmpinner), "%s/%s", create->temp, create->skelfile);
-   tmpinner[strlen(tmpinner) - 7] = '\0'; // strip extensin
+   tmpinner[strlen(tmpinner) - 7] = '\0'; // strip extension
 
    ecore_event_handler_del(create->handler);
 

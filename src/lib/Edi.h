@@ -64,9 +64,9 @@ extern "C" {
  */
 
 /**
- * Initialize Edi.
+ * Initialise Edi.
  *
- * Initializes Edi, its dependencies and modules. Should be the first
+ * Initialises Edi, its dependencies and modules. Should be the first
  * function of Edi to be called.
  *
  * @return The init counter value.
