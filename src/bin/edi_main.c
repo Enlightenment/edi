@@ -338,6 +338,15 @@ edi_debugpanel_show()
      elm_toolbar_item_selected_set(_edi_debugpanel_item, EINA_TRUE);
 }
 
+static void
+_edi_toolbar_separator_add(Evas_Object *tb)
+{
+   Evas_Object *sep;
+   sep = elm_toolbar_item_append(tb, NULL, NULL, NULL, 0);
+   elm_toolbar_item_separator_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+}
+
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
@@ -415,7 +424,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 1.0);
-   elm_toolbar_icon_size_set(tb, 14);
+   elm_toolbar_icon_size_set(tb, 16);
    elm_object_style_set(tb, "item_horizontal");
    elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
@@ -423,18 +432,31 @@ edi_content_setup(Evas_Object *win, const char *path)
    elm_box_pack_end(content_out, tb);
    evas_object_show(tb);
 
+   _edi_toolbar_separator_add(tb);
+
    _edi_logpanel_item = elm_toolbar_item_append(tb, "stock_up", "Logs",
                                                 _edi_toggle_panel, "0");
+   _edi_toolbar_separator_add(tb);
+
    _edi_consolepanel_item = elm_toolbar_item_append(tb, "stock_up", "Console",
                                                     _edi_toggle_panel, "1");
+   _edi_toolbar_separator_add(tb);
+
    _edi_testpanel_item = elm_toolbar_item_append(tb, "stock_up", "Tests",
                                                  _edi_toggle_panel, "2");
+   _edi_toolbar_separator_add(tb);
+
    _edi_searchpanel_item = elm_toolbar_item_append(tb, "stock_up", "Search",
                                                  _edi_toggle_panel, "3");
+   _edi_toolbar_separator_add(tb);
+
    _edi_taskspanel_item = elm_toolbar_item_append(tb, "stock_up", "Tasks",
                                                   _edi_toggle_panel, "4");
+   _edi_toolbar_separator_add(tb);
+
    _edi_debugpanel_item = elm_toolbar_item_append(tb, "stock_up", "Debug",
                                                   _edi_toggle_panel, "5");
+   _edi_toolbar_separator_add(tb);
 
    // add lower panel panes
    logpanels = elm_table_add(logpane);
