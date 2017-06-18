@@ -81,8 +81,8 @@ static void
 _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info)
 {
    Evas_Event_Key_Down *event;
-   const char *text; 
-   char *command;
+   const char *text_markup;
+   char *command, *text;
    Eina_Bool res;
 
    event = event_info;
@@ -95,8 +95,9 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
      {
         if (!_debug_exe) return;
 
-        text = elm_object_part_text_get(_entry_widget, NULL);
-        if (strlen(text))
+        text_markup = elm_object_part_text_get(_entry_widget, NULL);
+        text = elm_entry_markup_to_utf8(text_markup);
+        if (text)
           {
              command = malloc(strlen(text) + 2);
              snprintf(command, strlen(text) + 2, "%s\n", text);
@@ -105,6 +106,7 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
                elm_code_file_line_append(_debug_output->file, command, strlen(command) - 1, NULL);
 
              free(command);
+             free(text);
           }
         elm_object_part_text_set(_entry_widget, NULL, "");
      }

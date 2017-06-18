@@ -849,13 +849,18 @@ _edi_mainview_project_search_cb(void *data,
                              Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
 {
-   const char *text;
+   const char *text_markup;
+   char *text;
 
-   text = elm_entry_entry_get((Evas_Object *) data);
-   if (!text || strlen(text) == 0) return;
+   text_markup = elm_object_text_get((Evas_Object *) data);
+   if (!text_markup || !text_markup[0]) return;
+
+   text = elm_entry_markup_to_utf8(text_markup);
 
    edi_searchpanel_show();
    edi_searchpanel_find(text);
+
+   free(text);
    evas_object_del(_edi_mainview_search_project_popup);
 }
 

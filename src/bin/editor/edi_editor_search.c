@@ -87,7 +87,7 @@ _edi_search_term_changed(Edi_Editor_Search *search, const char *text)
 }
 
 static void
-_edi_search_cache_use(Edi_Editor_Search *search, const char **text EINA_UNUSED, Elm_Code_Line **line EINA_UNUSED, int *found)
+_edi_search_cache_use(Edi_Editor_Search *search, char **text, Elm_Code_Line **line, int *found)
 {
    *text = search->first_result.text;
    *line = search->first_result.line;
@@ -103,17 +103,20 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    Eina_List *item;
    Elm_Code *code;
    Elm_Code_Line *line;
-   const char *text;
+   const char *text_markup;
+   char *text;
    unsigned int offset, pos_line, pos_col;
    int found;
    search->wrap = elm_check_state_get(search->checkbox);
 
-   text = elm_object_text_get(search->entry);
-   if (!text || !*text)
+   text_markup = elm_object_text_get(search->entry);
+   if (!text_markup || !text_markup[0])
      {
         search->term_found = EINA_FALSE;
         return EINA_FALSE;
      }
+
+   text = elm_entry_markup_to_utf8(text_markup);
 
    code = elm_code_widget_code_get(entry);
    elm_code_widget_cursor_position_get(entry, &pos_line, &pos_col);
@@ -190,6 +193,8 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    elm_code_widget_selection_end(entry, search->current_search_line,
                                  elm_code_widget_line_text_column_width_to_position(entry, line, found + strlen(text)) - 1);
 
+   free(text);
+
    return EINA_TRUE;
 }
 
@@ -215,7 +220,8 @@ static void
 _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
 {
    Edi_Editor *editor;
-   const char *replace;
+   const char *replace_markup;
+   char *replace = NULL;
 
    editor = (Edi_Editor *)data;
    // If there is no search term found to replace, then do a new search first.
@@ -228,8 +234,10 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
         if (search->current_search_line)
           {
              elm_code_widget_selection_delete(editor->entry);
-             replace = elm_object_text_get(search->replace_entry);
-             elm_code_widget_text_at_cursor_insert(editor->entry, replace);
+             replace_markup = elm_object_text_get(search->replace_entry);
+             replace = elm_entry_markup_to_utf8(replace_markup);
+             if (strlen(replace))
+               elm_code_widget_text_at_cursor_insert(editor->entry, replace);
 
              search->current_search_line = 0;
           }
@@ -239,6 +247,9 @@ _edi_replace_in_entry(void *data, Edi_Editor_Search *search)
 
         _edi_search_in_entry(editor->entry, search);
      }
+
+  if (replace)
+     free(replace);
 
    return;
 }
