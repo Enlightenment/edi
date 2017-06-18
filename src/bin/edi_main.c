@@ -1060,6 +1060,10 @@ _edi_menu_setup(Evas_Object *win)
 {
    Evas_Object *menu;
    Elm_Object_Item *menu_it;
+   static Eina_Bool setup = EINA_FALSE;
+
+   if (setup) return;
+   setup = EINA_TRUE;
 
    menu = elm_win_main_menu_get(win);
 
