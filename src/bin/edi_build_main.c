@@ -154,7 +154,8 @@ main(int argc, char **argv)
         goto end;
      }
 
-   getcwd(path, PATH_MAX);
+   if (!getcwd(path, PATH_MAX))
+     goto end;
    edi_project_set(path);
 
    if (!edi_builder_can_build())

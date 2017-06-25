@@ -44,7 +44,8 @@ _python_file_hidden_is(const char *file)
 static void
 _python_test(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("python -m unittest", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);

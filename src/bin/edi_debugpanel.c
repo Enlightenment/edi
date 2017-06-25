@@ -207,8 +207,9 @@ _edi_debug_process_id(int *state)
         snprintf(path, sizeof(path), "/proc/%d/cmdline", pid);
         f = fopen(path, "r");
         if (!f) continue;
-        fgets(buf, sizeof(buf), f);
+        p = fgets(buf, sizeof(buf), f);
         fclose(f);
+        if (!p) continue;
         temp_name = ecore_file_file_get(buf);
         if (!strcmp(temp_name, program_name))
           {
@@ -220,8 +221,7 @@ _edi_debug_process_id(int *state)
              if (f)
                {
                   count = 0;
-                  fgets(buf, sizeof(buf), f);
-                  p = buf;
+                  p = fgets(buf, sizeof(buf), f);
                   while (*p++ != '\0')
                     {
                        if (p[0] == ' ') { count++; p++; }
