@@ -47,7 +47,8 @@ _make_file_hidden_is(const char *file)
 static void
 _make_build_make(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run(BEAR_COMMAND MAKE_COMMAND, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -56,7 +57,8 @@ _make_build_make(void)
 static void
 _make_build_configure(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("./configure && " BEAR_COMMAND MAKE_COMMAND,
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
@@ -66,7 +68,8 @@ _make_build_configure(void)
 static void
 _make_build_autogen(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND MAKE_COMMAND,
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
@@ -87,6 +90,8 @@ _make_build(void)
 static void
 _make_test(void)
 {
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    chdir(edi_project_get());
    ecore_exe_pipe_run("env CK_VERBOSITY=verbose" MAKE_COMMAND " check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
@@ -96,7 +101,8 @@ _make_test(void)
 static void
 _make_clean(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) !=0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);

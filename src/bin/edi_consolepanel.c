@@ -230,7 +230,9 @@ _edi_test_line_parse_suite(const char *path)
 
    pathlength = strlen(path);
    snprintf(logfile, pathlength + 4 + 1, "%s.log", path);
-   realpath(logfile, logpath);
+   if (!realpath(logfile, logpath))
+     ERR("Log file not found: %s", logfile);
+
    if (_current_test_dir)
      eina_stringshare_del(_current_test_dir);
    _current_test_dir = eina_stringshare_add(dirname(logpath));

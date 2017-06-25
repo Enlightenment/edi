@@ -40,7 +40,8 @@ _cmake_file_hidden_is(const char *file)
 static void
 _cmake_build(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("mkdir -p build && cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && cd ..",
                               ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
@@ -50,7 +51,8 @@ _cmake_build(void)
 static void
 _cmake_test(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
@@ -59,7 +61,8 @@ _cmake_test(void)
 static void
 _cmake_clean(void)
 {
-   chdir(edi_project_get());
+   if (chdir(edi_project_get()) != 0)
+     ERR("Could not chdir");
    ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);

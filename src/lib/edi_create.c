@@ -162,7 +162,8 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
    handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_create_project_done, data);
    create->handler = handler;
 
-   chdir(create->path);
+   if (chdir(create->path) != 0)
+     ERR("Could not chdir");
 
    command = eina_strbuf_new();
 
