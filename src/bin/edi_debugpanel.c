@@ -400,7 +400,7 @@ void edi_debugpanel_start(void)
    char cmd[1024];
    char *args;
    int len;
-   const char *mime, *fmt = "set args %s\n";
+   const char *warning, *mime, *fmt;
 
    if (!_edi_project_config->launch.path)
      {
@@ -409,6 +409,13 @@ void edi_debugpanel_start(void)
      }
 
    if (_debug_exe) return;
+
+   if (!ecore_file_exists(_edi_project_config->launch.path))
+     {
+        warning = "Warning: executable does not exists (run make?)";
+        elm_code_file_line_append(_debug_output->file, warning, strlen(warning), NULL);
+        return;
+     }
 
    mime = efreet_mime_type_get(_edi_project_config->launch.path);
    if (!strcmp(mime, "application/x-shellscript"))
@@ -429,6 +436,7 @@ void edi_debugpanel_start(void)
 
    if (_edi_project_config->launch.args)
      {
+        fmt = "set args %s\n";
         len = strlen(fmt) + strlen(_edi_project_config->launch.args) + 1;
         args = malloc(len);
         snprintf(args, len, fmt, _edi_project_config->launch.args);
