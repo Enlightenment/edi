@@ -2,12 +2,16 @@
 # include "config.h"
 #endif
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__) || defined(__OpenBSD__)
  #include <unistd.h>
  #include <sys/types.h>
  #include <sys/sysctl.h>
  #include <sys/user.h>
 #endif
+#if defined(__OpenBSD__)
+ #include <sys/proc.h>
+#endif
+
 #include <Eo.h>
 #include <Eina.h>
 #include <Elementary.h>
@@ -56,7 +60,9 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
       { 
          if (ev->size >= (int)(sizeof(buf) -2)) return ECORE_CALLBACK_DONE;
          
-         snprintf(buf, ev->size + 1, "%s", (char *)ev->data);
+         memcpy(buf, ev->data, ev->size);
+         buf[ev->size] = 0;
+
          pos = buf;
          start = pos;
          if (*start == '\n') start++;
@@ -133,9 +139,9 @@ _edi_debug_process_id(int *state)
 {
    const char *program_name;
    int my_pid, child_pid = -1;
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__) || defined(__OpenBSD__)
    struct kinfo_proc kp;
-   int mib[4];
+   int mib[6];
    size_t len;
    int max_pid, i;
 
@@ -143,20 +149,37 @@ _edi_debug_process_id(int *state)
 
    if (!_debug_exe) return -1;
 
+#if defined(__FreeBSD__) || defined(__DragonFly__)
    len = sizeof(max_pid);
    max_pid = _sysctlfromname("kern.lastpid", mib, 2, &len);
-
+#elif defined(PID_MAX)
+   max_pid = PID_MAX;
+#else
+   max_pid = 99999;
+#endif
    my_pid = ecore_exe_pid_get(_debug_exe);
 
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
    if (sysctlnametomib("kern.proc.pid", mib, &len) < 0) return -1;
-
+#elif defined(__OpenBSD__)
+   mib[0] = CTL_KERN;
+   mib[1] = KERN_PROC;
+   mib[2] = KERN_PROC_PID;
+   mib[4] = sizeof(struct kinfo_proc);
+   mib[5] = 1;
+#endif
    program_name = ecore_file_file_get(_edi_project_config->launch.path);
 
    for (i = my_pid; i <= max_pid; i++)
      {
         mib[3] = i;
         len = sizeof(kp);
-        sysctl(mib, 4, &kp, &len, NULL, 0);
+#if defined(__OpenBSD__)
+        if (sysctl(mib, 6, &kp, &len, NULL, 0) == -1) continue;
+#else
+        if (sysctl(mib, 4, &kp, &len, NULL, 0) == -1) continue;
+#endif
+
 #if defined(__FreeBSD__) || defined(__DragonFly__)
         if (kp.ki_ppid != my_pid) continue;
         if (strcmp(program_name, kp.ki_comm)) continue;
@@ -168,7 +191,19 @@ _edi_debug_process_id(int *state)
              else
                *state = DEBUG_PROCESS_SLEEPING;
           }
-#else
+#elif defined(__OpenBSD__)
+        if (kp.p_ppid != my_pid) continue;
+        if (strcmp(program_name, kp.p_comm)) continue;
+        child_pid = kp.p_pid;
+
+        if (state)
+          {
+             if (kp.p_stat == SRUN || kp.p_stat == SSLEEP)
+               *state = DEBUG_PROCESS_ACTIVE;
+             else
+               *state = DEBUG_PROCESS_SLEEPING;
+          }
+#else /* APPLE */
         if (kp.kp_proc.p_oppid != my_pid) continue;
         if (strcmp(program_name, kp.kp_proc.p_comm)) continue;
         child_pid = kp.kp_proc.p_pid;
