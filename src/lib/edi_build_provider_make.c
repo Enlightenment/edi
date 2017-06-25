@@ -3,6 +3,7 @@
 #endif
 
 #include <unistd.h>
+#include <Eina.h>
 #include <Ecore.h>
 #include <Ecore_File.h>
 
@@ -44,12 +45,29 @@ _make_file_hidden_is(const char *file)
    return EINA_FALSE;
 }
 
+static const char *
+_make_comand_compound_get(const char *prepend, const char *append)
+{
+   const char *cmd;
+   Eina_Strbuf *buf;
+
+   buf = eina_strbuf_new();
+   eina_strbuf_append_printf(buf, "%s" BEAR_COMMAND MAKE_COMMAND " -j %d %s", prepend, eina_cpu_count(), append);
+   cmd = eina_strbuf_release(buf);
+
+   return cmd;
+}
+
 static void
 _make_build_make(void)
 {
+   static const char *cmd = NULL;
+   if (!cmd)
+     cmd = _make_comand_compound_get("", "");
+
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run(BEAR_COMMAND MAKE_COMMAND, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -57,10 +75,13 @@ _make_build_make(void)
 static void
 _make_build_configure(void)
 {
+   static const char *cmd = NULL;
+   if (!cmd)
+     cmd = _make_comand_compound_get("./configure && ", "");
+
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("./configure && " BEAR_COMMAND MAKE_COMMAND,
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -68,10 +89,13 @@ _make_build_configure(void)
 static void
 _make_build_autogen(void)
 {
+   static const char *cmd = NULL;
+   if (!cmd)
+     cmd = _make_comand_compound_get("./autogen.sh && ", "");
+
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("./autogen.sh && " BEAR_COMMAND MAKE_COMMAND,
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -90,10 +114,14 @@ _make_build(void)
 static void
 _make_test(void)
 {
+   static const char *cmd = NULL;
+   if (!cmd)
+     cmd = _make_comand_compound_get("env CK_VERBOSITY=verbose ", "check");
+
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
    chdir(edi_project_get());
-   ecore_exe_pipe_run("env CK_VERBOSITY=verbose" MAKE_COMMAND " check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
@@ -101,9 +129,13 @@ _make_test(void)
 static void
 _make_clean(void)
 {
+   static const char *cmd = NULL;
+   if (!cmd)
+     cmd = _make_comand_compound_get("", "clean");
+
    if (chdir(edi_project_get()) !=0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                               ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                               ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 }
