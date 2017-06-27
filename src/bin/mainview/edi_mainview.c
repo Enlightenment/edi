@@ -331,7 +331,7 @@ _edi_mainview_item_tab_add(Edi_Path_Options *options, const char *mime)
           edi_mainview_goto(options->line);
      }
 
-   _edi_project_config_tab_add(options->path, options->type, EINA_FALSE);
+   _edi_project_config_tab_add(options->path, mime?mime:options->type, EINA_FALSE);
 }
 
 static void
@@ -391,7 +391,7 @@ _edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
    evas_object_show(win);
 
-   _edi_project_config_tab_add(options->path, options->type, EINA_TRUE);
+   _edi_project_config_tab_add(options->path, mime?mime:options->type, EINA_TRUE);
 }
 
 static void
@@ -500,6 +500,18 @@ edi_mainview_open(Edi_Path_Options *options)
      {
         eio_file_direct_stat(options->path, _edi_mainview_tab_stat_done, dummy, options);
      }
+   else if (!edi_content_provider_for_id_get(options->type))
+     {
+        const char *mime = options->type;
+        Edi_Content_Provider *provider = edi_content_provider_for_mime_get(mime);
+
+        if (provider)
+          options->type = provider->id;
+        else
+          options->type = NULL;
+
+        _edi_mainview_item_tab_add(options, mime);
+     }
    else
      {
         _edi_mainview_item_tab_add(options, NULL);
@@ -532,6 +544,18 @@ edi_mainview_open_window(Edi_Path_Options *options)
    if (options->type == NULL)
      {
         eio_file_direct_stat(options->path, _edi_mainview_win_stat_done, dummy, options);
+     }
+   else if (!edi_content_provider_for_id_get(options->type))
+     {
+        const char *mime = options->type;
+        Edi_Content_Provider *provider = edi_content_provider_for_mime_get(mime);
+
+        if (provider)
+          options->type = provider->id;
+        else
+          options->type = NULL;
+
+        _edi_mainview_item_win_add(options, mime);
      }
    else
      {

@@ -109,7 +109,7 @@ Edi_Content_Provider *edi_content_provider_for_id_get(const char *id)
    provider = _edi_content_provider_registry;
    while (provider != NULL && provider->id != NULL)
      {
-        if (!strncmp(id, provider->id, strlen(provider->id)))
+        if (!strncmp(id, provider->id, strlen(id)))
           return provider;
 
         provider++;
