@@ -21,6 +21,12 @@
 
 #include "edi_private.h"
 
+#if defined (__APPLE__)
+ #define LIBTOOL_COMMAND "glibtool"
+#else
+ #define LIBTOOL_COMMAND "libtool"
+#endif
+
 static Ecore_Exe *_debug_exe = NULL;
 static Evas_Object *_info_widget, *_entry_widget, *_button_start, *_button_quit;
 static Evas_Object *_button_int, *_button_term;
@@ -424,7 +430,7 @@ void edi_debugpanel_start(void)
 
    mime = efreet_mime_type_get(_edi_project_config->launch.path);
    if (!strcmp(mime, "application/x-shellscript"))
-     snprintf(cmd, sizeof(cmd), "libtool --mode execute gdb %s", _edi_project_config->launch.path);
+     snprintf(cmd, sizeof(cmd), LIBTOOL_COMMAND " --mode execute gdb %s", _edi_project_config->launch.path);
    else
      snprintf(cmd, sizeof(cmd), "gdb %s", _edi_project_config->launch.path);
 
