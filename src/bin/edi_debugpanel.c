@@ -129,7 +129,7 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
      }
 }
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__)
+#if defined(__FreeBSD__) || defined(__DragonFly__)
 
 static long int
 _sysctlfromname(const char *name, void *mib, int depth, size_t *len)
