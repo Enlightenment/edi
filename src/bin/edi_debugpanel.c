@@ -52,24 +52,28 @@ static Eina_Bool
 _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *event)
 {
    Ecore_Exe_Event_Data *ev;
-   char buf[65535];
-   char *pos, *start, *end = NULL;
-
+   int idx;
+   char *start, *end = NULL;
    ev = event;
-   if (ev)
-      { 
-         if (ev->size >= (int)(sizeof(buf) -2)) return ECORE_CALLBACK_DONE;
-         
-         memcpy(buf, ev->data, ev->size);
-         buf[ev->size] = 0;
 
-         pos = buf;
-         start = pos;
-         if (*start == '\n') start++;
-         while (*pos++ != '\0')
+   if (ev && ev->size)
+      { 
+         if (!ev->data) return ECORE_CALLBACK_DONE;
+
+         char buf[ev->size + 1];
+         memcpy(buf, ev->data, ev->size);
+         buf[ev->size] = '\0';
+
+         idx = 0;
+
+         if (buf[idx] == '\n')
+           idx++;
+
+         start = &buf[idx];
+         while (idx < ev->size)
            {
-              if (*pos == '\n')
-                end = pos;
+              if (buf[idx] == '\n')
+                end = &buf[idx];
           
               if (start && end)
                 {
@@ -77,6 +81,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
                    start = end + 1;
                    end = NULL;
                 }
+              idx++;
            }
     }
 
