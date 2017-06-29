@@ -242,12 +242,12 @@ _edi_toggle_file_panel(void *data, Evas_Object *obj EINA_UNUSED, void *event_inf
 
    if (size == 0.0)
      {
-        elm_icon_standard_set(_edi_filepanel_icon, "stock_left");
+        elm_icon_standard_set(_edi_filepanel_icon, "go-previous");
         _edi_slide_panel_new(_edi_leftpanes, panel, _edi_project_config->gui.leftsize, EINA_TRUE, EINA_TRUE);
      }
    else
      {
-        elm_icon_standard_set(_edi_filepanel_icon, "stock_right");
+        elm_icon_standard_set(_edi_filepanel_icon, "go-next");
         _edi_slide_panel_new(_edi_leftpanes, panel, _edi_project_config->gui.leftsize, EINA_FALSE, EINA_TRUE);
      }
 }
@@ -273,7 +273,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 
    if (item == _edi_selected_bottompanel)
      {
-        elm_toolbar_item_icon_set(item, "stock_up");
+        elm_toolbar_item_icon_set(item, "go-up");
 
         _edi_slide_panel_new(_edi_bottompanes, panel, _edi_project_config->gui.bottomsize, EINA_FALSE, EINA_FALSE);
         _edi_selected_bottompanel = NULL;
@@ -281,8 +281,8 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
    else
      {
         if (_edi_selected_bottompanel)
-          elm_toolbar_item_icon_set(_edi_selected_bottompanel, "stock_up");
-        elm_toolbar_item_icon_set(item, "stock_down");
+          elm_toolbar_item_icon_set(_edi_selected_bottompanel, "go-up");
+        elm_toolbar_item_icon_set(item, "go-down");
 
         size = elm_panes_content_right_size_get(_edi_bottompanes);
         if (size == 0.0)
@@ -382,9 +382,9 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    icon = elm_icon_add(content_in);
    if (_edi_project_config->gui.leftopen)
-     elm_icon_standard_set(icon, "stock_left");
+     elm_icon_standard_set(icon, "go-previous");
    else
-     elm_icon_standard_set(icon, "stock_right");
+     elm_icon_standard_set(icon, "go-next");
    button = elm_button_add(content_in);
    elm_object_part_content_set(button, "icon", icon);
    elm_object_focus_allow_set(button, EINA_FALSE);
@@ -434,27 +434,27 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    _edi_toolbar_separator_add(tb);
 
-   _edi_logpanel_item = elm_toolbar_item_append(tb, "stock_up", "Logs",
+   _edi_logpanel_item = elm_toolbar_item_append(tb, "go-up", "Logs",
                                                 _edi_toggle_panel, "0");
    _edi_toolbar_separator_add(tb);
 
-   _edi_consolepanel_item = elm_toolbar_item_append(tb, "stock_up", "Console",
+   _edi_consolepanel_item = elm_toolbar_item_append(tb, "go-up", "Console",
                                                     _edi_toggle_panel, "1");
    _edi_toolbar_separator_add(tb);
 
-   _edi_testpanel_item = elm_toolbar_item_append(tb, "stock_up", "Tests",
+   _edi_testpanel_item = elm_toolbar_item_append(tb, "go-up", "Tests",
                                                  _edi_toggle_panel, "2");
    _edi_toolbar_separator_add(tb);
 
-   _edi_searchpanel_item = elm_toolbar_item_append(tb, "stock_up", "Search",
+   _edi_searchpanel_item = elm_toolbar_item_append(tb, "go-up", "Search",
                                                  _edi_toggle_panel, "3");
    _edi_toolbar_separator_add(tb);
 
-   _edi_taskspanel_item = elm_toolbar_item_append(tb, "stock_up", "Tasks",
+   _edi_taskspanel_item = elm_toolbar_item_append(tb, "go-up", "Tasks",
                                                   _edi_toggle_panel, "4");
    _edi_toolbar_separator_add(tb);
 
-   _edi_debugpanel_item = elm_toolbar_item_append(tb, "stock_up", "Debug",
+   _edi_debugpanel_item = elm_toolbar_item_append(tb, "go-up", "Debug",
                                                   _edi_toggle_panel, "5");
    _edi_toolbar_separator_add(tb);
 
@@ -503,32 +503,32 @@ edi_content_setup(Evas_Object *win, const char *path)
         elm_panes_content_right_size_set(logpane, _edi_project_config->gui.bottomsize);
         if (_edi_project_config->gui.bottomtab == 1)
           {
-             elm_toolbar_item_icon_set(_edi_consolepanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_consolepanel_item, "go-down");
              _edi_selected_bottompanel = _edi_consolepanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 2)
           {
-             elm_toolbar_item_icon_set(_edi_testpanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_testpanel_item, "go-down");
              _edi_selected_bottompanel = _edi_testpanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 3)
           {
-             elm_toolbar_item_icon_set(_edi_searchpanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_searchpanel_item, "go-down");
              _edi_selected_bottompanel = _edi_searchpanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 4)
           {
-             elm_toolbar_item_icon_set(_edi_taskspanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_taskspanel_item, "go-down");
              _edi_selected_bottompanel = _edi_taskspanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 5)
           {
-             elm_toolbar_item_icon_set(_edi_debugpanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_debugpanel_item, "go-down");
              _edi_selected_bottompanel = _edi_debugpanel_item;
           }
         else
           {
-             elm_toolbar_item_icon_set(_edi_logpanel_item, "stock_down");
+             elm_toolbar_item_icon_set(_edi_logpanel_item, "go-down");
              _edi_selected_bottompanel = _edi_logpanel_item;
           }
      }
