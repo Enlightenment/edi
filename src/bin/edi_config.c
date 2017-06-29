@@ -353,7 +353,8 @@ _edi_config_project_add(const char *path)
 
    EINA_LIST_FOREACH_SAFE(_edi_config->projects, list, next, project)
      {
-        if (!strncmp(project->path, path, strlen(project->path)))
+        if (strlen(project->path) == strlen(path) &&
+            !strncmp(project->path, path, strlen(project->path)))
           _edi_config->projects = eina_list_remove_list(_edi_config->projects, list);
      }
 
