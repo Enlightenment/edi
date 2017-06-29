@@ -50,25 +50,30 @@ _edi_scm_screens_commit_cb(void *data,
                            void *event_info EINA_UNUSED)
 {
    Edi_Scm_Engine *engine;
-   const char *message;
+   const char *text;
+   char *message;
 
    engine = edi_scm_engine_get();
    // engine has been checked before now
    if (!engine)
      return;
 
-   message = elm_entry_entry_get((Evas_Object *) data);
-   if (!message || strlen(message) == 0)
+   text = elm_entry_entry_get((Evas_Object *) data);
+   if (!text || !text[0])
      {
         _edi_scm_screens_message_open("Please enter a valid commit message.");
         return;
      }
+
+   message = elm_entry_markup_to_utf8(text);
 
    edi_consolepanel_clear();
    edi_consolepanel_show();
    edi_scm_commit(message);
 
    evas_object_del(_popup);
+
+   free(message);
 }
 
 void
