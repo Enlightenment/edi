@@ -1336,25 +1336,6 @@ _win_delete_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event
    edi_close();
 }
 
-static void
-_win_cb_key_down(void *data, Evas *e EINA_UNUSED,
-                 Evas_Object *obj EINA_UNUSED, void *event)
-{
-   Eina_Bool ctrl, alt, shift;
-   Evas_Event_Key_Down *ev = event;
-   Evas_Object *win = data;
-
-   ctrl = evas_key_modifier_is_set(ev->modifiers, "Ctrl");
-   alt = evas_key_modifier_is_set(ev->modifiers, "Alt");
-   shift = evas_key_modifier_is_set(ev->modifiers, "Shift");
-
-   if (!ctrl && alt && !shift)
-     {
-        if (!strcmp(ev->key, "f"))
-          _edi_menu_setup(win);
-     }
-}
-
 Eina_Bool
 edi_open(const char *inputpath)
 {
@@ -1401,6 +1382,8 @@ edi_open(const char *inputpath)
    elm_box_pack_end(hbx, vbx);
    evas_object_show(vbx);
 
+   _edi_menu_setup(win);
+
    content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -1422,9 +1405,6 @@ edi_open(const char *inputpath)
    ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_SAVED, _edi_file_saved, NULL);
-
-   evas_object_event_callback_add(win, EVAS_CALLBACK_KEY_DOWN,
-                                  _win_cb_key_down, win);
 
    free(path);
    return EINA_TRUE;
