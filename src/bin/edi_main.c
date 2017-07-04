@@ -344,7 +344,6 @@ _edi_toolbar_separator_add(Evas_Object *tb)
    Evas_Object *sep;
    sep = elm_toolbar_item_append(tb, NULL, NULL, NULL, 0);
    elm_toolbar_item_separator_set(sep, EINA_TRUE);
-   evas_object_show(sep);
 }
 
 static Evas_Object *
@@ -1080,7 +1079,7 @@ _edi_menu_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 static void
 _edi_menu_setup(Evas_Object *win)
 {
-   Evas_Object *menu;
+   Evas_Object *menu = elm_win_main_menu_get(win);
    Elm_Object_Item *menu_it;
    static Eina_Bool setup = EINA_FALSE;
 
@@ -1154,12 +1153,12 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 }
 
 static Evas_Object *
-edi_toolbar_setup(Evas_Object *win)
+edi_toolbar_setup(Evas_Object *parent)
 {
    Evas_Object *tb;
    Elm_Object_Item *tb_it;
 
-   tb = elm_toolbar_add(win);
+   tb = elm_toolbar_add(parent);
    elm_toolbar_horizontal_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
@@ -1340,7 +1339,7 @@ Eina_Bool
 edi_open(const char *inputpath)
 {
    Evas_Object *win, *hbx, *vbx, *tb, *content;
-   const char *winname;
+   char *winname;
    char *path;
 
    if (!edi_project_set(inputpath))
@@ -1356,10 +1355,12 @@ edi_open(const char *inputpath)
 
    winname = _edi_win_title_get();
    win = elm_win_util_standard_add("main", winname);
-   free((char*)winname);
+   free(winname);
    if (!win) return EINA_FALSE;
 
    _edi_main_win = win;
+   _edi_menu_setup(win);
+
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
@@ -1373,6 +1374,7 @@ edi_open(const char *inputpath)
    evas_object_show(hbx);
 
    tb = edi_toolbar_setup(hbx);
+   elm_box_pack_start(hbx, tb);
    _edi_toolbar = tb;
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
 
@@ -1389,11 +1391,6 @@ edi_open(const char *inputpath)
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbx, content);
 
-   ERR("Loaded project at %s", path);
-   evas_object_resize(win, _edi_project_config->gui.width * elm_config_scale_get(),
-                      _edi_project_config->gui.height * elm_config_scale_get());
-   evas_object_show(win);
-
    _edi_config_project_add(path);
    _edi_open_tabs();
    edi_scm_init();
@@ -1405,6 +1402,11 @@ edi_open(const char *inputpath)
    ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_SAVED, _edi_file_saved, NULL);
+
+   ERR("Loaded project at %s", path);
+   evas_object_resize(win, _edi_project_config->gui.width * elm_config_scale_get(),
+                      _edi_project_config->gui.height * elm_config_scale_get());
+   evas_object_show(win);
 
    free(path);
    return EINA_TRUE;
