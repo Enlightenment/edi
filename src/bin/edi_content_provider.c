@@ -10,6 +10,8 @@
 
 #include "edi_config.h"
 
+#include "language/edi_language_provider.h"
+
 #include "edi_private.h"
 
 // TODO move out to edi_content.c or similar just like the editor type
@@ -72,17 +74,17 @@ static Edi_Content_Provider _edi_content_provider_registry[] =
 Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 {
    const char *id = NULL;
+   Edi_Language_Provider *provider;
 
    if (!mime)
      return NULL;
 
-   if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
+   provider = edi_language_provider_for_mime_get(mime);
+
+   if (!!provider)
+     id = "code";
+   else if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
      id = "text";
-   else if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc")
-            || !strcasecmp(mime, "text/x-modelica"))
-     id = "code";
-   else if (!strcasecmp(mime, "text/x-c++src") || !strcasecmp(mime, "text/x-c++hdr"))
-     id = "code";
    else if (!strncasecmp(mime, "image/", 6))
      id = "image";
    else if (!strcasecmp(mime, "text/x-diff") || !strcasecmp(mime, "text/x-patch"))

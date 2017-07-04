@@ -45,6 +45,15 @@ _make_file_hidden_is(const char *file)
    return EINA_FALSE;
 }
 
+static Eina_Bool
+_make_project_runnable_is(const char *path)
+{
+   if (!path || !path[0])
+     return EINA_FALSE;
+
+   return ecore_file_exists(path);
+}
+
 static const char *
 _make_comand_compound_get(const char *prepend, const char *append)
 {
@@ -127,6 +136,36 @@ _make_test(void)
 }
 
 static void
+_make_run(const char *path, const char *args)
+{
+   char *full_cmd;
+   int full_len;
+
+   if (!path) return;
+   if (chdir(edi_project_get()) !=0)
+     ERR("Could not chdir");
+
+   if (!args)
+     {
+        ecore_exe_pipe_run(path, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                                 ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                                 ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+        return;
+     }
+
+   full_len = strlen(path) + strlen(path);
+   full_cmd = malloc(sizeof(char) * (full_len + 1));
+   snprintf(full_cmd, full_len + 2, "%s %s", path, args);
+
+   ecore_exe_pipe_run(full_cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                                ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                                ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   free(full_cmd);
+}
+
+static void
 _make_clean(void)
 {
    static const char *cmd = NULL;
@@ -141,5 +180,5 @@ _make_clean(void)
 }
 
 Edi_Build_Provider _edi_build_provider_make =
-   {"make", _make_project_supported, _make_file_hidden_is,
-     _make_build, _make_test, _make_clean};
+   {"make", _make_project_supported, _make_file_hidden_is, _make_project_runnable_is,
+     _make_build, _make_test, _make_run, _make_clean};

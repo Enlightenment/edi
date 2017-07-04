@@ -9,6 +9,7 @@
 #include "edi_private.h"
 
 #include "edi_language_provider_c.c"
+#include "edi_language_provider_rust.c"
 
 static Edi_Language_Provider _edi_language_provider_registry[] =
 {
@@ -17,22 +18,35 @@ static Edi_Language_Provider _edi_language_provider_registry[] =
       _edi_language_c_mime_name, _edi_language_c_snippet_get,
       _edi_language_c_lookup, _edi_language_c_lookup_doc
    },
+   {
+      "rust", _edi_language_rust_add, _edi_language_rust_refresh, _edi_language_rust_del,
+      _edi_language_rust_mime_name, _edi_language_rust_snippet_get,
+      NULL, NULL
+   },
+
 
    {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 };
 
 Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor)
 {
-   Edi_Language_Provider *provider;
    const char *mime = editor->mimetype;
+
+   return edi_language_provider_for_mime_get(mime);
+}
+
+Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime)
+{
+   Edi_Language_Provider *provider;
    const char *id = NULL;
 
    if (!mime)
      return NULL;
 
-   if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc")
-       || !strcasecmp(mime, "text/x-modelica"))
+   if (!strcasecmp(mime, "text/x-chdr") || !strcasecmp(mime, "text/x-csrc"))
      id = "c";
+   if (!strcasecmp(mime, "text/rust"))
+     id = "rust";
 
    if (!id)
      return NULL;

@@ -37,6 +37,15 @@ _cmake_file_hidden_is(const char *file)
    return EINA_FALSE;
 }
 
+static Eina_Bool
+_cmake_project_runnable_is(const char *path)
+{
+   if (!path || !path[0])
+     return EINA_FALSE;
+
+   return ecore_file_exists(path);
+}
+
 static void
 _cmake_build(void)
 {
@@ -59,6 +68,36 @@ _cmake_test(void)
 }
 
 static void
+_cmake_run(const char *path, const char *args)
+{
+   char *full_cmd;
+   int full_len;
+
+   if (!path) return;
+   if (chdir(edi_project_get()) !=0)
+     ERR("Could not chdir");
+
+   if (!args)
+     {
+        ecore_exe_pipe_run(path, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                                 ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                                 ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+        return;
+     }
+
+   full_len = strlen(path) + strlen(path);
+   full_cmd = malloc(sizeof(char) * (full_len + 1));
+   snprintf(full_cmd, full_len + 2, "%s %s", path, args);
+
+   ecore_exe_pipe_run(full_cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                                ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                                ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   free(full_cmd);
+}
+
+static void
 _cmake_clean(void)
 {
    if (chdir(edi_project_get()) != 0)
@@ -69,5 +108,5 @@ _cmake_clean(void)
 }
 
 Edi_Build_Provider _edi_build_provider_cmake =
-   {"cmake", _cmake_project_supported, _cmake_file_hidden_is,
-     _cmake_build, _cmake_test, _cmake_clean};
+   {"cmake", _cmake_project_supported, _cmake_file_hidden_is, _cmake_project_runnable_is,
+     _cmake_build, _cmake_test, _cmake_run, _cmake_clean};

@@ -16,9 +16,11 @@ typedef struct _Edi_Build_Provider
 
    Eina_Bool (*path_supported_is)(const char *path);
    Eina_Bool (*file_hidden_is)(const char *path);
+   Eina_Bool (*project_runnable_is)(const char *path);
 
    void (*build)(void);
    void (*test)(void);
+   void (*run)(const char *path, const char *args);
    void (*clean)(void);
 } Edi_Build_Provider;
 

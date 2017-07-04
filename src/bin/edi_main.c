@@ -601,32 +601,6 @@ edi_launcher_config_missing()
 }
 
 static void
-_edi_launcher_run(Edi_Project_Config_Launch *launch)
-{
-   char *full_cmd;
-   int full_len;
-
-   if (!_edi_project_config->launch.path)
-     {
-        edi_launcher_config_missing();
-        return;
-     }
-
-   if (!_edi_project_config->launch.args)
-     {
-        ecore_exe_run(launch->path, NULL);
-        return;
-     }
-
-   full_len = strlen(_edi_project_config->launch.path) + strlen(_edi_project_config->launch.path);
-   full_cmd = malloc(sizeof(char) * (full_len + 1));
-   snprintf(full_cmd, full_len + 2, "%s %s", _edi_project_config->launch.path, _edi_project_config->launch.args);
-   ecore_exe_run(full_cmd, NULL);
-
-   free(full_cmd);
-}
-
-static void
 _edi_project_credentials_missing()
 
 {
@@ -755,6 +729,18 @@ _edi_build_prep(Evas_Object *button)
      }
 
    return EINA_TRUE;
+}
+
+static void
+_edi_launcher_run(Edi_Project_Config_Launch *launch)
+{
+   if (!edi_builder_can_run(_edi_project_config->launch.path))
+     {
+        edi_launcher_config_missing();
+        return;
+     }
+
+   edi_builder_run(launch->path, launch->args);
 }
 
 static void

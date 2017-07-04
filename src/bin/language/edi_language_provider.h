@@ -67,6 +67,17 @@ typedef struct _Edi_Language_Provider
 Edi_Language_Provider *edi_language_provider_get(Edi_Editor *editor);
 
 /**
+ * Look up a suggest provider based on the mime type provided.
+ *
+ * @param mime the mime type for a file you wish to get a suggestion provider for
+ *
+ * @return an Edi_Editor_Suggest_Provider if one is registered or NULL otherwise
+ *
+ * @ingroup Lookup
+ */
+Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime);
+
+/**
  * Query whether a suggest provider is available for the specified editor session.
  *
  * @param editor the editor session for a file you wish to get a suggestion provider for

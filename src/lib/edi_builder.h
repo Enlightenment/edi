@@ -33,6 +33,19 @@ EAPI Eina_Bool
 edi_builder_can_build(void);
 
 /**
+ * Check if Edi can run the current project.
+ * This may depend on user configuration which is passed into the method.
+ *
+ * @return Whether or not the current project has a runnable executable.
+ *
+ * @see edi_builder_build().
+ *
+ * @ingroup Builder
+ */
+EAPI Eina_Bool
+edi_builder_can_run(const char *runpath);
+
+/**
  * Run a build for the current project.
  *
  * @see edi_builder_can_build().
@@ -51,6 +64,16 @@ edi_builder_build(void);
  */
 EAPI void
 edi_builder_test(void);
+
+/**
+ * Run a resulting executable for the current project.
+ *
+ * @see edi_builder_can_run().
+ *
+ * @ingroup Builder
+ */
+EAPI void
+edi_builder_run(const char *runpath, const char *args);
 
 /**
  * Run a clean for the current project.

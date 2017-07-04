@@ -19,6 +19,16 @@ edi_builder_can_build(void)
    return !!provider;
 }
 
+EAPI Eina_Bool
+edi_builder_can_run(const char *runpath)
+{
+   Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+
+   return provider && provider->project_runnable_is(runpath);
+}
+
 EAPI void
 edi_builder_build(void)
 {
@@ -41,6 +51,18 @@ edi_builder_test(void)
      return;
 
    provider->test();
+}
+
+EAPI void
+edi_builder_run(const char *runpath, const char *args)
+{
+   Edi_Build_Provider *provider;
+
+   provider = edi_build_provider_for_project_get();
+   if (!provider)
+     return;
+
+   provider->run(runpath, args);
 }
 
 EAPI void

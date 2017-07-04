@@ -33,65 +33,65 @@ _exec_cmd(const char *cmd)
 }
 
 static Eina_Bool
-_python_project_supported(const char *path)
+_cargo_project_supported(const char *path)
 {
-   return _relative_path_exists(path, "setup.py");
+   return _relative_path_exists(path, "Cargo.toml");
 }
 
 static Eina_Bool
-_python_file_hidden_is(const char *file)
+_cargo_file_hidden_is(const char *file)
 {
    if (!file || strlen(file) == 0)
      return EINA_FALSE;
 
-   if (eina_str_has_extension(file, ".pyc") || eina_str_has_extension(file, ".pyo"))
+   if (eina_str_has_extension(file, ".o") || !strcmp(ecore_file_file_get(file), "target"))
      return EINA_TRUE;
 
    return EINA_FALSE;
 }
 
 static Eina_Bool
-_python_project_runnable_is(const char *file EINA_UNUSED)
+_cargo_project_runnable_is(const char *file EINA_UNUSED)
 {
    return EINA_TRUE;
 }
 
 static void
-_python_build(void)
+_cargo_build(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py build");
+     _exec_cmd("cargo build");
 }
 
 static void
-_python_test(void)
+_cargo_test(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py test");
+     _exec_cmd("cargo test");
 }
 
 static void
-_python_run(const char *path EINA_UNUSED, const char *args EINA_UNUSED)
+_cargo_run(const char *path EINA_UNUSED, const char *args EINA_UNUSED)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py run");
+     _exec_cmd("cargo run");
 }
 
 static void
-_python_clean(void)
+_cargo_clean(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py clean --all");
+     _exec_cmd("cargo clean");
 }
 
-Edi_Build_Provider _edi_build_provider_python =
+Edi_Build_Provider _edi_build_provider_cargo =
    {
-      "python",
-      _python_project_supported,
-      _python_file_hidden_is,
-      _python_project_runnable_is,
-      _python_build,
-      _python_test,
-      _python_run,
-      _python_clean
+      "cargo",
+      _cargo_project_supported,
+      _cargo_file_hidden_is,
+      _cargo_project_runnable_is,
+      _cargo_build,
+      _cargo_test,
+      _cargo_run,
+      _cargo_clean
    };
