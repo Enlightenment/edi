@@ -96,14 +96,45 @@ _edi_search_cache_use(Edi_Editor_Search *search, char **text, Elm_Code_Line **li
    search->current_search_col = search->first_result.column;
 }
 
+
+static Eina_List *
+_edi_search_clear_highlights(Eina_List *tokens)
+{
+   Elm_Code_Token *token;
+   Eina_List *ret, *item, *item_next;
+
+   ret = tokens;
+
+   EINA_LIST_FOREACH_SAFE(tokens, item, item_next, token)
+     {
+        if (token->type == ELM_CODE_TOKEN_TYPE_MATCH)
+          ret = eina_list_remove(ret, token);
+     }
+
+   return ret;
+}
+
+static void
+_edi_search_show_highlights(Elm_Code_Line *line, const char *text)
+{
+   int match;
+
+   match = elm_code_line_text_strpos(line, text, 0);
+   while (match != ELM_CODE_TEXT_NOT_FOUND)
+     {
+        elm_code_line_token_add(line, match, match + strlen(text) - 1, 1, ELM_CODE_TOKEN_TYPE_MATCH);
+
+        match = elm_code_line_text_strpos(line, text, match + 1);
+     }
+}
+
 static Eina_Bool
 _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
 {
    Eina_Bool try_next = EINA_FALSE;
-   Eina_List *item, *subitem, *subitem_next;
+   Eina_List *item;
    Elm_Code *code;
    Elm_Code_Line *line;
-   Elm_Code_Token *token;
    const char *text_markup;
    char *text;
    unsigned int offset, pos, pos_line, pos_col;
@@ -136,19 +167,15 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    found = ELM_CODE_TEXT_NOT_FOUND;
    EINA_LIST_FOREACH(code->file->lines, item, line)
      {
-        EINA_LIST_FOREACH_SAFE(line->tokens, subitem, subitem_next, token)
-          {
-             if (token->type == ELM_CODE_TOKEN_TYPE_MATCH)
-               line->tokens = eina_list_remove(line->tokens, token);
-          }
+        line->tokens = _edi_search_clear_highlights(line->tokens);
+        _edi_search_show_highlights(line, text);
+
         offset = 0;
         match = elm_code_line_text_strpos(line, text, offset);
         if (match == ELM_CODE_TEXT_NOT_FOUND)
           continue;
 
-        elm_code_line_token_add(line, match, match + strlen(text) - 1, 1, ELM_CODE_TOKEN_TYPE_MATCH);
         pos = elm_code_widget_line_text_column_width_to_position(entry, line, match);
-
         if (!_edi_search_cache_exists(search))
           _edi_search_cache_store(search, match, text, line, pos);
 
@@ -163,7 +190,7 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
              if (match == ELM_CODE_TEXT_NOT_FOUND)
                continue;
 
-             elm_code_line_token_add(line, match, match + strlen(text) - 1, 1, ELM_CODE_TOKEN_TYPE_MATCH);
+             pos = elm_code_widget_line_text_column_width_to_position(entry, line, match);
           }
 
         if (found == ELM_CODE_TEXT_NOT_FOUND)
@@ -270,6 +297,9 @@ static void
 _edi_editor_search_hide(Edi_Editor *editor)
 {
    Edi_Editor_Search *search;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   Eina_List *item;
 
    search = editor->search;
    if (!search)
@@ -280,6 +310,12 @@ _edi_editor_search_hide(Edi_Editor *editor)
      {
         evas_object_hide(search->widget);
         elm_box_unpack(search->parent, search->widget);
+     }
+
+   code = elm_code_widget_code_get(editor->entry);
+   EINA_LIST_FOREACH(code->file->lines, item, line)
+     {
+        line->tokens = _edi_search_clear_highlights(line->tokens);
      }
 
    search->current_search_line = 0;
