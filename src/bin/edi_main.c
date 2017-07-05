@@ -1065,7 +1065,7 @@ _edi_menu_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 static void
 _edi_menu_setup(Evas_Object *win)
 {
-   Evas_Object *menu = elm_win_main_menu_get(win);
+   Evas_Object *menu;
    Elm_Object_Item *menu_it;
    static Eina_Bool setup = EINA_FALSE;
 
@@ -1345,8 +1345,6 @@ edi_open(const char *inputpath)
    if (!win) return EINA_FALSE;
 
    _edi_main_win = win;
-   _edi_menu_setup(win);
-
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
