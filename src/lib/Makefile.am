@@ -27,6 +27,7 @@ edi_build_provider_make.c \
 edi_build_provider_cmake.c \
 edi_build_provider_cargo.c \
 edi_build_provider_python.c \
+edi_build_provider_meson.c \
 edi_build_provider.c \
 edi_builder.c \
 edi_create.c \
