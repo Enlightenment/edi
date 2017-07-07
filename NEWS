@@ -6,8 +6,13 @@ Features:
 
   * Integrate GDB debugger console
   * Add snippet support to the code editor
-  * Add SCM support (just git right now)
+  * Add SCM support (git)
+  * Add rust language and clang build support
+  * Highlight all search results
 
+Bug fixes:
+
+  * Fix issue where large projects could cause slow starts 
 
 ---------
 Edi 0.5.1
