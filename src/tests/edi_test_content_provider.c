@@ -70,20 +70,20 @@ START_TEST (edi_test_content_provider_c_files)
    _edi_test_content_provider_type_assert("text/x-chdr", "code");
 }
 END_TEST
-
+/*
 START_TEST (edi_test_content_provider_cpp_files)
 {
    _edi_test_content_provider_type_assert("text/x-c++src", "code");
    _edi_test_content_provider_type_assert("text/x-c++hdr", "code");
 }
 END_TEST
-
+*/
 void edi_test_content_provider(TCase *tc)
 {
    tcase_add_test(tc, edi_test_content_provider_id_lookup);
    tcase_add_test(tc, edi_test_content_provider_mime_lookup);
    tcase_add_test(tc, edi_test_content_provider_text_files);
    tcase_add_test(tc, edi_test_content_provider_c_files);
-   tcase_add_test(tc, edi_test_content_provider_cpp_files);
+//   tcase_add_test(tc, edi_test_content_provider_cpp_files);
 }
 
