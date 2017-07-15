@@ -13,8 +13,8 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Check for tests and coverage
 AC_ARG_WITH([tests],
-   [AS_HELP_STRING([--with-tests=none|regular|coverage],
-                   [choose testing method: regular, coverage or none.
+   [AS_HELP_STRING([--with-tests=none|tests|coverage],
+                   [choose testing method: tests, coverage or none.
                     @<:@default=auto@:>@])],
    [build_tests=${withval}],
    [build_tests=auto])

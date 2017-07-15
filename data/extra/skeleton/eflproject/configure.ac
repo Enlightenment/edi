@@ -39,9 +39,9 @@ PKG_CHECK_MODULES([EFL],
 
 # Check for tests and coverage
 AC_ARG_WITH([tests],
-   [AC_HELP_STRING([--with-tests=none|regular|coverage],
-                   [choose testing method: regular, coverage or none.
-                    @<:@default=none@:>@])],
+   [AC_HELP_STRING([--with-tests=none|tests|coverage],
+                   [choose testing method: tests, coverage or none.
+                    @<:@default=auto@:>@])],
    [build_tests=${withval}],
    [build_tests=auto])
 
