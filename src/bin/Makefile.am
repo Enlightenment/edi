@@ -50,6 +50,7 @@ screens/edi_settings_font.c \
 screens/edi_settings.c \
 screens/edi_file_screens.c \
 screens/edi_scm_screens.c \
+screens/edi_screens.c \
 edi_filepanel.c \
 edi_file.c \
 edi_logpanel.c \

@@ -17,6 +17,7 @@
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
 #include "screens/edi_file_screens.h"
+#include "screens/edi_screens.h"
 #include "edi_private.h"
 
 typedef struct _Edi_Dir_Data
@@ -143,15 +144,21 @@ _item_menu_rename_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_item_menu_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
-                      void *event_info EINA_UNUSED)
+_item_menu_del_do_cb(void *data)
 {
-   Edi_Dir_Data *sd;
+   Edi_Dir_Data *sd = data;
 
-   sd = data;
    edi_mainview_item_close_path(sd->path);
 
    ecore_file_unlink(sd->path);
+}
+
+static void
+_item_menu_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_screens_message_confirm(_main_win, "Are you sure you want to delete this file?",
+                               _item_menu_del_do_cb, data);
 }
 
 static void
@@ -166,8 +173,7 @@ _item_menu_scm_add_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_item_menu_scm_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
-                      void *event_info EINA_UNUSED)
+_item_menu_scm_del_do_cb(void *data)
 {
    Edi_Dir_Data *sd;
 
@@ -175,6 +181,14 @@ _item_menu_scm_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
    edi_mainview_item_close_path(sd->path);
 
    edi_scm_del(sd->path);
+}
+
+static void
+_item_menu_scm_del_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_screens_message_confirm(_main_win, "Are you sure you want to delete this file?",
+                               _item_menu_scm_del_do_cb, data);
 }
 
 static void
@@ -253,8 +267,7 @@ _item_menu_open_terminal_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_item_menu_rmdir_cb(void *data, Evas_Object *obj EINA_UNUSED,
-                      void *event_info EINA_UNUSED)
+_item_menu_rmdir_do_cb(void *data)
 {
    Edi_Dir_Data *sd;
 
@@ -263,6 +276,14 @@ _item_menu_rmdir_cb(void *data, Evas_Object *obj EINA_UNUSED,
      return;
 
    ecore_file_recursive_rm(sd->path);
+}
+
+static void
+_item_menu_rmdir_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_screens_message_confirm(_main_win, "Are you sure you want to delete this directory?",
+                               _item_menu_rmdir_do_cb, data);
 }
 
 static void

@@ -61,6 +61,17 @@ Evas_Object *edi_settings_show(Evas_Object *mainwin);
 void edi_settings_font_add(Evas_Object *parent);
 
 /**
+ * Create a a confirmation dialogue and add it to the parent obj.
+ *
+ * @param parent The parent object to display the dialogue in.
+ * @param message The generic message to display in the dialogue.
+ * @param confirm_cb Function to execute upon confirmation.
+ * @param data Data to pass to the confirm_cb callback.
+ * @ingroup UI
+ */
+void edi_screens_message_confirm(Evas_Object *parent, const char *message, void ((*confirm_cb)(void *)), void *data);
+
+/**
  * @}
  */
 
@@ -68,4 +79,4 @@ void edi_settings_font_add(Evas_Object *parent);
 }
 #endif
 
-#endif /* EDI_CONSOLEPANEL_H_ */
+#endif /* EDI_SCREENS_H_ */

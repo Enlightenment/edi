@@ -27,6 +27,7 @@
 #include "screens/edi_screens.h"
 #include "screens/edi_file_screens.h"
 #include "screens/edi_scm_screens.h"
+#include "screens/edi_screens.h"
 
 #include "edi_private.h"
 
@@ -1008,11 +1009,18 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_edi_menu_scm_stash_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                       void *event_info EINA_UNUSED)
+_edi_scm_stash_do_cb(void *data EINA_UNUSED)
 {
    edi_scm_stash();
    edi_mainview_refresh_all();
+}
+
+static void
+_edi_menu_scm_stash_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   edi_screens_message_confirm(_edi_main_win, "Are you sure you wish to stash these changes?",
+                               _edi_scm_stash_do_cb, NULL);
 }
 
 static void
