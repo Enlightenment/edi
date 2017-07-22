@@ -165,9 +165,11 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
        _edi_search_term_changed(search, text))
      {
         _edi_search_cache_reset(search);
-        search->cache.text = strdup(text);
+        line = elm_code_file_line_get(elm_code_widget_code_get(entry)->file, 1);
         elm_code_widget_cursor_position_set(entry, 1, 1);
+        _edi_search_cache_store(search, 0, text, line, 1);
         _edi_search_in_entry(entry, search);
+        return EINA_TRUE;
      }
 
    found = ELM_CODE_TEXT_NOT_FOUND;
@@ -226,6 +228,8 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
         evas_object_show(search->wrapped);
         elm_code_widget_cursor_position_set(entry, 1, 1);
         elm_code_widget_selection_clear(entry);
+        line = elm_code_file_line_get(elm_code_widget_code_get(entry)->file, 1);
+        _edi_search_cache_reset(search);
         _edi_search_cache_use(search, &text, &line, &found);
         free(text);
         return EINA_TRUE;
