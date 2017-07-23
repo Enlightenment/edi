@@ -50,6 +50,7 @@ struct _Edi_Project_Config_Tab
    const char *path;
    const char *type;
    Eina_Bool windowed;
+   int panel_id;
 };
 
 struct _Edi_Project_Config_Launch
@@ -114,7 +115,7 @@ void _edi_project_config_load(void);
 void _edi_project_config_save(void);
 
 void _edi_project_config_tab_add(const char *path, const char *type,
-                                 Eina_Bool windowed);
+                                 Eina_Bool windowed, int panel_id);
 void _edi_project_config_tab_remove(const char *path);
 
 #ifdef __cplusplus

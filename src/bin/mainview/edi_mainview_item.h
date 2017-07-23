@@ -36,6 +36,9 @@ typedef struct _Edi_Mainview_Item
    Eina_Bool loaded;
 } Edi_Mainview_Item;
 
+Edi_Mainview_Item * edi_mainview_item_add(Edi_Path_Options *path, const char *mime,
+                                          Elm_Object_Item *tab, Evas_Object *win);
+                                          
 #ifdef __cplusplus
 }
 #endif

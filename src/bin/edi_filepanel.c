@@ -135,6 +135,20 @@ _item_menu_open_as_image_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_open_panel_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                            void *event_info EINA_UNUSED)
+{
+   Edi_Mainview_Panel *panel;
+   Edi_Path_Options *options;
+   Edi_Dir_Data *sd = data;
+
+   options = edi_path_options_create(sd->path);
+   panel = edi_mainview_panel_append();
+
+   edi_mainview_panel_open(panel, options);
+}
+
+static void
 _item_menu_rename_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
@@ -224,10 +238,13 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
 
    menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
                                _item_menu_xdgopen_cb, sd);
+
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "open in new panel", _item_menu_open_panel_cb, sd);
 
    if (edi_scm_enabled())
      {

@@ -35,6 +35,7 @@ edi_searchpanel.h \
 edi_consolepanel.h \
 edi_debugpanel.h \
 mainview/edi_mainview_item.h \
+mainview/edi_mainview_panel.h \
 mainview/edi_mainview.h
 
 edi_SOURCES = \
@@ -58,6 +59,7 @@ edi_searchpanel.c \
 edi_consolepanel.c \
 edi_debugpanel.c \
 mainview/edi_mainview_item.c \
+mainview/edi_mainview_panel.c \
 mainview/edi_mainview.c \
 edi_main.c \
 edi_private.h

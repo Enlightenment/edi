@@ -7,6 +7,7 @@
 #include "Edi.h"
 
 #include "mainview/edi_mainview_item.h"
+#include "mainview/edi_mainview_panel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -251,6 +252,10 @@ void edi_mainview_project_search_popup_show();
 
 Edi_Mainview_Item *edi_mainview_item_current_get();
 
+Edi_Mainview_Panel *edi_mainview_panel_current_get();
+
+void edi_mainview_tab_select(unsigned int id);
+
 /**
  * Select the passed item in the mainview UI.
  * By definition this will already be an open file as the Edi_Mainview_Item will
@@ -277,8 +282,14 @@ void edi_mainview_item_prev();
  */
 void edi_mainview_item_next();
 
-void edi_mainview_tab_select(unsigned int id);
+Edi_Mainview_Panel *edi_mainview_panel_append();
 
+Edi_Mainview_Panel *edi_mainview_panel_for_item_get(Edi_Mainview_Item *item);
+Edi_Mainview_Panel *edi_mainview_panel_by_index(int index);
+int edi_mainview_panel_count(void);
+int edi_mainview_panel_id(Edi_Mainview_Panel *panel);
+void edi_mainview_panel_focus(Edi_Mainview_Panel *panel);
+void edi_mainview_panel_remove(Edi_Mainview_Panel *panel);
 /**
  * @}
  *

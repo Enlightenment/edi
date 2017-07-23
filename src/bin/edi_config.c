@@ -234,6 +234,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, type, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, windowed, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, panel_id, EET_T_INT);
 
    _edi_proj_cfg_edd = EDI_CONFIG_DD_NEW("Project_Config", Edi_Project_Config);
    #undef T
@@ -504,7 +505,7 @@ _edi_project_config_save()
 
 void
 _edi_project_config_tab_add(const char *path, const char *type,
-                            Eina_Bool windowed)
+                            Eina_Bool windowed, int panel_id)
 {
    Edi_Project_Config_Tab *tab;
    Eina_List *list, *next;
@@ -525,6 +526,8 @@ _edi_project_config_tab_add(const char *path, const char *type,
 
    tab->type = eina_stringshare_add(type);
    tab->windowed = windowed;
+   tab->panel_id = panel_id;
+
    _edi_project_config->tabs = eina_list_append(_edi_project_config->tabs, tab);
    _edi_project_config_save_no_notify();
 }

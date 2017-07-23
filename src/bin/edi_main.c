@@ -351,7 +351,7 @@ static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
    Evas_Object *filepane, *logpane, *logpanels, *content_out, *content_in, *tb;
-   Evas_Object *icon, *button;
+   Evas_Object *icon, *button, *mainview;
 
    filepane = elm_panes_add(win);
    evas_object_size_hint_weight_set(filepane, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -396,8 +396,14 @@ edi_content_setup(Evas_Object *win, const char *path)
    elm_box_pack_end(content_in, button);
    evas_object_show(button);
 
-   edi_mainview_add(content_in, win);
-   evas_object_show(content_in);
+   mainview = elm_box_add(content_in);
+   evas_object_size_hint_weight_set(mainview, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(mainview, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(mainview);
+   elm_box_pack_end(content_in, mainview);
+
+   edi_mainview_add(mainview, win);
+
    elm_object_part_content_set(filepane, "right", content_in);
    elm_box_pack_end(content_out, filepane);
 
@@ -831,13 +837,6 @@ _edi_menu_save_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_edi_menu_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                         void *event_info EINA_UNUSED)
-{
-   edi_mainview_new_window();
-}
-
-static void
 _edi_menu_close_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
@@ -848,7 +847,7 @@ static void
 _edi_menu_closeall_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
-   edi_mainview_closeall();
+   edi_mainview_close_all();
 }
 
 static void
@@ -922,18 +921,32 @@ _edi_menu_findfile_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
-_edi_menu_tasks_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
-                      void *event_info EINA_UNUSED)
-{
-   edi_taskspanel_show();
-   edi_taskspanel_find();
-}
-
-static void
 _edi_menu_goto_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
    edi_mainview_goto_popup_show();
+}
+
+static void
+_edi_menu_view_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                         void *event_info EINA_UNUSED)
+{
+   edi_mainview_new_window();
+}
+
+static void
+_edi_menu_view_split_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                         void *event_info EINA_UNUSED)
+{
+   edi_mainview_panel_append();
+}
+
+static void
+_edi_menu_view_tasks_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_taskspanel_show();
+   edi_taskspanel_find();
 }
 
 static void
@@ -1088,7 +1101,6 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
    elm_menu_item_add(menu, menu_it, "folder-new", "New Directory ...", _edi_menu_new_dir_cb, NULL);
    _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_open_window_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-close", "Close", _edi_menu_close_cb, NULL);
    elm_menu_item_add(menu, menu_it, "document-close", "Close all", _edi_menu_closeall_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
@@ -1109,7 +1121,12 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "go-jump", "Goto Line ...", _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find", "Find in project ...", _edi_menu_find_project_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find", "Open Tasks", _edi_menu_tasks_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "View", NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_view_open_window_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", "Split pane", _edi_menu_view_split_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, "edit-find", "Open Tasks", _edi_menu_view_tasks_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
@@ -1293,6 +1310,7 @@ _edi_open_tabs()
    Edi_Project_Config_Tab *tab;
    Edi_Path_Options *options;
    Eina_List *tabs, *list;
+   Edi_Mainview_Panel *panel;
    char *path;
 
    tabs = _edi_project_config->tabs;
@@ -1307,10 +1325,26 @@ _edi_open_tabs()
         options = edi_path_options_create(path);
         options->type = eina_stringshare_add(tab->type);
         options->background = EINA_TRUE;
-        if (tab->windowed)
-          edi_mainview_open_window(options);
+        if (tab->panel_id == 0)
+          {
+             if (tab->windowed)
+               edi_mainview_open_window(options);
+             else
+               edi_mainview_open(options);
+
+          }
         else
-          edi_mainview_open(options);
+          {
+             while (edi_mainview_panel_count() <= tab->panel_id)
+               {
+                  /* Make sure we have enough panels */
+                  edi_mainview_panel_append();
+               }
+             panel = edi_mainview_panel_by_index(tab->panel_id);
+             options = edi_path_options_create(path);
+             edi_mainview_panel_open(panel, options);
+          }
+
         free(path);
      }
 
