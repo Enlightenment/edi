@@ -4,6 +4,7 @@ Edi 0.6
 
 Features:
 
+  * Multiple panel support in main UI
   * Integrate GDB debugger console
   * Add snippet support to the code editor
   * Add SCM support (git)
@@ -12,7 +13,7 @@ Features:
 
 Bug fixes:
 
-  * Fix issue where large projects could cause slow starts 
+  * Fix issue where large projects could cause slow starts
 
 ---------
 Edi 0.5.1
