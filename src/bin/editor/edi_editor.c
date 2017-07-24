@@ -962,6 +962,18 @@ _edi_clang_dispose(void *data, Ecore_Thread *thread EINA_UNUSED)
 #endif
 
 static void
+_focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Mainview_Panel *panel;
+   Edi_Mainview_Item *item;
+
+   item = (Edi_Mainview_Item *)data;
+   panel = edi_mainview_panel_for_item_get(item);
+
+   edi_mainview_panel_focus(panel);
+}
+
+static void
 _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Editor *editor;
@@ -1115,6 +1127,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
    evas_object_event_callback_add(widget, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, editor);
+   evas_object_smart_callback_add(widget, "focused", _focused_cb, item);
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);

@@ -245,6 +245,7 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
         _edi_project_config_save_no_notify();
      }
 
+   edi_mainview_panel_focus(panel);
    ecore_event_add(EDI_EVENT_TAB_CHANGED, NULL, NULL, NULL);
 }
 
@@ -255,7 +256,6 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Mainview_Panel *panel;
 
    panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)data);
-   edi_mainview_panel_focus(panel);
    edi_mainview_panel_item_select(panel, (Edi_Mainview_Item *)data);
 }
 
