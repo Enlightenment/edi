@@ -133,6 +133,7 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    elm_obj_code_widget_font_set(widget, font_name, font_size);
    elm_obj_code_widget_line_numbers_set(widget, EINA_TRUE);
    elm_obj_code_widget_editable_set(widget, EINA_FALSE);
+   elm_obj_code_widget_policy_set(widget, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
