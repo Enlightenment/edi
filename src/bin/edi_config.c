@@ -342,8 +342,8 @@ _edi_config_load(void)
 void
 _edi_config_save(void)
 {
-   if (_edi_config_domain_save(_edi_config_dir_get(), EDI_CONFIG_NAME, _edi_cfg_edd, _edi_config))
-     ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
+   if (!_edi_config_domain_save(_edi_config_dir_get(), EDI_CONFIG_NAME, _edi_cfg_edd, _edi_config))
+     ERR("Could not save configuration");
 }
 
 void
@@ -412,6 +412,19 @@ _edi_config_mime_search(const char *mime)
           }
      }
    return NULL;
+}
+
+Eina_Bool
+_edi_project_config_save_no_notify()
+{
+   return _edi_config_domain_save(_edi_project_config_dir_get(), EDI_PROJECT_CONFIG_NAME, _edi_proj_cfg_edd, _edi_project_config);
+}
+
+void
+_edi_project_config_save()
+{
+   if (_edi_project_config_save_no_notify())
+     ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
 }
 
 void
@@ -487,20 +500,7 @@ _edi_project_config_load()
 
    _edi_project_config->version = EDI_PROJECT_CONFIG_FILE_VERSION;
 
-   if (save) _edi_project_config_save();
-}
-
-static Eina_Bool
-_edi_project_config_save_no_notify()
-{
-   return _edi_config_domain_save(_edi_project_config_dir_get(), EDI_PROJECT_CONFIG_NAME, _edi_proj_cfg_edd, _edi_project_config);
-}
-
-void
-_edi_project_config_save()
-{
-   if (_edi_project_config_save_no_notify())
-     ecore_event_add(EDI_EVENT_CONFIG_CHANGED, NULL, NULL, NULL);
+   if (save) _edi_project_config_save_no_notify();
 }
 
 void
