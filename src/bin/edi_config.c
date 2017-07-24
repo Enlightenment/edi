@@ -41,8 +41,8 @@
 #  define EDI_CONFIG_FILE_VERSION \
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
-#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0001
-#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0003
+#  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0002
+#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0004
 #  define EDI_PROJECT_CONFIG_FILE_VERSION \
    ((EDI_PROJECT_CONFIG_FILE_EPOCH << 16) | EDI_PROJECT_CONFIG_FILE_GENERATION)
 
@@ -56,6 +56,7 @@ static Edi_Config_DD *_edi_cfg_mime_edd = NULL;
 
 static Edi_Project_Config_DD *_edi_proj_cfg_edd = NULL;
 static Edi_Project_Config_DD *_edi_proj_cfg_tab_edd = NULL;
+static Edi_Project_Config_DD *_edi_proj_cfg_panel_edd = NULL;
 
 /* external variables */
 Edi_Config *_edi_config = NULL;
@@ -124,12 +125,23 @@ _edi_config_cb_free(void)
 static void
 _edi_project_config_cb_free(void)
 {
+   Edi_Project_Config_Panel *panel;
    Edi_Project_Config_Tab *tab;
 
    if (!_edi_project_config)
      return;
 
-   EINA_LIST_FREE(_edi_project_config->tabs, tab)
+   EINA_LIST_FREE(_edi_project_config->panels, panel)
+     {
+        EINA_LIST_FREE(panel->tabs, tab)
+          {
+             if (tab->path) eina_stringshare_del(tab->path);
+             if (tab->type) eina_stringshare_del(tab->type);
+             free(tab);
+          }
+     }
+
+   EINA_LIST_FREE(_edi_project_config->windows, tab)
      {
         if (tab->path) eina_stringshare_del(tab->path);
         if (tab->type) eina_stringshare_del(tab->type);
@@ -233,8 +245,14 @@ _edi_config_init(void)
    #define D _edi_proj_cfg_tab_edd
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, type, EET_T_STRING);
-   EDI_CONFIG_VAL(D, T, windowed, EET_T_UCHAR);
-   EDI_CONFIG_VAL(D, T, panel_id, EET_T_INT);
+
+   _edi_proj_cfg_panel_edd = EDI_CONFIG_DD_NEW("Project_Config_Panel", Edi_Project_Config_Panel);
+   #undef T
+   #undef D
+   #define T Edi_Project_Config_Panel
+   #define D _edi_proj_cfg_panel_edd
+   EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
+   EDI_CONFIG_VAL(D, T, current_tab, EET_T_UINT);
 
    _edi_proj_cfg_edd = EDI_CONFIG_DD_NEW("Project_Config", Edi_Project_Config);
    #undef T
@@ -258,13 +276,13 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.tab_inserts_spaces, EET_T_UCHAR);
 
-   EDI_CONFIG_LIST(D, T, tabs, _edi_proj_cfg_tab_edd);
-   EDI_CONFIG_VAL(D, T, current_tab, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, launch.args, EET_T_STRING);
-
    EDI_CONFIG_VAL(D, T, user_fullname, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, user_email, EET_T_STRING);
+
+   EDI_CONFIG_LIST(D, T, panels, _edi_proj_cfg_panel_edd);
+   EDI_CONFIG_LIST(D, T, windows, _edi_proj_cfg_tab_edd);
 
    _edi_config_load();
 
@@ -414,6 +432,17 @@ _edi_config_mime_search(const char *mime)
    return NULL;
 }
 
+static Edi_Project_Config_Panel *
+_panel_add()
+{
+   Edi_Project_Config_Panel *panel;
+
+   panel = calloc(1, sizeof(Edi_Project_Config_Panel));
+
+   _edi_project_config->panels = eina_list_append(_edi_project_config->panels, panel);
+   return panel;
+}
+
 Eina_Bool
 _edi_project_config_save_no_notify()
 {
@@ -477,8 +506,6 @@ _edi_project_config_load()
    _edi_project_config->gui.width_marker = 80;
    _edi_project_config->gui.tabstop = 8;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
-
-   _edi_project_config->tabs = NULL;
    IFPCFGEND;
 
    IFPCFG(0x0002);
@@ -500,7 +527,46 @@ _edi_project_config_load()
 
    _edi_project_config->version = EDI_PROJECT_CONFIG_FILE_VERSION;
 
+   IFPCFG(0x0004);
+   _edi_project_config->panels = NULL;
+   _panel_add();
+   _edi_project_config->windows = NULL;
+   IFPCFGEND;
+
    if (save) _edi_project_config_save_no_notify();
+}
+
+Eina_List **
+_tablist_get(Eina_Bool windowed, int panel_id)
+{
+   Edi_Project_Config_Panel *panel;
+
+   if (windowed)
+     return &_edi_project_config->windows;
+
+   panel = eina_list_nth(_edi_project_config->panels, panel_id);
+   while (!panel)
+     {
+        _panel_add();
+        panel = eina_list_nth(_edi_project_config->panels, panel_id);
+     }
+
+   return &panel->tabs;
+}
+
+void
+_edi_project_config_tab_current_set(int panel_id, int tab_id)
+{
+   Edi_Project_Config_Panel *panel;
+
+   panel = eina_list_nth(_edi_project_config->panels, panel_id);
+   while (!panel)
+     {
+        _panel_add();
+        panel = eina_list_nth(_edi_project_config->panels, panel_id);
+     }
+
+   panel->current_tab = tab_id;
 }
 
 void
@@ -508,13 +574,7 @@ _edi_project_config_tab_add(const char *path, const char *type,
                             Eina_Bool windowed, int panel_id)
 {
    Edi_Project_Config_Tab *tab;
-   Eina_List *list, *next;
-
-   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
-     {
-        if (!strncmp(tab->path, path, strlen(tab->path)))
-          _edi_project_config->tabs = eina_list_remove_list(_edi_project_config->tabs, list);
-     }
+   Eina_List **tabs;
 
    tab = malloc(sizeof(*tab));
 
@@ -523,22 +583,22 @@ _edi_project_config_tab_add(const char *path, const char *type,
      tab->path = eina_stringshare_add(path + strlen(edi_project_get()) + 1);
    else
      tab->path = eina_stringshare_add(path);
-
    tab->type = eina_stringshare_add(type);
-   tab->windowed = windowed;
-   tab->panel_id = panel_id;
 
-   _edi_project_config->tabs = eina_list_append(_edi_project_config->tabs, tab);
+   tabs = _tablist_get(windowed, panel_id);
+   *tabs = eina_list_append(*tabs, tab);
+
    _edi_project_config_save_no_notify();
 }
 
 void
-_edi_project_config_tab_remove(const char *path)
+_edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_id)
 {
    Edi_Project_Config_Tab *tab;
-   Eina_List *list, *next;
+   Eina_List *list, *next, **tabs;
 
-   EINA_LIST_FOREACH_SAFE(_edi_project_config->tabs, list, next, tab)
+   tabs = _tablist_get(windowed, panel_id);
+   EINA_LIST_FOREACH_SAFE(*tabs, list, next, tab)
      {
         if (!strncmp(tab->path, path, strlen(tab->path)))
           break;
@@ -547,7 +607,7 @@ _edi_project_config_tab_remove(const char *path)
           break;
      }
 
-   _edi_project_config->tabs = eina_list_remove(_edi_project_config->tabs, tab);
+   *tabs = eina_list_remove(*tabs, tab);
    _edi_project_config_save_no_notify();
 
    eina_stringshare_del(tab->path);

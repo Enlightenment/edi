@@ -89,6 +89,24 @@ edi_mainview_panel_for_item_get(Edi_Mainview_Item *item)
    return NULL;
 }
 
+unsigned int
+edi_mainview_panel_index_get(Edi_Mainview_Panel *panel)
+{
+   Eina_List *it;
+   Edi_Mainview_Panel *panel2;
+   unsigned int i = 0;
+
+   EINA_LIST_FOREACH(_edi_mainview_panels, it, panel2)
+     {
+        if (panel == panel2)
+          break;
+
+        i++;
+     }
+
+   return i;
+}
+
 void
 edi_mainview_item_prev()
 {
@@ -117,7 +135,7 @@ _edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
    it = evas_object_data_get(obj, "edi_mainview_item");
    _edi_mainview_wins = eina_list_remove(_edi_mainview_wins, it);
 
-   _edi_project_config_tab_remove(it->path);
+   _edi_project_config_tab_remove(it->path, EINA_TRUE, 0);
    eina_stringshare_del(it->path);
 
    if (edi_noproject())

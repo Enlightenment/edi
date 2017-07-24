@@ -254,6 +254,8 @@ Edi_Mainview_Item *edi_mainview_item_current_get();
 
 Edi_Mainview_Panel *edi_mainview_panel_current_get();
 
+unsigned int edi_mainview_panel_index_get(Edi_Mainview_Panel *panel);
+
 void edi_mainview_tab_select(unsigned int id);
 
 /**

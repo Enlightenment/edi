@@ -19,6 +19,7 @@ typedef struct _Edi_Config_Mime_Association Edi_Config_Mime_Association;
 typedef struct _Edi_Config Edi_Config;
 
 typedef struct _Edi_Project_Config Edi_Project_Config;
+typedef struct _Edi_Project_Config_Panel Edi_Project_Config_Panel;
 typedef struct _Edi_Project_Config_Tab Edi_Project_Config_Tab;
 typedef struct _Edi_Project_Config_Launch Edi_Project_Config_Launch;
 
@@ -45,12 +46,16 @@ struct _Edi_Config
    Eina_List *mime_assocs;
 };
 
+struct _Edi_Project_Config_Panel
+{
+   Eina_List *tabs;
+   unsigned int current_tab;
+};
+
 struct _Edi_Project_Config_Tab
 {
    const char *path;
    const char *type;
-   Eina_Bool windowed;
-   int panel_id;
 };
 
 struct _Edi_Project_Config_Launch
@@ -82,11 +87,12 @@ struct _Edi_Project_Config
         Eina_Bool tab_inserts_spaces;
      } gui;
 
-   Eina_List *tabs;
-   unsigned int current_tab;
    Edi_Project_Config_Launch launch;
    Eina_Stringshare *user_fullname;
    Eina_Stringshare *user_email;
+
+   Eina_List *panels;
+   Eina_List *windows;
 };
 
 extern Edi_Config *_edi_config;
@@ -116,7 +122,8 @@ void _edi_project_config_save(void);
 
 void _edi_project_config_tab_add(const char *path, const char *type,
                                  Eina_Bool windowed, int panel_id);
-void _edi_project_config_tab_remove(const char *path);
+void _edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_id);
+void _edi_project_config_tab_current_set(int panel_id, int tab_id);
 
 #ifdef __cplusplus
 }

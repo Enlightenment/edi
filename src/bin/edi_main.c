@@ -1307,14 +1307,54 @@ _edi_file_saved(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_U
 void
 _edi_open_tabs()
 {
+   Edi_Project_Config_Panel *panel;
    Edi_Project_Config_Tab *tab;
    Edi_Path_Options *options;
-   Eina_List *tabs, *list;
-   Edi_Mainview_Panel *panel;
+   Eina_List *tabs, *panels, *list, *sublist;
+   Edi_Mainview_Panel *panel_obj;
    char *path;
+   unsigned int tab_id = 0, panel_id = 0;
 
-   tabs = _edi_project_config->tabs;
-   _edi_project_config->tabs = NULL;
+   panels = _edi_project_config->panels;
+   _edi_project_config->panels = NULL;
+   EINA_LIST_FOREACH(panels, list, panel)
+     {
+        if (panel_id != 0)
+          /* Make sure we have enough panels */
+          edi_mainview_panel_append();
+        panel_obj = edi_mainview_panel_by_index(panel_id);
+
+        tabs = panel->tabs;
+        panel->tabs = NULL;
+        tab_id = 0;
+        EINA_LIST_FOREACH(tabs, sublist, tab)
+          {
+             if (!strncmp(tab->path, edi_project_get(), strlen(edi_project_get())))
+               path = strdup(tab->path);
+             else
+               path = edi_path_append(edi_project_get(), tab->path);
+
+             options = edi_path_options_create(path);
+             options->type = eina_stringshare_add(tab->type);
+             options->background = tab_id != panel->current_tab;
+
+             edi_mainview_panel_open(panel_obj, options);
+
+             tab_id++;
+             free(path);
+          }
+
+        edi_mainview_panel_tab_select(panel_obj, panel->current_tab);
+        panel_id++;
+
+        EINA_LIST_FREE(tabs, tab)
+          {
+             free(tab);
+          }
+     }
+
+   tabs = _edi_project_config->windows;
+   _edi_project_config->windows = NULL;
    EINA_LIST_FOREACH(tabs, list, tab)
      {
         if (!strncmp(tab->path, edi_project_get(), strlen(edi_project_get())))
@@ -1324,37 +1364,14 @@ _edi_open_tabs()
 
         options = edi_path_options_create(path);
         options->type = eina_stringshare_add(tab->type);
-        options->background = EINA_TRUE;
-        if (tab->panel_id == 0)
-          {
-             if (tab->windowed)
-               edi_mainview_open_window(options);
-             else
-               edi_mainview_open(options);
 
-          }
-        else
-          {
-             while (edi_mainview_panel_count() <= tab->panel_id)
-               {
-                  /* Make sure we have enough panels */
-                  edi_mainview_panel_append();
-               }
-             panel = edi_mainview_panel_by_index(tab->panel_id);
-             options = edi_path_options_create(path);
-             edi_mainview_panel_open(panel, options);
-          }
-
+        edi_mainview_open_window(options);
         free(path);
      }
-
    EINA_LIST_FREE(tabs, tab)
      {
         free(tab);
      }
-
-   if (_edi_project_config->current_tab != 0)
-     edi_mainview_tab_select(_edi_project_config->current_tab);
 }
 
 static void
