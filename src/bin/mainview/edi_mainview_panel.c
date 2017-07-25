@@ -267,12 +267,16 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
           const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
    Edi_Mainview_Panel *panel;
+   int index;
 
    panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)data);
    edi_mainview_panel_item_close(panel, data);
-   if (eina_list_count(panel->items)== 0)
+   if (eina_list_count(panel->items)== 0 && edi_mainview_panel_count() > 1)
      {
         edi_mainview_panel_remove(panel);
+        index = edi_mainview_panel_count() - 1;
+        panel = edi_mainview_panel_by_index(index);
+        edi_mainview_panel_focus(panel);
      }
 }
 
