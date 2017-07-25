@@ -615,3 +615,25 @@ _edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_i
      eina_stringshare_del(tab->type);
    free(tab);
 }
+
+void
+_edi_project_config_panel_remove(int panel_id)
+{
+   Edi_Project_Config_Tab *tab;
+   Edi_Project_Config_Panel *panel = eina_list_nth(_edi_project_config->panels, panel_id);
+
+   _edi_project_config->panels = eina_list_remove(_edi_project_config->panels, panel);
+
+   EINA_LIST_FREE(panel->tabs, tab)
+     {
+        if (tab->path)
+          eina_stringshare_del(tab->path);
+        if (tab->type)
+          eina_stringshare_del(tab->type);
+        free(tab);
+     }
+
+   free(panel);
+
+   _edi_project_config_save_no_notify();
+}

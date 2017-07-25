@@ -499,6 +499,10 @@ edi_mainview_project_search_popup_show(void)
 void
 edi_mainview_panel_remove(Edi_Mainview_Panel *panel)
 {
+   int panel_id = edi_mainview_panel_id(panel);
+
+   _edi_project_config_panel_remove(panel_id);
+
    evas_object_del(panel->welcome);
    evas_object_del(panel->content);
    evas_object_del(panel->tabs);

@@ -124,6 +124,7 @@ void _edi_project_config_tab_add(const char *path, const char *type,
                                  Eina_Bool windowed, int panel_id);
 void _edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_id);
 void _edi_project_config_tab_current_set(int panel_id, int tab_id);
+void _edi_project_config_panel_remove(int panel_id);
 
 #ifdef __cplusplus
 }
