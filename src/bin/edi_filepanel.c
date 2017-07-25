@@ -249,7 +249,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "open in new panel", _item_menu_open_panel_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", "open in new panel", _item_menu_open_panel_cb, sd);
 
    if (edi_scm_enabled())
      {
