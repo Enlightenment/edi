@@ -25,6 +25,12 @@ static void
 dummy()
 {}
 
+unsigned int
+edi_mainview_panel_item_count(Edi_Mainview_Panel *panel)
+{
+   return eina_list_count(panel->items);
+}
+
 Edi_Mainview_Item *
 edi_mainview_panel_item_current_get(Edi_Mainview_Panel *panel)
 {

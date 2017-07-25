@@ -279,6 +279,14 @@ void edi_mainview_panel_goto_position(Edi_Mainview_Panel *panel, unsigned int ro
 void edi_mainview_panel_goto_popup_show();
 
 /**
+ * Return number of items in panel.
+ * @param panel the mainview panel context
+ *
+ * @ingroup Content
+ */
+unsigned int edi_mainview_panel_item_count(Edi_Mainview_Panel *panel);
+
+/**
  * @}
  *
  */
