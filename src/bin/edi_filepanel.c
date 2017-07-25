@@ -241,16 +241,17 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, sd);
    elm_menu_item_add(menu, NULL, "window-new", "open new window", _item_menu_open_window_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
-                               _item_menu_xdgopen_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", "open in new panel", _item_menu_open_panel_cb, sd);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", "open in new panel", _item_menu_open_panel_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
+                               _item_menu_xdgopen_cb, sd);
 
+   elm_menu_item_separator_add(menu, NULL);
    if (edi_scm_enabled())
      {
         menu_it = elm_menu_item_add(menu, NULL, NULL, "source control", NULL, NULL);
