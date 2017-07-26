@@ -19,7 +19,7 @@
 #include "edi_private.h"
 #include "edi_config.h"
 
-static Evas_Object *_main_win, *_mainview_panel, *_mainview_parent;
+static Evas_Object *_main_win, *_mainview_panel;
 static Evas_Object *_edi_mainview_search_project_popup;
 
 static Edi_Mainview_Panel *_current_panel;
@@ -519,28 +519,10 @@ Edi_Mainview_Panel *
 edi_mainview_panel_append()
 {
    Edi_Mainview_Panel *panel;
-   Evas_Object *split, *box;
 
-   elm_box_unpack_all(_mainview_parent);
-
-   split = elm_panes_add(_mainview_parent);
-   evas_object_size_hint_weight_set(split, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(split, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(split);
-   elm_box_pack_end(_mainview_parent, split);
-
-   box = elm_box_add(_mainview_parent);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(box);
-
-   elm_object_part_content_set(split, "left", _mainview_panel);
-   elm_object_part_content_set(split, "right", box);
-
-   panel = edi_mainview_panel_add(box);
+   panel = edi_mainview_panel_add(_mainview_panel);
+   _current_panel = panel;
    _edi_mainview_panels = eina_list_append(_edi_mainview_panels, panel);
-
-   _mainview_panel = split;
 
    return panel;
 }
@@ -548,21 +530,10 @@ edi_mainview_panel_append()
 void
 edi_mainview_add(Evas_Object *parent, Evas_Object *win)
 {
-   Edi_Mainview_Panel *panel;
-   Evas_Object *box;
-
+   _mainview_panel = parent;
    _main_win = win;
-   _mainview_parent = parent;
 
-   box = elm_box_add(parent);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(box);
-   elm_box_pack_end(parent, box);
-   _mainview_panel = box;
-
-   panel = edi_mainview_panel_add(box);
-   _current_panel = panel;
-   _edi_mainview_panels = eina_list_append(_edi_mainview_panels, panel);
+   elm_box_horizontal_set(parent, EINA_TRUE);
+   edi_mainview_panel_append();
 }
 
