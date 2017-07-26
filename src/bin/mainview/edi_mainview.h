@@ -252,10 +252,32 @@ void edi_mainview_project_search_popup_show();
 
 Edi_Mainview_Item *edi_mainview_item_current_get();
 
+/**
+ * Return current panel in mainview.
+ *
+ * @return the current mainview panel object.
+ *
+ * @ingroup Panels
+ */
 Edi_Mainview_Panel *edi_mainview_panel_current_get();
 
+/*
+ * Return the index of a given panel instance.
+ *
+ * @param panel The panel instance.
+ * @return integer index of given panel.
+ *
+ * @ingroup Panels
+ */
 unsigned int edi_mainview_panel_index_get(Edi_Mainview_Panel *panel);
 
+/*
+ * Select tab by id from mainview in use.
+ *
+ * @param the integer id of the tab requested.
+ *
+ * @ingroup Tabs
+ */
 void edi_mainview_tab_select(unsigned int id);
 
 /**
@@ -284,13 +306,71 @@ void edi_mainview_item_prev();
  */
 void edi_mainview_item_next();
 
+/**
+ * Append/add a new panel to the existing panels.
+ * Creates a new panel instance and returns a pointer to it.
+ *
+ * @return the newly created mainview panel object.
+ *
+ * @ingroup Panels
+ */
 Edi_Mainview_Panel *edi_mainview_panel_append();
 
+/*
+ * Return panel object from mainview item.
+ *
+ * @param item the mainview item related to the returned panel.
+ * @return the mainview panel object associated with the item.
+ *
+ * @ingroup Panels
+ */
 Edi_Mainview_Panel *edi_mainview_panel_for_item_get(Edi_Mainview_Item *item);
+
+/*
+ * Return panel object from it's numeric index.
+ *
+ * @param index The panel's index requested.
+ * @return the mainview panel object associated with the index.
+ *
+ * @ingroup Panels
+ */
 Edi_Mainview_Panel *edi_mainview_panel_by_index(int index);
+
+/**
+ * Returns the number of open panels.
+ *
+ * @return number of existing panels.
+ *
+ * @ingroup Panels
+ */
 int edi_mainview_panel_count(void);
+
+/*
+ * Return the panel id of a given panel instance.
+ *
+ * @param panel The panel instance.
+ * @return the integer id associated with given panel.
+ *
+ * @ingroup Panels
+ */
 int edi_mainview_panel_id(Edi_Mainview_Panel *panel);
+
+/*
+ * Focus a given panel instance.
+ *
+ * @param panel The panel instance.
+ *
+ * @ingroup Panels
+ */
 void edi_mainview_panel_focus(Edi_Mainview_Panel *panel);
+
+/*
+ * Remove a given panel instance.
+ *
+ * @param panel The panel instance.
+ *
+ * @ingroup Panels
+ */
 void edi_mainview_panel_remove(Edi_Mainview_Panel *panel);
 /**
  * @}
