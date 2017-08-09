@@ -95,7 +95,8 @@ edi_mainview_panel_item_prev(Edi_Mainview_Panel *panel)
    if (first == panel->current)
      {
         prev = eina_list_nth(panel->items, eina_list_count(panel->items)-1);
-        edi_mainview_panel_item_select(panel, prev);
+        if (prev)
+          edi_mainview_panel_item_select(panel, prev);
         return;
      }
 
@@ -124,7 +125,8 @@ edi_mainview_panel_item_next(Edi_Mainview_Panel *panel)
    if (last == panel->current)
      {
         next = eina_list_nth(panel->items, 0);
-        edi_mainview_panel_item_select(panel, next);
+        if (next)
+          edi_mainview_panel_item_select(panel, next);
         return;
      }
 
