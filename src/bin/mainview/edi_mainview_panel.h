@@ -32,12 +32,12 @@ typedef struct _Edi_Mainview_Panel
 } Edi_Mainview_Panel;
 
 /**
- * @brief Content management functions.
- * @defgroup Content
+ * @brief UI management functions.
+ * @defgroup UI
  *
  * @{
  *
- * Opening and managing content within the view.
+ * Initialisation and management of UI panels.
  *
  */
 
@@ -47,9 +47,18 @@ typedef struct _Edi_Mainview_Panel
  * @param parent The mainview parent into which the panel will be loaded.
  * @return the panel that represents tha added mainview panel.
  *
- * @ingroup Content
+ * @ingroup UI
  */
 Edi_Mainview_Panel *edi_mainview_panel_add(Evas_Object *parent);
+
+/**
+ * Free the panel and any related objects.
+ *
+ * @param The panel to free.
+ *
+ * @ingroup UI
+ */
+void edi_mainview_panel_free(Edi_Mainview_Panel *panel);
 
 /**
  * Close mainview by path.
@@ -57,25 +66,16 @@ Edi_Mainview_Panel *edi_mainview_panel_add(Evas_Object *parent);
  * @param panel the mainview panel context
  * @praram path The path of file to close.
  *
- * @ingroup Content
+ * @ingroup UI
  */
 void edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path);
-
-/**
- * Refresh all existing open files.
- *
- * @param panel the mainview panel context
- *
- * @ingroup Content
- */
-void edi_mainview_panel_refresh_all(Edi_Mainview_Panel *panel);
 
 /**
  * Close all existing open files.
  *
  * @param panel the mainview panel context
  *
- * @ingroup Content
+ * @ingroup UI
  */
 void edi_mainview_panel_close_all(Edi_Mainview_Panel *panel);
 
@@ -86,7 +86,7 @@ void edi_mainview_panel_close_all(Edi_Mainview_Panel *panel);
  * @param panel the mainview panel context
  * @param path The absolute path of the file to open.
  *
- * @ingroup Content
+ * @ingroup UI
  */
 void edi_mainview_panel_open_path(Edi_Mainview_Panel *panel, const char *path);
 
@@ -97,9 +97,31 @@ void edi_mainview_panel_open_path(Edi_Mainview_Panel *panel, const char *path);
  * @param panel the mainview panel context
  * @param path The path and options of the file to open.
  *
- * @ingroup Content
+ * @ingroup UI
  */
 void edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options);
+
+/**
+ * @}
+ *
+ *
+ * @brief Content management functions.
+ * @defgroup Content
+ *
+ * @{
+ *
+ * Opening and managing content within the view.
+ *
+ */
+
+/**
+ * Refresh all existing open files.
+ *
+ * @param panel the mainview panel context
+ *
+ * @ingroup Content
+ */
+void edi_mainview_panel_refresh_all(Edi_Mainview_Panel *panel);
 
 void edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item);
 

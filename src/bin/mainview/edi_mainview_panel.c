@@ -778,6 +778,18 @@ _edi_mainview_panel_prev_clicked_cb(void *data,
    elm_scroller_region_bring_in(scroller, x, y, w, h);
 }
 
+void
+edi_mainview_panel_free(Edi_Mainview_Panel *panel)
+{
+   evas_object_del(panel->welcome);
+   evas_object_del(panel->content);
+   evas_object_del(panel->tabs);
+   evas_object_del(panel->scroll);
+   evas_object_del(panel->box);
+
+   free(panel);
+}
+
 Edi_Mainview_Panel *
 edi_mainview_panel_add(Evas_Object *parent)
 {

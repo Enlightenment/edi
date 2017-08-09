@@ -502,17 +502,9 @@ edi_mainview_panel_remove(Edi_Mainview_Panel *panel)
    int panel_id = edi_mainview_panel_id(panel);
 
    _edi_project_config_panel_remove(panel_id);
-
-   evas_object_del(panel->welcome);
-   evas_object_del(panel->content);
-   evas_object_del(panel->tabs);
-   evas_object_del(panel->scroll);
-   evas_object_del(panel->box);
+   edi_mainview_panel_free(panel);
 
    _edi_mainview_panels = eina_list_remove(_edi_mainview_panels, panel);
-
-   free(panel);
-   panel = NULL;
 }
 
 Edi_Mainview_Panel *

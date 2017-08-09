@@ -39,6 +39,19 @@ extern "C" {
 void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
 
 /**
+ * @}
+ *
+ *
+ * @brief Content management functions.
+ * @defgroup Content
+ *
+ * @{
+ *
+ * Opening and managing content within the view.
+ *
+ */
+
+/**
  * Close mainview by path.
  *
  * @praram path The path of file to close.
@@ -60,19 +73,6 @@ void edi_mainview_refresh_all(void);
  * @ingroup Content
  */
 void edi_mainview_close_all(void);
-
-/**
- * @}
- *
- *
- * @brief Content management functions.
- * @defgroup Content
- *
- * @{
- *
- * Opening and managing content within the view.
- *
- */
 
 /**
  * Open the file at path for editing using the type specified.
