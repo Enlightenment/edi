@@ -710,30 +710,37 @@ edi_mainview_panel_close_all(Edi_Mainview_Panel *panel)
    Edi_Mainview_Item *it;
 
    EINA_LIST_FOREACH(panel->items, item, it)
-     {
-        if (it)
-          edi_mainview_panel_item_close(panel, it);
-     }
+     edi_mainview_panel_item_close(panel, it);
 }
 
 void
 edi_mainview_panel_refresh_all(Edi_Mainview_Panel *panel)
 {
-   Eina_List *item;
+   Eina_List *item, *tabs = NULL;
    Edi_Mainview_Item *it;
-   char *path;
+   Edi_Path_Options *options;
 
    EINA_LIST_FOREACH(panel->items, item, it)
      {
-        if (it)
-          {
-             path = strdup(it->path);
-             edi_mainview_panel_item_close(panel, it);
-             if (ecore_file_exists(path))
-               edi_mainview_panel_open_path(panel, path);
-             free(path);
-          }
+        options = edi_path_options_create(it->path);
+        options->type = eina_stringshare_add(it->mimetype);
+        options->background = it != panel->current;
+
+        tabs = eina_list_append(tabs, options);
      }
+
+   edi_mainview_panel_close_all(panel);
+
+   EINA_LIST_FOREACH(tabs, item, options)
+     {
+        if (!ecore_file_exists(options->path))
+          continue;
+
+        edi_mainview_panel_open(panel, options);
+     }
+
+   EINA_LIST_FREE(tabs, options)
+     free(options);
 }
 
 void
