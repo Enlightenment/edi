@@ -426,14 +426,14 @@ _edi_mainview_project_search_popup_cancel_cb(void *data EINA_UNUSED,
 }
 
 static void
-_edi_mainview_project_search_cb(void *data EINA_UNUSED,
-                             Evas_Object *obj,
+_edi_mainview_project_search_cb(void *data,
+                             Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
 {
    const char *text_markup;
    char *text;
 
-   text_markup = elm_object_text_get(obj);
+   text_markup = elm_object_text_get((Evas_Object *) data);
    if (!text_markup || !text_markup[0]) return;
 
    text = elm_entry_markup_to_utf8(text_markup);
@@ -455,7 +455,7 @@ _edi_mainview_project_search_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EIN
    str = elm_object_text_get(obj);
 
    if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
-     _edi_mainview_project_search_cb(NULL, obj, NULL);
+     _edi_mainview_project_search_cb(obj, NULL, NULL);
 }
 
 void
