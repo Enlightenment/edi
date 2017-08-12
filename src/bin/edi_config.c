@@ -622,6 +622,9 @@ _edi_project_config_panel_remove(int panel_id)
    Edi_Project_Config_Tab *tab;
    Edi_Project_Config_Panel *panel = eina_list_nth(_edi_project_config->panels, panel_id);
 
+   if (!panel)
+     return;
+
    _edi_project_config->panels = eina_list_remove(_edi_project_config->panels, panel);
 
    EINA_LIST_FREE(panel->tabs, tab)

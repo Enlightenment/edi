@@ -305,10 +305,19 @@ void
 edi_mainview_close_all(void)
 {
    Eina_List *item;
-   Edi_Mainview_Panel *it;
+   Edi_Mainview_Panel *panel, *it;
+
+   if (edi_mainview_is_empty()) return;
 
    EINA_LIST_FOREACH(_edi_mainview_panels, item, it)
-     edi_mainview_panel_close_all(it);
+     {
+        if (edi_mainview_panel_item_count(it))
+          edi_mainview_panel_close_all(it);
+        edi_mainview_panel_remove(it);
+     }
+
+   panel = edi_mainview_panel_append();
+   edi_mainview_panel_focus(panel);
 }
 
 void
@@ -354,9 +363,12 @@ edi_mainview_new_window()
 void
 edi_mainview_close()
 {
-   if (edi_mainview_is_empty()) return;
+   if (!_current_panel || edi_mainview_is_empty()) return;
 
    edi_mainview_panel_close(_current_panel);
+   if (edi_mainview_panel_count() > 1 &&
+       !edi_mainview_panel_item_count(_current_panel))
+     edi_mainview_panel_remove(_current_panel);
 }
 
 void
@@ -541,6 +553,8 @@ edi_mainview_panel_remove(Edi_Mainview_Panel *panel)
    edi_mainview_panel_free(panel);
 
    _edi_mainview_panels = eina_list_remove(_edi_mainview_panels, panel);
+
+   _current_panel = edi_mainview_panel_by_index(0);
 }
 
 Edi_Mainview_Panel *
