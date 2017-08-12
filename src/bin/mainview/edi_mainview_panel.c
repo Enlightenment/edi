@@ -618,7 +618,7 @@ edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
    elm_object_text_set(button, "cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
-                                       _edi_popup_cancel_cb, NULL);
+                                       _edi_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "go");
