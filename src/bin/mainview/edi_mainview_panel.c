@@ -535,6 +535,8 @@ edi_mainview_panel_search(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
+   if (edi_mainview_is_empty()) return;
+
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
    if (editor)
@@ -544,6 +546,8 @@ edi_mainview_panel_search(Edi_Mainview_Panel *panel)
 void
 edi_mainview_panel_goto(Edi_Mainview_Panel *panel, unsigned int number)
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_goto_position(panel, number, 1);
 }
 

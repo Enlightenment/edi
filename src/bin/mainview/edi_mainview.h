@@ -345,6 +345,15 @@ Edi_Mainview_Panel *edi_mainview_panel_by_index(int index);
  */
 int edi_mainview_panel_count(void);
 
+/**
+ * Return whether the mainview is completely empty.
+ *
+ * @return true if there are any items open in any panel.
+ *
+ * @ingroup Panels
+ */
+Eina_Bool edi_mainview_is_empty(void);
+
 /*
  * Return the panel id of a given panel instance.
  *

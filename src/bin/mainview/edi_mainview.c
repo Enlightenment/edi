@@ -29,6 +29,16 @@ static void
 dummy()
 {}
 
+Eina_Bool
+edi_mainview_is_empty(void)
+{
+   if (edi_mainview_panel_count() == 1 &&
+       !edi_mainview_panel_item_count(edi_mainview_panel_by_index(0)))
+     return EINA_TRUE;
+
+   return EINA_FALSE;
+}
+
 int
 edi_mainview_panel_count(void)
 {
@@ -324,6 +334,8 @@ edi_mainview_item_close_path(const char *path)
 void
 edi_mainview_save()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_save(_current_panel);
 }
 
@@ -342,72 +354,96 @@ edi_mainview_new_window()
 void
 edi_mainview_close()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_close(_current_panel);
 }
 
 void
 edi_mainview_undo()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_undo(_current_panel);
 }
 
 Eina_Bool
 edi_mainview_can_undo()
 {
+   if (edi_mainview_is_empty()) return EINA_FALSE;
+
    return edi_mainview_panel_can_undo(_current_panel);
 }
 
 void
 edi_mainview_redo()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_redo(_current_panel);
 }
 
 Eina_Bool
 edi_mainview_can_redo()
 {
+   if (edi_mainview_is_empty()) return EINA_FALSE;
+
    return edi_mainview_panel_can_redo(_current_panel);
 }
 
 Eina_Bool
 edi_mainview_modified()
 {
+   if (edi_mainview_is_empty()) return EINA_FALSE;
+
    return edi_mainview_panel_modified(_current_panel);
 }
 
 void
 edi_mainview_cut()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_cut(_current_panel);
 }
 
 void
 edi_mainview_copy()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_copy(_current_panel);
 }
 
 void
 edi_mainview_paste()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_paste(_current_panel);
 }
 
 void
 edi_mainview_search()
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_search(_current_panel);
 }
 
 void
 edi_mainview_goto(unsigned int number)
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_goto(_current_panel, number);
 }
 
 void
 edi_mainview_goto_position(unsigned int row, unsigned int col)
 {
+   if (edi_mainview_is_empty()) return;
+
    edi_mainview_panel_goto_position(_current_panel, row, col);
 }
 
