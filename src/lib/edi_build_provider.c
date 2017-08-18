@@ -23,8 +23,6 @@ EAPI Edi_Build_Provider *edi_build_provider_for_project_path_get(const char *pat
    if (!path)
      return NULL;
 
-   if (_edi_build_provider_make.path_supported_is(path))
-     return &_edi_build_provider_make;
    if (_edi_build_provider_cmake.path_supported_is(path))
      return &_edi_build_provider_cmake;
    if (_edi_build_provider_cargo.path_supported_is(path))
@@ -33,6 +31,8 @@ EAPI Edi_Build_Provider *edi_build_provider_for_project_path_get(const char *pat
      return &_edi_build_provider_python;
    if (_edi_build_provider_meson.path_supported_is(path))
      return &_edi_build_provider_meson;
+   if (_edi_build_provider_make.path_supported_is(path))
+     return &_edi_build_provider_make;
 
    return NULL;
 }
