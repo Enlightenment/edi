@@ -797,6 +797,8 @@ edi_mainview_panel_free(Edi_Mainview_Panel *panel)
    evas_object_del(panel->tabs);
    evas_object_del(panel->scroll);
    evas_object_del(panel->box);
+   if (panel->sep)
+     evas_object_del(panel->sep);
 
    free(panel);
 }
@@ -805,11 +807,20 @@ Edi_Mainview_Panel *
 edi_mainview_panel_add(Evas_Object *parent)
 {
    Edi_Mainview_Panel *panel;
-   Evas_Object *box, *scroll, *txt, *nf, *tabs, *tab, *bg, *pad, *scr, *tb;
+   Evas_Object *box, *sep, *scroll, *txt, *nf, *tabs, *tab, *bg, *pad, *scr, *tb;
    Evas_Object *next, *prev, *ico_next, *ico_prev;
    _main_win = parent;
 
    panel = calloc(1, sizeof(*panel));
+
+   if (edi_mainview_panel_count() > 0)
+     {
+        sep = elm_separator_add(parent);
+        elm_separator_horizontal_set(sep, EINA_FALSE);
+        evas_object_show(sep);
+        panel->sep = sep;
+        elm_box_pack_end(parent, sep);
+     }
 
    box = elm_box_add(parent);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);

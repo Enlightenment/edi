@@ -28,7 +28,7 @@ typedef struct _Edi_Mainview_Panel
    Eina_List *items;
 
    Edi_Mainview_Item *current;
-   Evas_Object *box, *scroll, *tabs, *content, *welcome, *tb;
+   Evas_Object *box, *scroll, *tabs, *content, *welcome, *tb, *sep;
 } Edi_Mainview_Panel;
 
 /**
