@@ -106,32 +106,51 @@ static void
 _item_menu_open_as_text_cb(void *data, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
+   Edi_Mainview_Panel *panel;
+   Edi_Path_Options *options;
    Edi_Dir_Data *sd;
 
    sd = data;
-   edi_mainview_item_close_path(sd->path);
-   _open_cb(sd->path, "text", EINA_FALSE);
+
+   panel = edi_mainview_panel_current_get();
+   options = edi_path_options_create(sd->path);
+   edi_mainview_panel_item_close_path(panel, sd->path);
+   options->type = "text";
+   edi_mainview_panel_open(panel, options);
 }
 
 static void
 _item_menu_open_as_code_cb(void *data, Evas_Object *obj EINA_UNUSED,
                            void *event_info EINA_UNUSED)
 {
+   Edi_Mainview_Panel *panel;
+   Edi_Path_Options *options;
    Edi_Dir_Data *sd;
 
    sd = data;
-   edi_mainview_item_close_path(sd->path);
-   _open_cb(sd->path, "code", EINA_FALSE);
+
+   panel = edi_mainview_panel_current_get();
+   options = edi_path_options_create(sd->path);
+   edi_mainview_panel_item_close_path(panel, sd->path);
+   options->type = "code";
+   edi_mainview_panel_open(panel, options);
 }
 
 static void
 _item_menu_open_as_image_cb(void *data, Evas_Object *obj EINA_UNUSED,
                             void *event_info EINA_UNUSED)
 {
+   Edi_Mainview_Panel *panel;
+   Edi_Path_Options *options;
    Edi_Dir_Data *sd;
 
    sd = data;
-   _open_cb(sd->path, "image", EINA_FALSE);
+
+   panel = edi_mainview_panel_current_get();
+   options = edi_path_options_create(sd->path);
+   edi_mainview_panel_item_close_path(panel, sd->path);
+   options->type = "image";
+   edi_mainview_panel_open(panel, options);
 }
 
 static void

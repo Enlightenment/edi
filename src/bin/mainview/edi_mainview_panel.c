@@ -34,6 +34,7 @@ edi_mainview_panel_item_count(Edi_Mainview_Panel *panel)
 Edi_Mainview_Item *
 edi_mainview_panel_item_current_get(Edi_Mainview_Panel *panel)
 {
+   if (!panel) return NULL;
    return panel->current;
 }
 
@@ -207,7 +208,8 @@ edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item
      return;
 
    edi_mainview_item_prev();
-   evas_object_del(item->view);
+   if (item->view)
+     evas_object_del(item->view);
    elm_box_unpack(panel->tabs, item->tab);
    evas_object_del(item->tab);
    panel->items = eina_list_remove(panel->items, item);
@@ -309,6 +311,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    Evas_Object *content, *tab;//, *icon;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
+   Elm_Code *code;
 
    if (!panel) return;
 
@@ -345,7 +348,12 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    // Set focus on the newly opening window so that one can just start typing
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
    if (editor)
-     elm_object_focus_set(editor->entry, EINA_TRUE);
+     {
+        elm_object_focus_set(editor->entry, EINA_TRUE);
+        code = elm_code_widget_code_get(editor->entry);
+        editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
+        editor->modified = EINA_FALSE;
+     }
 
    if (options->line)
      {
@@ -363,6 +371,8 @@ _get_item_for_path(Edi_Mainview_Panel *panel, const char *path)
 {
    Eina_List *item;
    Edi_Mainview_Item *it;
+
+   if (!panel) return NULL;
 
    EINA_LIST_FOREACH(panel->items, item, it)
      {
@@ -417,14 +427,14 @@ edi_mainview_panel_save(Edi_Mainview_Panel *panel)
    Elm_Code *code;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
-
    if (!editor)
      return;
 
-   editor->modified = EINA_FALSE;
-
    code = elm_code_widget_code_get(editor->entry);
    elm_code_file_save(code->file);
+   editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
+   editor->modified = EINA_FALSE;
+
    ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
 }
 
@@ -727,7 +737,7 @@ edi_mainview_panel_refresh_all(Edi_Mainview_Panel *panel)
    EINA_LIST_FOREACH(panel->items, item, it)
      {
         options = edi_path_options_create(it->path);
-        options->type = eina_stringshare_add(it->mimetype);
+        options->type = eina_stringshare_add(it->editortype);
         options->background = it != panel->current;
 
         tabs = eina_list_append(tabs, options);
@@ -752,6 +762,8 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
 {
    Eina_List *item;
    Edi_Mainview_Item *it;
+
+   if (!panel) return;
 
    EINA_LIST_FOREACH(panel->items, item, it)
      {

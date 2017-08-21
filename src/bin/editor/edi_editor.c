@@ -34,19 +34,14 @@ static void
 _edi_editor_file_change_reload_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    Edi_Editor *editor;
-   const char *filename;
-   Elm_Code *code;
 
    editor = (Edi_Editor *)data;
    if (!editor) return;
 
-   code = elm_code_widget_code_get(editor->entry);
-   filename = elm_code_file_path_get(code->file);
-
-   edi_mainview_close();
-   edi_mainview_open_path(filename);
+   edi_editor_reload(editor);
 
    evas_object_del(editor->popup);
+   editor->popup = NULL;
 }
 
 static void
@@ -60,44 +55,60 @@ _edi_editor_file_change_ignore_cb(void *data, Evas_Object *obj EINA_UNUSED, void
    edi_editor_save(editor);
    editor->save_time = time(NULL);
    evas_object_del(editor->popup);
+   editor->popup = NULL;
 }
 
 static void
-_edi_editor_file_change_popup(Edi_Editor *editor)
+_edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *box, *table;
-   Evas_Object *label, *bt_reload, *bt_ignore;
+   Evas_Object *table, *box, *label, *sep, *icon, *button;
 
-   editor->popup = elm_popup_add(editor->entry);
+   if (editor->popup)
+     return;
+
+   editor->popup = elm_popup_add(parent);
+   elm_popup_orient_set(editor->popup, ELM_POPUP_ORIENT_CENTER);
    elm_popup_scrollable_set(editor->popup, EINA_TRUE);
-   elm_object_part_text_set(editor->popup, "title,text", "File has changed...");
+   elm_object_part_text_set(editor->popup, "title,text", "Confirmation");
    evas_object_size_hint_align_set(editor->popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(editor->popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_show(editor->popup);
+
+   table = elm_table_add(editor->popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "dialog-warning");
+   evas_object_size_hint_min_set(icon, 47 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
 
    box = elm_box_add(editor->popup);
    label = elm_label_add(editor->popup);
-   elm_object_text_set(label, "File has changed on disk.");
+   elm_object_text_set(label, "File contents have changed. Would you like to refresh <br> the contents of this file?");
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
-   table = elm_table_add(editor->popup);
-   bt_reload = elm_button_add(editor->popup);
-   elm_object_text_set(bt_reload, "Reload");
-   elm_table_pack(table, bt_reload, 0, 0, 1, 1);
-   evas_object_smart_callback_add(bt_reload, "clicked", _edi_editor_file_change_reload_cb, editor);
-   evas_object_show(bt_reload);
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+   evas_object_show(box);
+   elm_table_pack(table, box, 1, 0, 1, 1);
 
-   bt_ignore = elm_button_add(editor->popup);
-   elm_object_text_set(bt_ignore, "Ignore");
-   elm_table_pack(table, bt_ignore, 1, 0, 1, 1);
-   evas_object_smart_callback_add(bt_ignore, "clicked", _edi_editor_file_change_ignore_cb, editor);
-
-   elm_box_pack_end(box, table);
-   evas_object_show(bt_ignore);
-   elm_object_content_set(editor->popup, box);
+   elm_object_content_set(editor->popup, table);
    evas_object_show(table);
-   evas_object_resize(editor->popup, 200 * elm_config_scale_get(), 200 * elm_config_scale_get());
+
+   button = elm_button_add(editor->popup);
+   elm_object_text_set(button, "Refresh");
+   elm_object_part_content_set(editor->popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_reload_cb, editor);
+
+   button = elm_button_add(editor->popup);
+   elm_object_text_set(button, "No, continue editing");
+   elm_object_part_content_set(editor->popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_ignore_cb, editor);
+
+   evas_object_show(editor->popup);
 }
 
 void
@@ -105,7 +116,6 @@ edi_editor_save(Edi_Editor *editor)
 {
    Elm_Code *code;
    const char *filename;
-   time_t mtime;
 
    if (!editor->modified)
      return;
@@ -113,17 +123,6 @@ edi_editor_save(Edi_Editor *editor)
    code = elm_code_widget_code_get(editor->entry);
 
    filename = elm_code_file_path_get(code->file);
-
-   mtime = ecore_file_mod_time(filename);
-
-   if ((editor->save_time) && (editor->save_time < mtime))
-     {
-        ecore_timer_del(editor->save_timer);
-        editor->save_timer = NULL;
-        _edi_editor_file_change_popup(editor);
-        editor->modified = EINA_FALSE;
-        return;
-     }
 
    edi_mainview_save();
 
@@ -966,11 +965,31 @@ _focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 {
    Edi_Mainview_Panel *panel;
    Edi_Mainview_Item *item;
+   Elm_Code *code;
+   Edi_Editor *editor;
+   const char *filename;
+   time_t mtime;
 
    item = (Edi_Mainview_Item *)data;
    panel = edi_mainview_panel_for_item_get(item);
 
    edi_mainview_panel_focus(panel);
+
+   editor = evas_object_data_get(obj, "editor");
+
+   code = elm_code_widget_code_get(editor->entry);
+   filename = elm_code_file_path_get(code->file);
+
+   mtime = ecore_file_mod_time(filename);
+
+   if ((editor->save_time) && (editor->save_time < mtime))
+     {
+        ecore_timer_del(editor->save_timer);
+        editor->save_timer = NULL;
+        _edi_editor_file_change_popup(evas_object_smart_parent_get(obj), editor);
+        editor->modified = EINA_FALSE;
+        return;
+     }
 }
 
 static void
@@ -1079,6 +1098,31 @@ _editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o, void *event_info
      edi_language_provider_get(editor)->del(editor);
 }
 
+void
+edi_editor_reload(Edi_Editor *editor)
+{
+   Elm_Code *code;
+   const char *path;
+
+   ecore_thread_main_loop_begin();
+
+   code = elm_code_widget_code_get(editor->entry);
+   path = elm_code_file_path_get(code->file);
+   elm_code_file_clear(code->file);
+   code->file = elm_code_file_open(code, path);
+
+   editor->modified = EINA_FALSE;
+   editor->save_time = ecore_file_mod_time(path);
+
+   if (editor->save_timer)
+     {
+        ecore_timer_del(editor->save_timer);
+        editor->save_timer = NULL;
+     }
+
+   ecore_thread_main_loop_end();
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -1123,6 +1167,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    editor = calloc(1, sizeof(*editor));
    editor->entry = widget;
    editor->mimetype = item->mimetype;
+   evas_object_data_set(widget, "editor", editor);
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);

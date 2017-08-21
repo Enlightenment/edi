@@ -54,7 +54,7 @@ void edi_mainview_add(Evas_Object *parent, Evas_Object *win);
 /**
  * Close mainview by path.
  *
- * @praram path The path of file to close.
+ * @param path The path of file to close.
  *
  * @ingroup Content
  */

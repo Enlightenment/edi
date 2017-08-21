@@ -88,6 +88,15 @@ struct _Edi_Editor
 Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
 
 /**
+ * Reload existing editor's content from disk.
+ *
+ * @param editor the editor instance to reload content from.
+ *
+ * @ingroup Editor
+ */
+void edi_editor_reload(Edi_Editor *editor);
+
+/**
  * @}
  *
  * @brief Widgets.
