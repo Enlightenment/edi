@@ -454,7 +454,7 @@ edi_mainview_panel_can_undo(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
-   if (!panel->current)
+   if (!panel || !panel->current)
      return EINA_FALSE;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
@@ -481,7 +481,7 @@ edi_mainview_panel_can_redo(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
-   if (!panel->current)
+   if (!panel || !panel->current)
      return EINA_FALSE;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
@@ -497,7 +497,7 @@ edi_mainview_panel_modified(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
-   if (!panel->current)
+   if (!panel || !panel->current)
      return EINA_FALSE;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
