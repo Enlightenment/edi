@@ -124,7 +124,7 @@ edi_editor_save(Edi_Editor *editor)
 
    filename = elm_code_file_path_get(code->file);
 
-   edi_mainview_save();
+   elm_code_file_save(code->file);
 
    editor->save_time = ecore_file_mod_time(filename);
 
@@ -138,6 +138,8 @@ edi_editor_save(Edi_Editor *editor)
 
    if (edi_language_provider_has(editor))
      edi_language_provider_get(editor)->refresh(editor);
+
+   ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
 }
 
 static Eina_Bool

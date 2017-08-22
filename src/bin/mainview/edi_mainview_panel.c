@@ -424,18 +424,12 @@ void
 edi_mainview_panel_save(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
-   Elm_Code *code;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (!editor)
      return;
 
-   code = elm_code_widget_code_get(editor->entry);
-   elm_code_file_save(code->file);
-   editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
-   editor->modified = EINA_FALSE;
-
-   ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
+   edi_editor_save(editor);
 }
 
 void
