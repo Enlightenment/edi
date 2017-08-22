@@ -76,7 +76,7 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    table = elm_table_add(editor->popup);
    icon = elm_icon_add(table);
    elm_icon_standard_set(icon, "dialog-warning");
-   evas_object_size_hint_min_set(icon, 47 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
    evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(icon);

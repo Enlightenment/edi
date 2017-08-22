@@ -165,7 +165,7 @@ _edi_file_screens_rename_cb(void *data,
 void
 edi_file_screens_rename(Evas_Object *parent, const char *path)
 {
-   Evas_Object *popup, *box, *input, *button;
+   Evas_Object *table, *popup, *box, *input, *button, *sep, *label, *icon;
    const char *leaf;
 
    _parent_obj = parent;
@@ -180,9 +180,25 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
    leaf = ecore_file_file_get(path);
    _directory_path = eina_stringshare_add(ecore_file_dir_get(path));
 
+
+   table = elm_table_add(popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "dialog-information");
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
+
    box = elm_box_add(popup);
-   elm_box_horizontal_set(box, EINA_FALSE);
-   elm_object_content_set(popup, box);
+   label = elm_label_add(popup);
+   if (ecore_file_is_dir(path))
+     elm_object_text_set(label, "Please enter a new name for this directory.");
+   else
+     elm_object_text_set(label, "Please enter a new name for this file.");
+   evas_object_show(label);
+
+   elm_box_pack_end(box, label);
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
@@ -193,6 +209,16 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
    elm_box_pack_end(box, input);
+   evas_object_show(box);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+   evas_object_show(table);
+
+   elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "cancel");
@@ -214,7 +240,7 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
 void
 edi_file_screens_create_file(Evas_Object *parent, const char *directory)
 {
-   Evas_Object *popup, *box, *input, *button;
+   Evas_Object *table, *popup, *box, *input, *button, *sep, *label, *icon;
 
    _parent_obj = parent;
    _popup = popup = elm_popup_add(parent);
@@ -222,17 +248,41 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
                             "Enter new file name");
    _directory_path = eina_stringshare_add(directory);
 
+   table = elm_table_add(popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "document-new");
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
+
    box = elm_box_add(popup);
-   elm_box_horizontal_set(box, EINA_FALSE);
-   elm_object_content_set(popup, box);
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "Please enter a name for this new file.");
+   evas_object_show(label);
+
+   elm_box_pack_end(box, label);
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_editable_set(input, EINA_TRUE);
    elm_entry_scrollable_set(input, EINA_TRUE);
-   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
    elm_box_pack_end(box, input);
+   evas_object_show(box);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+
+   elm_box_pack_end(box, sep);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+   evas_object_show(table);
+
+   elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "cancel");
@@ -253,7 +303,7 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
 void
 edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
 {
-   Evas_Object *popup, *box, *input, *button;
+   Evas_Object *table, *popup, *box, *input, *button, *sep, *label, *icon;
 
    _parent_obj = parent;
    _directory_path = eina_stringshare_add(directory);
@@ -262,17 +312,41 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
    elm_object_part_text_set(popup, "title,text",
                             "Enter new directory name");
 
+   table = elm_table_add(popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "folder-new");
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
+
    box = elm_box_add(popup);
-   elm_box_horizontal_set(box, EINA_FALSE);
-   elm_object_content_set(popup, box);
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "Please enter a name for this new directory.");
+   evas_object_show(label);
+
+   elm_box_pack_end(box, label);
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_editable_set(input, EINA_TRUE);
    elm_entry_scrollable_set(input, EINA_TRUE);
-   evas_object_size_hint_weight_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
    elm_box_pack_end(box, input);
+   evas_object_show(box);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+
+   elm_box_pack_end(box, sep);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+   evas_object_show(table);
+
+   elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "cancel");

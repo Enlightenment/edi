@@ -509,25 +509,49 @@ _edi_mainview_project_search_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EIN
 void
 edi_mainview_project_search_popup_show(void)
 {
-   Evas_Object *popup, *box, *input, *button;
+  Evas_Object *table, *popup, *box, *input, *button, *sep, *label, *icon;
 
    popup = elm_popup_add(_main_win);
    _edi_mainview_search_project_popup = popup;
    elm_object_part_text_set(popup, "title,text",
-                            "Search for");
+                            "Search for (whole project)");
+
+   table = elm_table_add(popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "system-search");
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
 
    box = elm_box_add(popup);
-   elm_box_horizontal_set(box, EINA_FALSE);
-   elm_object_content_set(popup, box);
+   label = elm_label_add(popup);
+   elm_object_text_set(label, "Please enter a term to search for within<br> the whole prject.");
+   evas_object_show(label);
+
+   elm_box_pack_end(box, label);
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
+   elm_entry_editable_set(input, EINA_TRUE);
    elm_entry_scrollable_set(input, EINA_TRUE);
-   evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_project_search_popup_key_up_cb, NULL);
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_event_callback_add(input, EVAS_CALLBACK_KEY_UP, _edi_mainview_project_search_popup_key_up_cb, NULL);
    evas_object_show(input);
    elm_box_pack_end(box, input);
+   evas_object_show(box);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+
+   elm_box_pack_end(box, sep);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+   evas_object_show(table);
+
+   elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "cancel");
