@@ -10,23 +10,6 @@ extern "C" {
  * @brief These routines are used for Edi SCM management.
  */
 
-typedef int (scm_fn_add)(const char *path);
-typedef int (scm_fn_mod)(const char *path);
-typedef int (scm_fn_del)(const char *path);
-typedef int (scm_fn_move)(const char *src, const char *dest);
-typedef int (scm_fn_commit)(const char *message);
-typedef int (scm_fn_status)(void);
-typedef int (scm_fn_push)(void);
-typedef int (scm_fn_pull)(void);
-typedef int (scm_fn_stash)(void);
-
-typedef int (scm_fn_remote_add)(const char *remote_url);
-typedef const char * (scm_fn_remote_name)(void);
-typedef const char * (scm_fn_remote_email)(void);
-typedef const char * (scm_fn_remote_url)(void);
-typedef int (scm_fn_credentials)(const char *name, const char *email);
-typedef Eina_List * (scm_fn_status_get)(void);
-
 typedef enum {
    EDI_SCM_STATUS_ADDED = 1,
    EDI_SCM_STATUS_DELETED,
@@ -43,6 +26,24 @@ typedef struct _Edi_Scm_Status
    Eina_Bool staged;
 } Edi_Scm_Status;
 
+typedef int (scm_fn_add)(const char *path);
+typedef int (scm_fn_mod)(const char *path);
+typedef int (scm_fn_del)(const char *path);
+typedef int (scm_fn_move)(const char *src, const char *dest);
+typedef int (scm_fn_commit)(const char *message);
+typedef int (scm_fn_status)(void);
+typedef int (scm_fn_push)(void);
+typedef int (scm_fn_pull)(void);
+typedef int (scm_fn_stash)(void);
+typedef Edi_Scm_Status_Code (scm_fn_file_status)(const char *path);
+
+typedef int (scm_fn_remote_add)(const char *remote_url);
+typedef const char * (scm_fn_remote_name)(void);
+typedef const char * (scm_fn_remote_email)(void);
+typedef const char * (scm_fn_remote_url)(void);
+typedef int (scm_fn_credentials)(const char *name, const char *email);
+typedef Eina_List * (scm_fn_status_get)(void);
+
 typedef struct _Edi_Scm_Engine
 {
    const char     *name;
@@ -50,15 +51,16 @@ typedef struct _Edi_Scm_Engine
    const char     *path;
    Eina_List      *statuses;
 
-   scm_fn_add     *file_add;
-   scm_fn_mod     *file_mod;
-   scm_fn_del     *file_del;
-   scm_fn_move    *move;
-   scm_fn_commit  *commit;
-   scm_fn_status  *status;
-   scm_fn_push    *push;
-   scm_fn_pull    *pull;
-   scm_fn_stash   *stash;
+   scm_fn_add         *file_add;
+   scm_fn_mod         *file_mod;
+   scm_fn_del         *file_del;
+   scm_fn_move        *move;
+   scm_fn_commit      *commit;
+   scm_fn_status      *status;
+   scm_fn_file_status *file_status;
+   scm_fn_push        *push;
+   scm_fn_pull        *pull;
+   scm_fn_stash       *stash;
 
    scm_fn_remote_add   *remote_add;
    scm_fn_remote_name  *remote_name_get;
@@ -156,6 +158,16 @@ void edi_scm_commit(const char *message);
  * @ingroup Scm
  */
 void edi_scm_status(void);
+
+/**
+ * Get file status within repository.
+ *
+ * @param path The file path.
+ * @return The status code of the file.
+ *
+ * @ingroup Scm
+ */
+Edi_Scm_Status_Code edi_scm_file_status(const char *path);
 
 /**
  * Get status of repository.

@@ -214,11 +214,17 @@ static void
 _item_menu_scm_del_do_cb(void *data)
 {
    Edi_Dir_Data *sd;
+   Edi_Scm_Status_Code status;
 
    sd = data;
+
    edi_mainview_item_close_path(sd->path);
 
-   edi_scm_del(sd->path);
+   status = edi_scm_file_status(sd->path);
+   if (status != EDI_SCM_STATUS_UNTRACKED)
+     edi_scm_del(sd->path);
+   else
+     ecore_file_unlink(sd->path);
 }
 
 static void

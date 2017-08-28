@@ -197,6 +197,33 @@ _parse_line(char *line)
    return status;
 }
 
+static Edi_Scm_Status_Code
+_edi_scm_git_file_status(const char *path)
+{
+   Eina_Strbuf *command;
+   Edi_Scm_Status *status;
+   Edi_Scm_Status_Code result;
+   char *line;
+
+   command = eina_strbuf_new();
+
+   eina_strbuf_append_printf(command, "git status --porcelain %s", path);
+
+   line = _edi_scm_exec_response(eina_strbuf_string_get(command));
+
+   status = _parse_line(line);
+
+   eina_strbuf_free(command);
+
+   free(line);
+   result = status->change;
+
+   eina_stringshare_del(status->path);
+   free(status);
+
+   return result;
+}
+
 static Eina_List *
 _edi_scm_git_status_get(void)
 {
@@ -490,6 +517,14 @@ edi_scm_status_get(void)
    return EINA_TRUE;
 }
 
+EAPI Edi_Scm_Status_Code
+edi_scm_file_status(const char *path)
+{
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   return e->file_status(path);
+}
+
 static void
 _edi_scm_commit_thread_cb(void *data, Ecore_Thread *thread)
 {
@@ -617,6 +652,7 @@ _edi_scm_git_init()
    engine->pull = _edi_scm_git_pull;
    engine->push = _edi_scm_git_push;
    engine->stash = _edi_scm_git_stash;
+   engine->file_status = _edi_scm_git_file_status;
 
    engine->remote_add = _edi_scm_git_remote_add;
    engine->remote_name_get = _edi_scm_git_remote_name_get;
