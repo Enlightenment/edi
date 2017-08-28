@@ -816,6 +816,14 @@ _edi_mainview_panel_prev_clicked_cb(void *data,
    elm_scroller_region_bring_in(scroller, x, y, w, h);
 }
 
+static void
+_edi_mainview_panel_welcome_focused_cb(void *data,
+                                    Evas_Object *obj EINA_UNUSED,
+                                    void *event_info EINA_UNUSED)
+{
+    edi_mainview_panel_focus((Edi_Mainview_Panel *) data);
+}
+
 void
 edi_mainview_panel_free(Edi_Mainview_Panel *panel)
 {
@@ -941,6 +949,10 @@ edi_mainview_panel_add(Evas_Object *parent)
    evas_object_size_hint_align_set(txt, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(txt);
    elm_object_content_set(scroll, txt);
+
+   elm_object_focus_allow_set(txt, EINA_TRUE);
+   evas_object_smart_callback_add(txt, "focused",
+                                       _edi_mainview_panel_welcome_focused_cb, panel);
 
    panel->welcome = scroll;
    _edi_mainview_panel_show(panel, scroll);
