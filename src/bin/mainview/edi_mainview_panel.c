@@ -452,6 +452,9 @@ edi_mainview_panel_save(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
+   if (!panel || !panel->current)
+     return;
+
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (!editor)
      return;
@@ -463,6 +466,9 @@ void
 edi_mainview_panel_undo(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
+
+   if (!panel || !panel->current)
+     return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
@@ -490,6 +496,9 @@ void
 edi_mainview_panel_redo(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
+
+   if (!panel || !panel->current)
+     return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
@@ -533,6 +542,9 @@ edi_mainview_panel_cut(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
+   if (!panel || !panel->current)
+     return;
+
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
    if (editor)
@@ -544,6 +556,9 @@ edi_mainview_panel_copy(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
 
+   if (!panel || !panel->current)
+     return;
+
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
    if (editor)
@@ -554,6 +569,9 @@ void
 edi_mainview_panel_paste(Edi_Mainview_Panel *panel)
 {
    Edi_Editor *editor;
+
+   if (!panel || !panel->current)
+     return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
@@ -568,6 +586,9 @@ edi_mainview_panel_search(Edi_Mainview_Panel *panel)
 
    if (edi_mainview_is_empty()) return;
 
+   if (!panel || !panel->current)
+     return;
+
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
 
    if (editor)
@@ -579,6 +600,9 @@ edi_mainview_panel_goto(Edi_Mainview_Panel *panel, unsigned int number)
 {
    if (edi_mainview_is_empty()) return;
 
+   if (!panel || !panel->current)
+     return;
+
    edi_mainview_panel_goto_position(panel, number, 1);
 }
 
@@ -586,6 +610,9 @@ void
 edi_mainview_panel_goto_position(Edi_Mainview_Panel *panel, unsigned int row, unsigned int col)
 {
    Edi_Editor *editor;
+
+   if (!panel || !panel->current)
+     return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (!editor || row <= 0 || col <= 0)
