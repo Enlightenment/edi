@@ -1025,7 +1025,6 @@ static void
 _edi_scm_stash_do_cb(void *data EINA_UNUSED)
 {
    edi_scm_stash();
-   edi_mainview_refresh_all();
 }
 
 static void

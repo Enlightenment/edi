@@ -271,9 +271,12 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
 
    panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)data);
 
-   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
-   if (editor)
-     elm_object_focus_set(editor->entry, EINA_FALSE);
+   if (panel && panel->current)
+     {
+        editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+        if (editor)
+          elm_object_focus_set(editor->entry, EINA_FALSE);
+     }
 
    edi_mainview_panel_item_select(panel, (Edi_Mainview_Item *)data);
 }
