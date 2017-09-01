@@ -41,6 +41,7 @@ void edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
 
 const char *edi_filepanel_selected_path_get(Evas_Object *obj);
 
+void edi_filepanel_select_path(const char *path);
 void edi_filepanel_search();
 
 /**

@@ -782,6 +782,18 @@ _filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 }
 
 void
+edi_filepanel_select_path(const char *path)
+{
+   Elm_Object_Item *item;
+
+   item = _file_listing_item_find(path);
+   if (!item)
+     return;
+
+  elm_genlist_item_selected_set(item, EINA_TRUE);
+}
+
+void
 edi_filepanel_search()
 {
    elm_box_pack_start(_filepanel_box, _filter_box);
