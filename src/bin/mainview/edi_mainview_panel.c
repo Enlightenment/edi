@@ -271,14 +271,16 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
 
    panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)data);
 
-   if (panel && panel->current)
-     {
-        editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
-        if (editor)
-          elm_object_focus_set(editor->entry, EINA_FALSE);
-     }
+   edi_mainview_panel_focus(panel);
+
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (editor)
+     elm_object_focus_set(editor->entry, EINA_FALSE);
 
    edi_mainview_panel_item_select(panel, (Edi_Mainview_Item *)data);
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (editor)
+     elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
 static void
@@ -335,6 +337,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    tab = elm_button_add(panel->tabs);
    evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
+   elm_object_focus_allow_set(tab, EINA_FALSE);
 
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
    elm_object_part_text_set(tab, "elm.btn.text", basename((char*)options->path));
@@ -730,9 +733,11 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
 {
    Edi_Mainview_Item *it;
    Edi_Mainview_Panel *current;
+   Edi_Editor *editor;
    int i;
 
    current = panel;
+
 
    for (i = 0; i < edi_mainview_panel_count(); i++)
      {
@@ -741,8 +746,16 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
         it = _get_item_for_path(panel, options->path);
         if (it)
           {
-             edi_mainview_panel_item_select(panel, it);
              edi_mainview_panel_focus(panel);
+
+             editor = evas_object_data_get(panel->current->view, "editor");
+             if (editor)
+               elm_object_focus_set(editor->entry, EINA_FALSE);
+
+             edi_mainview_panel_item_select(panel, it);
+             editor = evas_object_data_get(panel->current->view, "editor");
+             if (editor)
+               elm_object_focus_set(editor->entry, EINA_TRUE);
 
              if (options->line)
                {
