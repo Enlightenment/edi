@@ -167,6 +167,8 @@ _item_menu_open_panel_cb(void *data, Evas_Object *obj EINA_UNUSED,
    else
      panel = edi_mainview_panel_append();
 
+   edi_mainview_item_close_path(sd->path);
+
    options = edi_path_options_create(sd->path);
 
    edi_mainview_panel_open(panel, options);

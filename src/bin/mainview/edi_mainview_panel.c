@@ -729,23 +729,36 @@ void
 edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
 {
    Edi_Mainview_Item *it;
+   Edi_Mainview_Panel *current;
+   int i;
+
+   current = panel;
+
+   for (i = 0; i < edi_mainview_panel_count(); i++)
+     {
+        panel = edi_mainview_panel_by_index(i);
+
+        it = _get_item_for_path(panel, options->path);
+        if (it)
+          {
+             edi_mainview_panel_item_select(panel, it);
+             edi_mainview_panel_focus(panel);
+
+             if (options->line)
+               {
+                  if (options->character > 1)
+                    edi_mainview_goto_position(options->line, options->character);
+                  else
+                    edi_mainview_goto(options->line);
+               }
+             return;
+          }
+
+   }
+
+   panel = current;
 
    edi_mainview_panel_focus(panel);
-
-   it = _get_item_for_path(panel, options->path);
-   if (it)
-     {
-        edi_mainview_panel_item_select(panel, it);
-        if (options->line)
-          {
-             if (options->character > 1)
-               edi_mainview_goto_position(options->line, options->character);
-             else
-               edi_mainview_goto(options->line);
-          }
-        return;
-     }
-
    if (options->type == NULL)
      {
         eio_file_direct_stat(options->path, _edi_mainview_panel_tab_stat_done, dummy, options);
@@ -812,7 +825,8 @@ void
 edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
 {
    Eina_List *item;
-   Edi_Mainview_Item *it;
+   int panel_id;
+   Edi_Mainview_Item *it, *prev = NULL;
 
    if (!panel) return;
 
@@ -821,8 +835,19 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
         if (it && !strcmp(it->path, path))
           {
              edi_mainview_panel_item_close(panel, it);
-             return;
+             if (prev)
+               edi_mainview_panel_item_select(panel, prev);
+
+             if (edi_mainview_panel_item_count(panel) == 0 &&
+                 edi_mainview_panel_count() > 1)
+               {
+                  edi_mainview_panel_remove(panel);
+                  panel_id = edi_mainview_panel_count() -1;
+                  panel = edi_mainview_panel_by_index(panel_id);
+                  edi_mainview_panel_focus(panel);
+               }
           }
+        prev = it;
      }
 }
 
