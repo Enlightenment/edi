@@ -271,7 +271,7 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Editor *editor;
    Edi_Mainview_Item *item = (Edi_Mainview_Item *) data;
 
-   panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)item);
+   panel = edi_mainview_panel_for_item_get(item);
 
    edi_mainview_panel_focus(panel);
 
