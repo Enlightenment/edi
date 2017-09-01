@@ -149,6 +149,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
    elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
 
    evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
+   elm_win_center(win, EINA_TRUE, EINA_TRUE);
    evas_object_show(win);
 }
 
