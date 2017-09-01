@@ -39,9 +39,30 @@ typedef void (*edi_filepanel_item_clicked_cb)(const char *path,
 void edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
                        const char *path, edi_filepanel_item_clicked_cb cb);
 
+/**
+ * Get the path of the currently selected item in the file panel.
+ *
+ * @param obj The filepanel object.
+ * @return The path of the selected item.
+ *
+ * @ingroup UI
+ */
 const char *edi_filepanel_selected_path_get(Evas_Object *obj);
 
+/**
+ * Select an item in the filepanel from its path.
+ *
+ * @param path The path to be selected in the file panel.
+ *
+ * @ingroup UI
+ */
 void edi_filepanel_select_path(const char *path);
+
+/**
+ * Initialise a file panel search.
+ *
+ * @ingroup UI
+ */
 void edi_filepanel_search();
 
 /**
