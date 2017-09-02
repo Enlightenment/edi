@@ -265,31 +265,31 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, "fileopen", "open", _item_menu_open_cb, sd);
-   elm_menu_item_add(menu, NULL, "window-new", "open new window", _item_menu_open_window_cb, sd);
+   elm_menu_item_add(menu, NULL, "fileopen", "Open", _item_menu_open_cb, sd);
+   elm_menu_item_add(menu, NULL, "window-new", "Open in New Window", _item_menu_open_window_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", "open in new panel", _item_menu_open_panel_cb, sd);
+   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", "Open in New Panel", _item_menu_open_panel_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "open as", NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, "Open as ...", NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "open external",
+   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", "Open External",
                                _item_menu_xdgopen_cb, sd);
 
    elm_menu_item_separator_add(menu, NULL);
    if (edi_scm_enabled())
      {
-        menu_it = elm_menu_item_add(menu, NULL, NULL, "source control", NULL, NULL);
-        elm_menu_item_add(menu, menu_it, "document-save-as", "add changes", _item_menu_scm_add_cb, sd);
-        elm_menu_item_add(menu, menu_it, "document-save-as", "rename file", _item_menu_rename_cb, sd);
-        elm_menu_item_add(menu, menu_it, "edit-delete", "delete file", _item_menu_scm_del_cb, sd);
+        menu_it = elm_menu_item_add(menu, NULL, NULL, "Source Control ...", NULL, NULL);
+        elm_menu_item_add(menu, menu_it, "document-save-as", "Add Changes", _item_menu_scm_add_cb, sd);
+        elm_menu_item_add(menu, menu_it, "document-save-as", "Rename File", _item_menu_rename_cb, sd);
+        elm_menu_item_add(menu, menu_it, "edit-delete", "Delete File", _item_menu_scm_del_cb, sd);
      }
    else
      {
-        menu_it = elm_menu_item_add(menu, NULL, "document-save-as", "rename file", _item_menu_rename_cb, sd);
-        menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "delete file", _item_menu_del_cb, sd);
+        menu_it = elm_menu_item_add(menu, NULL, "document-save-as", "Rename File", _item_menu_rename_cb, sd);
+        menu_it = elm_menu_item_add(menu, NULL, "edit-delete", "Delete File", _item_menu_del_cb, sd);
      }
 }
 
@@ -368,16 +368,16 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, "document-new", "create file here", _item_menu_create_file_cb, sd);
-   elm_menu_item_add(menu, NULL, "folder-new", "create directory here", _item_menu_create_dir_cb, sd);
+   elm_menu_item_add(menu, NULL, "document-new", "Create File here", _item_menu_create_file_cb, sd);
+   elm_menu_item_add(menu, NULL, "folder-new", "Create Directory here", _item_menu_create_dir_cb, sd);
    if (ecore_file_app_installed("terminology"))
-     elm_menu_item_add(menu, NULL, "terminal", "open terminal here", _item_menu_open_terminal_cb, sd);
+     elm_menu_item_add(menu, NULL, "utilities-terminal", "Open Terminal here", _item_menu_open_terminal_cb, sd);
 
    if (strcmp(sd->path, edi_project_get()))
      {
-        elm_menu_item_add(menu, NULL, "document-save-as", "rename", _item_menu_rename_cb, sd);
+        elm_menu_item_add(menu, NULL, "document-save-as", "Rename Directory", _item_menu_rename_cb, sd);
         if (ecore_file_dir_is_empty(sd->path))
-          elm_menu_item_add(menu, NULL, "edit-delete", "remove directory", _item_menu_rmdir_cb, sd);
+          elm_menu_item_add(menu, NULL, "edit-delete", "Remove Directory", _item_menu_rmdir_cb, sd);
      }
 }
 

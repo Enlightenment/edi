@@ -221,14 +221,14 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
    elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
+   elm_object_text_set(button, "Cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
-   elm_object_text_set(button, "rename");
+   elm_object_text_set(button, "Rename");
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_file_screens_rename_cb, path);
@@ -285,13 +285,13 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
    elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
+   elm_object_text_set(button, "Cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "create");
+   elm_object_text_set(button, "Create");
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_create_file_cb, input);
@@ -349,13 +349,13 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
    elm_object_content_set(popup, table);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
+   elm_object_text_set(button, "Cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "create");
+   elm_object_text_set(button, "Create");
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_create_dir_cb, input);

@@ -219,14 +219,14 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_box_pack_end(box, input);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "cancel");
+   elm_object_text_set(button, "Cancel");
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
-   elm_object_text_set(button, "commit");
+   elm_object_text_set(button, "Commit");
    elm_object_disabled_set(button, !staged_changes);
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
