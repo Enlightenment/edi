@@ -55,45 +55,22 @@ static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
 static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
-static Evas_Object *_edi_main_win, *_edi_main_box, *_edi_message_popup;
+static Evas_Object *_edi_main_win, *_edi_main_box;
 int _edi_log_dom = -1;
 
-static void
-_edi_on_close_message(void *data,
-                     Evas_Object *obj EINA_UNUSED,
-                     void *event_info EINA_UNUSED)
-{
-   evas_object_del(data);
-   evas_object_del(_edi_message_popup);
-}
-
-static void
-_edi_message_open(const char *message)
-{
-   Evas_Object *popup, *button;
-
-   popup = elm_popup_add(_edi_main_win);
-   _edi_message_popup = popup;
-   elm_object_part_text_set(popup, "title,text",
-                           message);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "Ok");
-   elm_object_part_content_set(popup, "button1", button);
-   evas_object_smart_callback_add(button, "clicked",
-                                 _edi_on_close_message, NULL);
-
-   evas_object_show(popup);
-}
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 {
    Edi_Path_Options *options;
+   const char *title, *message;
 
    if (path == NULL)
      {
-        _edi_message_open("Please choose a file from the list");
+        title = "Information";
+        message = "Please choose a file from the list.";
+
+        edi_screens_message(_edi_main_win, title, message);
         return;
      }
 
@@ -579,54 +556,27 @@ _edi_icon_update()
 
 }
 
-static void
-_edi_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
-                     void *event_info EINA_UNUSED)
-{
-   evas_object_del((Evas_Object *)data);
-}
-
 void
 edi_launcher_config_missing()
 {
-   Evas_Object *popup, *label, *button;
+   const char *title, *message;
 
-   popup = elm_popup_add(_edi_main_win);
-   elm_object_part_text_set(popup, "title,text", "Unable to launch");
+   title = "Unable to launch";
+   message = "No launch binary found, please configure in Settings.";
 
-   label = elm_label_add(popup);
-   elm_object_text_set(label, "No launch binary found, please configure in Settings");
-   evas_object_show(label);
-   elm_object_content_set(popup, label);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "OK");
-   elm_object_part_content_set(popup, "button1", button);
-   evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
-
-   evas_object_show(popup);
+   edi_screens_message(_edi_main_win, title, message);
 }
 
 static void
 _edi_project_credentials_missing()
 
 {
-   Evas_Object *popup, *label, *button;
+   const char *title, *message;
 
-   popup = elm_popup_add(_edi_main_win);
-   elm_object_part_text_set(popup, "title,text", "User information");
+   title = "User information";
+   message = "No user information found, please configure in Settings.";
 
-   label = elm_label_add(popup);
-   elm_object_text_set(label, "No user information found, please configure in Settings");
-   evas_object_show(label);
-   elm_object_content_set(popup, label);
-
-   button = elm_button_add(popup);
-   elm_object_text_set(button, "OK");
-   elm_object_part_content_set(popup, "button1", button);
-   evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
-
-   evas_object_show(popup);
+   edi_screens_message(_edi_main_win, title, message);
 }
 
 static Eina_Bool

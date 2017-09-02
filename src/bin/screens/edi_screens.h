@@ -67,9 +67,21 @@ void edi_settings_font_add(Evas_Object *parent);
  * @param message The generic message to display in the dialogue.
  * @param confirm_cb Function to execute upon confirmation.
  * @param data Data to pass to the confirm_cb callback.
+ *
  * @ingroup UI
  */
 void edi_screens_message_confirm(Evas_Object *parent, const char *message, void ((*confirm_cb)(void *)), void *data);
+
+/**
+ * Create an information dialogue and add it to the parent obj.
+ *
+ * @param parent The parent object to display the dialogue in.
+ * @param title The title for the popup.
+ * @param message The text to be displayed in the popup.
+ *
+ * @ingroup UI
+ */
+void edi_screens_message(Evas_Object *parent, const char *title, const char *message);
 
 /**
  * @}
