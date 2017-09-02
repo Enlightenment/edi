@@ -935,7 +935,7 @@ _edi_menu_view_open_window_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUS
 }
 
 static void
-_edi_menu_view_split_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+_edi_menu_view_new_panel_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                          void *event_info EINA_UNUSED)
 {
    edi_mainview_panel_append();
@@ -1123,7 +1123,7 @@ _edi_menu_setup(Evas_Object *win)
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, "View", NULL, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", "New window", _edi_menu_view_open_window_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", "Split pane", _edi_menu_view_split_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", "New panel", _edi_menu_view_new_panel_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find", "Open Tasks", _edi_menu_view_tasks_cb, NULL);
 
