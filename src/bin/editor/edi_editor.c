@@ -10,6 +10,7 @@
 #include "edi_editor.h"
 
 #include "mainview/edi_mainview.h"
+#include "edi_filepanel.h"
 #include "edi_config.h"
 
 #include "language/edi_language_provider.h"
@@ -981,6 +982,8 @@ _focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 
    code = elm_code_widget_code_get(editor->entry);
    filename = elm_code_file_path_get(code->file);
+
+   edi_filepanel_select_path(filename);
 
    mtime = ecore_file_mod_time(filename);
 

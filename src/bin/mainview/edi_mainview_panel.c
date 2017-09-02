@@ -12,7 +12,6 @@
 #include "mainview/edi_mainview_panel.h"
 #include "mainview/edi_mainview.h"
 
-#include "edi_filepanel.h"
 #include "editor/edi_editor.h"
 #include "edi_content_provider.h"
 
@@ -283,8 +282,6 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (editor)
      elm_object_focus_set(editor->entry, EINA_TRUE);
-
-   edi_filepanel_select_path(item->path);
 }
 
 static void
