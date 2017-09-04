@@ -67,7 +67,7 @@ _make_comand_compound_get(const char *prepend, const char *append)
    return cmd;
 }
 
-static void
+static int
 _make_build_make(void)
 {
    static const char *cmd = NULL;
@@ -76,12 +76,11 @@ _make_build_make(void)
 
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   return edi_exe_wait(cmd);
 }
 
-static void
+static int
 _make_build_configure(void)
 {
    static const char *cmd = NULL;
@@ -90,12 +89,11 @@ _make_build_configure(void)
 
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   return edi_exe_wait(cmd);
 }
 
-static void
+static int
 _make_build_autogen(void)
 {
    static const char *cmd = NULL;
@@ -104,20 +102,21 @@ _make_build_autogen(void)
 
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   return edi_exe_wait(cmd);
 }
 
-static void
+static int
 _make_build(void)
 {
    if (edi_project_file_exists("Makefile") || edi_project_file_exists("makefile"))
-     _make_build_make();
+     return _make_build_make();
    else if (edi_project_file_exists("configure"))
-     _make_build_configure();
+     return _make_build_configure();
    else if (edi_project_file_exists("autogen.sh"))
-     _make_build_autogen();
+     return _make_build_autogen();
+
+   return -1;
 }
 
 static void

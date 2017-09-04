@@ -79,16 +79,14 @@ _meson_project_runnable_is(const char *path)
    return ecore_file_can_exec(path);
 }
 
-static Ecore_Exe *
+static int
 _meson_ninja_do(Meson_Data *md, const char *arg)
 {
    const char *cmd;
 
    cmd = eina_slstr_printf("ninja -C %s %s", md->fulldir, arg ?: "");
-   return ecore_exe_pipe_run(cmd,
-                             ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                             ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                             ECORE_EXE_PIPE_WRITE /*| ECORE_EXE_USE_SH*/, md);
+
+   return edi_exe_wait(cmd);
 }
 
 static Eina_Bool
@@ -125,15 +123,15 @@ _meson_prepare(Meson_Data *md)
    return EINA_FALSE;
 }
 
-static void
+static int
 _meson_build(void)
 {
    Meson_Data *md = _meson_data_get();
 
    if (!_meson_prepare(md))
-     return;
+     return -1;
 
-   _meson_ninja_do(md, NULL);
+   return _meson_ninja_do(md, NULL);
 }
 
 static void

@@ -48,11 +48,13 @@ edi_builder_can_run(const char *runpath);
 /**
  * Run a build for the current project.
  *
+ * @return The status code of the build process.
+ *
  * @see edi_builder_can_build().
  *
  * @ingroup Builder
  */
-EAPI void
+EAPI int
 edi_builder_build(void);
 
 /**

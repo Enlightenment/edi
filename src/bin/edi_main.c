@@ -701,10 +701,29 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 }
 
 static void
+_edi_build_project(void)
+{
+   Eina_Strbuf *message;
+   int status;
+
+   message = eina_strbuf_new();
+
+   status = edi_builder_build();
+   if (status != 0)
+     eina_strbuf_append_printf(message, "Build of project <b>%s</b> in %s failed with status code %d.", edi_project_name_get(), edi_project_get(), status);
+   else
+     eina_strbuf_append_printf(message, "Build of project <b>%s</b> in %s was successful.", edi_project_name_get(), edi_project_get());
+
+   edi_screens_desktop_notify("EDI Project Build Status", eina_strbuf_string_get(message));
+
+   eina_strbuf_free(message);
+}
+
+static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    if (_edi_build_prep(obj))
-     edi_builder_build();
+     _edi_build_project();
 }
 
 static void
@@ -903,7 +922,7 @@ static void
 _edi_menu_build_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
-   edi_builder_build();
+   _edi_build_project();
 }
 
 static void

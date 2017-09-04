@@ -119,3 +119,19 @@ void edi_screens_message(Evas_Object *parent, const char *title, const char *mes
 
    evas_object_show(popup);
 }
+
+void edi_screens_desktop_notify(const char *title, const char *message)
+{
+   Eina_Strbuf *command;
+
+   if (!ecore_file_app_installed("notify-send"))
+     return;
+
+   command = eina_strbuf_new();
+
+   eina_strbuf_append_printf(command, "notify-send -t 10000 -i edi '%s' '%s'", title, message);
+
+   ecore_exe_run(eina_strbuf_string_get(command), NULL);
+
+   eina_strbuf_free(command);
+}

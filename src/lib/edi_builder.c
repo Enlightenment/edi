@@ -29,16 +29,16 @@ edi_builder_can_run(const char *runpath)
    return provider && provider->project_runnable_is(runpath);
 }
 
-EAPI void
+EAPI int
 edi_builder_build(void)
 {
    Edi_Build_Provider *provider;
 
    provider = edi_build_provider_for_project_get();
    if (!provider)
-     return;
+     return -1;
 
-   provider->build();
+   return provider->build();
 }
 
 EAPI void

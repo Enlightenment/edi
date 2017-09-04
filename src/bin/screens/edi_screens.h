@@ -84,6 +84,16 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
 void edi_screens_message(Evas_Object *parent, const char *title, const char *message);
 
 /**
+ * Send a desktop notification message to the window manager.
+ *
+ * @param title The title for the notification.
+ * @param message The text to be displayed in the desktop notification.
+ *
+ * @ingroup UI
+ */
+void edi_screens_desktop_notify(const char *title, const char *message);
+
+/**
  * @}
  */
 

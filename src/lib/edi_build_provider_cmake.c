@@ -46,15 +46,13 @@ _cmake_project_runnable_is(const char *path)
    return ecore_file_exists(path);
 }
 
-static void
+static int
 _cmake_build(void)
 {
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("mkdir -p build && cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && cd ..",
-                              ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   return edi_exe_wait("mkdir -p build && cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .. && make && cd ..");
 }
 
 static void

@@ -56,11 +56,13 @@ _python_project_runnable_is(const char *file EINA_UNUSED)
    return EINA_TRUE;
 }
 
-static void
+static int
 _python_build(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py build");
+     return edi_exe_wait("./setup.py build");
+
+   return -1;
 }
 
 static void
