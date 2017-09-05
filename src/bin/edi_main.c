@@ -721,7 +721,10 @@ static void
 _edi_build_project(void)
 {
    if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
-     edi_builder_build();
+     {
+        edi_consolepanel_show();
+        edi_builder_build();
+     }
 }
 
 static void
