@@ -56,13 +56,11 @@ _cargo_project_runnable_is(const char *file EINA_UNUSED)
    return EINA_TRUE;
 }
 
-static int
+static void
 _cargo_build(void)
 {
    if (chdir(edi_project_get()) == 0)
-     return edi_exe_wait("cargo build");
-
-   return -1;
+     edi_exe_notify("edi_build", "cargo build");
 }
 
 static void

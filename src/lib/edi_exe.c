@@ -5,9 +5,82 @@
 #include <sys/wait.h>
 
 #include <Ecore.h>
+#include <Ecore_Con.h>
 
 #include "Edi.h"
 #include "edi_private.h"
+
+static Ecore_Event_Handler *_edi_exe_handler = NULL;
+static Ecore_Event_Handler *_edi_exe_notify_handler = NULL;
+
+static Eina_Bool
+_edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   int *status;
+   void *(*func)(int value);
+   Ecore_Con_Server *srv;
+   Ecore_Con_Event_Client_Data *ev = event;
+
+   status = ev->data;
+   func = data;
+   srv = ecore_con_client_server_get(ev->client);
+
+   func(*status);
+
+   ecore_event_handler_del(_edi_exe_notify_handler);
+   _edi_exe_notify_handler = NULL;
+
+   ecore_con_client_del(ev->client);
+   ecore_con_server_del(srv);
+
+   return EINA_FALSE;
+}
+
+EAPI Eina_Bool
+edi_exe_notify_handle(const char *name, void ((*func)(int)))
+{
+   if (_edi_exe_notify_handler) return EINA_FALSE;
+
+   ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
+
+   _edi_exe_notify_handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, func);
+
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+_edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event)
+{
+  Ecore_Exe_Event_Del *ev;
+  Ecore_Con_Server *srv;
+  const char *name = data;
+
+  ev = event;
+
+  if (!ev->exe) return ECORE_CALLBACK_RENEW;
+
+  srv = ecore_con_server_connect(ECORE_CON_LOCAL_USER, name, 0, NULL);
+
+  ecore_con_server_send(srv, &ev->exit_code, sizeof(int *));
+
+  ecore_event_handler_del(_edi_exe_handler);
+  _edi_exe_handler = NULL;
+
+  return ECORE_CALLBACK_DONE;
+}
+
+EAPI void
+edi_exe_notify(const char *name, const char *command)
+{
+   if (_edi_exe_handler) return;
+
+   ecore_exe_pipe_run(command,
+                      ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+                      ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
+                      ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   _edi_exe_handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_exe_event_done_cb, name);
+}
 
 EAPI int
 edi_exe_wait(const char *command)

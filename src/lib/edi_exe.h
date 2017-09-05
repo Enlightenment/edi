@@ -41,6 +41,27 @@ EAPI int edi_exe_wait(const char *command);
 EAPI char *edi_exe_response(const char *command);
 
 /**
+ * Run an executable command with notifcation enabled.
+ *
+ * @param name The name of the resource used to identify the notification.
+ * @param command The command to execute in a child process.
+ *
+ * @ingroup Exe
+ */
+EAPI void edi_exe_notify(const char *name, const char *command);
+
+/**
+ * This function is used to set a callback that will execute when an
+ * edi_exe_response has terminated and supplied its exit status.
+ *
+ * @param name The name of the resource used to identify the notification.
+ * @param func Function that will execute upon receiving exit code of exe.
+ *
+ * @ingroup Exe
+ */
+EAPI Eina_Bool edi_exe_notify_handle(const char *name, void ((*func)(int)));
+
+/**
  * @}
  */
 

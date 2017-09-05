@@ -67,7 +67,7 @@ _make_comand_compound_get(const char *prepend, const char *append)
    return cmd;
 }
 
-static int
+static void
 _make_build_make(void)
 {
    static const char *cmd = NULL;
@@ -77,10 +77,10 @@ _make_build_make(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
 
-   return edi_exe_wait(cmd);
+   edi_exe_notify("edi_build", cmd);
 }
 
-static int
+static void
 _make_build_configure(void)
 {
    static const char *cmd = NULL;
@@ -90,10 +90,10 @@ _make_build_configure(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
 
-   return edi_exe_wait(cmd);
+   edi_exe_notify("edi_build", cmd);
 }
 
-static int
+static void
 _make_build_autogen(void)
 {
    static const char *cmd = NULL;
@@ -103,20 +103,18 @@ _make_build_autogen(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
 
-   return edi_exe_wait(cmd);
+   edi_exe_notify("edi_build", cmd);
 }
 
-static int
+static void
 _make_build(void)
 {
    if (edi_project_file_exists("Makefile") || edi_project_file_exists("makefile"))
-     return _make_build_make();
+     _make_build_make();
    else if (edi_project_file_exists("configure"))
-     return _make_build_configure();
+     _make_build_configure();
    else if (edi_project_file_exists("autogen.sh"))
-     return _make_build_autogen();
-
-   return -1;
+     _make_build_autogen();
 }
 
 static void
