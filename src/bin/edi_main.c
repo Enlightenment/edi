@@ -712,7 +712,7 @@ _edi_build_display_status_cb(int status)
    else
      eina_strbuf_append_printf(message, "Build of project <b>%s</b> in %s was successful.", edi_project_name_get(), edi_project_get());
 
-   edi_screens_desktop_notify("EDI Project Build Status", eina_strbuf_string_get(message));
+   edi_screens_desktop_notify("EDI :: Build Status", eina_strbuf_string_get(message));
 
    eina_strbuf_free(message);
 }
@@ -728,6 +728,26 @@ _edi_build_project(void)
 }
 
 static void
+_edi_build_clean_project(void)
+{
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
+     {
+        edi_consolepanel_show();
+        edi_builder_clean();
+     }
+}
+
+static void
+_edi_build_test_project(void)
+{
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
+     {
+        edi_consolepanel_show();
+        edi_builder_test();
+     }
+}
+
+static void
 _tb_build_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    if (_edi_build_prep(obj))
@@ -738,7 +758,7 @@ static void
 _tb_test_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    if (_edi_build_prep(obj))
-     edi_builder_test();
+     _edi_build_test_project();
 }
 
 static void
@@ -937,7 +957,7 @@ static void
 _edi_menu_test_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
-   edi_builder_test();
+   _edi_build_test_project();
 }
 
 static void
@@ -951,7 +971,7 @@ static void
 _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
-   edi_builder_clean();
+   _edi_build_clean_project();
 }
 
 static void

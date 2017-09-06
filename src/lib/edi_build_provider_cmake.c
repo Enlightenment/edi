@@ -60,9 +60,8 @@ _cmake_test(void)
 {
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("env CK_VERBOSITY=verbose make check", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   edi_exe_notify("edi_build", "env CK_VERBOSITY=verbose make check");
 }
 
 static void
@@ -100,9 +99,8 @@ _cmake_clean(void)
 {
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run("make clean", ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   edi_exe_notify("edi_build", "make clean");
 }
 
 Edi_Build_Provider _edi_build_provider_cmake =

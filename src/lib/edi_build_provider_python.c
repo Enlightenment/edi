@@ -67,7 +67,7 @@ static void
 _python_test(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py test");
+     edi_exe_notify("edi_build", "./setup.py test");
 }
 
 static void
@@ -81,7 +81,7 @@ static void
 _python_clean(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("./setup.py clean --all");
+     edi_exe_notify("edi_build", "./setup.py clean --all");
 }
 
 Edi_Build_Provider _edi_build_provider_python =

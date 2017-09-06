@@ -18,20 +18,15 @@ _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSE
 {
    int *status;
    void *(*func)(int value);
-   Ecore_Con_Server *srv;
    Ecore_Con_Event_Client_Data *ev = event;
 
    status = ev->data;
    func = data;
-   srv = ecore_con_client_server_get(ev->client);
 
    func(*status);
 
    ecore_event_handler_del(_edi_exe_notify_handler);
    _edi_exe_notify_handler = NULL;
-
-   ecore_con_client_del(ev->client);
-   ecore_con_server_del(srv);
 
    return EINA_FALSE;
 }
@@ -41,6 +36,7 @@ edi_exe_notify_handle(const char *name, void ((*func)(int)))
 {
    if (_edi_exe_notify_handler) return EINA_FALSE;
 
+  /* These are UNIX domain sockets, no need to clean up */
    ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
 
    _edi_exe_notify_handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, func);
@@ -59,9 +55,11 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
 
   if (!ev->exe) return ECORE_CALLBACK_RENEW;
 
+  /* These are UNIX domain sockets, no need to clean up */
   srv = ecore_con_server_connect(ECORE_CON_LOCAL_USER, name, 0, NULL);
 
   ecore_con_server_send(srv, &ev->exit_code, sizeof(int *));
+  ecore_con_server_flush(srv);
 
   ecore_event_handler_del(_edi_exe_handler);
   _edi_exe_handler = NULL;

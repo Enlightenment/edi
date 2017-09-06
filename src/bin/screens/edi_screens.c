@@ -129,7 +129,7 @@ void edi_screens_desktop_notify(const char *title, const char *message)
 
    command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "notify-send -t 10000 -i edi '%s' '%s'", title, message);
+   eina_strbuf_append_printf(command, "notify-send -t 7000 -i edi '%s' '%s'", title, message);
 
    ecore_exe_run(eina_strbuf_string_get(command), NULL);
 

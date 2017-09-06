@@ -127,9 +127,8 @@ _make_test(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
    chdir(edi_project_get());
-   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   edi_exe_notify("edi_build", cmd);
 }
 
 static void
@@ -171,9 +170,8 @@ _make_clean(void)
 
    if (chdir(edi_project_get()) !=0)
      ERR("Could not chdir");
-   ecore_exe_pipe_run(cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                              ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                              ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
+
+   edi_exe_notify("edi_build", cmd);
 }
 
 Edi_Build_Provider _edi_build_provider_make =

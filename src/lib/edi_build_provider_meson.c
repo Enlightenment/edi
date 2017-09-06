@@ -137,6 +137,7 @@ _meson_build(void)
 static void
 _meson_test(void)
 {
+   edi_exe_notify("edi_build", "exit 1");
    ERR("Edi doesn't support test with Meson/Ninja!");
 }
 

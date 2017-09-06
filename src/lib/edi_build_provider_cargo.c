@@ -67,7 +67,7 @@ static void
 _cargo_test(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("cargo test");
+     edi_exe_notify("edi_build", "cargo test");
 }
 
 static void
@@ -81,7 +81,7 @@ static void
 _cargo_clean(void)
 {
    if (chdir(edi_project_get()) == 0)
-     _exec_cmd("cargo clean");
+     edi_exe_notify("edi_build", "cargo clean");
 }
 
 Edi_Build_Provider _edi_build_provider_cargo =
