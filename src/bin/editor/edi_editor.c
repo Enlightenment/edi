@@ -1107,15 +1107,14 @@ void
 edi_editor_reload(Edi_Editor *editor)
 {
    Elm_Code *code;
-   const char *path;
+   char *path;
 
    ecore_thread_main_loop_begin();
 
    code = elm_code_widget_code_get(editor->entry);
-   path = elm_code_file_path_get(code->file);
+   path = strdup(elm_code_file_path_get(code->file));
    elm_code_file_clear(code->file);
    code->file = elm_code_file_open(code, path);
-
    editor->modified = EINA_FALSE;
    editor->save_time = ecore_file_mod_time(path);
 
@@ -1125,6 +1124,7 @@ edi_editor_reload(Edi_Editor *editor)
         editor->save_timer = NULL;
      }
 
+   free(path);
    ecore_thread_main_loop_end();
 }
 
