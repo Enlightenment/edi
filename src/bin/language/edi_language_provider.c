@@ -9,6 +9,7 @@
 #include "edi_private.h"
 
 #include "edi_language_provider_c.c"
+#include "edi_language_provider_python.c"
 #include "edi_language_provider_rust.c"
 
 static Edi_Language_Provider _edi_language_provider_registry[] =
@@ -17,6 +18,11 @@ static Edi_Language_Provider _edi_language_provider_registry[] =
       "c", _edi_language_c_add, _edi_language_c_refresh, _edi_language_c_del,
       _edi_language_c_mime_name, _edi_language_c_snippet_get,
       _edi_language_c_lookup, _edi_language_c_lookup_doc
+   },
+   {
+      "python", _edi_language_python_add, _edi_language_python_refresh, _edi_language_python_del,
+      _edi_language_python_mime_name, _edi_language_python_snippet_get,
+      NULL, NULL
    },
    {
       "rust", _edi_language_rust_add, _edi_language_rust_refresh, _edi_language_rust_del,
@@ -47,6 +53,8 @@ Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime)
      id = "c";
    if (!strcasecmp(mime, "text/rust"))
      id = "rust";
+   if (!strcasecmp(mime, "text/x-python"))
+     id = "python";
 
    if (!id)
      return NULL;
