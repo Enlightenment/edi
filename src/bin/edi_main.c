@@ -701,26 +701,31 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 }
 
 static void
-_edi_build_display_status_cb(int status)
+_edi_build_display_status_cb(int status, void *data)
 {
-   Eina_Strbuf *message;
+   Eina_Strbuf *title, *message;
+   const char *name = data;
 
+   title = eina_strbuf_new();
    message = eina_strbuf_new();
 
    if (status != 0)
-     eina_strbuf_append_printf(message, "Build of project <b>%s</b> in %s failed with status code %d.", edi_project_name_get(), edi_project_get(), status);
+     eina_strbuf_append_printf(message, "%s of project <b>%s</b> in %s failed with status code %d.\n", name, edi_project_name_get(), edi_project_get(), status);
    else
-     eina_strbuf_append_printf(message, "Build of project <b>%s</b> in %s was successful.", edi_project_name_get(), edi_project_get());
+     eina_strbuf_append_printf(message, "%s of project <b>%s</b> in %s was successful.\n", name, edi_project_name_get(), edi_project_get());
 
-   edi_screens_desktop_notify("EDI :: Build Status", eina_strbuf_string_get(message));
+   eina_strbuf_append_printf(title, "EDI :: %s Status", name);
 
+   edi_screens_desktop_notify(eina_strbuf_string_get(title), eina_strbuf_string_get(message));
+
+   eina_strbuf_free(title);
    eina_strbuf_free(message);
 }
 
 static void
 _edi_build_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Build"))
      {
         edi_consolepanel_show();
         edi_builder_build();
@@ -730,7 +735,7 @@ _edi_build_project(void)
 static void
 _edi_build_clean_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Clean"))
      {
         edi_consolepanel_show();
         edi_builder_clean();
@@ -740,7 +745,7 @@ _edi_build_clean_project(void)
 static void
 _edi_build_test_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Test"))
      {
         edi_consolepanel_show();
         edi_builder_test();

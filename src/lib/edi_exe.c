@@ -13,33 +13,47 @@
 static Ecore_Event_Handler *_edi_exe_handler = NULL;
 static Ecore_Event_Handler *_edi_exe_notify_handler = NULL;
 
+typedef struct _Edi_Exe_Args {
+   void ((*func)(int, void *));
+   void *data;
+} Edi_Exe_Args;
+
 static Eina_Bool
 _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    int *status;
-   void *(*func)(int value);
+   Edi_Exe_Args *args;
    Ecore_Con_Event_Client_Data *ev = event;
 
    status = ev->data;
-   func = data;
 
-   func(*status);
+   args = data;
+
+   args->func(*status, args->data);
 
    ecore_event_handler_del(_edi_exe_notify_handler);
    _edi_exe_notify_handler = NULL;
+
+   free(args);
 
    return EINA_FALSE;
 }
 
 EAPI Eina_Bool
-edi_exe_notify_handle(const char *name, void ((*func)(int)))
+edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
 {
+   Edi_Exe_Args *args;
+
    if (_edi_exe_notify_handler) return EINA_FALSE;
 
   /* These are UNIX domain sockets, no need to clean up */
    ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
 
-   _edi_exe_notify_handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, func);
+   args = malloc(sizeof(Edi_Exe_Args));
+   args->func = func;
+   args->data = data;
+
+   _edi_exe_notify_handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, args);
 
    return EINA_TRUE;
 }

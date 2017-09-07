@@ -56,10 +56,11 @@ EAPI void edi_exe_notify(const char *name, const char *command);
  *
  * @param name The name of the resource used to identify the notification.
  * @param func Function that will execute upon receiving exit code of exe.
+ * @param data Additional data to pass to the callback.
  *
  * @ingroup Exe
  */
-EAPI Eina_Bool edi_exe_notify_handle(const char *name, void ((*func)(int)));
+EAPI Eina_Bool edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data);
 
 /**
  * @}
