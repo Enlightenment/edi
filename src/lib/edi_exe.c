@@ -40,10 +40,13 @@ _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSE
 EAPI Eina_Bool
 edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
 {
+   Ecore_Con_Server *srv;
    Edi_Exe_Args *args;
 
   /* These are UNIX domain sockets, no need to clean up */
-   ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
+   srv = ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
+   if (!srv)
+     return EINA_FALSE;
 
    args = malloc(sizeof(Edi_Exe_Args));
    args->func = func;
@@ -68,9 +71,11 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
   name = args->data;
   /* These are UNIX domain sockets, no need to clean up */
   srv = ecore_con_server_connect(ECORE_CON_LOCAL_USER, name, 0, NULL);
-
-  ecore_con_server_send(srv, &ev->exit_code, sizeof(int *));
-  ecore_con_server_flush(srv);
+  if (srv)
+    {
+       ecore_con_server_send(srv, &ev->exit_code, sizeof(int));
+       ecore_con_server_flush(srv);
+    }
 
   ecore_event_handler_del(args->handler);
 
