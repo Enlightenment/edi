@@ -6,10 +6,6 @@
  * Always put system first, then EFL, then your public header,
  * and finally your private one. */
 
-#if ENABLE_NLS
-# include <libintl.h>
-#endif
-
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
 #include <Eio.h>
@@ -67,8 +63,8 @@ _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
 
    if (path == NULL)
      {
-        title = "Information";
-        message = "Please choose a file from the list.";
+        title = _("File path required");
+        message = _("Please choose a file from the list.");
 
         edi_screens_message(_edi_main_win, title, message);
         return;
@@ -417,27 +413,27 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    _edi_toolbar_separator_add(tb);
 
-   _edi_logpanel_item = elm_toolbar_item_append(tb, "go-up", "Logs",
+   _edi_logpanel_item = elm_toolbar_item_append(tb, "go-up", _("Logs"),
                                                 _edi_toggle_panel, "0");
    _edi_toolbar_separator_add(tb);
 
-   _edi_consolepanel_item = elm_toolbar_item_append(tb, "go-up", "Console",
+   _edi_consolepanel_item = elm_toolbar_item_append(tb, "go-up", _("Console"),
                                                     _edi_toggle_panel, "1");
    _edi_toolbar_separator_add(tb);
 
-   _edi_testpanel_item = elm_toolbar_item_append(tb, "go-up", "Tests",
+   _edi_testpanel_item = elm_toolbar_item_append(tb, "go-up", _("Tests"),
                                                  _edi_toggle_panel, "2");
    _edi_toolbar_separator_add(tb);
 
-   _edi_searchpanel_item = elm_toolbar_item_append(tb, "go-up", "Search",
+   _edi_searchpanel_item = elm_toolbar_item_append(tb, "go-up", _("Search"),
                                                  _edi_toggle_panel, "3");
    _edi_toolbar_separator_add(tb);
 
-   _edi_taskspanel_item = elm_toolbar_item_append(tb, "go-up", "Tasks",
+   _edi_taskspanel_item = elm_toolbar_item_append(tb, "go-up", _("Tasks"),
                                                   _edi_toggle_panel, "4");
    _edi_toolbar_separator_add(tb);
 
-   _edi_debugpanel_item = elm_toolbar_item_append(tb, "go-up", "Debug",
+   _edi_debugpanel_item = elm_toolbar_item_append(tb, "go-up", _("Debug"),
                                                   _edi_toggle_panel, "5");
    _edi_toolbar_separator_add(tb);
 
@@ -561,8 +557,8 @@ edi_launcher_config_missing()
 {
    const char *title, *message;
 
-   title = "Unable to launch";
-   message = "No launch binary found, please configure in Settings.";
+   title = _("Unable to launch");
+   message = _("No launch binary found, please configure in Settings.");
 
    edi_screens_message(_edi_main_win, title, message);
 }
@@ -573,8 +569,8 @@ _edi_project_credentials_missing()
 {
    const char *title, *message;
 
-   title = "User information";
-   message = "No user information found, please configure in Settings.";
+   title = _("Missing user information");
+   message = _("No user information found, please configure in Settings.");
 
    edi_screens_message(_edi_main_win, title, message);
 }
@@ -681,7 +677,7 @@ _edi_build_prep(Evas_Object *button)
 
    if (!edi_builder_can_build())
      {
-        edi_consolepanel_append_error_line("Cowardly refusing to build unknown project type.");
+        edi_consolepanel_append_error_line(_("Cowardly refusing to build unknown project type."));
         return EINA_FALSE;
      }
 
@@ -710,11 +706,11 @@ _edi_build_display_status_cb(int status, void *data)
    message = eina_strbuf_new();
 
    if (status != 0)
-     eina_strbuf_append_printf(message, "%s of project <b>%s</b> in %s failed with status code %d.\n", name, edi_project_name_get(), edi_project_get(), status);
+     eina_strbuf_append_printf(message, _("%s of project <b>%s</b> in %s failed with status code %d.\n"), name, edi_project_name_get(), edi_project_get(), status);
    else
-     eina_strbuf_append_printf(message, "%s of project <b>%s</b> in %s was successful.\n", name, edi_project_name_get(), edi_project_get());
+     eina_strbuf_append_printf(message, _("%s of project <b>%s</b> in %s was successful.\n"), name, edi_project_name_get(), edi_project_get());
 
-   eina_strbuf_append_printf(title, "EDI :: %s Status (%s)", name, status ? "Failure" : "Success");
+   eina_strbuf_append_printf(title, _("EDI :: %s Status (%s)"), name, status ? _("Failure") : _("Success"));
 
    edi_screens_desktop_notify(eina_strbuf_string_get(title), eina_strbuf_string_get(message));
 
@@ -725,7 +721,7 @@ _edi_build_display_status_cb(int status, void *data)
 static void
 _edi_build_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Build"))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Build")))
      {
         edi_consolepanel_show();
         edi_builder_build();
@@ -735,7 +731,7 @@ _edi_build_project(void)
 static void
 _edi_build_clean_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Clean"))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Clean")))
      {
         edi_consolepanel_show();
         edi_builder_clean();
@@ -745,7 +741,7 @@ _edi_build_clean_project(void)
 static void
 _edi_build_test_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, "Test"))
+   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Test")))
      {
         edi_consolepanel_show();
         edi_builder_test();
@@ -1033,7 +1029,7 @@ static void
 _edi_menu_scm_stash_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                        void *event_info EINA_UNUSED)
 {
-   edi_screens_message_confirm(_edi_main_win, "Are you sure you wish to stash these changes?",
+   edi_screens_message_confirm(_edi_main_win, _("Are you sure you wish to stash these changes?"),
                                _edi_scm_stash_do_cb, NULL);
 }
 
@@ -1096,59 +1092,59 @@ _edi_menu_setup(Evas_Object *win)
 
    menu = elm_win_main_menu_get(win);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "File", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", "New Project ...", _edi_menu_project_new_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("File"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", _("New Project ..."), _edi_menu_project_new_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "document-new", "New ...", _edi_menu_new_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", "New Directory ...", _edi_menu_new_dir_cb, NULL);
-   _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", "Save", _edi_menu_save_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "document-close", "Close", _edi_menu_close_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "document-close", "Close all", _edi_menu_closeall_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-new", _("New ..."), _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", _("New Directory ..."), _edi_menu_new_dir_cb, NULL);
+   _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", _("Save"), _edi_menu_save_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-close", _("Close"), _edi_menu_close_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-close", _("Close all"), _edi_menu_closeall_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "preferences-desktop", "Settings", _edi_menu_settings_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "preferences-desktop", _("Settings"), _edi_menu_settings_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "application-exit", "Quit", _edi_menu_quit_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "application-exit", _("Quit"), _edi_menu_quit_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "Edit", NULL, NULL);
-   _edi_menu_undo = elm_menu_item_add(menu, menu_it, "edit-undo", "Undo", _edi_menu_undo_cb, NULL);
-   _edi_menu_redo = elm_menu_item_add(menu, menu_it, "edit-redo", "Redo", _edi_menu_redo_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Edit"), NULL, NULL);
+   _edi_menu_undo = elm_menu_item_add(menu, menu_it, "edit-undo", _("Undo"), _edi_menu_undo_cb, NULL);
+   _edi_menu_redo = elm_menu_item_add(menu, menu_it, "edit-redo", _("Redo"), _edi_menu_redo_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-cut", "Cut", _edi_menu_cut_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-copy", "Copy", _edi_menu_copy_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-paste", "Paste", _edi_menu_paste_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-cut", _("Cut"), _edi_menu_cut_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-copy", _("Copy"), _edi_menu_copy_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-paste", _("Paste"), _edi_menu_paste_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find-replace", "Find & Replace", _edi_menu_find_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find", "Find file", _edi_menu_findfile_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "go-jump", "Goto Line ...", _edi_menu_goto_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Find & Replace"), _edi_menu_find_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", _("Find file"), _edi_menu_findfile_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "go-jump", _("Goto Line ..."), _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", "Find in project ...", _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", _("Find in project ..."), _edi_menu_find_project_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "View", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "window-new", "New Window", _edi_menu_view_open_window_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", "New Panel", _edi_menu_view_new_panel_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "window-new", _("New Window"), _edi_menu_view_open_window_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", _("New Panel"), _edi_menu_view_new_panel_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", "Open Tasks", _edi_menu_view_tasks_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", _("Open Tasks"), _edi_menu_view_tasks_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "Build", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "system-run", "Build", _edi_menu_build_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "media-record", "Test", _edi_menu_test_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "media-playback-start", "Run", _edi_menu_run_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "utilities-terminal", "Debug", _edi_menu_debug_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-clear", "Clean", _edi_menu_clean_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debug"), _edi_menu_debug_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "Project", NULL, NULL);
-   _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", "Init", _edi_menu_scm_init_cb, NULL);
-   _edi_menu_commit = elm_menu_item_add(menu, menu_it, "mail-send", "Commit", _edi_menu_scm_commit_cb, NULL);
-   _edi_menu_stash = elm_menu_item_add(menu, menu_it, "edit-undo", "Stash", _edi_menu_scm_stash_cb, NULL);
-   _edi_menu_status = elm_menu_item_add(menu, menu_it, "dialog-error", "Status", _edi_menu_scm_status_cb, NULL);
-   _edi_menu_push = elm_menu_item_add(menu, menu_it, "go-up", "Push", _edi_menu_scm_push_cb, NULL);
-   _edi_menu_pull = elm_menu_item_add(menu, menu_it, "go-down", "Pull", _edi_menu_scm_pull_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
+   _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Init"), _edi_menu_scm_init_cb, NULL);
+   _edi_menu_commit = elm_menu_item_add(menu, menu_it, "mail-send", _("Commit"), _edi_menu_scm_commit_cb, NULL);
+   _edi_menu_stash = elm_menu_item_add(menu, menu_it, "edit-undo", _("Stash"), _edi_menu_scm_stash_cb, NULL);
+   _edi_menu_status = elm_menu_item_add(menu, menu_it, "dialog-error", _("Status"), _edi_menu_scm_status_cb, NULL);
+   _edi_menu_push = elm_menu_item_add(menu, menu_it, "go-up", _("Push"), _edi_menu_scm_push_cb, NULL);
+   _edi_menu_pull = elm_menu_item_add(menu, menu_it, "go-down", _("Pull"), _edi_menu_scm_pull_cb, NULL);
 
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, "Help", NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "go-home", "Website", _edi_menu_website_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Help"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "go-home", _("Visit Website"), _edi_menu_website_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "help-about", "About", _edi_menu_about_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "help-about", _("About"), _edi_menu_about_cb, NULL);
 }
 
 static Evas_Object *
@@ -1179,42 +1175,42 @@ edi_toolbar_setup(Evas_Object *parent)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
 
-   _edi_toolbar_item_add(tb, "document-new", "New File", _tb_new_cb);
-   _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", "Save", _tb_save_cb);
-   _edi_toolbar_item_add(tb, "document-close", "Close", _tb_close_cb);
+   _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
+   _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", _("Save"), _tb_save_cb);
+   _edi_toolbar_item_add(tb, "document-close", _("Close"), _tb_close_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_undo = _edi_toolbar_item_add(tb, "edit-undo", "Undo", _tb_undo_cb);
-   _edi_toolbar_redo = _edi_toolbar_item_add(tb, "edit-redo", "Redo", _tb_redo_cb);
+   _edi_toolbar_undo = _edi_toolbar_item_add(tb, "edit-undo", _("Undo"), _tb_undo_cb);
+   _edi_toolbar_redo = _edi_toolbar_item_add(tb, "edit-redo", _("Redo"), _tb_redo_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "edit-cut", "Cut", _tb_cut_cb);
-   _edi_toolbar_item_add(tb, "edit-copy", "Copy", _tb_copy_cb);
-   _edi_toolbar_item_add(tb, "edit-paste", "Paste", _tb_paste_cb);
+   _edi_toolbar_item_add(tb, "edit-cut", _("Cut"), _tb_cut_cb);
+   _edi_toolbar_item_add(tb, "edit-copy", _("Copy"), _tb_copy_cb);
+   _edi_toolbar_item_add(tb, "edit-paste", _("Paste"), _tb_paste_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "edit-find-replace", "Find...", _tb_search_cb);
-   _edi_toolbar_item_add(tb, "go-jump", "Goto Line", _tb_goto_cb);
+   _edi_toolbar_item_add(tb, "edit-find-replace", _("Find..."), _tb_search_cb);
+   _edi_toolbar_item_add(tb, "go-jump", _("Goto Line"), _tb_goto_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "system-run", "Build", _tb_build_cb);
-   _edi_toolbar_item_add(tb, "media-record", "Test", _tb_test_cb);
-   _edi_toolbar_item_add(tb, "media-playback-start", "Run", _tb_run_cb);
-   _edi_toolbar_item_add(tb, "utilities-terminal", "Debug", _tb_debug_cb);
+   _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
+   _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
+   _edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
+   _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "preferences-desktop", "Settings", _tb_settings_cb);
-   _edi_toolbar_item_add(tb, "help-about", "About", _tb_about_cb);
+   _edi_toolbar_item_add(tb, "preferences-desktop", _("Settings"), _tb_settings_cb);
+   _edi_toolbar_item_add(tb, "help-about", _("About"), _tb_about_cb);
 
    evas_object_show(tb);
    return tb;
@@ -1390,7 +1386,7 @@ edi_open(const char *inputpath)
 
    if (!edi_project_set(inputpath))
      {
-        fprintf(stderr, "Project path must be a directory\n");
+        fprintf(stderr, _("Project path must be a directory\n"));
         return EINA_FALSE;
      }
    path = realpath(inputpath, NULL);
@@ -1604,7 +1600,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
         mime = efreet_mime_type_get(project_path);
         if (!edi_content_provider_for_mime_get(mime))
           {
-             fprintf(stderr, "Could not open file of unsupported mime type (%s)\n", mime);
+             fprintf(stderr, _("Could not open file of unsupported mime type (%s)\n"), mime);
              goto end;
           }
         edi_open_file(project_path);

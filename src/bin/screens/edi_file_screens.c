@@ -25,7 +25,7 @@ _edi_file_screens_message_open(const char *message)
                            message);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Ok");
+   elm_object_text_set(button, _("OK"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                  _edi_file_screens_message_close_cb, popup);
@@ -58,7 +58,7 @@ _edi_file_screens_create_file_cb(void *data,
    name = elm_entry_entry_get((Evas_Object *) data);
    if (!name || strlen(name) == 0)
      {
-        _edi_file_screens_message_open("Please enter a file name.");
+        _edi_file_screens_message_open(_("Please enter a file name."));
         return;
      }
 
@@ -73,7 +73,7 @@ _edi_file_screens_create_file_cb(void *data,
              edi_mainview_open_path(path);
           }
         else
-          _edi_file_screens_message_open("Unable to write file.");
+          _edi_file_screens_message_open(_("Unable to write file."));
      }
 
    eina_stringshare_del(_directory_path);
@@ -97,14 +97,14 @@ _edi_file_screens_create_dir_cb(void *data,
    name = elm_entry_entry_get((Evas_Object *) data);
    if (!name || strlen(name) == 0)
      {
-        _edi_file_screens_message_open("Please enter a directory name.");
+        _edi_file_screens_message_open(_("Please enter a directory name."));
         return;
      }
 
    path = edi_path_append(directory, name);
 
    mkdir(path, 0755);
-   
+
    eina_stringshare_del(_directory_path);
    _directory_path = NULL;
 
@@ -129,7 +129,7 @@ _edi_file_screens_rename_cb(void *data,
    name = elm_entry_entry_get(entry);
    if (!name || strlen(name) == 0)
      {
-        _edi_file_screens_message_open("Please enter a valid name.");
+        _edi_file_screens_message_open(_("Please enter a valid name."));
         return;
      }
 
@@ -138,9 +138,9 @@ _edi_file_screens_rename_cb(void *data,
    if (ecore_file_exists(path))
      {
         if (ecore_file_is_dir(path))
-          _edi_file_screens_message_open("Directory with that name already exists.");
+          _edi_file_screens_message_open(_("Directory with that name already exists."));
         else
-          _edi_file_screens_message_open("File with that name already exists.");
+          _edi_file_screens_message_open(_("File with that name already exists."));
         return;
      }
 
@@ -173,18 +173,18 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
 
    if (ecore_file_is_dir(path))
      elm_object_part_text_set(popup, "title,text",
-                                     "Rename directory");
+                                     _("Rename directory"));
    else
      elm_object_part_text_set(popup, "title,text",
-                                     "Rename file");
+                                     _("Rename file"));
    leaf = ecore_file_file_get(path);
    _directory_path = eina_stringshare_add(ecore_file_dir_get(path));
 
    label = elm_label_add(popup);
    if (ecore_file_is_dir(path))
-     elm_object_text_set(label, "Please enter a new name for this directory.");
+     elm_object_text_set(label, _("Please enter a new name for this directory."));
    else
-     elm_object_text_set(label, "Please enter a new name for this file.");
+     elm_object_text_set(label, _("Please enter a new name for this file."));
    evas_object_show(label);
 
    box = elm_box_add(popup);
@@ -218,14 +218,14 @@ edi_file_screens_rename(Evas_Object *parent, const char *path)
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
-   elm_object_text_set(button, "Rename");
+   elm_object_text_set(button, _("Rename"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_file_screens_rename_cb, path);
@@ -242,7 +242,7 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
    _parent_obj = parent;
    _popup = popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text",
-                            "Enter new file name");
+                            _("Enter new file name"));
    _directory_path = eina_stringshare_add(directory);
 
    box = elm_box_add(popup);
@@ -252,7 +252,7 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
    elm_box_pack_end(box, sep);
 
    label = elm_label_add(popup);
-   elm_object_text_set(label, "Please enter a name for this new file.");
+   elm_object_text_set(label, _("Please enter a name for this new file."));
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
@@ -279,13 +279,13 @@ edi_file_screens_create_file(Evas_Object *parent, const char *directory)
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Create");
+   elm_object_text_set(button, _("Create"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_create_file_cb, input);
@@ -304,7 +304,7 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
 
    _popup_dir = popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text",
-                            "Enter new directory name");
+                            _("Enter new directory name"));
 
    box = elm_box_add(popup);
    sep = elm_separator_add(box);
@@ -313,7 +313,7 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
    elm_box_pack_end(box, sep);
 
    label = elm_label_add(popup);
-   elm_object_text_set(label, "Please enter a name for this new directory.");
+   elm_object_text_set(label, _("Please enter a name for this new directory."));
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
@@ -340,13 +340,13 @@ edi_file_screens_create_dir(Evas_Object *parent, const char *directory)
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Create");
+   elm_object_text_set(button, _("Create"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_file_screens_create_dir_cb, input);

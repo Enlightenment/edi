@@ -412,7 +412,7 @@ _edi_mainview_panel_mime_content_safe_popup(void)
 
    popup = elm_popup_add(_main_win);
    elm_object_part_text_set(popup, "title,text",
-                                   "Unrecognized file type");
+                                   _("Unrecognized file type"));
 
    table = elm_table_add(popup);
    icon = elm_icon_add(table);
@@ -429,7 +429,7 @@ _edi_mainview_panel_mime_content_safe_popup(void)
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
    label = elm_label_add(popup);
-   elm_object_text_set(label, "To force open, select this file in the file browser, <br>and use \"open as\" menu options.");
+   elm_object_text_set(label, _("To force open, select this file in the file browser, <br>and use \"open as\" menu options."));
    evas_object_show(label);
    elm_table_pack(table, label, 1, 0, 1, 1);
    evas_object_show(table);
@@ -444,7 +444,7 @@ _edi_mainview_panel_mime_content_safe_popup(void)
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "OK");
+   elm_object_text_set(button, _("OK"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
 
@@ -671,7 +671,7 @@ edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
    popup = elm_popup_add(_main_win);
    _edi_mainview_goto_popup = popup;
    elm_object_part_text_set(popup, "title,text",
-                            "Enter line number");
+                            _("Enter line number"));
 
    box = elm_box_add(popup);
    elm_box_horizontal_set(box, EINA_FALSE);
@@ -697,13 +697,13 @@ edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
    elm_box_pack_end(box, sep);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Go");
+   elm_object_text_set(button, _("Go"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_panel_goto_popup_go_cb, input);

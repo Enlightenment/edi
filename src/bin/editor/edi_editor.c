@@ -70,7 +70,7 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    editor->popup = elm_popup_add(parent);
    elm_popup_orient_set(editor->popup, ELM_POPUP_ORIENT_CENTER);
    elm_popup_scrollable_set(editor->popup, EINA_TRUE);
-   elm_object_part_text_set(editor->popup, "title,text", "Confirmation");
+   elm_object_part_text_set(editor->popup, "title,text", _("Confirmation"));
    evas_object_size_hint_align_set(editor->popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(editor->popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
@@ -85,7 +85,7 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
 
    box = elm_box_add(editor->popup);
    label = elm_label_add(editor->popup);
-   elm_object_text_set(label, "File contents have changed. Would you like to refresh <br> the contents of this file?");
+   elm_object_text_set(label, _("File contents have changed. Would you like to reload <br> the contents of this file?"));
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
@@ -100,12 +100,12 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(table);
 
    button = elm_button_add(editor->popup);
-   elm_object_text_set(button, "Refresh");
+   elm_object_text_set(button, _("Reload"));
    elm_object_part_content_set(editor->popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_reload_cb, editor);
 
    button = elm_button_add(editor->popup);
-   elm_object_text_set(button, "No, continue editing");
+   elm_object_text_set(button, _("No, continue editing"));
    elm_object_part_content_set(editor->popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_ignore_cb, editor);
 
@@ -673,7 +673,7 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
    widget = (Elm_Code_Widget *)obj;
    elm_code_widget_cursor_position_get(widget, &line, &col);
 
-   snprintf(buf, sizeof(buf), "Line:%d, Column:%d", line, col);
+   snprintf(buf, sizeof(buf), _("Line:%d, Column:%d"), line, col);
    elm_object_text_set((Evas_Object *)data, buf);
 }
 
@@ -716,9 +716,9 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    lines = elm_label_add(panel);
    code = elm_code_widget_code_get(editor->entry);
    if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
-     elm_object_text_set(lines, "WIN");
+     elm_object_text_set(lines, _("WIN"));
    else
-     elm_object_text_set(lines, "UNIX");
+     elm_object_text_set(lines, _("UNIX"));
    evas_object_size_hint_align_set(lines, 0.0, 0.5);
    evas_object_size_hint_weight_set(lines, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(panel, lines);

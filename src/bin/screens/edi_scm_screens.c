@@ -29,7 +29,7 @@ _edi_scm_screens_message_open(const char *message)
                            message);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Ok");
+   elm_object_text_set(button, _("OK"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                  _edi_scm_screens_message_close_cb, popup);
@@ -61,7 +61,7 @@ _edi_scm_screens_commit_cb(void *data,
    text = elm_entry_entry_get((Evas_Object *) data);
    if (!text || !text[0])
      {
-        _edi_scm_screens_message_open("Please enter a valid commit message.");
+        _edi_scm_screens_message_open(_("Please enter a valid commit message."));
         return;
      }
 
@@ -91,7 +91,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    engine= edi_scm_engine_get();
    if (!engine)
      {
-        _edi_scm_screens_message_open("SCM engine is not available.");
+        _edi_scm_screens_message_open(_("SCM engine is not available."));
         return;
      }
 
@@ -101,7 +101,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_part_text_set(popup, "title,text",
-                                     "Commit Changes");
+                                     _("Commit Changes"));
    box = elm_box_add(popup);
    elm_box_horizontal_set(box, EINA_FALSE);
    elm_object_content_set(popup, box);
@@ -125,7 +125,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_box_pack_end(hbox, label);
 
    user = eina_strbuf_new();
-   eina_strbuf_append_printf(user, "Author:<br><b>%s</b><br>&lt;%s&gt;",
+   eina_strbuf_append_printf(user, "%s:<br><b>%s</b><br>&lt;%s&gt;", _("Author"),
                              engine->remote_name_get(), engine->remote_email_get());
    elm_object_text_set(label, eina_strbuf_string_get(user));
    eina_strbuf_free(user);
@@ -146,7 +146,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    label = elm_label_add(box);
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_text_set(label, "<b>Summary<b>");
+   elm_object_text_set(label, _("Summary"));
    elm_box_pack_end(box, label);
    evas_object_show(label);
 
@@ -174,30 +174,30 @@ edi_scm_screens_commit(Evas_Object *parent)
                {
                 case EDI_SCM_STATUS_ADDED:
                   elm_icon_standard_set(icon, "document-new");
-                  eina_strbuf_append(text, "(add) ");
+                  eina_strbuf_append_printf(text, "(%s) ", _("add"));
                   break;
                 case EDI_SCM_STATUS_MODIFIED:
                   elm_icon_standard_set(icon, "document-save-as");
-                  eina_strbuf_append(text, "(mod) ");
+                  eina_strbuf_append_printf(text, "(%s) ", _("mod"));
                   break;
                 case EDI_SCM_STATUS_DELETED:
                   elm_icon_standard_set(icon, "edit-delete");
-                  eina_strbuf_append(text, "(del) ");
+                  eina_strbuf_append_printf(text, "(%s) ", _("del"));
                   break;
                 case EDI_SCM_STATUS_RENAMED:
                   elm_icon_standard_set(icon, "document-save-as");
-                  eina_strbuf_append(text, "(ren) ");
+                  eina_strbuf_append_printf(text, "(%s) ", _("ren"));
                   break;
                 case EDI_SCM_STATUS_UNTRACKED:
                   elm_icon_standard_set(icon, "dialog-question");
-                  eina_strbuf_append(text, "(untracked)");
+                  eina_strbuf_append_printf(text, "(%s)", _("untracked"));
                   break;
                 default:
                   elm_icon_standard_set(icon, "text-x-generic");
                }
 
              if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
-               eina_strbuf_append(text, "- unstaged");
+               eina_strbuf_append_printf(text, "- %s", _("unstaged"));
 
              elm_list_item_append(list, eina_strbuf_string_get(text), icon, NULL, NULL, NULL);
 
@@ -214,7 +214,7 @@ edi_scm_screens_commit(Evas_Object *parent)
      {
         icon = elm_icon_add(box);
         elm_icon_standard_set(icon, "dialog-information");
-        elm_list_item_append(list, "Nothing to commit.", icon, NULL, NULL, NULL);
+        elm_list_item_append(list, _("Nothing to commit."), icon, NULL, NULL, NULL);
      }
 
    elm_scroller_bounce_set(list, EINA_TRUE, EINA_TRUE);
@@ -223,7 +223,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_show(list);
 
    input = elm_entry_add(box);
-   elm_object_text_set(input, "Enter commit summary<br><br>And change details<br>");
+   elm_object_text_set(input, _("Enter commit summary<br><br>And change details<br>"));
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_entry_editable_set(input, staged_changes);
@@ -249,7 +249,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    if (strlen(markup))
      eina_strbuf_append_printf(text, "<font=Fixed>%s</font>", markup);
    else
-     eina_strbuf_append(text, "No changes to display.");
+     eina_strbuf_append(text, _("No changes to display."));
 
    elm_object_text_set(entry, eina_strbuf_string_get(text));
 
@@ -263,14 +263,14 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_box_pack_end(box, sep);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_popup_cancel_cb, popup);
 
    button = elm_button_add(popup);
    evas_object_data_set(button, "input", input);
-   elm_object_text_set(button, "Commit");
+   elm_object_text_set(button, _("Commit"));
    elm_object_disabled_set(button, !staged_changes);
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
@@ -285,10 +285,10 @@ edi_scm_screens_binary_missing(Evas_Object *parent, const char *binary)
    Evas_Object *popup, *label, *button;
    Eina_Strbuf *text = eina_strbuf_new();
 
-   eina_strbuf_append_printf(text, "No %s binary found, please install %s.", binary, binary);
+   eina_strbuf_append_printf(text, _("No %s binary found, please install %s."), binary, binary);
 
    popup = elm_popup_add(parent);
-   elm_object_part_text_set(popup, "title,text", "SCM: Unable to launch");
+   elm_object_part_text_set(popup, "title,text", _("Unable to launch SCM binary"));
    label = elm_label_add(popup);
    elm_object_text_set(label, eina_strbuf_string_get(text));
    evas_object_show(label);
@@ -297,7 +297,7 @@ edi_scm_screens_binary_missing(Evas_Object *parent, const char *binary)
    eina_strbuf_free(text);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "OK");
+   elm_object_text_set(button, _("OK"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked", _edi_scm_screens_popup_cancel_cb, popup);
 

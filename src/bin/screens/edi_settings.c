@@ -117,7 +117,7 @@ _edi_settings_font_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSE
    evas_object_show(box);
 
    edi_settings_font_add(box);
-   elm_naviframe_item_push(naviframe, "Font", NULL, NULL, box, NULL);
+   elm_naviframe_item_push(naviframe, _("Font"), NULL, NULL, box, NULL);
 }
 
 static Evas_Object *
@@ -146,7 +146,7 @@ _edi_settings_display_create(Evas_Object *parent)
 {
    Evas_Object *box, *hbox, *frame, *label, *spinner, *check, *button, *preview;
 
-   frame = _edi_settings_panel_create(parent, "Display");
+   frame = _edi_settings_panel_create(parent, _("Display"));
    box = elm_object_part_content_get(frame, "default");
 
    hbox = elm_box_add(parent);
@@ -157,7 +157,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Font");
+   elm_object_text_set(label, _("Font"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
@@ -176,7 +176,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_object_focus_set(button, EINA_TRUE);
 
    check = elm_check_add(box);
-   elm_object_text_set(check, "Display whitespace");
+   elm_object_text_set(check, _("Display whitespace"));
    elm_check_state_set(check, _edi_project_config->gui.show_whitespace);
    elm_box_pack_end(box, check);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
@@ -193,7 +193,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Line width marker");
+   elm_object_text_set(label, _("Line width marker"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
@@ -219,7 +219,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Tabstop");
+   elm_object_text_set(label, _("Tabstop"));
    evas_object_size_hint_align_set(label, 0.0, 0.5);
    elm_box_pack_end(hbox, label);
    evas_object_show(label);
@@ -238,7 +238,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(spinner);
 
    check = elm_check_add(box);
-   elm_object_text_set(check, "Insert spaces when tab is pressed");
+   elm_object_text_set(check, _("Insert spaces when tab is pressed"));
    elm_check_state_set(check, _edi_project_config->gui.tab_inserts_spaces);
    elm_box_pack_end(box, check);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
@@ -248,7 +248,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(check);
 
    check = elm_check_add(box);
-   elm_object_text_set(check, "Hide Toolbar");
+   elm_object_text_set(check, _("Hide Toolbar"));
    elm_check_state_set(check, _edi_project_config->gui.toolbar_hidden);
    elm_box_pack_end(box, check);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
@@ -298,7 +298,7 @@ _edi_settings_builds_create(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *hbox, *label, *ic, *selector, *file, *entry;
 
-   frame = _edi_settings_panel_create(parent, "Builds");
+   frame = _edi_settings_panel_create(parent, _("Builds"));
    box = elm_object_part_content_get(frame, "default");
 
    hbox = elm_box_add(parent);
@@ -309,7 +309,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Runtime binary");
+   elm_object_text_set(label, _("Runtime binary"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -320,7 +320,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
 
    selector = elm_fileselector_button_add(box);
-   elm_object_text_set(selector, "Select");
+   elm_object_text_set(selector, _("Select"));
    elm_object_part_content_set(selector, "icon", ic);
    elm_fileselector_path_set(selector, edi_project_get());
    evas_object_size_hint_weight_set(selector, 0.25, 0.0);
@@ -348,7 +348,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Runtime args");
+   elm_object_text_set(label, _("Runtime arguments"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -425,7 +425,7 @@ _edi_settings_project_create(Evas_Object *parent)
    Eina_Strbuf *text;
 
    frames = elm_box_add(parent);
-   frame = _edi_settings_panel_create(frames, "Project Settings");
+   frame = _edi_settings_panel_create(frames, _("Project Settings"));
    evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, 0.5);
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(frames, frame);
@@ -440,7 +440,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Author Name: ");
+   elm_object_text_set(label, _("Author Name: "));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -465,7 +465,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Author E-mail: ");
+   elm_object_text_set(label, _("Author E-mail: "));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -487,7 +487,7 @@ _edi_settings_project_create(Evas_Object *parent)
 
    engine = edi_scm_engine_get();
    text = eina_strbuf_new();
-   eina_strbuf_append(text, "Source Control");
+   eina_strbuf_append(text, _("Source Control"));
    eina_strbuf_append_printf(text, " (%s)", engine->name);
 
    frame = _edi_settings_panel_create(frames, eina_strbuf_string_get(text));
@@ -506,7 +506,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, "Remote URL:");
+   elm_object_text_set(label, _("Remote URL:"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -554,11 +554,11 @@ _edi_settings_behaviour_create(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *check;
 
-   frame = _edi_settings_panel_create(parent, "Behaviour");
+   frame = _edi_settings_panel_create(parent, _("Behaviour"));
    box = elm_object_part_content_get(frame, "default");
 
    check = elm_check_add(box);
-   elm_object_text_set(check, "Auto save files");
+   elm_object_text_set(check, _("Auto save files"));
    elm_check_state_set(check, _edi_config->autosave);
    elm_box_pack_end(box, check);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
@@ -569,7 +569,7 @@ _edi_settings_behaviour_create(Evas_Object *parent)
    elm_object_focus_set(check, EINA_TRUE);
 
    check = elm_check_add(box);
-   elm_object_text_set(check, "Trim trailing whitespace");
+   elm_object_text_set(check, _("Trim trailing whitespace"));
    elm_check_state_set(check, _edi_config->trim_whitespace);
    elm_box_pack_end(box, check);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
@@ -589,7 +589,7 @@ edi_settings_show(Evas_Object *mainwin)
    win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
    if (!win) return NULL;
 
-   elm_win_title_set(win, "Edi Settings");
+   elm_win_title_set(win, _("Edi Settings"));
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_settings_exit, win);
 
@@ -635,16 +635,16 @@ edi_settings_show(Evas_Object *mainwin)
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
 
 
-   elm_toolbar_item_append(tb, "applications-development", "Project",_edi_settings_category_cb, _edi_settings_project);
-   default_it = elm_toolbar_item_append(tb, "preferences-desktop", "Display",
+   elm_toolbar_item_append(tb, "applications-development", _("Project"),_edi_settings_category_cb, _edi_settings_project);
+   default_it = elm_toolbar_item_append(tb, "preferences-desktop", _("Display"),
                                         _edi_settings_category_cb, _edi_settings_display);
    elm_toolbar_item_append(tb, "system-run", "Builds",
                            _edi_settings_category_cb, _edi_settings_builds);
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-   elm_toolbar_item_append(tb, "application-internet", "Global", NULL, NULL);
-   elm_toolbar_item_append(tb, "preferences-other", "Behaviour",
+   elm_toolbar_item_append(tb, "application-internet", _("Global"), NULL, NULL);
+   elm_toolbar_item_append(tb, "preferences-other", _("Behaviour"),
                            _edi_settings_category_cb, _edi_settings_behaviour);
    elm_toolbar_item_selected_set(default_it, EINA_TRUE);
 

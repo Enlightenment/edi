@@ -29,7 +29,7 @@ const char *
 _edi_language_python_mime_name(const char *mime)
 {
    if (!strcasecmp(mime, "text/x-python"))
-     return "Python source";
+     return _("Python source");
 
    return NULL;
 }

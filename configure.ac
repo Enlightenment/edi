@@ -53,6 +53,19 @@ EFL_INIT
 
 AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT([external])
+po_makefile_in=po/Makefile.in
+have_po="yes"
+
+AC_SUBST([LTLIBINTL])
+if test "x$LIBINTL" = "x"; then
+  LIBINTL="$INTLLIBS"
+fi
+
+if test "x${POSUB}" = "x" ; then
+  have_po="no"
+fi
+
+AM_CONDITIONAL([HAVE_PO], [test "x${have_po}" = "xyes"])
 
 # if cross compiling, disable NLS support.
 # It's not worth the trouble, at least for now.

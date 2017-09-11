@@ -4,6 +4,17 @@
 #include <Eina.h>
 #include <Elementary.h>
 
+#ifdef HAVE_PO
+# include <locale.h>
+#endif
+
+#ifdef ENABLE_NLS
+# include <libintl.h>
+# define _(x) gettext(x)
+#else
+# define _(x) (x)
+#endif
+
 extern int _edi_log_dom;
 
 #ifdef CRIT

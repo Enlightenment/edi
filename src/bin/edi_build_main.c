@@ -6,10 +6,6 @@
  * Always put system first, then EFL, then your public header,
  * and finally your private one. */
 
-#if ENABLE_NLS
-# include <libintl.h>
-#endif
-
 #include <Ecore_Getopt.h>
 #include <Eio.h>
 
@@ -64,10 +60,10 @@ static void
 _edi_build_create_done_cb(const char *path, Eina_Bool success)
 {
    if (success)
-     fprintf(stdout, "Project created at path %s\n", path);
+     fprintf(stdout, _("Project created at path %s\n"), path);
    else
      {
-        fprintf(stderr, "Unable to create project at path %s\n", path);
+        fprintf(stderr, _("Unable to create project at path %s\n"), path);
         _exit_code = EXIT_FAILURE;
      }
 
@@ -78,13 +74,13 @@ _edi_build_create_done_cb(const char *path, Eina_Bool success)
 static void
 _edi_build_print_start(Edi_Build_Provider *provider, const char *action)
 {
-   printf("Building \"%s\" target [%s] using [%s].\n", edi_project_name_get(), action, provider->id);
+   printf(_("Building \"%s\" target [%s] using [%s].\n"), edi_project_name_get(), action, provider->id);
 }
 
 static void
 _edi_build_print_noop(Edi_Build_Provider *provider, const char *action)
 {
-   printf("Target [%s] not supported for builder [%s].\n", action, provider->id);
+   printf(_("Target [%s] not supported for builder [%s].\n"), action, provider->id);
 }
 
 static int
@@ -168,7 +164,7 @@ main(int argc, char **argv)
      {
         if (argc - args != 7)
           {
-             fprintf(stderr, "create requires 6 additional parameters:\n");
+             fprintf(stderr, _("create requires 6 additional parameters:\n"));
              fprintf(stderr, "  skeleton, parent_path, project_name, "
                              "project_url, creator_name, creator_email\n");
              goto end;
@@ -182,7 +178,7 @@ main(int argc, char **argv)
 
    if (!edi_builder_can_build())
      {
-        fprintf(stderr, "Cowardly refusing to build unknown project type.\n");
+        fprintf(stderr, _("Cowardly refusing to build unknown project type.\n"));
         ecore_shutdown();
         goto exit;
      }
@@ -198,7 +194,7 @@ main(int argc, char **argv)
        ((ret = _edi_build_action_try(provider, provider->test, "test", build_type)) == EXIT_NOACTION) &&
        ((ret = _edi_build_action_try(provider, (void *)provider->build, "build", build_type)) == EXIT_NOACTION))
      {
-        fprintf(stderr, "Unrecognized build type - try build, clean, create or test.\n");
+        fprintf(stderr, _("Unrecognized build type - try build, clean, create or test.\n"));
         goto end;
      }
    if (ret != EXIT_SUCCESS)

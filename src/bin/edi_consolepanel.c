@@ -182,7 +182,7 @@ static void
 _edi_test_output_suite(int count, int pass, int fail)
 {
    char *line;
-   const char *format = "Total pass %d (%d%%), fail %d";
+   const char *format = _("Total pass %d (%d%%), fail %d)");
    int linemax, percent;
 
    linemax = strlen(format) - 6 + 30;

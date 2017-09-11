@@ -37,7 +37,7 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
    Evas_Object *popup, *table, *label, *button, *icon, *box, *sep;
 
    _edi_screens_popup = popup = elm_popup_add(parent);
-   elm_object_part_text_set(popup, "title,text", "Confirmation required");
+   elm_object_part_text_set(popup, "title,text", _("Confirmation required"));
 
    table = elm_table_add(popup);
 
@@ -70,13 +70,13 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Yes");
+   elm_object_text_set(button, _("Yes"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_data_set(button, "callback", confirm_cb);
    evas_object_smart_callback_add(button, "clicked", _edi_screens_message_confirm_cb, data);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "No");
+   elm_object_text_set(button, _("No"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked", _edi_screens_popup_cancel_cb, popup);
 
@@ -119,7 +119,7 @@ void edi_screens_message(Evas_Object *parent, const char *title, const char *mes
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "OK");
+   elm_object_text_set(button, _("OK"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked", _edi_screens_popup_cancel_cb, popup);
 

@@ -60,13 +60,13 @@ static void
 _edi_doc_tag_name_set(Edi_Language_Document *doc)
 {
    if (strlen(eina_strbuf_string_get(doc->param)) > 0)
-     eina_strbuf_prepend(doc->param, "<b><br><br> Parameters<br></b>");
+     eina_strbuf_prepend_printf(doc->param, "<b><br><br> %s<br></b>", _("Parameters"));
 
    if (strlen(eina_strbuf_string_get(doc->ret)) > 0)
-     eina_strbuf_prepend(doc->ret, "<b><br><br> Returns<br></b>   ");
+     eina_strbuf_prepend_printf(doc->ret, "<b><br><br> %s<br></b>   ", _("Returns"));
 
    if (strlen(eina_strbuf_string_get(doc->see)) > 0)
-     eina_strbuf_prepend(doc->see, "<b><br><br> See also<br></b>");
+     eina_strbuf_prepend_printf(doc->see, "<b><br><br> %s<br></b>", _("See also"));
 }
 
 static void
@@ -135,7 +135,7 @@ edi_editor_doc_open(Edi_Editor *editor)
         elm_popup_timeout_set(editor->doc_popup, 1.5);
         elm_object_style_set(editor->doc_popup, "transparent");
         label = elm_label_add(editor->doc_popup);
-        elm_object_text_set(label, "No help available for this term");
+        elm_object_text_set(label, _("No help available for this term"));
         evas_object_show(label);
         elm_object_content_set(editor->doc_popup, label);
         evas_object_show(editor->doc_popup);
@@ -157,7 +157,7 @@ edi_editor_doc_open(Edi_Editor *editor)
 
    //Close button
    Evas_Object *btn = elm_button_add(editor->doc_popup);
-   elm_object_text_set(btn, "Close");
+   elm_object_text_set(btn, _("Close"));
    evas_object_smart_callback_add(btn, "clicked", _edi_doc_popup_cb_btn_clicked,
                                   editor->doc_popup);
    elm_object_part_content_set(editor->doc_popup, "button1", btn);

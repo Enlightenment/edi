@@ -65,6 +65,10 @@ EXTRA_DIST = \
 	m4/efl_compiler_flag.m4 \
 	m4/efl_path_max.m4
 
+if HAVE_PO
+SUBDIRS += po
+endif
+
 if EFL_HAVE_LCOV
 
 lcov-reset:

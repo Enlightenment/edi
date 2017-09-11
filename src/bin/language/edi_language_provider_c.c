@@ -153,9 +153,9 @@ const char *
 _edi_language_c_mime_name(const char *mime)
 {
    if (!strcasecmp(mime, "text/x-chdr"))
-     return "C header";
+     return _("C header");
    if (!strcasecmp(mime, "text/x-csrc"))
-     return "C source";
+     return _("C source");
 
    return NULL;
 }

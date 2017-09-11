@@ -514,7 +514,7 @@ edi_mainview_project_search_popup_show(void)
    popup = elm_popup_add(_main_win);
    _edi_mainview_search_project_popup = popup;
    elm_object_part_text_set(popup, "title,text",
-                            "Search for (whole project)");
+                            _("Search for (whole project)"));
 
    box = elm_box_add(popup);
    sep = elm_separator_add(box);
@@ -523,7 +523,7 @@ edi_mainview_project_search_popup_show(void)
    elm_box_pack_end(box, sep);
 
    label = elm_label_add(popup);
-   elm_object_text_set(label, "Please enter a term to search for within<br> the whole project.");
+   elm_object_text_set(label, _("Please enter a term to search for within<br> the whole project."));
    evas_object_show(label);
    elm_box_pack_end(box, label);
 
@@ -551,13 +551,13 @@ edi_mainview_project_search_popup_show(void)
    elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Cancel");
+   elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_project_search_popup_cancel_cb, NULL);
 
    button = elm_button_add(popup);
-   elm_object_text_set(button, "Search");
+   elm_object_text_set(button, _("Search"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_project_search_cb, input);

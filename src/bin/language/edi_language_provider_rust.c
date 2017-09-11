@@ -29,7 +29,7 @@ const char *
 _edi_language_rust_mime_name(const char *mime)
 {
    if (!strcasecmp(mime, "text/rust"))
-     return "Rust source";
+     return _("Rust source");
 
    return NULL;
 }

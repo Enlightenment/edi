@@ -54,7 +54,7 @@ _edi_debugpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, voi
    return ECORE_CALLBACK_RENEW;
 }
 
-static Eina_Bool 
+static Eina_Bool
 _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *event)
 {
    Ecore_Exe_Event_Data *ev;
@@ -63,7 +63,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
    ev = event;
 
    if (ev && ev->size)
-      { 
+      {
          if (!ev->data) return ECORE_CALLBACK_DONE;
 
          char buf[ev->size + 1];
@@ -80,7 +80,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
            {
               if (buf[idx] == '\n')
                 end = &buf[idx];
-          
+
               if (start && end)
                 {
                    elm_code_file_line_append(_debug_output->file, start, end - start, NULL);
@@ -92,7 +92,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
     }
 
     return ECORE_CALLBACK_DONE;
-} 
+}
 
 static void
 _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info)
@@ -423,7 +423,7 @@ void edi_debugpanel_start(void)
 
    if (!ecore_file_exists(_edi_project_config->launch.path))
      {
-        warning = "Warning: executable does not exists (run make?)";
+        warning = _("Warning: executable does not exists (run make?)");
         elm_code_file_line_append(_debug_output->file, warning, strlen(warning), NULL);
         return;
      }
@@ -536,7 +536,7 @@ void edi_debugpanel_add(Evas_Object *parent)
    elm_table_pack(table, bt_start, 4, 0, 1, 1);
    elm_table_pack(table, bt_quit, 5, 0, 1, 1);
    evas_object_show(table);
-  
+
    _debug_output = code;
    _info_widget = widget;
    _entry_widget = entry;

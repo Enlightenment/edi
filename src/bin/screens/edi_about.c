@@ -30,7 +30,7 @@ edi_about_show(Evas_Object *mainwin)
    win = elm_win_add(mainwin, "about", ELM_WIN_BASIC);
    if (!win) return NULL;
 
-   elm_win_title_set(win, "About Edi (" VERSION ")");
+   elm_win_title_set(win, _("About Edi"));
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_about_exit, win);
 
@@ -75,16 +75,16 @@ edi_about_show(Evas_Object *mainwin)
    elm_box_pack_end(vbox, elm_box_add(vbox));
 
    text = elm_label_add(box);
-   elm_object_text_set(text, "<br>EDI is an IDE designed to get people into coding for Unix.<br>" \
+   elm_object_text_set(text, _("<br>EDI is an IDE designed to get people into coding for Unix.<br>" \
                              "It's based on the <b>EFL</b> and written completely natively<br>" \
-                             "to provide a <i>responsive</i> and <i>beautiful</i> UI.<br>");
+                             "to provide a <i>responsive</i> and <i>beautiful</i> UI.<br>"));
    evas_object_size_hint_weight_set(text, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(text, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, text);
    evas_object_show(text);
 
    title = elm_entry_add(box);
-   elm_object_text_set(title, "<hilight><align=center>EDI's lovely authors</align></hilight>");
+   elm_object_text_set(title, _("EDI's lovely authors"));
    elm_entry_editable_set(title, EINA_FALSE);
    elm_object_focus_allow_set(title, EINA_FALSE);
    evas_object_size_hint_weight_set(title, EVAS_HINT_EXPAND, 0.0);
@@ -116,7 +116,7 @@ edi_about_show(Evas_Object *mainwin)
    evas_object_show(space);
 
    button = elm_button_add(box);
-   elm_object_text_set(button, "Visit Website");
+   elm_object_text_set(button, _("Visit Website"));
    evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
                                   "http://edi-ide.com");
    elm_box_pack_end(buttonbox, button);
@@ -128,7 +128,7 @@ edi_about_show(Evas_Object *mainwin)
    evas_object_show(space);
 
    button = elm_button_add(box);
-   elm_object_text_set(button, "Report Issue");
+   elm_object_text_set(button, _("Report Issue"));
    evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
                                   "https://phab.enlightenment.org/maniphest/task/edit/form/2/?projects=PHID-PROJ-geg2fyscqgjjxt3fider");
    elm_box_pack_end(buttonbox, button);
@@ -140,7 +140,7 @@ edi_about_show(Evas_Object *mainwin)
    evas_object_show(space);
 
    button = elm_button_add(box);
-   elm_object_text_set(button, "Donate Now");
+   elm_object_text_set(button, _("Donate Now"));
    evas_object_smart_callback_add(button, "clicked", _edi_about_url_cb,
                                   "https://www.bountysource.com/teams/edi-ide");
    elm_box_pack_end(buttonbox, button);
