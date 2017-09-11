@@ -106,6 +106,11 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_box_horizontal_set(box, EINA_FALSE);
    elm_object_content_set(popup, box);
 
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+
    hbox = elm_box_add(popup);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -251,6 +256,11 @@ edi_scm_screens_commit(Evas_Object *parent)
    eina_strbuf_free(text);
    free(markup);
    free(diff);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "Cancel");
