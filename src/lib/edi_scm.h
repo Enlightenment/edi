@@ -32,6 +32,7 @@ typedef int (scm_fn_del)(const char *path);
 typedef int (scm_fn_move)(const char *src, const char *dest);
 typedef int (scm_fn_commit)(const char *message);
 typedef int (scm_fn_status)(void);
+typedef char *(scm_fn_diff)(void);
 typedef int (scm_fn_push)(void);
 typedef int (scm_fn_pull)(void);
 typedef int (scm_fn_stash)(void);
@@ -57,6 +58,7 @@ typedef struct _Edi_Scm_Engine
    scm_fn_move        *move;
    scm_fn_commit      *commit;
    scm_fn_status      *status;
+   scm_fn_diff        *diff;
    scm_fn_file_status *file_status;
    scm_fn_push        *push;
    scm_fn_pull        *pull;
@@ -175,6 +177,13 @@ Edi_Scm_Status_Code edi_scm_file_status(const char *path);
  * @return State whether a change was registered (true/false).
 */
 Eina_Bool edi_scm_status_get(void);
+
+/**
+ * Get diff of changes in repository.
+ *
+ * @return diff output as a string.
+*/
+char *edi_scm_diff(void);
 
 /**
  * Move from src to dest.

@@ -288,6 +288,23 @@ _edi_scm_git_status_get(void)
    return list;
 }
 
+static char *
+_edi_scm_git_diff(void)
+{
+   char *output;
+   Eina_Strbuf *command;
+
+   command = eina_strbuf_new();
+
+   eina_strbuf_append(command, "git diff");
+
+   output = _edi_scm_exec_response(eina_strbuf_string_get(command));
+
+   eina_strbuf_free(command);
+
+   return output;
+}
+
 static int
 _edi_scm_git_commit(const char *message)
 {
@@ -570,6 +587,14 @@ edi_scm_remote_add(const char *remote_url)
    return e->remote_add(remote_url);
 }
 
+EAPI char *
+edi_scm_diff(void)
+{
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   return e->diff();
+}
+
 static void
 _edi_scm_stash_thread_cb(void *data, Ecore_Thread *thread)
 {
@@ -648,6 +673,7 @@ _edi_scm_git_init()
    engine->file_del = _edi_scm_git_file_del;
    engine->move = _edi_scm_git_file_move;
    engine->status = _edi_scm_git_status;
+   engine->diff = _edi_scm_git_diff;
    engine->commit = _edi_scm_git_commit;
    engine->pull = _edi_scm_git_pull;
    engine->push = _edi_scm_git_push;
