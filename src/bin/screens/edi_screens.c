@@ -49,22 +49,25 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
    evas_object_show(icon);
    elm_table_pack(table, icon, 0, 0, 1, 1);
 
-   box = elm_box_add(popup);
    label = elm_label_add(table);
    elm_object_text_set(label, message);
    evas_object_show(label);
-   elm_box_pack_end(box, label);
 
+   elm_table_pack(table, label, 1, 0, 1, 1);
+   evas_object_show(table);
+
+   box = elm_box_add(popup);
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
-   evas_object_show(box);
+   elm_box_pack_end(box, table);
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
-   elm_table_pack(table, box, 1, 0, 1, 1);
-   elm_object_content_set(popup, table);
-
-   evas_object_show(table);
+   elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "Yes");
@@ -96,21 +99,24 @@ void edi_screens_message(Evas_Object *parent, const char *title, const char *mes
    evas_object_show(icon);
    elm_table_pack(table, icon, 0, 0, 1, 1);
 
-   box = elm_box_add(popup);
    label = elm_label_add(popup);
    elm_object_text_set(label, message);
    evas_object_show(label);
-   elm_box_pack_end(box, label);
+   elm_table_pack(table, label, 1, 0, 1, 1);
+   evas_object_show(table);
 
+   box = elm_box_add(popup);
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
-   evas_object_show(box);
-   elm_table_pack(table, box, 1, 0, 1, 1);
-   evas_object_show(table);
+   elm_box_pack_end(box, table);
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
-   elm_object_content_set(popup, table);
+   elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "OK");

@@ -424,20 +424,24 @@ _edi_mainview_panel_mime_content_safe_popup(void)
    elm_table_pack(table, icon, 0, 0, 1, 1);
 
    box = elm_box_add(popup);
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
    label = elm_label_add(popup);
    elm_object_text_set(label, "To force open, select this file in the file browser, <br>and use \"open as\" menu options.");
    evas_object_show(label);
-   elm_box_pack_end(box, label);
+   elm_table_pack(table, label, 1, 0, 1, 1);
+   evas_object_show(table);
+   elm_box_pack_end(box, table);
 
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
-   elm_table_pack(table, box, 1, 0, 1, 1);
    evas_object_show(box);
 
-   elm_object_content_set(popup, table);
-   evas_object_show(table);
+   elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "OK");
@@ -662,7 +666,7 @@ _edi_mainview_panel_goto_popup_key_up_cb(void *data, Evas *e EINA_UNUSED,
 void
 edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
 {
-   Evas_Object *popup, *box, *input, *button;
+   Evas_Object *popup, *box, *input, *sep, *button;
 
    popup = elm_popup_add(_main_win);
    _edi_mainview_goto_popup = popup;
@@ -673,6 +677,11 @@ edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
    elm_box_horizontal_set(box, EINA_FALSE);
    elm_object_content_set(popup, box);
 
+   sep = elm_separator_add(popup);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
    elm_entry_scrollable_set(input, EINA_TRUE);
@@ -681,6 +690,11 @@ edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(input);
    elm_box_pack_end(box, input);
+
+   sep = elm_separator_add(popup);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, "Cancel");
