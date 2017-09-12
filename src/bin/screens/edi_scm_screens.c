@@ -83,6 +83,8 @@ _entry_lines_append(Elm_Code *code, char *diff)
    char *pos = diff;
    char *start, *end = NULL;
 
+   if (!*pos) return;
+
    start = pos;
    while (*pos++ != '\0')
     {
@@ -96,6 +98,9 @@ _entry_lines_append(Elm_Code *code, char *diff)
             end = NULL;
          }
     }
+    end = pos;
+    if (end > start)
+      elm_code_file_line_append(code->file, start, end - start, NULL);
 }
 
 void
