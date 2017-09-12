@@ -106,7 +106,7 @@ _entry_lines_append(Elm_Code *code, char *diff)
 void
 edi_scm_screens_commit(Evas_Object *parent)
 {
-   Evas_Object *popup, *box, *hbox, *cbox, *sep, *label, *avatar, *input, *button;
+   Evas_Object *popup, *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
    Evas_Object *list, *icon;
    Elm_Code_Widget *entry;
    Elm_Code *code;
@@ -126,28 +126,28 @@ edi_scm_screens_commit(Evas_Object *parent)
 
    _parent_obj = parent;
    _popup = popup = elm_popup_add(parent);
-   elm_popup_scrollable_set(popup, EINA_TRUE);
    evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_part_text_set(popup, "title,text",
-                                     _("Commit Changes"));
+
    box = elm_box_add(popup);
    elm_box_horizontal_set(box, EINA_FALSE);
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_content_set(popup, box);
 
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
-
    hbox = elm_box_add(popup);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(hbox);
-   elm_box_pack_end(box, hbox);
+
+   frame = elm_frame_add(hbox);
+   elm_object_text_set(frame, _("Summary"));
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frame, hbox);
+   evas_object_show(frame);
+   elm_box_pack_end(box, frame);
 
    label = elm_label_add(hbox);
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
@@ -169,24 +169,18 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_show(avatar);
    elm_box_pack_end(hbox, avatar);
 
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
-
-   label = elm_label_add(box);
-   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_text_set(label, _("Summary"));
-   elm_box_pack_end(box, label);
-   evas_object_show(label);
+   cbox = elm_box_add(box);
+   evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_min_set(cbox, 250 * elm_config_scale_get(), 100 * elm_config_scale_get());
+   evas_object_show(cbox);
 
    list = elm_list_add(box);
-   elm_list_mode_set(list, ELM_LIST_EXPAND);
    elm_list_select_mode_set(list, ELM_OBJECT_SELECT_MODE_NONE);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, list);
+   elm_box_pack_end(cbox, list);
+   elm_box_pack_end(box, cbox);
 
    staged_changes = EINA_FALSE;
 
@@ -253,6 +247,12 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_list_go(list);
    evas_object_show(list);
 
+   frame = elm_frame_add(popup);
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(frame, _("Commit message"));
+   evas_object_show(frame);
+
    input = elm_entry_add(box);
    elm_object_text_set(input, _("Enter commit summary<br><br>And change details<br>"));
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -262,17 +262,25 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_entry_single_line_set(input, EINA_TRUE);
    elm_object_style_set(input, "entry");
    evas_object_show(input);
-   elm_box_pack_end(box, input);
+   elm_object_content_set(frame, input);
+   elm_box_pack_end(box, frame);
 
    diff = edi_scm_diff();
    if (strlen(diff))
      {
+        frame = elm_frame_add(popup);
+        evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        elm_object_text_set(frame, _("Changes"));
+        evas_object_show(frame);
+
         cbox = elm_box_add(popup);
         evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        evas_object_size_hint_min_set(cbox, 400 * elm_config_scale_get(), 400 * elm_config_scale_get());
+        evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 250 * elm_config_scale_get());
         evas_object_show(cbox);
-        elm_box_pack_end(box, cbox);
+        elm_object_content_set(frame, cbox);
+        elm_box_pack_end(box, frame);
 
         code = elm_code_create();
         entry = elm_code_widget_add(box, code);
@@ -290,11 +298,6 @@ edi_scm_screens_commit(Evas_Object *parent)
      }
 
    free(diff);
-
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));
