@@ -89,6 +89,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
                 }
               idx++;
            }
+        /* We can forget the last line ihere as it's the prompt string */
     }
 
     return ECORE_CALLBACK_DONE;
