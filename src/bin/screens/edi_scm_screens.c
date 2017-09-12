@@ -4,6 +4,7 @@
 
 #include "Edi.h"
 #include "mainview/edi_mainview.h"
+#include "edi_config.h"
 #include "edi_consolepanel.h"
 #include "edi_scm_screens.h"
 #include "edi_private.h"
@@ -76,16 +77,39 @@ _edi_scm_screens_commit_cb(void *data,
    free(message);
 }
 
+static void
+_entry_lines_append(Elm_Code *code, char *diff)
+{
+   char *pos = diff;
+   char *start, *end = NULL;
+
+   start = pos;
+   while (*pos++ != '\0')
+    {
+       if (*pos == '\n')
+         end = pos;
+
+       if (start && end)
+         {
+            elm_code_file_line_append(code->file, start, end - start, NULL);
+            start = end + 1;
+            end = NULL;
+         }
+    }
+}
+
 void
 edi_scm_screens_commit(Evas_Object *parent)
 {
-   Evas_Object *popup, *box, *hbox, *sep, *label, *avatar, *input, *button;
-   Evas_Object *list, *icon, *entry;
+   Evas_Object *popup, *box, *hbox, *cbox, *sep, *label, *avatar, *input, *button;
+   Evas_Object *list, *icon;
+   Elm_Code_Widget *entry;
+   Elm_Code *code;
    Eina_Strbuf *text, *user;
    Eina_List *l;
    Edi_Scm_Engine *engine;
    Edi_Scm_Status *status;
-   char *diff, *markup;
+   char *diff;
    Eina_Bool staged_changes;
 
    engine= edi_scm_engine_get();
@@ -104,6 +128,8 @@ edi_scm_screens_commit(Evas_Object *parent)
                                      _("Commit Changes"));
    box = elm_box_add(popup);
    elm_box_horizontal_set(box, EINA_FALSE);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_content_set(popup, box);
 
    sep = elm_separator_add(box);
@@ -233,28 +259,31 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_show(input);
    elm_box_pack_end(box, input);
 
-   entry = elm_entry_add(box);
-   evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_entry_line_wrap_set(entry, ELM_WRAP_NONE);
-   elm_entry_editable_set(entry, EINA_FALSE);
-   elm_entry_scrollable_set(entry, EINA_TRUE);
-   elm_entry_single_line_set(entry, EINA_TRUE);
-   evas_object_show(entry);
-   elm_box_pack_end(box, entry);
-
    diff = edi_scm_diff();
-   text = eina_strbuf_new();
-   markup = elm_entry_utf8_to_markup(diff);
-   if (strlen(markup))
-     eina_strbuf_append_printf(text, "<font=Fixed>%s</font>", markup);
-   else
-     eina_strbuf_append(text, _("No changes to display."));
+   if (strlen(diff))
+     {
+        cbox = elm_box_add(popup);
+        evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        evas_object_size_hint_min_set(cbox, 400 * elm_config_scale_get(), 400 * elm_config_scale_get());
+        evas_object_show(cbox);
+        elm_box_pack_end(box, cbox);
 
-   elm_object_text_set(entry, eina_strbuf_string_get(text));
+        code = elm_code_create();
+        entry = elm_code_widget_add(box, code);
+        elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_DIFF);
+        elm_obj_code_widget_font_set(entry, _edi_project_config->font.name, _edi_project_config->font.size);
+        elm_obj_code_widget_gravity_set(entry, 0.0, 1.0);
+        elm_obj_code_widget_editable_set(entry, EINA_FALSE);
+        elm_obj_code_widget_line_numbers_set(entry, EINA_FALSE);
+        evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+        evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
+        evas_object_show(entry);
+        elm_box_pack_end(cbox, entry);
 
-   eina_strbuf_free(text);
-   free(markup);
+        _entry_lines_append(code, diff);
+     }
+
    free(diff);
 
    sep = elm_separator_add(box);
