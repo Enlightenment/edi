@@ -62,7 +62,7 @@ _edi_editor_file_change_ignore_cb(void *data, Evas_Object *obj EINA_UNUSED, void
 static void
 _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *table, *box, *label, *sep, *icon, *button;
+   Evas_Object *table, *frame, *box, *label, *sep, *icon, *button;
 
    if (editor->popup)
      return;
@@ -83,6 +83,10 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(icon);
    elm_table_pack(table, icon, 0, 0, 1, 1);
 
+   frame = elm_frame_add(editor->popup);
+   elm_object_content_set(frame, table);
+   evas_object_show(frame);
+
    box = elm_box_add(editor->popup);
    label = elm_label_add(editor->popup);
    elm_object_text_set(label, _("File contents have changed. Would you like to reload <br> the contents of this file?"));
@@ -96,7 +100,7 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(box);
    elm_table_pack(table, box, 1, 0, 1, 1);
 
-   elm_object_content_set(editor->popup, table);
+   elm_object_content_set(editor->popup, frame);
    evas_object_show(table);
 
    button = elm_button_add(editor->popup);

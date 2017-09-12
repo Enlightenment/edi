@@ -34,7 +34,7 @@ _edi_screens_message_confirm_cb(void *data, Evas_Object *obj,
 
 void edi_screens_message_confirm(Evas_Object *parent, const char *message, void ((*confirm_cb)(void *)), void *data)
 {
-   Evas_Object *popup, *table, *label, *button, *icon, *box, *sep;
+   Evas_Object *popup, *frame, *table, *label, *button, *icon, *box, *sep;
 
    _edi_screens_popup = popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text", _("Confirmation required"));
@@ -57,17 +57,16 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
    evas_object_show(table);
 
    box = elm_box_add(popup);
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
    elm_box_pack_end(box, table);
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
 
-   elm_object_content_set(popup, box);
+   frame = elm_frame_add(popup);
+   evas_object_show(frame);
+   elm_object_content_set(frame, box);
+   elm_object_content_set(popup, frame);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Yes"));
