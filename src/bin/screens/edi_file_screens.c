@@ -157,8 +157,6 @@ _edi_file_screens_rename_cb(void *data,
           ecore_file_mv(existing_path, path);
         else
           edi_scm_move(existing_path, path);
-
-        edi_filepanel_update_path(path);
      }
 
    evas_object_del(_popup);

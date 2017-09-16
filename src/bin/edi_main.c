@@ -1003,7 +1003,6 @@ _edi_menu_scm_init_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    edi_consolepanel_show();
    edi_scm_git_new();
    edi_scm_init();
-   edi_filepanel_update_all();
    _edi_icon_update();
 }
 
@@ -1025,7 +1024,6 @@ static void
 _edi_scm_stash_do_cb(void *data EINA_UNUSED)
 {
    edi_scm_stash();
-   edi_filepanel_update_all();
 }
 
 static void
@@ -1052,7 +1050,6 @@ _edi_menu_scm_pull_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    edi_consolepanel_clear();
    edi_consolepanel_show();
    edi_scm_pull();
-   edi_filepanel_update_all();
 }
 
 static void
@@ -1068,7 +1065,6 @@ _edi_menu_scm_push_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    edi_consolepanel_clear();
    edi_consolepanel_show();
    edi_scm_push();
-   edi_filepanel_update_all();
 }
 
 static void

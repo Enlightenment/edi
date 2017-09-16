@@ -210,7 +210,6 @@ _item_menu_scm_add_cb(void *data, Evas_Object *obj EINA_UNUSED,
    sd = data;
 
    edi_scm_add(sd->path);
-   edi_filepanel_update_path(sd->path);
 }
 
 static void
@@ -228,8 +227,6 @@ _item_menu_scm_del_do_cb(void *data)
      edi_scm_del(sd->path);
    else
      ecore_file_unlink(sd->path);
-
-   edi_filepanel_update_path(sd->path);
 }
 
 static void
@@ -709,48 +706,6 @@ _file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
 }
 
 static void
-_edi_filepanel_update_dir(const char *directory)
-{
-   Eina_List *files;
-   char *path;
-   char *file;
-
-   files = ecore_file_ls(directory);
-
-   EINA_LIST_FREE(files, file)
-     {
-        if (file[0] != '.')
-          {
-             path = edi_path_append(directory, file);
-             if (ecore_file_is_dir(path))
-               _edi_filepanel_update_dir(path);
-             else
-               edi_filepanel_update_path(path);
-             free(path);
-          }
-        free(file);
-     }
-
-   if (files)
-     eina_list_free(files);
-}
-
-void
-edi_filepanel_update_all(void)
-{
-  _edi_filepanel_update_dir(edi_project_get());
-}
-
-void edi_filepanel_update_path(const char *path)
-{
-   Elm_Object_Item *item = _file_listing_item_find(path);
-   if (!item)
-     return;
-
-   elm_genlist_item_update(item);
-}
-
-static void
 _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
                       void *event EINA_UNUSED)
 {
@@ -774,8 +729,6 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
      _file_listing_item_delete(ev->filename);
    else
     DBG("Ignoring file update event for %s", ev->filename);
-
-   edi_filepanel_update_path(ev->filename);
 }
 
 /* Panel filtering */
