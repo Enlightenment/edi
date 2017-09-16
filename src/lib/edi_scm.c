@@ -58,7 +58,18 @@ _edi_scm_exec_response(const char *command)
 EAPI int
 edi_scm_git_new(void)
 {
-   return _edi_scm_exec("git init .");
+   int code;
+   char *oldpwd;
+
+   oldpwd = getcwd(NULL, PATH_MAX);
+
+   chdir(edi_project_get());
+   code = edi_exe_wait("git init .");
+   chdir(oldpwd);
+
+   free(oldpwd);
+
+   return code;
 }
 
 EAPI int
