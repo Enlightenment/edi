@@ -468,7 +468,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    if (provider)
      elm_icon_standard_set(ic, provider->icon);
    else
-          elm_icon_standard_set(ic, "empty");
+     elm_icon_standard_set(ic, "empty");
 
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    evas_object_show(ic);
