@@ -425,85 +425,12 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    evas_object_show(menu);
 }
 
-static const char *
-_file_icon_status(const char *path)
-{
-   Edi_Scm_Status_Code status;
-
-   if (!edi_scm_enabled() || ecore_file_is_dir(path))
-     return NULL;
-
-   status = edi_scm_file_status(path);
-   switch (status)
-     {
-        case EDI_SCM_STATUS_NONE:
-        case EDI_SCM_STATUS_RENAMED:
-        case EDI_SCM_STATUS_DELETED:
-        case EDI_SCM_STATUS_RENAMED_STAGED:
-        case EDI_SCM_STATUS_DELETED_STAGED:
-        case EDI_SCM_STATUS_UNKNOWN:
-        case EDI_SCM_STATUS_ADDED:
-           return NULL;
-        case EDI_SCM_STATUS_ADDED_STAGED:
-           return "document-new";
-        case EDI_SCM_STATUS_MODIFIED:
-        case EDI_SCM_STATUS_MODIFIED_STAGED:
-          return "document-save-as";
-        case EDI_SCM_STATUS_UNTRACKED:
-          return "dialog-question";
-     }
-
-   return NULL;
-}
-
-static char *
-_file_path_status(const char *path)
-{
-   char *orig;
-   Edi_Scm_Status_Code status;
-   static char text[4096];
-
-   orig = basename((char *)path);
-
-   if (!edi_scm_enabled() || ecore_file_is_dir(path))
-     return orig;
-
-   text[0] = '\0';
-   strcat(text, orig);
-
-   status = edi_scm_file_status(path);
-   switch (status)
-     {
-        case EDI_SCM_STATUS_NONE:
-        case EDI_SCM_STATUS_DELETED:
-        case EDI_SCM_STATUS_DELETED_STAGED:
-        case EDI_SCM_STATUS_UNKNOWN:
-           return text;
-        case EDI_SCM_STATUS_ADDED:
-           return strcat(text, _(" (Added & Unstaged)"));
-        case EDI_SCM_STATUS_ADDED_STAGED:
-           return strcat(text, _(" (Added)"));
-        case EDI_SCM_STATUS_RENAMED:
-           return strcat(text, _(" (Renamed & Unstaged)"));
-        case EDI_SCM_STATUS_RENAMED_STAGED:
-           return strcat(text, _(" (Renamed)"));
-        case EDI_SCM_STATUS_MODIFIED:
-           return strcat(text, _(" (Modified & Unstaged)"));
-        case EDI_SCM_STATUS_MODIFIED_STAGED:
-           return strcat(text, _(" (Modified)"));
-        case EDI_SCM_STATUS_UNTRACKED:
-           return strcat(text, _(" (Untracked)"));
-     }
-
-   return text;
-}
-
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
 {
    Edi_Dir_Data *sd = data;
 
-   return strdup(_file_path_status(sd->path));
+   return strdup(basename((char *)sd->path));
 }
 
 static Eina_Hash *mime_entries = NULL;
@@ -530,7 +457,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    Edi_Content_Provider *provider;
    Edi_Dir_Data *sd = data;
    Evas_Object *ic;
-   const char *icon_name;
 
    if (strcmp(source, "elm.swallow.icon"))
      return NULL;
@@ -539,18 +465,10 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    ic = elm_icon_add(obj);
 
-   icon_name = _file_icon_status(sd->path);
-   if (icon_name)
-     {
-        elm_icon_standard_set(ic, icon_name);
-     }
+   if (provider)
+     elm_icon_standard_set(ic, provider->icon);
    else
-     {
-        if (provider)
-          elm_icon_standard_set(ic, provider->icon);
-        else
           elm_icon_standard_set(ic, "empty");
-     }
 
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    evas_object_show(ic);
