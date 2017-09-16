@@ -210,6 +210,7 @@ _item_menu_scm_add_cb(void *data, Evas_Object *obj EINA_UNUSED,
    sd = data;
 
    edi_scm_add(sd->path);
+   edi_filepanel_update_path(sd->path);
 }
 
 static void
@@ -227,6 +228,8 @@ _item_menu_scm_del_do_cb(void *data)
      edi_scm_del(sd->path);
    else
      ecore_file_unlink(sd->path);
+
+   edi_filepanel_update_path(sd->path);
 }
 
 static void
@@ -422,12 +425,85 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    evas_object_show(menu);
 }
 
+static const char *
+_file_icon_status(const char *path)
+{
+   Edi_Scm_Status_Code status;
+
+   if (!edi_scm_enabled() || ecore_file_is_dir(path))
+     return NULL;
+
+   status = edi_scm_file_status(path);
+   switch (status)
+     {
+        case EDI_SCM_STATUS_NONE:
+        case EDI_SCM_STATUS_RENAMED:
+        case EDI_SCM_STATUS_DELETED:
+        case EDI_SCM_STATUS_RENAMED_STAGED:
+        case EDI_SCM_STATUS_DELETED_STAGED:
+        case EDI_SCM_STATUS_UNKNOWN:
+        case EDI_SCM_STATUS_ADDED:
+           return NULL;
+        case EDI_SCM_STATUS_ADDED_STAGED:
+           return "document-new";
+        case EDI_SCM_STATUS_MODIFIED:
+        case EDI_SCM_STATUS_MODIFIED_STAGED:
+          return "document-save-as";
+        case EDI_SCM_STATUS_UNTRACKED:
+          return "dialog-question";
+     }
+
+   return NULL;
+}
+
+static char *
+_file_path_status(const char *path)
+{
+   char *orig;
+   Edi_Scm_Status_Code status;
+   static char text[4096];
+
+   orig = basename((char *)path);
+
+   if (!edi_scm_enabled() || ecore_file_is_dir(path))
+     return orig;
+
+   text[0] = '\0';
+   strcat(text, orig);
+
+   status = edi_scm_file_status(path);
+   switch (status)
+     {
+        case EDI_SCM_STATUS_NONE:
+        case EDI_SCM_STATUS_DELETED:
+        case EDI_SCM_STATUS_DELETED_STAGED:
+        case EDI_SCM_STATUS_UNKNOWN:
+           return text;
+        case EDI_SCM_STATUS_ADDED:
+           return strcat(text, _(" (Added & Unstaged)"));
+        case EDI_SCM_STATUS_ADDED_STAGED:
+           return strcat(text, _(" (Added)"));
+        case EDI_SCM_STATUS_RENAMED:
+           return strcat(text, _(" (Renamed & Unstaged)"));
+        case EDI_SCM_STATUS_RENAMED_STAGED:
+           return strcat(text, _(" (Renamed)"));
+        case EDI_SCM_STATUS_MODIFIED:
+           return strcat(text, _(" (Modified & Unstaged)"));
+        case EDI_SCM_STATUS_MODIFIED_STAGED:
+           return strcat(text, _(" (Modified)"));
+        case EDI_SCM_STATUS_UNTRACKED:
+           return strcat(text, _(" (Untracked)"));
+     }
+
+   return text;
+}
+
 static char *
 _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
 {
    Edi_Dir_Data *sd = data;
 
-   return strdup(basename((char *)sd->path));
+   return strdup(_file_path_status(sd->path));
 }
 
 static Eina_Hash *mime_entries = NULL;
@@ -454,6 +530,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    Edi_Content_Provider *provider;
    Edi_Dir_Data *sd = data;
    Evas_Object *ic;
+   const char *icon_name;
 
    if (strcmp(source, "elm.swallow.icon"))
      return NULL;
@@ -461,10 +538,19 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    provider = _get_provider_from_hashset(sd->path);
 
    ic = elm_icon_add(obj);
-   if (provider)
-     elm_icon_standard_set(ic, provider->icon);
+
+   icon_name = _file_icon_status(sd->path);
+   if (icon_name)
+     {
+        elm_icon_standard_set(ic, icon_name);
+     }
    else
-     elm_icon_standard_set(ic, "empty");
+     {
+        if (provider)
+          elm_icon_standard_set(ic, provider->icon);
+        else
+          elm_icon_standard_set(ic, "empty");
+     }
 
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    evas_object_show(ic);
@@ -705,6 +791,48 @@ _file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
 }
 
 static void
+_edi_filepanel_update_dir(const char *directory)
+{
+   Eina_List *files;
+   char *path;
+   char *file;
+
+   files = ecore_file_ls(directory);
+
+   EINA_LIST_FREE(files, file)
+     {
+        if (file[0] != '.')
+          {
+             path = edi_path_append(directory, file);
+             if (ecore_file_is_dir(path))
+               _edi_filepanel_update_dir(path);
+             else
+               edi_filepanel_update_path(path);
+             free(path);
+          }
+        free(file);
+     }
+
+   if (files)
+     eina_list_free(files);
+}
+
+void
+edi_filepanel_update_all(void)
+{
+  _edi_filepanel_update_dir(edi_project_get());
+}
+
+void edi_filepanel_update_path(const char *path)
+{
+   Elm_Object_Item *item = _file_listing_item_find(path);
+   if (!item)
+     return;
+
+   elm_genlist_item_update(item);
+}
+
+static void
 _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
                       void *event EINA_UNUSED)
 {
@@ -727,7 +855,9 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    else if (type == EIO_MONITOR_DIRECTORY_DELETED)
      _file_listing_item_delete(ev->filename);
    else
-     DBG("Ignoring file update event for %s", ev->filename);
+    DBG("Ignoring file update event for %s", ev->filename);
+
+   edi_filepanel_update_path(ev->filename);
 }
 
 /* Panel filtering */

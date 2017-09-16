@@ -135,7 +135,7 @@ edi_exe_response(const char *command)
 
    while ((fgets(buf, sizeof(buf), p)) != NULL)
      {
-        eina_strbuf_append_printf(lines, "%s", buf);
+        eina_strbuf_append(lines, buf);
      }
 
    pclose(p);

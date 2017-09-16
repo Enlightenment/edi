@@ -168,22 +168,34 @@ _parse_line(char *line)
    if (change[0] == 'A' || change[1] == 'A')
      {
         status->change = EDI_SCM_STATUS_ADDED;
-        if (change[0] == 'A') status->staged = EINA_TRUE;
+        if (change[0] == 'A')
+          {
+            status->staged = status->change = EDI_SCM_STATUS_ADDED_STAGED;
+          }
      }
    else if (change[0] == 'R' || change[1] == 'R')
      {
         status->change = EDI_SCM_STATUS_RENAMED;
-        if (change[0] == 'R') status->staged = EINA_TRUE;
+        if (change[0] == 'R')
+          {
+             status->staged = status->change = EDI_SCM_STATUS_RENAMED_STAGED;
+          }
      }
    else if (change[0] == 'M' || change[1] == 'M')
      {
         status->change = EDI_SCM_STATUS_MODIFIED;
-        if (change[0] == 'M') status->staged = EINA_TRUE;
+        if (change[0] == 'M')
+          {
+             status->staged = status->change = EDI_SCM_STATUS_MODIFIED_STAGED;
+          }
      }
    else if (change[0] == 'D' || change[1] == 'D')
      {
         status->change = EDI_SCM_STATUS_DELETED;
-        if (change[0] == 'D') status->staged = EINA_TRUE;
+        if (change[0] == 'D')
+          {
+             status->staged = status->change = EDI_SCM_STATUS_DELETED_STAGED;
+          }
      }
    else if (change[0] == '?' && change[1] == '?')
      {
@@ -200,26 +212,27 @@ _parse_line(char *line)
 static Edi_Scm_Status_Code
 _edi_scm_git_file_status(const char *path)
 {
-   Eina_Strbuf *command;
    Edi_Scm_Status *status;
-   Edi_Scm_Status_Code result;
+   char command[4096];
    char *line;
+   Edi_Scm_Status_Code result;
 
-   command = eina_strbuf_new();
+   snprintf(command, sizeof(command), "git status --porcelain '%s'", path);
 
-   eina_strbuf_append_printf(command, "git status --porcelain %s", path);
-
-   line = _edi_scm_exec_response(eina_strbuf_string_get(command));
-
-   status = _parse_line(line);
-
-   eina_strbuf_free(command);
+   line = _edi_scm_exec_response(command);
+   if (!line[0] || !line[1])
+     {
+        result = EDI_SCM_STATUS_NONE;
+     }
+   else
+     {
+        status = _parse_line(line);
+        result = status->change;
+        eina_stringshare_del(status->path);
+        free(status);
+     }
 
    free(line);
-   result = status->change;
-
-   eina_stringshare_del(status->path);
-   free(status);
 
    return result;
 }
@@ -468,6 +481,9 @@ edi_scm_enabled(void)
    if (!engine)
      return EINA_FALSE;
 
+   if (!engine->initialized)
+     return EINA_FALSE;
+
    return _edi_scm_enabled(engine);
 }
 
@@ -686,6 +702,8 @@ _edi_scm_git_init()
    engine->remote_url_get = _edi_scm_git_remote_url_get;
    engine->credentials_set = _edi_scm_git_credentials_set;
    engine->status_get = _edi_scm_git_status_get;
+
+   engine->initialized = EINA_TRUE;
 
    return engine;
 }

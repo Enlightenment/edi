@@ -11,11 +11,16 @@ extern "C" {
  */
 
 typedef enum {
-   EDI_SCM_STATUS_ADDED = 1,
+   EDI_SCM_STATUS_NONE = 0,
+   EDI_SCM_STATUS_ADDED,
    EDI_SCM_STATUS_DELETED,
    EDI_SCM_STATUS_MODIFIED,
    EDI_SCM_STATUS_RENAMED,
    EDI_SCM_STATUS_UNTRACKED,
+   EDI_SCM_STATUS_ADDED_STAGED,
+   EDI_SCM_STATUS_DELETED_STAGED,
+   EDI_SCM_STATUS_MODIFIED_STAGED,
+   EDI_SCM_STATUS_RENAMED_STAGED,
    EDI_SCM_STATUS_UNKNOWN,
 } Edi_Scm_Status_Code;
 
@@ -70,6 +75,7 @@ typedef struct _Edi_Scm_Engine
    scm_fn_remote_url   *remote_url_get;
    scm_fn_credentials  *credentials_set;
    scm_fn_status_get   *status_get;
+   Eina_Bool           initialized;
 } Edi_Scm_Engine;
 
 /**

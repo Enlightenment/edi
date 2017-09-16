@@ -5,6 +5,8 @@
 #include "Edi.h"
 #include "mainview/edi_mainview.h"
 #include "edi_config.h"
+#include "edi_filepanel.h"
+#include "edi_file.h"
 #include "edi_consolepanel.h"
 #include "edi_scm_screens.h"
 #include "edi_private.h"
@@ -78,9 +80,9 @@ _edi_scm_screens_commit_cb(void *data,
 }
 
 static void
-_entry_lines_append(Elm_Code *code, char *diff)
+_entry_lines_append(Elm_Code *code, char *diff_text)
 {
-   char *pos = diff;
+   char *pos = diff_text;
    char *start, *end = NULL;
 
    if (!*pos) return;
@@ -103,6 +105,47 @@ _entry_lines_append(Elm_Code *code, char *diff)
       elm_code_file_line_append(code->file, start, end - start, NULL);
 }
 
+static void
+_set_icon_text(Evas_Object *icon, Eina_Strbuf *text, Edi_Scm_Status *status)
+{
+   eina_strbuf_append_printf(text, "%s ", status->path);
+
+   switch (status->change)
+     {
+        case EDI_SCM_STATUS_ADDED:
+        case EDI_SCM_STATUS_ADDED_STAGED:
+           elm_icon_standard_set(icon, "document-new");
+           eina_strbuf_append_printf(text, "(%s", _("Added"));
+           break;
+        case EDI_SCM_STATUS_MODIFIED:
+        case EDI_SCM_STATUS_MODIFIED_STAGED:
+           elm_icon_standard_set(icon, "document-save-as");
+           eina_strbuf_append_printf(text, "(%s", _("Modified"));
+           break;
+        case EDI_SCM_STATUS_DELETED:
+        case EDI_SCM_STATUS_DELETED_STAGED:
+           elm_icon_standard_set(icon, "edit-delete");
+           eina_strbuf_append_printf(text, "(%s", _("Deleted"));
+           break;
+        case EDI_SCM_STATUS_RENAMED:
+        case EDI_SCM_STATUS_RENAMED_STAGED:
+          elm_icon_standard_set(icon, "document-save-as");
+           eina_strbuf_append_printf(text, "(%s", _("Renamed"));
+           break;
+        case EDI_SCM_STATUS_UNTRACKED:
+           elm_icon_standard_set(icon, "dialog-question");
+           eina_strbuf_append_printf(text, "(%s", _("Untracked"));
+           break;
+        default:
+           elm_icon_standard_set(icon, "text-x-generic");
+     }
+
+   if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
+     eina_strbuf_append(text,  _(" & Unstaged)"));
+   else
+     eina_strbuf_append(text, ")");
+}
+
 void
 edi_scm_screens_commit(Evas_Object *parent)
 {
@@ -110,11 +153,10 @@ edi_scm_screens_commit(Evas_Object *parent)
    Evas_Object *list, *icon;
    Elm_Code_Widget *entry;
    Elm_Code *code;
-   Eina_Strbuf *text, *user;
-   Eina_List *l;
+   Eina_Strbuf *text;
    Edi_Scm_Engine *engine;
    Edi_Scm_Status *status;
-   char *diff;
+   char *diff_text;
    Eina_Bool staged_changes;
 
    engine= edi_scm_engine_get();
@@ -155,11 +197,11 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_show(label);
    elm_box_pack_end(hbox, label);
 
-   user = eina_strbuf_new();
-   eina_strbuf_append_printf(user, "%s:<br><b>%s</b><br>&lt;%s&gt;", _("Author"),
+   text = eina_strbuf_new();
+   eina_strbuf_append_printf(text, "%s:<br><b>%s</b><br>&lt;%s&gt;", _("Author"),
                              engine->remote_name_get(), engine->remote_email_get());
-   elm_object_text_set(label, eina_strbuf_string_get(user));
-   eina_strbuf_free(user);
+   elm_object_text_set(label, eina_strbuf_string_get(text));
+   eina_strbuf_reset(text);
 
    avatar = elm_image_add(hbox);
    edi_scm_screens_avatar_load(avatar, engine->remote_email_get());
@@ -172,7 +214,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    cbox = elm_box_add(box);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(cbox, 250 * elm_config_scale_get(), 100 * elm_config_scale_get());
+   evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 100 * elm_config_scale_get());
    evas_object_show(cbox);
 
    list = elm_list_add(box);
@@ -186,48 +228,14 @@ edi_scm_screens_commit(Evas_Object *parent)
 
    if (edi_scm_status_get())
      {
-        text = eina_strbuf_new();
-        EINA_LIST_FOREACH(engine->statuses, l, status)
+        EINA_LIST_FREE(engine->statuses, status)
           {
              icon = elm_icon_add(box);
+             _set_icon_text(icon, text, status);
+             elm_list_item_append(list, eina_strbuf_string_get(text), icon, NULL, NULL, NULL);
+             eina_strbuf_reset(text);
              if (status->staged)
                staged_changes = EINA_TRUE;
-
-             eina_strbuf_append_printf(text, "%s ", status->path);
-
-             switch (status->change)
-               {
-                case EDI_SCM_STATUS_ADDED:
-                  elm_icon_standard_set(icon, "document-new");
-                  eina_strbuf_append_printf(text, "(%s) ", _("add"));
-                  break;
-                case EDI_SCM_STATUS_MODIFIED:
-                  elm_icon_standard_set(icon, "document-save-as");
-                  eina_strbuf_append_printf(text, "(%s) ", _("mod"));
-                  break;
-                case EDI_SCM_STATUS_DELETED:
-                  elm_icon_standard_set(icon, "edit-delete");
-                  eina_strbuf_append_printf(text, "(%s) ", _("del"));
-                  break;
-                case EDI_SCM_STATUS_RENAMED:
-                  elm_icon_standard_set(icon, "document-save-as");
-                  eina_strbuf_append_printf(text, "(%s) ", _("ren"));
-                  break;
-                case EDI_SCM_STATUS_UNTRACKED:
-                  elm_icon_standard_set(icon, "dialog-question");
-                  eina_strbuf_append_printf(text, "(%s)", _("untracked"));
-                  break;
-                default:
-                  elm_icon_standard_set(icon, "text-x-generic");
-               }
-
-             if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
-               eina_strbuf_append_printf(text, "- %s", _("unstaged"));
-
-             elm_list_item_append(list, eina_strbuf_string_get(text), icon, NULL, NULL, NULL);
-
-             eina_strbuf_reset(text);
-
              eina_stringshare_del(status->path);
              free(status);
           }
@@ -265,8 +273,8 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_object_content_set(frame, input);
    elm_box_pack_end(box, frame);
 
-   diff = edi_scm_diff();
-   if (strlen(diff))
+   diff_text = edi_scm_diff();
+   if (diff_text[0] && diff_text[1])
      {
         frame = elm_frame_add(popup);
         evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -277,7 +285,7 @@ edi_scm_screens_commit(Evas_Object *parent)
         cbox = elm_box_add(popup);
         evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 250 * elm_config_scale_get());
+        evas_object_size_hint_min_set(cbox, 500 * elm_config_scale_get(), 250 * elm_config_scale_get());
         evas_object_show(cbox);
         elm_object_content_set(frame, cbox);
         elm_box_pack_end(box, frame);
@@ -294,10 +302,10 @@ edi_scm_screens_commit(Evas_Object *parent)
         evas_object_show(entry);
         elm_box_pack_end(cbox, entry);
 
-        _entry_lines_append(code, diff);
+        _entry_lines_append(code, diff_text);
      }
 
-   free(diff);
+   free(diff_text);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));

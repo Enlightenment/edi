@@ -59,6 +59,22 @@ const char *edi_filepanel_selected_path_get(Evas_Object *obj);
 void edi_filepanel_select_path(const char *path);
 
 /**
+ * Notify a file change has occurred to trigger an update to item content.
+ *
+ * @param path The path of the file to be updated in the file panel.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_update_path(const char *path);
+
+/**
+ * Notify filepanel to update all file items.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_update_all(void);
+
+/**
  * Initialise a file panel search.
  *
  * @ingroup UI
