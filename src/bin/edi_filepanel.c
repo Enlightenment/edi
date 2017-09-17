@@ -163,7 +163,8 @@ _file_status_item_add(const char *path, Edi_Scm_Status_Code status)
      _file_status_item_delete(path);
 
    code = malloc(sizeof(Edi_Scm_Status_Code));
-   memcpy(code, &status, sizeof(Edi_Scm_Status_Code));
+
+   *code = status;
 
    eina_hash_add(_list_statuses, path, code);
 }
@@ -624,9 +625,7 @@ _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUS
 
    code = _file_status_item_find(sd->path);
    if (code)
-     {
-        return strdup(_file_status(sd->path, *code));
-     }
+     return strdup(_file_status(sd->path, *code));
 
    return strdup(basename((char *)sd->path));
 }
@@ -638,28 +637,26 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    Edi_Dir_Data *sd = data;
    Evas_Object *ic;
    Edi_Scm_Status_Code *code;
-   const char *icon_name;
+   const char *icon_name = NULL;
 
    if (strcmp(source, "elm.swallow.icon"))
      return NULL;
 
-   provider = _get_provider_from_hashset(sd->path);
-
-   ic = elm_icon_add(obj);
-
    code = _file_status_item_find(sd->path);
    if (code)
+    icon_name = _icon_status(*code);
+
+   if (!icon_name)
      {
-        icon_name = _icon_status(*code);
-        elm_icon_standard_set(ic, icon_name);
-     }
-   else
-     {
+        provider = _get_provider_from_hashset(sd->path);
         if (provider)
-          elm_icon_standard_set(ic, provider->icon);
+          icon_name = provider->icon;
         else
-          elm_icon_standard_set(ic, "empty");
+          icon_name = "empty";
      }
+
+   ic = elm_icon_add(obj);
+   elm_icon_standard_set(ic, icon_name);
 
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
    evas_object_show(ic);
