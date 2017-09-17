@@ -29,7 +29,7 @@ typedef struct _Edi_Dir_Data
 
 static Elm_Genlist_Item_Class itc, itc2;
 static Evas_Object *list;
-static Eina_Hash *_list_items, *_list_statuses;
+static Eina_Hash *_list_items, *_list_statuses, *mime_entries = NULL;
 static edi_filepanel_item_clicked_cb _open_cb;
 
 static Evas_Object *menu, *_main_win, *_filepanel_box, *_filter_box, *_filter;
@@ -55,6 +55,22 @@ _file_path_hidden(const char *path, Eina_Bool filter)
 
    relative = path + strlen(_root_path);
    return regexec(&_filter_regex, relative, 0, NULL, 0);
+}
+
+static Edi_Content_Provider*
+_get_provider_from_hashset(const char *filename)
+{
+   if ( mime_entries == NULL ) mime_entries = eina_hash_string_superfast_new(NULL);
+   const char *mime = eina_hash_find(mime_entries, filename);
+   if ( !mime )
+     {
+       mime = efreet_mime_type_get(filename);
+
+       if (mime)
+         eina_hash_add(mime_entries, filename, strdup(mime));
+     }
+
+   return edi_content_provider_for_mime_get(mime);
 }
 
 static const char *
@@ -86,7 +102,7 @@ static char *
 _file_status(const char *path, Edi_Scm_Status_Code code)
 {
    char *orig;
-   static char text[4096];
+   static char text[PATH_MAX];
 
    orig = basename((char *)path);
 
@@ -615,24 +631,6 @@ _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUS
    return strdup(basename((char *)sd->path));
 }
 
-static Eina_Hash *mime_entries = NULL;
-
-static Edi_Content_Provider*
-_get_provider_from_hashset(const char *filename)
-{
-   if ( mime_entries == NULL ) mime_entries = eina_hash_string_superfast_new(NULL);
-   const char *mime = eina_hash_find(mime_entries, filename);
-   if ( !mime )
-     {
-       mime = efreet_mime_type_get(filename);
-
-       if (mime)
-         eina_hash_add(mime_entries, filename, strdup(mime));
-     }
-
-   return edi_content_provider_for_mime_get(mime);
-}
-
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
@@ -809,6 +807,7 @@ _file_listing_item_insert(const char *path, Eina_Bool isdir, Elm_Object_Item *pa
 
    if (_file_path_hidden(path, !isdir))
      return;
+
    sd->path = eina_stringshare_add(path);
 
    item = elm_genlist_item_sorted_insert(list, clas, sd, parent_it,
@@ -1099,6 +1098,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    _list_items = eina_hash_string_superfast_new(NULL);
    _list_statuses = eina_hash_string_superfast_new(NULL);
    eina_hash_free_cb_set(_list_statuses, _list_status_free_cb);
+
    _root_dir = calloc(1, sizeof(Edi_Dir_Data));
    _root_dir->path = path;
    _file_listing_fill(_root_dir, NULL);
