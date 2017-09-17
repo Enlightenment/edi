@@ -66,6 +66,43 @@ void edi_filepanel_select_path(const char *path);
 void edi_filepanel_search();
 
 /**
+ * Clear cache of file statuses, update the cache and update file panel items.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_status_refresh(void);
+
+/**
+ * Update the cache of scm statuses in memory.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_scm_status_update(void);
+
+/**
+ * Clear the caches list of scm statuses.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_scm_status_reset(void);
+
+/**
+ * Update a single item's state in the filepanel by path.
+ *
+ * @param path The path of the file to be updated.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_item_update(const char *path);
+
+/**
+ * Update all items' state in the filepanel.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_item_update_all(void);
+
+/**
  * @}
  */
 

@@ -1003,6 +1003,8 @@ _edi_menu_scm_init_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    edi_consolepanel_show();
    edi_scm_git_new();
    edi_scm_init();
+   edi_filepanel_scm_status_update();
+   edi_filepanel_status_refresh();
    _edi_icon_update();
 }
 
@@ -1024,6 +1026,7 @@ static void
 _edi_scm_stash_do_cb(void *data EINA_UNUSED)
 {
    edi_scm_stash();
+   edi_filepanel_scm_status_reset();
 }
 
 static void

@@ -73,7 +73,7 @@ _edi_scm_screens_commit_cb(void *data,
    edi_consolepanel_clear();
    edi_consolepanel_show();
    edi_scm_commit(message);
-
+   edi_filepanel_status_refresh();
    evas_object_del(_popup);
 
    free(message);

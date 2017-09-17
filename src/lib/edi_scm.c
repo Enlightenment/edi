@@ -163,7 +163,7 @@ _edi_scm_git_status(void)
 static Edi_Scm_Status *
 _parse_line(char *line)
 {
-   char *path, *change;
+   char *path, *fullpath, *change;
    Edi_Scm_Status *status;
 
    change = line;
@@ -216,6 +216,9 @@ _parse_line(char *line)
         status->change = EDI_SCM_STATUS_UNKNOWN;
 
    status->path = eina_stringshare_add(path);
+   fullpath = edi_path_append(edi_project_get(), path);
+   status->fullpath = eina_stringshare_add(fullpath);
+   free(fullpath);
 
    return status;
 }
@@ -240,6 +243,7 @@ _edi_scm_git_file_status(const char *path)
         status = _parse_line(line);
         result = status->change;
         eina_stringshare_del(status->path);
+        eina_stringshare_del(status->fullpath);
         free(status);
      }
 
@@ -569,23 +573,12 @@ edi_scm_file_status(const char *path)
    return e->file_status(path);
 }
 
-static void
-_edi_scm_commit_thread_cb(void *data, Ecore_Thread *thread)
-{
-   Edi_Scm_Engine *e;
-   const char *message = data;
-
-   e = edi_scm_engine_get();
-
-   e->commit(message);
-
-   ecore_thread_cancel(thread);
-}
-
 EAPI void
 edi_scm_commit(const char *message)
 {
-   ecore_thread_run(_edi_scm_commit_thread_cb, NULL, NULL, message);
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   e->commit(message);
 }
 
 static void

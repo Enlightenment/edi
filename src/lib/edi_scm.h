@@ -27,6 +27,7 @@ typedef enum {
 typedef struct _Edi_Scm_Status
 {
    Eina_Stringshare *path;
+   Eina_Stringshare *fullpath;
    Edi_Scm_Status_Code change;
    Eina_Bool staged;
 } Edi_Scm_Status;
