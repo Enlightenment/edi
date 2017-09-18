@@ -279,7 +279,7 @@ edi_scm_screens_commit(Evas_Object *parent)
         frame = elm_frame_add(popup);
         evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        elm_object_text_set(frame, _("Changes"));
+        elm_object_text_set(frame, _("Unstaged changes"));
         evas_object_show(frame);
 
         cbox = elm_box_add(popup);
