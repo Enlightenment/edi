@@ -615,22 +615,12 @@ edi_scm_diff(void)
    return e->diff();
 }
 
-static void
-_edi_scm_stash_thread_cb(void *data, Ecore_Thread *thread)
-{
-   Edi_Scm_Engine *e = data;
-
-   e->stash();
-
-   ecore_thread_cancel(thread);
-}
-
 EAPI void
 edi_scm_stash(void)
 {
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   ecore_thread_run(_edi_scm_stash_thread_cb, NULL, NULL, e);
+   e->stash();
 }
 
 EAPI int

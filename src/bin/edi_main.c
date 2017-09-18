@@ -1026,7 +1026,7 @@ static void
 _edi_scm_stash_do_cb(void *data EINA_UNUSED)
 {
    edi_scm_stash();
-   edi_filepanel_scm_status_reset();
+   edi_filepanel_scm_status_update();
 }
 
 static void

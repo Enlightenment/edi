@@ -80,13 +80,6 @@ void edi_filepanel_status_refresh(void);
 void edi_filepanel_scm_status_update(void);
 
 /**
- * Clear the caches list of scm statuses.
- *
- * @ingroup UI
- */
-void edi_filepanel_scm_status_reset(void);
-
-/**
  * Update a single item's state in the filepanel by path.
  *
  * @param path The path of the file to be updated.
