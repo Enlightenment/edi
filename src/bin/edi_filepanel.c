@@ -765,7 +765,6 @@ _on_list_expanded(void *data EINA_UNUSED,
    Elm_Object_Item *it = event_info;
    Edi_Dir_Data *sd = elm_object_item_data_get(it);
 
-   edi_filepanel_scm_status_update();
    _file_listing_fill(sd, it);
 }
 
@@ -777,7 +776,6 @@ _on_list_contracted(void *data EINA_UNUSED,
    Elm_Object_Item *it = event_info;
    Edi_Dir_Data *sd = elm_object_item_data_get(it);
 
-   edi_filepanel_scm_status_reset();
    _file_listing_empty(sd, it);
 }
 
