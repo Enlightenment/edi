@@ -609,11 +609,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_show(table);
    evas_object_size_hint_padding_set(table, 10, 0, 0, 0);
 
-   ic = elm_icon_add(table);
-   elm_icon_standard_set(ic, icon_name);
-   evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
-   evas_object_show(ic);
-   elm_table_pack(table, ic, 0, 0, 1, 1);
 
    label = elm_label_add(table);
    elm_object_text_set(label, text);
@@ -626,7 +621,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         elm_icon_standard_set(ic, icon_status);
         evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
         evas_object_show(ic);
-        elm_table_pack(table, ic, 2, 0, 1, 1);
+        elm_table_pack(table, ic, 0, 0, 1, 1);
 
         if (staged)
           {
@@ -634,7 +629,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
              elm_icon_standard_set(ic, "dialog-information");
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
-             elm_table_pack(table, ic, 3, 0, 1, 1);
+             elm_table_pack(table, ic, 2, 0, 1, 1);
              elm_object_tooltip_text_set(box, _("Staged changes"));
           }
         else
@@ -643,13 +638,21 @@ _content_get(void *data, Evas_Object *obj, const char *source)
              elm_icon_standard_set(ic, "dialog-error");
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
-             elm_table_pack(table, ic, 3, 0, 1, 1);
+             elm_table_pack(table, ic, 2, 0, 1, 1);
              if (*code != EDI_SCM_STATUS_UNTRACKED)
                elm_object_tooltip_text_set(box, _("Unstaged changes"));
              else
                elm_object_tooltip_text_set(box, _("Untracked changes"));
           }
-     }
+      }
+    else
+      {
+         ic = elm_icon_add(table);
+         elm_icon_standard_set(ic, icon_name);
+         evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
+         evas_object_show(ic);
+         elm_table_pack(table, ic, 0, 0, 1, 1);
+      }
 
    free(text);
 
