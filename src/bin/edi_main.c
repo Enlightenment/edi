@@ -710,7 +710,7 @@ _edi_build_display_status_cb(int status, void *data)
    else
      eina_strbuf_append_printf(message, _("%s of project <b>%s</b> in %s was successful.\n"), name, edi_project_name_get(), edi_project_get());
 
-   eina_strbuf_append_printf(title, _("EDI :: %s Status (%s)"), name, status ? _("Failure") : _("Success"));
+   eina_strbuf_append_printf(title, _("%s %s"), name, status ? _("Failed") : _("Passed"));
 
    edi_screens_desktop_notify(eina_strbuf_string_get(title), eina_strbuf_string_get(message));
 
