@@ -133,10 +133,12 @@ _set_icons_status(Evas_Object *icon, Evas_Object *icon_status, Edi_Scm_Status *s
            elm_icon_standard_set(icon, "text-x-generic");
      }
 
-   if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
+   if (status->change == EDI_SCM_STATUS_UNTRACKED)
      elm_icon_standard_set(icon_status, "dialog-error");
-   else
+   else if (status->staged)
      elm_icon_standard_set(icon_status, "dialog-information");
+   else
+     elm_icon_standard_set(icon_status, "dialog-error");
 }
 
 void
