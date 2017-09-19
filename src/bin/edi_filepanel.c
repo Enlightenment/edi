@@ -628,13 +628,22 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         evas_object_show(ic);
         elm_table_pack(table, ic, 2, 0, 1, 1);
 
-        if (!staged)
+        if (code && *code == EDI_SCM_STATUS_UNTRACKED)
+          {
+             elm_object_tooltip_text_set(box, _("Untracked changes"));
+          }
+        else if (!staged)
           {
              ic = elm_icon_add(table);
              elm_icon_standard_set(ic, "dialog-error");
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
              elm_table_pack(table, ic, 3, 0, 1, 1);
+             elm_object_tooltip_text_set(box, _("Unstaged changes"));
+          }
+        else
+          {
+             elm_object_tooltip_text_set(box, _("Staged changes"));
           }
      }
 

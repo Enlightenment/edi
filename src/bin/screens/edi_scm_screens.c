@@ -106,56 +106,50 @@ _entry_lines_append(Elm_Code *code, char *diff_text)
 }
 
 static void
-_set_icon_text(Evas_Object *icon, Eina_Strbuf *text, Edi_Scm_Status *status)
+_set_icons_status(Evas_Object *icon, Evas_Object *icon_status, Edi_Scm_Status *status)
 {
-   eina_strbuf_append_printf(text, "%s ", status->path);
-
    switch (status->change)
      {
         case EDI_SCM_STATUS_ADDED:
         case EDI_SCM_STATUS_ADDED_STAGED:
            elm_icon_standard_set(icon, "document-new");
-           eina_strbuf_append_printf(text, "(%s", _("Added"));
            break;
         case EDI_SCM_STATUS_MODIFIED:
         case EDI_SCM_STATUS_MODIFIED_STAGED:
            elm_icon_standard_set(icon, "document-save-as");
-           eina_strbuf_append_printf(text, "(%s", _("Modified"));
            break;
         case EDI_SCM_STATUS_DELETED:
         case EDI_SCM_STATUS_DELETED_STAGED:
            elm_icon_standard_set(icon, "edit-delete");
-           eina_strbuf_append_printf(text, "(%s", _("Deleted"));
            break;
         case EDI_SCM_STATUS_RENAMED:
         case EDI_SCM_STATUS_RENAMED_STAGED:
           elm_icon_standard_set(icon, "document-save-as");
-           eina_strbuf_append_printf(text, "(%s", _("Renamed"));
            break;
         case EDI_SCM_STATUS_UNTRACKED:
            elm_icon_standard_set(icon, "dialog-question");
-           eina_strbuf_append_printf(text, "(%s", _("Untracked"));
            break;
         default:
            elm_icon_standard_set(icon, "text-x-generic");
      }
 
    if (!status->staged && status->change != EDI_SCM_STATUS_UNTRACKED)
-     eina_strbuf_append(text,  _(" & Unstaged)"));
+     elm_icon_standard_set(icon_status, "dialog-error");
    else
-     eina_strbuf_append(text, ")");
+     elm_icon_standard_set(icon_status, "dialog-information");
 }
 
 void
 edi_scm_screens_commit(Evas_Object *parent)
 {
    Evas_Object *popup, *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
-   Evas_Object *list, *icon;
+   Evas_Object *list, *icon, *icon_status;
    Elm_Code_Widget *entry;
    Elm_Code *code;
    Eina_Strbuf *text;
    Edi_Scm_Engine *engine;
    Edi_Scm_Status *status;
+   Elm_Object_Item *item;
    char *diff_text;
    Eina_Bool staged_changes;
 
@@ -214,7 +208,7 @@ edi_scm_screens_commit(Evas_Object *parent)
    cbox = elm_box_add(box);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 100 * elm_config_scale_get());
+   evas_object_size_hint_min_set(cbox, 250 * elm_config_scale_get(), 100 * elm_config_scale_get());
    evas_object_show(cbox);
 
    list = elm_list_add(box);
@@ -231,15 +225,29 @@ edi_scm_screens_commit(Evas_Object *parent)
         EINA_LIST_FREE(engine->statuses, status)
           {
              icon = elm_icon_add(box);
-             _set_icon_text(icon, text, status);
-             elm_list_item_append(list, eina_strbuf_string_get(text), icon, NULL, NULL, NULL);
-             eina_strbuf_reset(text);
-             if (status->staged)
-               staged_changes = EINA_TRUE;
+             icon_status = elm_icon_add(box);
+
+             _set_icons_status(icon, icon_status, status);
+
+             item = elm_list_item_append(list, status->path, icon, icon_status, NULL, NULL);
+
+             if (status->change == EDI_SCM_STATUS_UNTRACKED)
+               {
+                  elm_object_item_tooltip_text_set(item, _("Untracked changes"));
+               }
+             else if (status->staged)
+               {
+                  staged_changes = EINA_TRUE;
+                  elm_object_item_tooltip_text_set(item, _("Staged changes"));
+               }
+             else
+               {
+                  elm_object_item_tooltip_text_set(item, _("Unstaged changes"));
+               }
+
              eina_stringshare_del(status->path);
              free(status);
           }
-        eina_strbuf_free(text);
         eina_list_free(engine->statuses);
         engine->statuses = NULL;
      }
