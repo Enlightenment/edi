@@ -406,6 +406,9 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
+   elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   elm_menu_item_separator_add(menu, NULL);
+
    elm_menu_item_add(menu, NULL, "fileopen", _("Open"), _item_menu_open_cb, sd);
    elm_menu_item_add(menu, NULL, "window-new", _("Open in New Window"), _item_menu_open_window_cb, sd);
 
@@ -509,6 +512,9 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
+   elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   elm_menu_item_separator_add(menu, NULL);
+
    elm_menu_item_add(menu, NULL, "document-new", _("Create File here"), _item_menu_create_file_cb, sd);
    elm_menu_item_add(menu, NULL, "folder-new", _("Create Directory here"), _item_menu_create_dir_cb, sd);
    if (ecore_file_app_installed("terminology"))
@@ -529,6 +535,7 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    Evas_Event_Mouse_Up *ev;
    Elm_Object_Item *it;
    Edi_Dir_Data *sd;
+
 
    ev = event_info;
    it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
@@ -556,8 +563,6 @@ _item_clicked_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
      _item_menu_dir_create(_main_win, sd);
    else
      _item_menu_create(_main_win, sd);
-
-   elm_object_item_focus_set(it, EINA_TRUE);
 
    elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
    evas_object_show(menu);
@@ -1064,6 +1069,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_object_part_content_set(cancel, "icon", icon);
 
    _list = list = elm_genlist_add(parent);
+   elm_object_focus_allow_set(_list, EINA_FALSE);
    elm_genlist_homogeneous_set(list, EINA_TRUE);
    elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_genlist_filter_set(list, "");
