@@ -576,7 +576,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 {
    Edi_Content_Provider *provider;
    Edi_Dir_Data *sd = data;
-   Evas_Object *box, *table, *label, *ic;
+   Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
    Edi_Scm_Status_Code *code;
    char *text;
    const char *icon_name, *icon_status;
@@ -602,61 +602,71 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    box = elm_box_add(obj);
    elm_box_horizontal_set(box, EINA_TRUE);
    elm_box_align_set(box, 0, 0);
-   table = elm_table_add(box);
 
-   elm_table_padding_set(table, 5, 0);
-   evas_object_show(box);
-   evas_object_show(table);
-   evas_object_size_hint_padding_set(table, 10, 0, 0, 0);
+   lbox = elm_box_add(box);
+   elm_box_horizontal_set(lbox, EINA_TRUE);
+   elm_box_padding_set(lbox, 5, 0);
+   evas_object_show(lbox);
 
+   ic = elm_icon_add(lbox);
+   elm_icon_standard_set(ic, icon_name);
+   evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
+   evas_object_show(ic);
+   elm_box_pack_end(lbox, ic);
 
-   label = elm_label_add(table);
+   label = elm_label_add(lbox);
    elm_object_text_set(label, text);
    evas_object_show(label);
-   elm_table_pack(table, label, 1, 0, 1, 1);
+   elm_box_pack_end(lbox, label);
+
+   mbox = elm_box_add(lbox);
+   elm_box_horizontal_set(mbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(mbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(mbox);
+
+   rbox = elm_box_add(mbox);
+   elm_box_horizontal_set(rbox, EINA_TRUE);
+   elm_box_padding_set(rbox, 5, 0);
+   evas_object_show(rbox);
 
    if (icon_status)
      {
-        ic = elm_icon_add(table);
+        ic = elm_icon_add(rbox);
         elm_icon_standard_set(ic, icon_status);
         evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
         evas_object_show(ic);
-        elm_table_pack(table, ic, 0, 0, 1, 1);
+        elm_box_pack_end(rbox, ic);
 
         if (staged)
           {
-             ic = elm_icon_add(table);
+             ic = elm_icon_add(mbox);
              elm_icon_standard_set(ic, "dialog-information");
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
-             elm_table_pack(table, ic, 2, 0, 1, 1);
+             elm_box_pack_end(rbox, ic);
+
              elm_object_tooltip_text_set(box, _("Staged changes"));
           }
         else
           {
-             ic = elm_icon_add(table);
+             ic = elm_icon_add(mbox);
              elm_icon_standard_set(ic, "dialog-error");
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
-             elm_table_pack(table, ic, 2, 0, 1, 1);
+             elm_box_pack_end(rbox, ic);
+
              if (*code != EDI_SCM_STATUS_UNTRACKED)
                elm_object_tooltip_text_set(box, _("Unstaged changes"));
              else
                elm_object_tooltip_text_set(box, _("Untracked changes"));
           }
       }
-    else
-      {
-         ic = elm_icon_add(table);
-         elm_icon_standard_set(ic, icon_name);
-         evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
-         evas_object_show(ic);
-         elm_table_pack(table, ic, 0, 0, 1, 1);
-      }
 
    free(text);
 
-   elm_box_pack_end(box, table);
+   elm_box_pack_end(box, lbox);
+   elm_box_pack_end(box, mbox);
+   elm_box_pack_end(box, rbox);
 
    return box;
 }
