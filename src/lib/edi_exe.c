@@ -13,6 +13,9 @@
 typedef struct _Edi_Exe_Args {
    void ((*func)(int, void *));
    void *data;
+   pid_t pid;
+   char *path;
+   Ecore_Con_Server *srv;
    Ecore_Event_Handler *handler;
 } Edi_Exe_Args;
 
@@ -30,6 +33,19 @@ _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSE
 
    args->func(*status, args->data);
 
+   /* Manually cleaning up??? */
+   if (ecore_con_server_fd_get(args->srv) != -1)
+     close(ecore_con_server_fd_get(args->srv));
+   if (ecore_con_client_fd_get(ev->client) != -1)
+     close(ecore_con_client_fd_get(ev->client));
+
+   if (args->path)
+     {
+        if (ecore_file_exists(args->path))
+          unlink(args->path);
+        free(args->path);
+     }
+
    free(args);
 
    return ECORE_CALLBACK_DONE;
@@ -41,7 +57,6 @@ edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
    Ecore_Con_Server *srv;
    Edi_Exe_Args *args;
 
-  /* These are UNIX domain sockets, no need to clean up */
    srv = ecore_con_server_add(ECORE_CON_LOCAL_USER, name, 0, NULL);
    if (!srv)
      return EINA_FALSE;
@@ -49,6 +64,8 @@ edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
    args = malloc(sizeof(Edi_Exe_Args));
    args->func = func;
    args->data = data;
+   args->path = ecore_con_local_path_new(EINA_FALSE, name, 0);
+   args->srv = srv;
    args->handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, args);
 
    return EINA_TRUE;
@@ -65,9 +82,10 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
   ev = event;
 
   if (!ev->exe) return ECORE_CALLBACK_RENEW;
+  if (ecore_exe_pid_get(ev->exe) != args->pid) return ECORE_CALLBACK_RENEW;
 
   name = args->data;
-  /* These are UNIX domain sockets, no need to clean up */
+
   srv = ecore_con_server_connect(ECORE_CON_LOCAL_USER, name, 0, NULL);
   if (srv)
     {
@@ -85,15 +103,17 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
 EAPI void
 edi_exe_notify(const char *name, const char *command)
 {
+   Ecore_Exe *exe;
    Edi_Exe_Args *args;
 
-   ecore_exe_pipe_run(command,
+   exe = ecore_exe_pipe_run(command,
                       ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                       ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                       ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 
    args = malloc(sizeof(Edi_Exe_Args));
    args->data = (char *)name;
+   args->pid = ecore_exe_pid_get(exe);
    args->handler = ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _edi_exe_event_done_cb, args);
 }
 

@@ -165,7 +165,7 @@ _meson_clean(void)
 {
    Meson_Data *md = _meson_data_get();
 
-   if (!_meson_configured_check(md->fulldir)) return;
+   //if (!_meson_configured_check(md->fulldir)) return;
    _meson_ninja_do(md, "clean");
 }
 

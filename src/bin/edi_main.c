@@ -48,7 +48,7 @@ static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testp
 static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
-static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
+static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo, *_edi_toolbar_build, *_edi_toolbar_test;
 static Evas_Object *_edi_menu_build, *_edi_menu_clean, *_edi_menu_test;
 static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
@@ -700,6 +700,8 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 static void
 _edi_build_menu_items_disabled_set(Eina_Bool state)
 {
+   elm_object_disabled_set(_edi_toolbar_build, state);
+   elm_object_disabled_set(_edi_toolbar_test, state);
    elm_object_disabled_set(_edi_menu_build, state);
    elm_object_disabled_set(_edi_menu_test, state);
    elm_object_disabled_set(_edi_menu_clean, state);
@@ -1218,8 +1220,8 @@ edi_toolbar_setup(Evas_Object *parent)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
-   _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
+   _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
+   _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
    _edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
    _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
 
