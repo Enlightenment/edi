@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 
 #include <Ecore.h>
+#include <Ecore_File.h>
 #include <Ecore_Con.h>
 
 #include "Edi.h"
