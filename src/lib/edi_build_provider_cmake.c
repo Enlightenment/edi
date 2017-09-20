@@ -61,7 +61,7 @@ _cmake_test(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
 
-   edi_exe_notify("edi_build", "env CK_VERBOSITY=verbose make check");
+   edi_exe_notify("edi_test", "env CK_VERBOSITY=verbose make check");
 }
 
 static void
@@ -100,7 +100,7 @@ _cmake_clean(void)
    if (chdir(edi_project_get()) != 0)
      ERR("Could not chdir");
 
-   edi_exe_notify("edi_build", "make clean");
+   edi_exe_notify("edi_clean", "make clean");
 }
 
 Edi_Build_Provider _edi_build_provider_cmake =

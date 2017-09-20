@@ -128,7 +128,7 @@ _make_test(void)
      ERR("Could not chdir");
    chdir(edi_project_get());
 
-   edi_exe_notify("edi_build", cmd);
+   edi_exe_notify("edi_test", cmd);
 }
 
 static void
@@ -171,7 +171,7 @@ _make_clean(void)
    if (chdir(edi_project_get()) !=0)
      ERR("Could not chdir");
 
-   edi_exe_notify("edi_build", cmd);
+   edi_exe_notify("edi_clean", cmd);
 }
 
 Edi_Build_Provider _edi_build_provider_make =

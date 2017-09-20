@@ -85,8 +85,10 @@ _meson_ninja_do(Meson_Data *md, const char *arg)
    const char *cmd;
 
    cmd = eina_slstr_printf("ninja -C %s %s", md->fulldir, arg ?: "");
-
-   edi_exe_notify("edi_build", cmd);
+   if (arg && !strcmp(arg, "clean"))
+     edi_exe_notify("edi_clean", cmd);
+   else
+     edi_exe_notify("edi_build", cmd);
 }
 
 static Eina_Bool
@@ -137,7 +139,7 @@ _meson_build(void)
 static void
 _meson_test(void)
 {
-   edi_exe_notify("edi_build", "exit 1");
+   edi_exe_notify("edi_test", "exit 1");
    ERR("Edi doesn't support test with Meson/Ninja!");
 }
 

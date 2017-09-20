@@ -16,8 +16,6 @@ typedef struct _Edi_Exe_Args {
    Ecore_Event_Handler *handler;
 } Edi_Exe_Args;
 
-static Eina_Bool _edi_exe_in_progress = EINA_FALSE;
-
 static Eina_Bool
 _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
@@ -28,11 +26,9 @@ _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSE
    status = ev->data;
 
    args = data;
+   ecore_event_handler_del(args->handler);
 
    args->func(*status, args->data);
-
-   ecore_event_handler_del(args->handler);
-   args->handler = NULL;
 
    free(args);
 
@@ -83,8 +79,6 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
 
   free(args);
 
-  _edi_exe_in_progress = EINA_FALSE;
-
   return ECORE_CALLBACK_DONE;
 }
 
@@ -92,11 +86,6 @@ EAPI void
 edi_exe_notify(const char *name, const char *command)
 {
    Edi_Exe_Args *args;
-
-   if (_edi_exe_in_progress)
-     return;
-
-   _edi_exe_in_progress = EINA_TRUE;
 
    ecore_exe_pipe_run(command,
                       ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |

@@ -49,6 +49,7 @@ static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
 static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo;
+static Evas_Object *_edi_menu_build, *_edi_menu_clean, *_edi_menu_test;
 static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
@@ -697,6 +698,14 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 }
 
 static void
+_edi_build_menu_items_disabled_set(Eina_Bool state)
+{
+   elm_object_disabled_set(_edi_menu_build, state);
+   elm_object_disabled_set(_edi_menu_test, state);
+   elm_object_disabled_set(_edi_menu_clean, state);
+}
+
+static void
 _edi_build_display_status_cb(int status, void *data)
 {
    Eina_Strbuf *title, *message;
@@ -714,6 +723,7 @@ _edi_build_display_status_cb(int status, void *data)
 
    edi_screens_desktop_notify(eina_strbuf_string_get(title), eina_strbuf_string_get(message));
 
+   _edi_build_menu_items_disabled_set(EINA_FALSE);
    eina_strbuf_free(title);
    eina_strbuf_free(message);
 }
@@ -723,6 +733,7 @@ _edi_build_project(void)
 {
    if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Build")))
      {
+        _edi_build_menu_items_disabled_set(EINA_TRUE);
         edi_consolepanel_show();
         edi_builder_build();
      }
@@ -731,8 +742,9 @@ _edi_build_project(void)
 static void
 _edi_build_clean_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Clean")))
+   if (edi_exe_notify_handle("edi_clean", _edi_build_display_status_cb, _("Clean")))
      {
+        _edi_build_menu_items_disabled_set(EINA_TRUE);
         edi_consolepanel_show();
         edi_builder_clean();
      }
@@ -741,8 +753,9 @@ _edi_build_clean_project(void)
 static void
 _edi_build_test_project(void)
 {
-   if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Test")))
+   if (edi_exe_notify_handle("edi_test", _edi_build_display_status_cb, _("Test")))
      {
+        _edi_build_menu_items_disabled_set(EINA_TRUE);
         edi_consolepanel_show();
         edi_builder_test();
      }
@@ -1130,11 +1143,11 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "edit-find", _("Open Tasks"), _edi_menu_view_tasks_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
+   _edi_menu_build = elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
+   _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
    elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debug"), _edi_menu_debug_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
+   _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
    _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Init"), _edi_menu_scm_init_cb, NULL);
