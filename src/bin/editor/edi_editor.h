@@ -44,6 +44,7 @@ struct _Edi_Editor
    Evas_Object *doc_popup; /**< The popup for documentation */
    Evas_Object *popup;
    Eina_List *undo_stack; /**< The list of operations that can be undone */
+   Eina_List *suggest_list; /**< The list of all possible suggestions for the file */
 
    /* Private */
    Edi_Editor_Search *search;

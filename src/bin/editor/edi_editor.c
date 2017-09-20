@@ -177,7 +177,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 }
 
 static char *
-_edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int col)
+_edi_editor_word_at_position_get(Edi_Editor *editor, unsigned int row, unsigned int col)
 {
    Elm_Code *code;
    Elm_Code_Line *line;
@@ -206,6 +206,16 @@ _edi_editor_current_word_get(Edi_Editor *editor, unsigned int row, unsigned int 
    curword[wordlen - 1] = '\0';
 
    return curword;
+}
+
+static char *
+_edi_editor_current_word_get(Edi_Editor *editor)
+{
+   unsigned int row, col;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   return _edi_editor_word_at_position_get(editor, row, col);
 }
 
 static Evas_Object *
@@ -259,19 +269,17 @@ static void
 _suggest_list_update(Edi_Editor *editor, char *word)
 {
    Edi_Language_Suggest_Item *suggest_it;
-   Eina_List *list, *l;
+   Eina_List *l;
    Elm_Genlist_Item_Class *ic;
    Elm_Object_Item *item;
 
    elm_genlist_clear(editor->suggest_genlist);
 
-   list = (Eina_List *)evas_object_data_get(editor->suggest_genlist,
-                                            "suggest_list");
    ic = elm_genlist_item_class_new();
    ic->item_style = "full";
    ic->func.content_get = _suggest_list_content_get;
 
-   EINA_LIST_FOREACH(list, l, suggest_it)
+   EINA_LIST_FOREACH(editor->suggest_list, l, suggest_it)
      {
         if (eina_str_has_prefix(suggest_it->summary, word))
           {
@@ -298,32 +306,33 @@ _suggest_list_update(Edi_Editor *editor, char *word)
 }
 
 static void
-_suggest_list_set(Edi_Editor *editor)
+_suggest_list_load(Edi_Editor *editor)
 {
+   Edi_Language_Provider *provider;
    char *curword;
    unsigned int row, col;
-   Eina_List *list = NULL;
 
-   list = (Eina_List *)evas_object_data_get(editor->suggest_genlist,
-                                            "suggest_list");
-   if (list)
+   if (evas_object_visible_get(editor->suggest_bg))
+     return;
+
+   provider = edi_language_provider_get(editor);
+   if (!provider)
+     return;
+
+   if (editor->suggest_list)
      {
         Edi_Language_Suggest_Item *suggest_it;
 
-        EINA_LIST_FREE(list, suggest_it)
+        EINA_LIST_FREE(editor->suggest_list, suggest_it)
           edi_language_suggest_item_free(suggest_it);
 
-        list = NULL;
-        evas_object_data_del(editor->suggest_genlist, "suggest_list");
+        editor->suggest_list = NULL;
      }
 
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
-   curword = _edi_editor_current_word_get(editor, row, col);
-   list = edi_language_provider_get(editor)->lookup(editor, row, col - strlen(curword));
-
-   evas_object_data_set(editor->suggest_genlist, "suggest_list", list);
-   _suggest_list_update(editor, curword);
+   curword = _edi_editor_word_at_position_get(editor, row, col);
+   editor->suggest_list = provider->lookup(editor, row, col - strlen(curword));
    free(curword);
 }
 
@@ -335,7 +344,7 @@ _suggest_list_selection_insert(Edi_Editor *editor, const char *selection)
 
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
 
-   word = _edi_editor_current_word_get(editor, row, col);
+   word = _edi_editor_word_at_position_get(editor, row, col);
    wordlen = strlen(word);
    free(word);
 
@@ -348,22 +357,8 @@ static void
 _suggest_bg_cb_hide(void *data, Evas *e EINA_UNUSED,
                     Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Eina_List *list = NULL;
-   Edi_Editor *editor;
+   Edi_Editor *editor = (Edi_Editor *)data;
 
-   editor = (Edi_Editor *)data;
-   list = (Eina_List *)evas_object_data_get(editor->suggest_genlist,
-                                            "suggest_list");
-   if (list)
-     {
-        Edi_Language_Suggest_Item *suggest_it;
-
-        EINA_LIST_FREE(list, suggest_it)
-          edi_language_suggest_item_free(suggest_it);
-
-        list = NULL;
-        evas_object_data_del(editor->suggest_genlist, "suggest_list");
-     }
    evas_object_key_ungrab(editor->suggest_genlist, "Return", 0, 0);
    evas_object_key_ungrab(editor->suggest_genlist, "Up", 0, 0);
    evas_object_key_ungrab(editor->suggest_genlist, "Down", 0, 0);
@@ -442,7 +437,7 @@ _suggest_popup_show(Edi_Editor *editor)
    evas_object_geometry_get(elm_object_top_widget_get(editor->entry),
                             NULL, NULL, NULL, &eh);
 
-   word = _edi_editor_current_word_get(editor, row, col);
+   word = _edi_editor_word_at_position_get(editor, row, col);
 
    bg_x = cx - (strlen(word) + 1) * cw;
    bg_y = cy + ch;
@@ -486,7 +481,7 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              return;
           }
 
-        word = _edi_editor_current_word_get(editor, row, col - 1);
+        word = _edi_editor_word_at_position_get(editor, row, col - 1);
         if (!strcmp(word, ""))
           evas_object_hide(editor->suggest_bg);
         else
@@ -500,7 +495,7 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              return;
           }
 
-        word = _edi_editor_current_word_get(editor, row, col + 1);
+        word = _edi_editor_word_at_position_get(editor, row, col + 1);
         if (!strcmp(word, ""))
           evas_object_hide(editor->suggest_bg);
         else
@@ -514,7 +509,7 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
              return;
           }
 
-        word = _edi_editor_current_word_get(editor, row, col - 1);
+        word = _edi_editor_word_at_position_get(editor, row, col - 1);
         if (!strcmp(word, ""))
           evas_object_hide(editor->suggest_bg);
         else
@@ -530,7 +525,7 @@ _suggest_popup_key_down_cb(Edi_Editor *editor, const char *key, const char *stri
      }
    else if (string && strlen(string) == 1)
      {
-        word = _edi_editor_current_word_get(editor, row, col);
+        word = _edi_editor_word_at_position_get(editor, row, col);
         strncat(word, string, 1);
         _suggest_list_update(editor, word);
      }
@@ -590,7 +585,7 @@ _edi_editor_snippet_insert(Edi_Editor *editor, Evas_Event_Key_Down *ev)
 
    provider = edi_language_provider_get(editor);
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-   key = _edi_editor_current_word_get(editor, row, col);
+   key = _edi_editor_word_at_position_get(editor, row, col);
    snippet = provider->snippet_get(key);
 
    if (!snippet)
@@ -689,10 +684,9 @@ Edi_Language_Suggest_Item *
 _suggest_match_get(Edi_Editor *editor, const char *word)
 {
    Edi_Language_Suggest_Item *suggest_it;
-   unsigned int row, col, wordlen;
+   unsigned int wordlen;
 
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-   Eina_List *l, *list = edi_language_provider_get(editor)->lookup(editor, row, col - strlen(word));
+   Eina_List *l, *list = editor->suggest_list;
 
    wordlen = strlen(word);
    EINA_LIST_FOREACH(list, l, suggest_it)
@@ -712,14 +706,11 @@ _suggest_hint_click_suggest(void *data, Evas_Object *obj EINA_UNUSED,
 {
    Edi_Editor *editor = data;
    Edi_Language_Suggest_Item *match;
-   unsigned int row, col;
    char *word;
 
    _suggest_hint_hide(editor);
 
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-   word = _edi_editor_current_word_get(editor, row, col);
-
+   word = _edi_editor_current_word_get(editor);
    match = _suggest_match_get(editor, word);
    if (match)
      _suggest_list_selection_insert(editor, match->summary);
@@ -789,7 +780,8 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
         else if (edi_language_provider_has(editor) && !strcmp(ev->key, "space"))
           {
-             _suggest_list_set(editor);
+             _suggest_list_load(editor);
+             _suggest_list_update(editor, _edi_editor_current_word_get(editor));
           }
      }
    else if ((!alt) && (ctrl) && (shift))
@@ -817,13 +809,11 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
      {
         char *word;
         const char *snippet;
-        unsigned int row, col;
         Edi_Language_Suggest_Item *suggest;
 
-        elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-        word = _edi_editor_current_word_get(editor, row, col);
-
+        word = _edi_editor_current_word_get(editor);
         snippet = provider->snippet_get(word);
+
         if (snippet)
           _edi_editor_snippet_insert(editor, ev);
         else if (strlen(word) >= 3)
@@ -853,18 +843,15 @@ _edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 }
 
 static void
-_edit_file_changed(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
+_edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Elm_Code_Widget *widget;
    Edi_Editor *editor;
    Edi_Language_Provider *provider;
    char *word;
    const char *snippet;
-   unsigned int row, col;
 
    ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
 
-   widget = (Elm_Code_Widget *)obj;
    editor = (Edi_Editor *)data;
 
    if (evas_object_visible_get(editor->suggest_bg))
@@ -874,8 +861,7 @@ _edit_file_changed(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
    if (!provider)
      return;
 
-   elm_code_widget_cursor_position_get(widget, &row, &col);
-   word = _edi_editor_current_word_get(editor, row, col);
+   word = _edi_editor_current_word_get(editor);
 
    if (word && strlen(word) > 1)
      {
@@ -1275,6 +1261,9 @@ _edi_editor_parse_file_cb(Elm_Code_File *file EINA_UNUSED, void *data)
    editor->highlight_cancel = EINA_FALSE;
    editor->highlight_thread = ecore_thread_run(_edi_clang_setup, _edi_clang_dispose, NULL, editor);
 #endif
+
+   if (edi_language_provider_has(editor))
+     _suggest_list_load(editor);
 }
 
 static Eina_Bool
