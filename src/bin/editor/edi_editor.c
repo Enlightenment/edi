@@ -17,6 +17,8 @@
 
 #include "edi_private.h"
 
+static Evas_Object *_suggest_hint;
+
 static void _suggest_popup_show(Edi_Editor *editor);
 
 typedef struct
@@ -598,8 +600,147 @@ _edi_editor_snippet_insert(Edi_Editor *editor, Evas_Event_Key_Down *ev)
    elm_code_widget_selection_delete(editor->entry);
    elm_code_widget_text_at_cursor_insert(editor->entry, snippet);
 
-   ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+   if (ev)
+     ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
    free(key);
+   return;
+}
+
+static void
+_suggest_hint_hide(Edi_Editor *editor EINA_UNUSED)
+{
+   if (!_suggest_hint)
+     return;
+
+   evas_object_hide(_suggest_hint);
+}
+
+static Evas_Object *
+_suggest_hint_popup_add(Edi_Editor *editor, const char *content, Evas_Smart_Cb fn)
+{
+   Evas_Object *pop, *btn, *text;
+   unsigned int row, col;
+   Evas_Coord cx, cy, cw, ch;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   elm_code_widget_geometry_for_position_get(editor->entry, row, col,
+                                             &cx, &cy, &cw, &ch);
+
+   pop = elm_box_add(editor->entry);
+   evas_object_size_hint_weight_set(pop, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(pop, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   evas_object_size_hint_weight_set(pop, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(pop, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_move(pop, cx, cy - ch);
+
+   btn = elm_button_add(pop);
+   evas_object_smart_callback_add(btn, "clicked", fn, editor);
+   evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(pop, btn);
+   evas_object_show(btn);
+
+   text = elm_label_add(btn);
+   evas_object_size_hint_weight_set(text, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(text, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(text, content);
+
+   elm_layout_content_set(btn, "elm.swallow.content", text);
+   evas_object_show(text);
+
+   return pop;
+}
+
+static void
+_suggest_hint_click_snippet(void *data, Evas_Object *obj EINA_UNUSED,
+                            void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor = data;
+
+   _suggest_hint_hide(editor);
+   _edi_editor_snippet_insert(editor, NULL);
+}
+
+static void
+_suggest_hint_show_snippet(Edi_Editor *editor, const char *word)
+{
+   unsigned int row, col;
+   const char *snippet;
+
+   if (!word || strlen(word) == 0)
+     return;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+
+   snippet = edi_language_provider_get(editor)->snippet_get(word);
+   if (!snippet)
+     return;
+
+   _suggest_hint = _suggest_hint_popup_add(editor,
+      eina_slstr_printf("Press tab to insert snippet <hilight>%s</hilight>", word),
+      _suggest_hint_click_snippet);
+   evas_object_show(_suggest_hint);
+}
+
+Edi_Language_Suggest_Item *
+_suggest_match_get(Edi_Editor *editor, const char *word)
+{
+   Edi_Language_Suggest_Item *suggest_it;
+   unsigned int row, col, wordlen;
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   Eina_List *l, *list = edi_language_provider_get(editor)->lookup(editor, row, col - strlen(word));
+
+   wordlen = strlen(word);
+   EINA_LIST_FOREACH(list, l, suggest_it)
+     {
+        if (strlen(suggest_it->summary) <= wordlen)
+          continue;
+        if (eina_str_has_prefix(suggest_it->summary, word))
+          return suggest_it;
+     }
+
+   return NULL;
+}
+
+static void
+_suggest_hint_click_suggest(void *data, Evas_Object *obj EINA_UNUSED,
+                            void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor = data;
+   Edi_Language_Suggest_Item *match;
+   unsigned int row, col;
+   char *word;
+
+   _suggest_hint_hide(editor);
+
+   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+   word = _edi_editor_current_word_get(editor, row, col);
+
+   match = _suggest_match_get(editor, word);
+   if (match)
+     _suggest_list_selection_insert(editor, match->summary);
+
+   free(word);
+}
+
+static void
+_suggest_hint_show_match(Edi_Editor *editor, const char *word)
+{
+   Edi_Language_Suggest_Item *match;
+
+   match = _suggest_match_get(editor, word);
+   if (!match)
+     return;
+
+   _suggest_hint = _suggest_hint_popup_add(editor,
+      eina_slstr_printf("Press tab to insert suggestion <hilight>%s</hilight>", match->summary),
+      _suggest_hint_click_suggest);
+
+   evas_object_show(_suggest_hint);
 }
 
 static void
@@ -608,6 +749,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 {
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
+   Edi_Language_Provider *provider;
    Eina_Bool ctrl, alt, shift;
    Evas_Event_Key_Down *ev = event;
 
@@ -621,6 +763,7 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
      return;
 
    editor = (Edi_Editor *)evas_object_data_get(item->view, "editor");
+   _suggest_hint_hide(editor);
 
    if ((!alt) && (ctrl) && (!shift))
      {
@@ -657,17 +800,45 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
      }
 
-   if ((!alt) && (!ctrl))
+   if (alt || ctrl)
+     return;
+
+   provider = edi_language_provider_get(editor);
+   if (!provider)
+     return;
+
+   if (evas_object_visible_get(editor->suggest_bg))
      {
-        if (!strcmp(ev->key, "Tab") && edi_language_provider_has(editor))
+        _suggest_popup_key_down_cb(editor, ev->key, ev->string);
+        return;
+     }
+
+   if (!strcmp(ev->key, "Tab"))
+     {
+        char *word;
+        const char *snippet;
+        unsigned int row, col;
+        Edi_Language_Suggest_Item *suggest;
+
+        elm_code_widget_cursor_position_get(editor->entry, &row, &col);
+        word = _edi_editor_current_word_get(editor, row, col);
+
+        snippet = provider->snippet_get(word);
+        if (snippet)
           _edi_editor_snippet_insert(editor, ev);
-        else if (edi_language_provider_has(editor))
-          _suggest_popup_key_down_cb(editor, ev->key, ev->string);
+        else if (strlen(word) >= 3)
+          {
+             suggest = _suggest_match_get(editor, word);
+             if (suggest)
+               _suggest_list_selection_insert(editor, suggest->summary);
+          }
+
+        free(word);
      }
 }
 
 static void
-_edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+_edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
    Elm_Code_Widget *widget;
    char buf[30];
@@ -682,9 +853,40 @@ _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EI
 }
 
 static void
-_edit_file_changed(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+_edit_file_changed(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   Elm_Code_Widget *widget;
+   Edi_Editor *editor;
+   Edi_Language_Provider *provider;
+   char *word;
+   const char *snippet;
+   unsigned int row, col;
+
    ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
+
+   widget = (Elm_Code_Widget *)obj;
+   editor = (Edi_Editor *)data;
+
+   if (evas_object_visible_get(editor->suggest_bg))
+     return;
+
+   provider = edi_language_provider_get(editor);
+   if (!provider)
+     return;
+
+   elm_code_widget_cursor_position_get(widget, &row, &col);
+   word = _edi_editor_current_word_get(editor, row, col);
+
+   if (word && strlen(word) > 1)
+     {
+        snippet = provider->snippet_get(word);
+        if (snippet)
+          _suggest_hint_show_snippet(editor, word);
+        else if (strlen(word) >= 3)
+          _suggest_hint_show_match(editor, word);
+     }
+
+   free(word);
 }
 
 static void
@@ -738,7 +940,7 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
    _edit_cursor_moved(position, editor->entry, NULL);
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
-   evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, position);
+   evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, editor);
 }
 
 #if HAVE_LIBCLANG
