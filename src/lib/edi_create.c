@@ -73,29 +73,61 @@ _edi_create_year_get()
    return tp->tm_year + 1900;
 }
 
+char *
+edi_create_escape_quotes(const char *in)
+{
+   char buf[1024], *out_ptr;
+   const char *pos, *in_ptr;
+   int replace_len;
+
+   pos = strstr(in, "'");
+   if (!pos)
+     return strdup(in);
+
+   in_ptr = in;
+   out_ptr = buf;
+   while (pos)
+     {
+        replace_len = pos - in_ptr;
+        snprintf(out_ptr, replace_len + 1, "%s", in_ptr);
+        snprintf(out_ptr + replace_len, 8, "'\\\"'\\\"'");
+
+	in_ptr += replace_len + 1;
+	out_ptr += replace_len + 7;
+        pos = strstr(in_ptr, "'");
+     }
+   snprintf(out_ptr, strlen(in) - (in_ptr - in) + 1, "%s", in_ptr);
+
+   return strdup(buf);
+}
+
 static void
 _edi_create_filter_file(Edi_Create *create, const char *path)
 {
-   char *cmd, *lowername, *uppername;
+   char *cmd, *name, *lowername, *uppername, *user;
    const char *template;
    int length;
 
+   name = edi_create_escape_quotes(create->name);
+   user = edi_create_escape_quotes(create->user);
    create->filters++;
 // TODO speed this up - pre-cache this filter!
    template = "sh -c \"sed -i.bak 's|\\${edi_name}|%s|g;s|\\${Edi_Name}|%s|g;s|\\${EDI_NAME}|%s|g;s|\\${Edi_User}|%s|g;s|\\${Edi_Email}|%s|g;s|\\${Edi_Url}|%s|g;s|\\${Edi_Year}|%d|g' %s\"; rm %s.bak";
-   length = strlen(template) + (strlen(create->name) * 3)  + strlen(create->user) + strlen(create->email) + strlen(create->url) + (strlen(path) * 2) + 4 - 16 + 1;
+   length = strlen(template) + (strlen(name) * 3)  + strlen(user) + strlen(create->email) + strlen(create->url) + (strlen(path) * 2) + 4 - 16 + 1;
 
-   lowername = strdup(create->name);
+   lowername = strdup(name);
    eina_str_tolower(&lowername);
-   uppername = strdup(create->name);
+   uppername = strdup(name);
    eina_str_toupper(&uppername);
 
    cmd = malloc(sizeof(char) * length);
-   snprintf(cmd, length, template, lowername, create->name, uppername , create->user, create->email, create->url, _edi_create_year_get(), path, path);
+   snprintf(cmd, length, template, lowername, name, uppername , user, create->email, create->url, _edi_create_year_get(), path, path);
 
    ecore_exe_run(cmd, NULL);
    free(lowername);
    free(uppername);
+   free(name);
+   free(user);
    free(cmd);
 
    // This matches the filtered path copy created in the copy callback

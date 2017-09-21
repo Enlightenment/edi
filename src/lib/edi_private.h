@@ -2,6 +2,7 @@
 # define EDI_PRIVATE_H
 
 extern int _edi_lib_log_dom;
+char *edi_create_escape_quotes(const char *in);
 
 #ifdef ERR
 # undef ERR

@@ -15,6 +15,7 @@ static const struct {
 } tests[] = {
   { "basic", edi_test_basic },
   { "path", edi_test_path },
+  { "create", edi_test_create },
   { "exe", edi_test_exe },
   { "content_provider", edi_test_content_provider },
   { "language_provider", edi_test_language_provider },

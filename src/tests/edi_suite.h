@@ -8,6 +8,7 @@
 void edi_test_basic(TCase *tc);
 void edi_test_console(TCase *tc);
 void edi_test_path(TCase *tc);
+void edi_test_create(TCase *tc);
 void edi_test_exe(TCase *tc);
 void edi_test_content_provider(TCase *tc);
 void edi_test_language_provider(TCase *tc);
