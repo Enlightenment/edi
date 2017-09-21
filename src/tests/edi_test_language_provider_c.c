@@ -4,13 +4,11 @@
 
 #include <Elementary.h>
 
-#include "../bin/edi_private.h"
-#include "language/edi_language_provider.h"
-
 #include "edi_suite.h"
 
 int _edi_lib_log_dom = -1;
 
+/*
 static Elm_Code *
 _setup(Edi_Editor *editor, Evas_Object *win)
 {
@@ -99,6 +97,7 @@ START_TEST (edi_test_language_provider_c_summary)
    elm_shutdown();
 }
 END_TEST
+*/
 
 void edi_test_language_provider_c(TCase *tc)
 {

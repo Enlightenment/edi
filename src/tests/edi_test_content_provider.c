@@ -3,6 +3,7 @@
 #endif
 
 #include "edi_content_provider.c"
+#include "language/edi_language_provider.c"
 
 #include "edi_suite.h"
 
