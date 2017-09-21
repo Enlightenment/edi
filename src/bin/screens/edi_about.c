@@ -94,12 +94,13 @@ edi_about_show(Evas_Object *mainwin)
 
    /* Authors screen */
    authors = elm_entry_add(box);
+   elm_entry_line_wrap_set(authors, EINA_FALSE);
+   elm_entry_text_style_user_push(authors, "DEFAULT='font=Mono')");
    elm_entry_file_set(authors, PACKAGE_DOC_DIR "/AUTHORS", ELM_TEXT_FORMAT_PLAIN_UTF8);
    elm_entry_editable_set(authors, EINA_FALSE);
    elm_object_focus_allow_set(authors, EINA_FALSE);
    evas_object_size_hint_weight_set(authors, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(authors, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_resize(authors, 320 * elm_config_scale_get(), 160 * elm_config_scale_get());
    elm_box_pack_end(box, authors);
    evas_object_show(authors);
 
@@ -146,7 +147,7 @@ edi_about_show(Evas_Object *mainwin)
    elm_box_pack_end(buttonbox, button);
    evas_object_show(button);
 
-   evas_object_resize(win, 360 * elm_config_scale_get(), 220 * elm_config_scale_get());
+   evas_object_resize(win, 520 * elm_config_scale_get(), 300 * elm_config_scale_get());
    evas_object_show(win);
 
    return win;
