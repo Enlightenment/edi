@@ -576,7 +576,7 @@ _suggest_popup_setup(Edi_Editor *editor)
 }
 
 static void
-_edi_editor_snippet_insert(Edi_Editor *editor, Evas_Event_Key_Down *ev)
+_edi_editor_snippet_insert(Edi_Editor *editor)
 {
    char *key;
    const char *snippet;
@@ -595,8 +595,6 @@ _edi_editor_snippet_insert(Edi_Editor *editor, Evas_Event_Key_Down *ev)
    elm_code_widget_selection_delete(editor->entry);
    elm_code_widget_text_at_cursor_insert(editor->entry, snippet);
 
-   if (ev)
-     ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
    free(key);
    return;
 }
@@ -656,7 +654,7 @@ _suggest_hint_click_snippet(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Editor *editor = data;
 
    _suggest_hint_hide(editor);
-   _edi_editor_snippet_insert(editor, NULL);
+   _edi_editor_snippet_insert(editor);
 }
 
 static void
@@ -815,12 +813,18 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
         snippet = provider->snippet_get(word);
 
         if (snippet)
-          _edi_editor_snippet_insert(editor, ev);
+          {
+             ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+             _edi_editor_snippet_insert(editor);
+          }
         else if (strlen(word) >= 3)
           {
              suggest = _suggest_match_get(editor, word);
              if (suggest)
-               _suggest_list_selection_insert(editor, suggest->summary);
+               {
+                  ev->event_flags |= EVAS_EVENT_FLAG_ON_HOLD;
+                  _suggest_list_selection_insert(editor, suggest->summary);
+               }
           }
 
         free(word);
