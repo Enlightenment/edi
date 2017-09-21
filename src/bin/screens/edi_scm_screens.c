@@ -181,21 +181,20 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 {
    Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
    Edi_Scm_Status_Code *code;
-   char *text, *path;
-   const char *icon_name, *icon_status;
+   const char *text, *icon_name, *icon_status;
+   char *path;
    Eina_Bool staged = EINA_FALSE;
 
    if (strcmp(source, "elm.swallow.content"))
      return NULL;
 
    path =  (char *) data;
-   text = NULL; icon_name = icon_status = NULL;
+
+   icon_name = icon_status = NULL;
 
    code = _file_status_item_find(path);
    if (code)
      icon_status = _icon_status(*code, &staged);
-
-   text = strdup(basename((char *)path));
 
    icon_name = "dialog-information";
 
@@ -215,8 +214,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_box_pack_end(lbox, ic);
 
    label = elm_label_add(lbox);
-   elm_object_text_set(label, text);
-   free(text);
+   elm_object_text_set(label, path);
    evas_object_show(label);
    elm_box_pack_end(lbox, label);
 
@@ -302,8 +300,8 @@ _file_status_list_fill(Evas_Object *list)
      {
         EINA_LIST_FREE(e->statuses, status)
           {
-             _file_status_item_add(status->fullpath, status->change);
-             elm_genlist_item_append(list, itc, strdup(status->fullpath), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+             _file_status_item_add(status->path, status->change);
+             elm_genlist_item_append(list, itc, strdup(status->path), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
              if (status->staged) staged = EINA_TRUE;
 
              eina_stringshare_del(status->fullpath);
