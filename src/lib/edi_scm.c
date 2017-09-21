@@ -317,14 +317,17 @@ _edi_scm_git_status_get(void)
 }
 
 static char *
-_edi_scm_git_diff(void)
+_edi_scm_git_diff(Eina_Bool cached)
 {
    char *output;
    Eina_Strbuf *command;
 
    command = eina_strbuf_new();
 
-   eina_strbuf_append(command, "git diff");
+   if (cached)
+     eina_strbuf_append(command, "git diff --cached");
+   else
+     eina_strbuf_append(command, "git diff");
 
    output = _edi_scm_exec_response(eina_strbuf_string_get(command));
 
@@ -608,11 +611,11 @@ edi_scm_remote_add(const char *remote_url)
 }
 
 EAPI char *
-edi_scm_diff(void)
+edi_scm_diff(Eina_Bool cached)
 {
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->diff();
+   return e->diff(cached);
 }
 
 EAPI void

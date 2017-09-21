@@ -38,7 +38,7 @@ typedef int (scm_fn_del)(const char *path);
 typedef int (scm_fn_move)(const char *src, const char *dest);
 typedef int (scm_fn_commit)(const char *message);
 typedef int (scm_fn_status)(void);
-typedef char *(scm_fn_diff)(void);
+typedef char *(scm_fn_diff)(Eina_Bool);
 typedef int (scm_fn_push)(void);
 typedef int (scm_fn_pull)(void);
 typedef int (scm_fn_stash)(void);
@@ -188,9 +188,11 @@ Eina_Bool edi_scm_status_get(void);
 /**
  * Get diff of changes in repository.
  *
+ * @param cached Whether the results are general or cached changes.
+ *
  * @return diff output as a string.
 */
-char *edi_scm_diff(void);
+char *edi_scm_diff(Eina_Bool cached);
 
 /**
  * Move from src to dest.

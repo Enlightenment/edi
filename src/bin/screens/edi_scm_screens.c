@@ -300,9 +300,12 @@ _file_status_list_fill(Evas_Object *list)
      {
         EINA_LIST_FREE(e->statuses, status)
           {
-             _file_status_item_add(status->path, status->change);
-             elm_genlist_item_append(list, itc, strdup(status->path), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-             if (status->staged) staged = EINA_TRUE;
+             if (status->staged)
+               {
+                  staged = EINA_TRUE;
+                  _file_status_item_add(status->path, status->change);
+                  elm_genlist_item_append(list, itc, strdup(status->path), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+               }
 
              eina_stringshare_del(status->fullpath);
              eina_stringshare_del(status->path);
@@ -452,13 +455,13 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_box_pack_end(box, frame);
    // End of Trick
 
-   text = edi_scm_diff();
+   text = edi_scm_diff(EINA_TRUE);
    if (text[0] && text[1])
      {
         frame = elm_frame_add(popup);
         evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
         evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
-        elm_object_text_set(frame, _("Unstaged changes"));
+        elm_object_text_set(frame, _("Committed changes"));
         evas_object_show(frame);
 
         cbox = elm_box_add(popup);
