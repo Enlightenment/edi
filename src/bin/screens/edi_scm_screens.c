@@ -503,6 +503,9 @@ edi_scm_screens_commit(Evas_Object *parent)
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_commit_cb, input);
    evas_object_show(popup);
+   if (staged_changes)
+     elm_entry_select_all(input);
+
    elm_object_focus_set(input, EINA_TRUE);
 }
 
