@@ -702,9 +702,9 @@ _edi_build_menu_items_disabled_set(Eina_Bool state)
 {
    elm_object_disabled_set(_edi_toolbar_build, state);
    elm_object_disabled_set(_edi_toolbar_test, state);
-   elm_object_disabled_set(_edi_menu_build, state);
-   elm_object_disabled_set(_edi_menu_test, state);
-   elm_object_disabled_set(_edi_menu_clean, state);
+   elm_object_item_disabled_set(_edi_menu_build, state);
+   elm_object_item_disabled_set(_edi_menu_test, state);
+   elm_object_item_disabled_set(_edi_menu_clean, state);
 }
 
 static void
