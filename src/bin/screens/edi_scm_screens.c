@@ -290,7 +290,6 @@ _file_status_list_fill(Evas_Object *list)
      }
 
    _hash_statuses = eina_hash_string_superfast_new(_list_status_free_cb);
-   eina_hash_free_buckets(_hash_statuses);
 
    itc = elm_genlist_item_class_new();
    itc->item_style = "full";
@@ -502,11 +501,12 @@ edi_scm_screens_commit(Evas_Object *parent)
    elm_object_part_content_set(popup, "button2", button);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_scm_screens_commit_cb, input);
-   evas_object_show(popup);
    if (staged_changes)
      elm_entry_select_all(input);
 
    elm_object_focus_set(input, EINA_TRUE);
+
+   evas_object_show(popup);
 }
 
 void
