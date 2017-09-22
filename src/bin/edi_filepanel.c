@@ -532,10 +532,13 @@ _item_menu_create_dir_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 static void
 _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
 {
+   Elm_Object_Item *menu_it;
+
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   elm_object_item_disabled_set(menu_it, EINA_TRUE);
    elm_menu_item_separator_add(menu, NULL);
 
    elm_menu_item_add(menu, NULL, "document-new", _("Create File here"), _item_menu_create_file_cb, sd);
