@@ -37,6 +37,15 @@ _edi_language_python_mime_name(const char *mime)
 const char *
 _edi_language_python_snippet_get(const char *key EINA_UNUSED)
 {
+   if (!strcmp(key, "def"))
+     return
+"def ():\n" \
+"    ";
+   else if (!strcmp(key, "defi"))
+     return
+"def __init__(self):\n" \
+"    ";
+
    return NULL;
 }
 
