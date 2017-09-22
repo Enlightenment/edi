@@ -106,6 +106,7 @@ void
 edi_editor_doc_open(Edi_Editor *editor)
 {
    Edi_Language_Document *doc = NULL;
+   Edi_Language_Provider *provider;
    Evas_Object *label;
    const char *detail, *param, *ret, *see;
    char *display;
@@ -114,7 +115,8 @@ edi_editor_doc_open(Edi_Editor *editor)
    const char *font;
    int font_size;
 
-   if (edi_language_provider_has(editor))
+   provider = edi_language_provider_get(editor);
+   if (provider && provider->lookup_doc)
      {
         unsigned int row, col;
 

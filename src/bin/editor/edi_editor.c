@@ -316,7 +316,7 @@ _suggest_list_load(Edi_Editor *editor)
      return;
 
    provider = edi_language_provider_get(editor);
-   if (!provider)
+   if (!provider || !provider->lookup)
      return;
 
    if (editor->suggest_list)
