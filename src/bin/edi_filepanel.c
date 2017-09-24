@@ -537,7 +537,7 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "folder", basename((char *)sd->path), NULL, NULL);
    elm_object_item_disabled_set(menu_it, EINA_TRUE);
    elm_menu_item_separator_add(menu, NULL);
 
