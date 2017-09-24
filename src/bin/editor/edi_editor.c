@@ -882,6 +882,7 @@ _edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EI
 
    editor = (Edi_Editor *)data;
 
+   _suggest_hint_hide(editor);
    if (evas_object_visible_get(editor->suggest_bg))
      return;
 
@@ -1227,6 +1228,7 @@ _unfocused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UN
    if (_edi_config->autosave)
      edi_editor_save(editor);
 
+   _suggest_hint_hide(editor);
    if (editor->suggest_bg)
      evas_object_hide(editor->suggest_bg);
 
@@ -1248,6 +1250,7 @@ _mouse_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
    editor = (Edi_Editor *)data;
    event = (Evas_Event_Mouse_Up *)event_info;
 
+   _suggest_hint_hide(editor);
    if (editor->suggest_bg)
      evas_object_hide(editor->suggest_bg);
 
