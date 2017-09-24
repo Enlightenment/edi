@@ -15,13 +15,11 @@ typedef struct _Edi_Exe_Args {
    void ((*func)(int, void *));
    void *data;
    pid_t pid;
-   char *path;
-   Ecore_Con_Server *srv;
    Ecore_Event_Handler *handler;
 } Edi_Exe_Args;
 
 static Eina_Bool
-_edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+_edi_exe_notify_client_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    int *status;
    Edi_Exe_Args *args;
@@ -34,18 +32,7 @@ _edi_exe_notify_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSE
 
    args->func(*status, args->data);
 
-   /* Manually cleaning up??? */
-   if (ecore_con_server_fd_get(args->srv) != -1)
-     close(ecore_con_server_fd_get(args->srv));
-   if (ecore_con_client_fd_get(ev->client) != -1)
-     close(ecore_con_client_fd_get(ev->client));
-
-   if (args->path)
-     {
-        if (ecore_file_exists(args->path))
-          unlink(args->path);
-        free(args->path);
-     }
+   ecore_con_client_send(ev->client, status, sizeof(int));
 
    free(args);
 
@@ -65,11 +52,23 @@ edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
    args = malloc(sizeof(Edi_Exe_Args));
    args->func = func;
    args->data = data;
-   args->path = ecore_con_local_path_new(EINA_FALSE, name, 0);
-   args->srv = srv;
-   args->handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_data_cb, args);
+   args->handler = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, (Ecore_Event_Handler_Cb) _edi_exe_notify_client_data_cb, args);
 
    return EINA_TRUE;
+}
+
+static Eina_Bool
+_edi_exe_notify_server_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Ecore_Con_Event_Server_Data *ev = event;
+   Edi_Exe_Args *args = data;
+
+   ecore_event_handler_del(args->handler);
+   ecore_con_server_del(ev->server);
+
+   free(args);
+
+   return ECORE_CALLBACK_DONE;
 }
 
 static Eina_Bool
@@ -90,13 +89,16 @@ _edi_exe_event_done_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event
   srv = ecore_con_server_connect(ECORE_CON_LOCAL_USER, name, 0, NULL);
   if (srv)
     {
+       ecore_event_handler_del(args->handler);
+       args->handler = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _edi_exe_notify_server_data_cb, args);
        ecore_con_server_send(srv, &ev->exit_code, sizeof(int));
        ecore_con_server_flush(srv);
     }
-
-  ecore_event_handler_del(args->handler);
-
-  free(args);
+  else
+    {
+       ecore_event_handler_del(args->handler);
+       free(args);
+    }
 
   return ECORE_CALLBACK_DONE;
 }
