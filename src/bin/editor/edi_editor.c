@@ -578,10 +578,14 @@ _suggest_popup_setup(Edi_Editor *editor)
 static void
 _edi_editor_snippet_insert(Edi_Editor *editor)
 {
-   char *key;
-   const char *snippet;
+   char *key, *leading;
+   unsigned int line_len;
+   int nl_pos;
+   short nl_len;
+   const char *snippet, *ptr;
    unsigned int row, col;
    Edi_Language_Provider *provider;
+   Elm_Code_Line *line;
 
    provider = edi_language_provider_get(editor);
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
@@ -591,9 +595,29 @@ _edi_editor_snippet_insert(Edi_Editor *editor)
    if (!snippet)
      return;
 
+   line = elm_code_file_line_get(elm_code_widget_code_get(editor->entry)->file, row);
+   leading = elm_code_line_indent_get(line);
+
    elm_code_widget_selection_select_word(editor->entry, row, col);
    elm_code_widget_selection_delete(editor->entry);
-   elm_code_widget_text_at_cursor_insert(editor->entry, snippet);
+
+   ptr = snippet;
+   nl_pos = elm_code_text_newlinenpos(ptr, strlen(ptr), &nl_len);
+
+   while (nl_pos != ELM_CODE_TEXT_NOT_FOUND)
+     {
+        char *insert;
+        line_len = nl_pos + nl_len;
+
+        insert = strndup(ptr, line_len);
+        elm_code_widget_text_at_cursor_insert(editor->entry, insert);
+        elm_code_widget_text_at_cursor_insert(editor->entry, leading);
+        free(insert);
+
+        ptr += line_len;
+        nl_pos = elm_code_text_newlinenpos(ptr, strlen(ptr), &nl_len);
+     }
+   elm_code_widget_text_at_cursor_insert(editor->entry, ptr);
 
    free(key);
    return;
