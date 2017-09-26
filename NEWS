@@ -8,12 +8,19 @@ Features:
   * Integrate GDB debugger console
   * Add snippet support to the code editor
   * Add SCM support (git)
+  * Provide tab completion & suggestions for autosuggest and snippets
   * Add rust language and clang build support
   * Highlight all search results
+  * Wrap search around at end of document
+  * Add checkout project to welcome screen
+  * Add translation support
 
 Bug fixes:
 
   * Fix issue where large projects could cause slow starts
+  * Fix T6044 Project templating fails with special characters in projects settings
+  * Fix T5480 EDI does not open window on some mime/file types
+  * Fix T1852 Search should wrap around
 
 ---------
 Edi 0.5.1
