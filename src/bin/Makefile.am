@@ -66,6 +66,7 @@ edi_private.h
 
 EXTRA_DIST = \
 language/edi_language_provider_c.c \
+language/edi_language_provider_python.c \
 language/edi_language_provider_rust.c
 
 edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la $(LTLIBINTL)
