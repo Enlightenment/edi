@@ -137,7 +137,7 @@ _icon_status(Edi_Scm_Status_Code code)
 }
 
 static void
-_file_status_free(Edi_Scm_Status *status)
+_edi_scm_status_free(Edi_Scm_Status *status)
 {
    eina_stringshare_del(status->fullpath);
    eina_stringshare_del(status->path);
@@ -151,7 +151,7 @@ _content_del(void *data, Evas_Object *obj EINA_UNUSED)
 {
    Edi_Scm_Status *status = data;
 
-   _file_status_free(status);
+   _edi_scm_status_free(status);
 }
 
 static Evas_Object *
@@ -267,11 +267,13 @@ _file_status_list_fill(Evas_Object *list)
           {
              if (status->staged)
                {
-                  staged = EINA_TRUE;
                   elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+                  staged = EINA_TRUE;
                }
              else
-              _file_status_free(status);
+               {
+                  _edi_scm_status_free(status);
+               }
 
           }
      }
