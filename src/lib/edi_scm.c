@@ -91,7 +91,7 @@ _edi_scm_git_file_add(const char *path)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git add '%s'", path);
+   eina_strbuf_append_printf(command, "git add %s", path);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
 
@@ -106,7 +106,7 @@ _edi_scm_git_file_mod(const char *path)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git mod '%s'", path);
+   eina_strbuf_append_printf(command, "git mod %s", path);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
 
@@ -136,7 +136,7 @@ _edi_scm_git_file_del(const char *path)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git rm '%s'", path);
+   eina_strbuf_append_printf(command, "git rm %s", path);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
 
@@ -163,7 +163,7 @@ _edi_scm_git_status(void)
 static Edi_Scm_Status *
 _parse_line(char *line)
 {
-   char *path, *fullpath, *change;
+   char *esc_path, *path, *fullpath, *change;
    Edi_Scm_Status *status;
 
    change = line;
@@ -215,10 +215,14 @@ _parse_line(char *line)
    else
         status->change = EDI_SCM_STATUS_UNKNOWN;
 
-   status->path = eina_stringshare_add(path);
-   fullpath = edi_path_append(edi_project_get(), path);
+   esc_path = ecore_file_escape_name(path);
+   status->path = eina_stringshare_add(esc_path);
+   fullpath = edi_path_append(edi_project_get(), esc_path);
    status->fullpath = eina_stringshare_add(fullpath);
+   status->unescaped = eina_stringshare_add(path);
+
    free(fullpath);
+   free(esc_path);
 
    return status;
 }
@@ -228,11 +232,12 @@ _edi_scm_git_file_status(const char *path)
 {
    Edi_Scm_Status *status;
    char command[4096];
-   char *line;
+   char *line, *escaped;
    Edi_Scm_Status_Code result;
 
-   snprintf(command, sizeof(command), "git status --porcelain '%s'", path);
-
+   escaped = ecore_file_escape_name(path);
+   snprintf(command, sizeof(command), "git status --porcelain %s", escaped);
+   free(escaped);
    line = _edi_scm_exec_response(command);
    if (!line[0] || !line[1])
      {
@@ -244,6 +249,7 @@ _edi_scm_git_file_status(const char *path)
         result = status->change;
         eina_stringshare_del(status->path);
         eina_stringshare_del(status->fullpath);
+        eina_stringshare_del(status->unescaped);
         free(status);
      }
 
@@ -342,7 +348,7 @@ _edi_scm_git_commit(const char *message)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git commit -m '%s'", message);
+   eina_strbuf_append_printf(command, "git commit -m \"%s\"", message);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
 
@@ -534,25 +540,51 @@ edi_scm_shutdown()
 EAPI int
 edi_scm_add(const char *path)
 {
+   char *escaped;
+   int result;
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->file_add(path);
+   escaped = ecore_file_escape_name(path);
+
+   result = e->file_add(escaped);
+
+   free(escaped);
+
+   return result;
 }
 
 EAPI int
 edi_scm_del(const char *path)
 {
+   char *escaped;
+   int result;
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->file_del(path);
+   escaped = ecore_file_escape_name(path);
+
+   result = e->file_del(escaped);
+
+   free(escaped);
+
+   return result;
 }
 
 EAPI int
 edi_scm_move(const char *src, const char *dest)
 {
+   char *esc_src, *esc_dst;
+   int result;
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->move(src, dest);
+   esc_src = ecore_file_escape_name(src);
+   esc_dst = ecore_file_escape_name(dest);
+
+   result = e->move(esc_src, esc_dst);
+
+   free(esc_src);
+   free(esc_dst);
+
+   return result;
 }
 
 EAPI Eina_Bool
@@ -571,9 +603,17 @@ edi_scm_status_get(void)
 EAPI Edi_Scm_Status_Code
 edi_scm_file_status(const char *path)
 {
+   char *escaped;
+   int result;
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   return e->file_status(path);
+   escaped = ecore_file_escape_name(path);
+
+   result = e->file_status(escaped);
+
+   free(escaped);
+
+   return result;
 }
 
 EAPI void

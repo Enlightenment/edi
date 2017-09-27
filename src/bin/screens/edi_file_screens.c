@@ -49,6 +49,7 @@ _edi_file_screens_create_file_cb(void *data,
                              void *event_info EINA_UNUSED)
 {
    const char *name;
+   char *text;
    char *path;
    const char *directory = _directory_path;
    FILE *f;
@@ -63,7 +64,9 @@ _edi_file_screens_create_file_cb(void *data,
         return;
      }
 
-   path = edi_path_append(directory, name);
+   text = elm_entry_markup_to_utf8(name);
+
+   path = edi_path_append(directory, text);
    if ((ecore_file_exists(path) && ecore_file_is_dir(path)) ||
        !ecore_file_exists(path))
      {
@@ -82,6 +85,7 @@ _edi_file_screens_create_file_cb(void *data,
 
    evas_object_del(_popup);
    free(path);
+   free(text);
 }
 
 static void
@@ -90,7 +94,7 @@ _edi_file_screens_create_dir_cb(void *data,
                              void *event_info EINA_UNUSED)
 {
    const char *name;
-   char *path;
+   char *path, *text;
    const char *directory = _directory_path;
 
    if (!ecore_file_is_dir(directory)) return;
@@ -102,7 +106,9 @@ _edi_file_screens_create_dir_cb(void *data,
         return;
      }
 
-   path = edi_path_append(directory, name);
+   text = elm_entry_markup_to_utf8(name);
+
+   path = edi_path_append(directory, text);
 
    mkdir(path, 0755);
 
@@ -111,6 +117,7 @@ _edi_file_screens_create_dir_cb(void *data,
 
    evas_object_del(_popup_dir);
    free(path);
+   free(text);
 }
 
 static void
@@ -120,7 +127,7 @@ _edi_file_screens_rename_cb(void *data,
 {
    Evas_Object *entry;
    const char *name, *existing_path, *directory;
-   char *path;
+   char *path, *text;
 
    directory = _directory_path;
    existing_path = (char *) data;
@@ -134,7 +141,9 @@ _edi_file_screens_rename_cb(void *data,
         return;
      }
 
-   path = edi_path_append(directory, name);
+   text = elm_entry_markup_to_utf8(name);
+
+   path = edi_path_append(directory, text);
 
    if (ecore_file_exists(path))
      {
@@ -161,6 +170,7 @@ _edi_file_screens_rename_cb(void *data,
 
    evas_object_del(_popup);
    free(path);
+   free(text);
 }
 
 void

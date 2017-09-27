@@ -184,6 +184,7 @@ edi_filepanel_scm_status_update(void)
              _file_status_item_add(status->fullpath, status->change);
              eina_stringshare_del(status->path);
              eina_stringshare_del(status->fullpath);
+             eina_stringshare_del(status->unescaped);
              free(status);
           }
         eina_list_free(e->statuses);
@@ -609,7 +610,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    Edi_Dir_Data *sd = data;
    Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
    Edi_Scm_Status_Code *code;
-   char *text;
+   char *text, *escaped;
    const char *icon_name, *icon_status;
    Eina_Bool staged = EINA_FALSE;
 
@@ -618,9 +619,12 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    text = NULL; icon_name = icon_status = NULL;
 
-   code = _file_status_item_find(sd->path);
+   escaped = ecore_file_escape_name(sd->path);
+   code = _file_status_item_find(escaped);
    if (code)
      icon_status = _icon_status(*code, &staged);
+
+   free(escaped);
 
    text = strdup(basename((char *)sd->path));
 
