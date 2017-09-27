@@ -12,7 +12,6 @@
 #include "edi_private.h"
 
 static Evas_Object *_parent_obj, *_popup, *_edi_scm_screens_message_popup;
-static Eina_Hash *_hash_statuses = NULL;
 
 static void
 _edi_scm_screens_message_close_cb(void *data EINA_UNUSED,
@@ -106,60 +105,29 @@ _entry_lines_append(Elm_Code *code, char *text)
       elm_code_file_line_append(code->file, start, end - start, NULL);
 }
 
-static Edi_Scm_Status_Code *
-_file_status_item_find(const char *path)
-{
-   return eina_hash_find(_hash_statuses, path);
-}
-
-static void
-_file_status_item_add(const char *path, Edi_Scm_Status_Code status)
-{
-   Edi_Scm_Status_Code *code;
-
-   if (_file_status_item_find(path)) return;
-
-   code = malloc(sizeof(Edi_Scm_Status_Code));
-
-   *code = status;
-   eina_hash_add(_hash_statuses, path, code);
-}
-
-
-static void _list_status_free_cb(void *data)
-{
-   Edi_Scm_Status_Code *code = data;
-
-   free(code);
-}
-
 static const char *
-_icon_status(Edi_Scm_Status_Code code, Eina_Bool *staged)
+_icon_status(Edi_Scm_Status_Code code)
 {
    switch (code)
      {
         case EDI_SCM_STATUS_NONE:
+        case EDI_SCM_STATUS_UNKNOWN:
+           return NULL;
         case EDI_SCM_STATUS_RENAMED:
            return "document-new";
         case EDI_SCM_STATUS_DELETED:
            return "edit-delete";
-        case EDI_SCM_STATUS_UNKNOWN:
-           return NULL;
         case EDI_SCM_STATUS_RENAMED_STAGED:
-           *staged = EINA_TRUE;
            return "document-new";
         case EDI_SCM_STATUS_DELETED_STAGED:
-           *staged = EINA_TRUE;
            return "edit-delete";
         case EDI_SCM_STATUS_ADDED:
            return "document-new";
         case EDI_SCM_STATUS_ADDED_STAGED:
-           *staged = EINA_TRUE;
            return "document-new";
         case EDI_SCM_STATUS_MODIFIED:
            return "document-save-as";
         case EDI_SCM_STATUS_MODIFIED_STAGED:
-           *staged = EINA_TRUE;
            return "document-save-as";
         case EDI_SCM_STATUS_UNTRACKED:
            return "dialog-question";
@@ -169,32 +137,36 @@ _icon_status(Edi_Scm_Status_Code code, Eina_Bool *staged)
 }
 
 static void
+_file_status_free(Edi_Scm_Status *status)
+{
+   eina_stringshare_del(status->fullpath);
+   eina_stringshare_del(status->path);
+   eina_stringshare_del(status->unescaped);
+
+   free(status);
+}
+
+static void
 _content_del(void *data, Evas_Object *obj EINA_UNUSED)
 {
-  char *path = data;
+   Edi_Scm_Status *status = data;
 
-  free(path);
+   _file_status_free(status);
 }
 
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
    Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
-   Edi_Scm_Status_Code *code;
+   Edi_Scm_Status *status;
    const char *text, *icon_name, *icon_status;
-   char *path;
-   Eina_Bool staged = EINA_FALSE;
 
    if (strcmp(source, "elm.swallow.content"))
      return NULL;
 
-   path =  (char *) data;
+   status = (Edi_Scm_Status *) data;
 
-   icon_name = icon_status = NULL;
-
-   code = _file_status_item_find(path);
-   if (code)
-     icon_status = _icon_status(*code, &staged);
+   icon_status = _icon_status(status->change);
 
    icon_name = "dialog-information";
 
@@ -214,7 +186,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_box_pack_end(lbox, ic);
 
    label = elm_label_add(lbox);
-   elm_object_text_set(label, path);
+   elm_object_text_set(label, status->unescaped);
    evas_object_show(label);
    elm_box_pack_end(lbox, label);
 
@@ -236,7 +208,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         evas_object_show(ic);
         elm_box_pack_end(rbox, ic);
 
-        if (staged)
+        if (status->staged)
           {
              ic = elm_icon_add(mbox);
              elm_icon_standard_set(ic, "dialog-information");
@@ -253,7 +225,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
              evas_object_show(ic);
              elm_box_pack_end(rbox, ic);
 
-             if (*code != EDI_SCM_STATUS_UNTRACKED)
+             if (status->change != EDI_SCM_STATUS_UNTRACKED)
                text = _("Unstaged changes");
              else
                text = _("Untracked changes");
@@ -273,6 +245,7 @@ static Eina_Bool
 _file_status_list_fill(Evas_Object *list)
 {
    Edi_Scm_Engine *e;
+   Eina_List *l;
    Edi_Scm_Status *status;
    Elm_Genlist_Item_Class *itc;
    Eina_Bool staged = EINA_FALSE;
@@ -280,14 +253,6 @@ _file_status_list_fill(Evas_Object *list)
    e = edi_scm_engine_get();
    if (!e)
      return EINA_FALSE;
-
-   if (_hash_statuses)
-     {
-        eina_hash_free_buckets(_hash_statuses);
-        eina_hash_free(_hash_statuses);
-     }
-
-   _hash_statuses = eina_hash_string_superfast_new(_list_status_free_cb);
 
    itc = elm_genlist_item_class_new();
    itc->item_style = "full";
@@ -298,18 +263,16 @@ _file_status_list_fill(Evas_Object *list)
 
    if (edi_scm_status_get())
      {
-        EINA_LIST_FREE(e->statuses, status)
+        EINA_LIST_FOREACH(e->statuses, l, status)
           {
              if (status->staged)
                {
                   staged = EINA_TRUE;
-                  _file_status_item_add(status->path, status->change);
-                  elm_genlist_item_append(list, itc, strdup(status->path), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+                  elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
                }
+             else
+              _file_status_free(status);
 
-             eina_stringshare_del(status->fullpath);
-             eina_stringshare_del(status->path);
-             free(status);
           }
      }
 
