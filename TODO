@@ -3,11 +3,11 @@ This project is in heavy development, we are currenty working towards the
 
 * Replace text (project-wide)
 * Code folding
-* Split pane view (split editor into multiple tabs and split tab to multiple panes)
+* Split pane view (split a tab to multiple views on a file)
 * Automatic code indenting / formatting
+* notepad, emacs and vim and editing modes (key bindings)
 * LLVM parsing
 * Integrated console
-* notepad, emacs and vim and editing modes (key bindings)
 * Cross reference for c, c++ and some scripting language
 * Support for EditorConfig - http://editorconfig.org/
 
