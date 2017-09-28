@@ -448,31 +448,68 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    elm_naviframe_item_title_enabled_set(item, EINA_TRUE, EINA_TRUE);
 }
 
+typedef struct _Edi_Welcome_Data {
+   Evas_Object *pb;
+   Evas_Object *button;
+   char *dir;
+   char *url;
+   int status;
+} Edi_Welcome_Data;
+
+static void
+_edi_welcome_clone_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Welcome_Data *wd = data;
+
+   elm_progressbar_pulse(wd->pb, EINA_FALSE);
+   elm_object_disabled_set(wd->button, EINA_FALSE);
+
+   if (wd->status)
+     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_TRUE);
+   else
+     _edi_welcome_project_open(wd->dir, EINA_FALSE);
+
+   free(wd->dir);
+   free(wd->url);
+
+   if (!wd->status)
+     free(wd);
+}
+
+static void
+_edi_welcome_clone_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Welcome_Data *wd = data;
+
+   wd->status = edi_scm_git_clone(wd->url, wd->dir);
+}
+
 static void
 _edi_welcome_project_clone_click_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *entry;
-   const char *url, *parent, *name, *dir;
-   int status;
+   const char *parent, *name;
+   Edi_Welcome_Data *wd = data;
 
    entry = elm_layout_content_get(_create_inputs[1], "elm.swallow.entry");
    parent = elm_object_text_get(entry);
    name = elm_object_text_get(_create_inputs[2]);
-   url = elm_object_text_get(_create_inputs[0]);
 
-   dir = edi_path_append(parent, name);
-   status = edi_scm_git_clone(url, dir);
-   if (status)
-     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_TRUE);
-   else
-     _edi_welcome_project_open(dir, EINA_FALSE);
+   wd->dir = edi_path_append(parent, name);
+   wd->url = strdup(elm_object_text_get(_create_inputs[0]));
+
+   elm_object_disabled_set(wd->button, EINA_TRUE);
+   elm_progressbar_pulse(wd->pb, EINA_TRUE);
+
+   ecore_thread_run(_edi_welcome_clone_thread_run_cb, _edi_welcome_clone_thread_end_cb, NULL, wd);
 }
 
 static void
 _edi_welcome_project_clone_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   Evas_Object *content, *button, *naviframe = data;
+   Evas_Object *content, *pb, *button, *naviframe = data;
    Elm_Object_Item *item;
+   Edi_Welcome_Data *wd;
    int row = 0;
 
    content = elm_table_add(naviframe);
@@ -484,13 +521,25 @@ _edi_welcome_project_clone_cb(void *data, Evas_Object *obj EINA_UNUSED, void *ev
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
    _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
 
+   pb = elm_progressbar_add(content);
+   evas_object_size_hint_align_set(pb, EVAS_HINT_FILL, 0.5);
+   evas_object_size_hint_weight_set(pb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_table_pack(content, pb, 0, row++, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH, 1);
+   elm_progressbar_pulse_set(pb, EINA_TRUE);
+   evas_object_show(pb);
+
    button = elm_button_add(content);
    elm_object_text_set(button, _("Checkout"));
    evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(button);
    elm_table_pack(content, button, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 2, row, 2, 1);
-   evas_object_smart_callback_add(button, "clicked", _edi_welcome_project_clone_click_cb, NULL);
+
+   wd = malloc(sizeof(Edi_Welcome_Data));
+   wd->button = button;
+   wd->pb = pb;
+
+   evas_object_smart_callback_add(button, "clicked", _edi_welcome_project_clone_click_cb, wd);
 
    item = elm_naviframe_item_push(naviframe, _("Checkout Existing Project"),
                                   NULL, NULL, content, NULL);
