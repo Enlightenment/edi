@@ -462,6 +462,7 @@ _edi_welcome_clone_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    Edi_Welcome_Data *wd = data;
 
    elm_progressbar_pulse(wd->pb, EINA_FALSE);
+   evas_object_hide(wd->pb);
    elm_object_disabled_set(wd->button, EINA_FALSE);
 
    if (wd->status)
@@ -500,6 +501,7 @@ _edi_welcome_project_clone_click_cb(void *data EINA_UNUSED, Evas_Object *obj EIN
 
    elm_object_disabled_set(wd->button, EINA_TRUE);
    elm_progressbar_pulse(wd->pb, EINA_TRUE);
+   evas_object_show(wd->pb);
 
    ecore_thread_run(_edi_welcome_clone_thread_run_cb, _edi_welcome_clone_thread_end_cb, NULL, wd);
 }
@@ -526,7 +528,6 @@ _edi_welcome_project_clone_cb(void *data, Evas_Object *obj EINA_UNUSED, void *ev
    evas_object_size_hint_weight_set(pb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    elm_table_pack(content, pb, 0, row++, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH, 1);
    elm_progressbar_pulse_set(pb, EINA_TRUE);
-   evas_object_show(pb);
 
    button = elm_button_add(content);
    elm_object_text_set(button, _("Checkout"));
