@@ -20,9 +20,10 @@ edi_file_path_hidden(const char *path)
 void
 edi_file_text_replace(const char *path, const char *search, const char *replace)
 {
-   char *map, *tempfilepath, *found;
+   char *map, *found;
    FILE *tempfile;
    Eina_File *f;
+   char tempfilepath[PATH_MAX];
    unsigned long long len, idx;
    unsigned int slen;
 
@@ -43,8 +44,7 @@ edi_file_text_replace(const char *path, const char *search, const char *replace)
         return;
      }
 
-   tempfilepath = malloc(strlen(path)) + 5;
-   sprintf(tempfilepath, "/tmp/%s.tmp", ecore_file_file_get(path));
+   snprintf(tempfilepath, sizeof(tempfilepath), "/tmp/%s.tmp", ecore_file_file_get(path));
 
    tempfile = fopen(tempfilepath, "wb");
    if (!tempfile) goto done;
