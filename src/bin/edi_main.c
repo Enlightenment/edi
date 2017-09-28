@@ -927,6 +927,13 @@ _edi_menu_find_project_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_find_replace_project_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                      void *event_info EINA_UNUSED)
+{
+   edi_mainview_project_replace_popup_show();
+}
+
+static void
 _edi_menu_findfile_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
@@ -1137,6 +1144,7 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "go-jump", _("Goto Line ..."), _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find", _("Find in project ..."), _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Replace in project ..."), _edi_menu_find_replace_project_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", _("New Window"), _edi_menu_view_open_window_cb, NULL);

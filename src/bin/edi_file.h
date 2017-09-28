@@ -32,6 +32,27 @@ extern "C" {
 Eina_Bool edi_file_path_hidden(const char *path);
 
 /**
+ * Replace all occurences of text within whole project.
+ *
+ * @param search The text to be replaced.
+ * @param replace The text that will replace.
+ *
+ * @ingroup Lookup
+ */
+void edi_file_text_replace_all(const char *search, const char *replace);
+
+/**
+ * Replace all occurences of text within given file.
+ *
+ * @param path The path of the file to replace all occurences of the text.
+ * @param search The text to be replaced.
+ * @param replace The text that will replace.
+ *
+ * @ingroup Lookup
+ */
+void edi_file_text_replace(const char *path, const char *search, const char *replace);
+
+/**
  * @}
  */
 

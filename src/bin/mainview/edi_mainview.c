@@ -14,7 +14,8 @@
 
 #include "editor/edi_editor.h"
 #include "edi_content_provider.h"
-#include "../edi_searchpanel.h"
+#include "edi_searchpanel.h"
+#include "edi_file.h"
 
 #include "edi_private.h"
 #include "edi_config.h"
@@ -466,6 +467,35 @@ edi_mainview_goto_popup_show()
 }
 
 static void
+_edi_mainview_popup_message_close_cb(void *data EINA_UNUSED,
+                     Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   Evas_Object *popup = data;
+
+   evas_object_del(popup);
+}
+
+static void
+_edi_mainview_popup_message_open(const char *message)
+{
+   Evas_Object *popup, *button;
+
+   popup = elm_popup_add(_main_win);
+   elm_object_part_text_set(popup, "title,text",
+                            message);
+
+   button = elm_button_add(popup);
+
+   elm_object_text_set(button, _("OK"));
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                  _edi_mainview_popup_message_close_cb, popup);
+
+   evas_object_show(popup);
+}
+
+static void
 _edi_mainview_project_search_popup_cancel_cb(void *data EINA_UNUSED,
                                    Evas_Object *obj EINA_UNUSED,
                                    void *event_info EINA_UNUSED)
@@ -482,7 +512,11 @@ _edi_mainview_project_search_cb(void *data,
    char *text;
 
    text_markup = elm_object_text_get((Evas_Object *) data);
-   if (!text_markup || !text_markup[0]) return;
+   if (!text_markup || !text_markup[0])
+     {
+        _edi_mainview_popup_message_open(_("Please enter a valid search term."));
+        return;
+     }
 
    text = elm_entry_markup_to_utf8(text_markup);
 
@@ -517,6 +551,7 @@ edi_mainview_project_search_popup_show(void)
                             _("Search for (whole project)"));
 
    box = elm_box_add(popup);
+   evas_object_show(box);
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
@@ -565,6 +600,127 @@ edi_mainview_project_search_popup_show(void)
    evas_object_show(popup);
    elm_object_focus_set(input, EINA_TRUE);
 }
+
+static void
+_edi_mainview_project_replace_cb(void *data,
+                             Evas_Object *obj,
+                             void *event_info EINA_UNUSED)
+{
+   const char *search_markup, *replace_markup;
+   char *search, *replace;
+
+   search_markup = elm_object_text_get(evas_object_data_get(obj, "search"));
+   if (!search_markup || !search_markup[0])
+     {
+        _edi_mainview_popup_message_open(_("Please enter a valid search string."));
+        return;
+     }
+
+   replace_markup = elm_object_text_get(data);
+   if (!replace_markup || !replace_markup[0])
+     {
+        _edi_mainview_popup_message_open(_("Please enter a valid replace string."));
+        return;
+     }
+
+   if (!strcmp(replace_markup, search_markup))
+     {
+        _edi_mainview_popup_message_open(_("Strings cannot match."));
+        return;
+     }
+
+   search = elm_entry_markup_to_utf8(search_markup);
+   replace = elm_entry_markup_to_utf8(replace_markup);
+
+   edi_file_text_replace_all(search, replace);
+
+   free(search);
+   free(replace);
+
+   evas_object_del(_edi_mainview_search_project_popup);
+}
+
+void
+edi_mainview_project_replace_popup_show(void)
+{
+   Evas_Object *popup, *table, *box, *label, *sep, *search, *replace, *button;
+
+   popup = elm_popup_add(_main_win);
+   _edi_mainview_search_project_popup = popup;
+   elm_object_part_text_set(popup, "title,text", _("Search &amp; Replace"));
+
+   box = elm_box_add(popup);
+   elm_object_content_set(popup, box);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+
+   label = elm_label_add(box);
+   elm_object_text_set(label, _("Replace all occurences of text within the whole project."));
+   evas_object_show(label);
+   elm_box_pack_end(box, label);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+
+   table = elm_table_add(box);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(table);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Search: "));
+   evas_object_show(label);
+   elm_table_pack(table, label, 0, 0, 1, 1);
+
+   search = elm_entry_add(table);
+   elm_entry_single_line_set(search, EINA_TRUE);
+   elm_entry_scrollable_set(search, EINA_TRUE);
+   evas_object_size_hint_weight_set(search, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(search, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(search);
+   elm_table_pack(table, search, 1, 0, 1, 1);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Replace: "));
+   evas_object_show(label);
+   elm_table_pack(table, label, 0, 1, 1, 1);
+
+   replace = elm_entry_add(table);
+   elm_entry_single_line_set(replace, EINA_TRUE);
+   elm_entry_scrollable_set(replace, EINA_TRUE);
+   evas_object_size_hint_weight_set(replace, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(replace, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(replace);
+   elm_table_pack(table, replace, 1, 1, 1, 1);
+
+   elm_box_pack_end(box, table);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, _("Cancel"));
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                  _edi_mainview_project_search_popup_cancel_cb, NULL);
+
+   button = elm_button_add(popup);
+   evas_object_data_set(button, "search", search);
+   elm_object_text_set(button, _("Replace"));
+   elm_object_part_content_set(popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked",
+                                  _edi_mainview_project_replace_cb, replace);
+
+   evas_object_show(popup);
+}
+
 void
 edi_mainview_panel_remove(Edi_Mainview_Panel *panel)
 {

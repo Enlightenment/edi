@@ -237,6 +237,14 @@ void edi_mainview_goto_popup_show();
  */
 void edi_mainview_project_search_popup_show();
 
+
+/**
+ * Present a popup to initiate a project-wide search and replace.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_project_replace_popup_show();
+
 /**
  * @}
  *
