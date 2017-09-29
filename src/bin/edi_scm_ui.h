@@ -23,9 +23,9 @@ extern "C" {
  */
 
 /**
- * Check the path is not hidden according to project rules.
+ * Create the commit dialog UI.
  * 
- * @param path The file path to check.
+ * @param parent Parent object to add the commit UI to.
  * @ingroup Lookup
  */
 void edi_scm_ui_add(Evas_Object *parent);
