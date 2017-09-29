@@ -25,7 +25,7 @@ _setup_win(void)
 
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
-   win = elm_win_util_standard_add(eina_strbuf_string_get(title), ELM_WIN_BASIC);
+   win = elm_win_util_standard_add(eina_strbuf_string_get(title), eina_strbuf_string_get(title));
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "edi");
    elm_win_icon_object_set(win, icon);
