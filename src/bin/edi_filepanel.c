@@ -301,8 +301,7 @@ _item_menu_open_panel_cb(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Path_Options *options;
    Edi_Dir_Data *sd = data;
 
-   if (edi_mainview_panel_count() == 1 &&
-      (edi_mainview_panel_item_count(edi_mainview_panel_by_index(0)) == 0))
+   if (edi_mainview_is_empty())
      panel = edi_mainview_panel_by_index(0);
    else
      panel = edi_mainview_panel_append();
