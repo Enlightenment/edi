@@ -753,7 +753,7 @@ _edi_scm_git_init()
 EAPI Edi_Scm_Engine *
 edi_scm_generic_init(void)
 {
-   if (ecore_file_exists(".git"))
+   if (!edi_exe_wait("git status"))
      return _edi_scm_git_init();
 
    return NULL;
