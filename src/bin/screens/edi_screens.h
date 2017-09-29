@@ -94,6 +94,16 @@ void edi_screens_message(Evas_Object *parent, const char *title, const char *mes
 void edi_screens_desktop_notify(const char *title, const char *message);
 
 /**
+ * SCM binary is not installed, show dialogue.
+ *
+ * @param parent The object into which the UI will load.
+ * @param binary The name of the missing binary.
+ *
+ * @ingroup Scm
+ */
+void edi_screens_scm_binary_missing(Evas_Object *parent, const char *binary);
+
+/**
  * @}
  */
 

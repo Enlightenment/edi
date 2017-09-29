@@ -1,7 +1,7 @@
 MAINTAINERCLEANFILES = Makefile.in
 AUTOMAKE_OPTIONS = subdir-objects
 
-bin_PROGRAMS = edi edi_build
+bin_PROGRAMS = edi edi_build edi_scm
 efl_cflags_safe = '@EFL_CFLAGS@'
 clang_include = '$(CLANG_INCLUDE)'
 
@@ -27,9 +27,9 @@ editor/edi_editor.h \
 edi_content_provider.h \
 screens/edi_screens.h \
 screens/edi_file_screens.h \
-screens/edi_scm_screens.h \
 edi_filepanel.h \
 edi_file.h \
+edi_scm_ui.h \
 edi_logpanel.h \
 edi_searchpanel.h \
 edi_consolepanel.h \
@@ -50,10 +50,10 @@ screens/edi_about.c \
 screens/edi_settings_font.c \
 screens/edi_settings.c \
 screens/edi_file_screens.c \
-screens/edi_scm_screens.c \
 screens/edi_screens.c \
 edi_filepanel.c \
 edi_file.c \
+edi_scm_ui.c \
 edi_logpanel.c \
 edi_searchpanel.c \
 edi_consolepanel.c \
@@ -73,6 +73,9 @@ edi_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la $(LTLIBINTL)
 
 edi_build_SOURCES = \
 edi_build_main.c
-
 edi_build_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la
 
+edi_scm_SOURCES = \
+edi_scm_ui.c \
+edi_scm_main.c
+edi_scm_LDADD = @EFL_LIBS@ $(top_builddir)/src/lib/libedi.la

@@ -22,7 +22,6 @@
 #include "mainview/edi_mainview.h"
 #include "screens/edi_screens.h"
 #include "screens/edi_file_screens.h"
-#include "screens/edi_scm_screens.h"
 #include "screens/edi_screens.h"
 
 #include "edi_private.h"
@@ -1017,7 +1016,7 @@ _edi_menu_scm_init_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 
    if (!ecore_file_app_installed("git"))
      {
-        edi_scm_screens_binary_missing(_edi_main_win, "git");
+        edi_screens_scm_binary_missing(_edi_main_win, "git");
         return;
      }
 
@@ -1031,9 +1030,17 @@ _edi_menu_scm_init_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_scm_program_exited_cb(int status EINA_UNUSED, void *data EINA_UNUSED)
+{
+   edi_filepanel_status_refresh();
+}
+
+static void
 _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                         void *event_info EINA_UNUSED)
 {
+   char *workdir = getcwd(NULL, PATH_MAX);
+
    if (!_edi_project_credentials_check())
      {
         _edi_project_credentials_missing();
@@ -1041,7 +1048,16 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
      }
 
    edi_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
-   edi_scm_screens_commit(_edi_main_win);
+
+   chdir(edi_project_get());
+
+   /* when program terminates update the filepanel */
+   if (edi_exe_notify_handle("edi_scm_status", _edi_scm_program_exited_cb, NULL))
+     edi_exe_notify("edi_scm_status", "edi_scm");
+
+   chdir(workdir);
+
+   free(workdir);
 }
 
 static void

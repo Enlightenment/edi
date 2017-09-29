@@ -140,3 +140,29 @@ void edi_screens_desktop_notify(const char *title, const char *message)
 
    eina_strbuf_free(command);
 }
+
+void
+edi_screens_scm_binary_missing(Evas_Object *parent, const char *binary)
+{
+   Evas_Object *popup, *label, *button;
+   Eina_Strbuf *text = eina_strbuf_new();
+
+   eina_strbuf_append_printf(text, _("No %s binary found, please install %s."), binary, binary);
+
+   popup = elm_popup_add(parent);
+   elm_object_part_text_set(popup, "title,text", _("Unable to launch SCM binary"));
+   label = elm_label_add(popup);
+   elm_object_text_set(label, eina_strbuf_string_get(text));
+   evas_object_show(label);
+   elm_object_content_set(popup, label);
+
+   eina_strbuf_free(text);
+
+   button = elm_button_add(popup);
+   elm_object_text_set(button, _("OK"));
+   elm_object_part_content_set(popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_screens_popup_cancel_cb, popup);
+
+   evas_object_show(popup);
+}
+

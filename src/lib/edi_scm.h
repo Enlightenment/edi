@@ -57,6 +57,7 @@ typedef struct _Edi_Scm_Engine
    const char     *name;
    const char     *directory;
    const char     *path;
+   char           *workdir;
    Eina_List      *statuses;
 
    scm_fn_add         *file_add;
@@ -96,6 +97,13 @@ typedef struct _Edi_Scm_Engine
  * @ingroup Scm
  */
 Edi_Scm_Engine *edi_scm_init();
+
+/**
+ * Init the SCM system.
+ *
+ * @ingroup Scm
+ */
+EAPI Edi_Scm_Engine *edi_scm_generic_init(void);
 
 /**
  * Shutdown and free memory in use by SCM system.

@@ -217,7 +217,7 @@ _parse_line(char *line)
 
    esc_path = ecore_file_escape_name(path);
    status->path = eina_stringshare_add(esc_path);
-   fullpath = edi_path_append(edi_project_get(), esc_path);
+   fullpath = edi_path_append(edi_scm_engine_get()->workdir, esc_path);
    status->fullpath = eina_stringshare_add(fullpath);
    status->unescaped = eina_stringshare_add(path);
 
@@ -740,9 +740,23 @@ _edi_scm_git_init()
    engine->credentials_set = _edi_scm_git_credentials_set;
    engine->status_get = _edi_scm_git_status_get;
 
+   if (edi_project_get())
+     engine->workdir = (char *) edi_project_get();
+   else
+     engine->workdir = getcwd(NULL, PATH_MAX);
+
    engine->initialized = EINA_TRUE;
 
    return engine;
+}
+
+EAPI Edi_Scm_Engine *
+edi_scm_generic_init(void)
+{
+   if (ecore_file_exists(".git"))
+     return _edi_scm_git_init();
+
+   return NULL;
 }
 
 EAPI Edi_Scm_Engine *
