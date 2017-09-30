@@ -150,6 +150,12 @@ _edi_scm_ui_screens_commit_cb(void *data,
 
    free(message);
 
+   if (edi_scm->thread) ecore_thread_cancel(edi_scm->thread);
+
+   while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
+
+   evas_object_del(edi_scm->parent);
+
    if (edi_scm->monitor)
      eio_monitor_del(edi_scm->monitor);
 
@@ -430,7 +436,10 @@ _edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
    edi_scm->results_max = elm_check_state_get(edi_scm->check);
 
    elm_genlist_clear(edi_scm->list);
+
    elm_code_file_clear(edi_scm->code->file);
+   /* FIXME: Clears but does not render until it *has* to. */
+   elm_code_file_line_append(edi_scm->code->file, "\n", 1, NULL);
 
    staged = _edi_scm_ui_status_list_fill(edi_scm);
 
@@ -536,7 +545,7 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(logo);
    elm_box_pack_end(hbox, logo);
 
-   /* General information*/
+   /* General information */
 
    label = elm_label_add(hbox);
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 1.0);
