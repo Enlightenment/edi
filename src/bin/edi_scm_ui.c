@@ -393,7 +393,7 @@ void
 edi_scm_ui_add(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
-   Evas_Object *table, *rect, *list, *pbox, *check;
+   Evas_Object *table, *rect, *list, *pbox, *check, *sep;
    Elm_Code_Widget *entry;
    Elm_Code *code;
    Eina_Strbuf *string;
@@ -405,19 +405,11 @@ edi_scm_ui_add(Evas_Object *parent)
    _parent_obj = parent;
 
    if (!edi_scm_generic_init())
-     {
-       exit(1 << 2); 
-//       _edi_scm_ui_screens_message_open(_("SCM is not available at this location."));
-       return;
-     }
+     exit(1 << 2);
 
    engine = edi_scm_engine_get();
    if (!engine)
-     {
-        exit(1 << 3);
- //       _edi_scm_ui_screens_message_open(_("SCM engine is not available."));
-        return;
-     }
+     exit(1 << 3);
 
    box = elm_box_add(parent);
    elm_box_horizontal_set(box, EINA_FALSE);
@@ -433,13 +425,6 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(hbox);
 
    /* General information*/
-   frame = elm_frame_add(hbox);
-   elm_object_text_set(frame, _("Summary"));
-   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_content_set(frame, hbox);
-   evas_object_show(frame);
-   elm_box_pack_end(box, frame);
 
    label = elm_label_add(hbox);
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
@@ -473,6 +458,7 @@ edi_scm_ui_add(Evas_Object *parent)
 
    elm_object_text_set(label, eina_strbuf_string_get(string));
    eina_strbuf_free(string);
+   elm_box_pack_end(box, hbox);
 
    /* Options */
    hbox = elm_box_add(parent);
@@ -492,15 +478,17 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(hbox);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_scm_ui_refresh_cb, NULL);
+   elm_box_pack_end(box, hbox);
+   sep = elm_separator_add(parent);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
-   frame = elm_frame_add(parent);
-   elm_object_text_set(frame, _("Options"));
-   elm_object_content_set(frame, hbox);
-   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(frame);
-   elm_box_pack_end(box, frame);
-
+   hbox = elm_box_add(parent);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(hbox);
    /* File listting */
    _list = list = elm_genlist_add(box);
    elm_genlist_mode_set(list, ELM_LIST_SCROLL);
@@ -529,7 +517,8 @@ edi_scm_ui_add(Evas_Object *parent)
    elm_object_content_set(frame, table);
    elm_table_pack(table, list, 0, 0, 1, 1);
    elm_object_content_set(frame, table);
-   elm_box_pack_end(box, frame);
+   elm_box_pack_end(hbox, frame);
+   elm_box_pack_end(box, hbox);
 
    staged_changes = _edi_scm_ui_status_list_fill(list);
 
@@ -564,7 +553,8 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(input);
 
    elm_object_content_set(frame, table);
-   elm_box_pack_end(box, frame);
+   elm_box_pack_end(hbox, frame);
+   elm_box_pack_end(box, hbox);
 
    /* Start of elm_code diff widget */
    frame = elm_frame_add(parent);
@@ -576,7 +566,7 @@ edi_scm_ui_add(Evas_Object *parent)
    cbox = elm_box_add(parent);
    evas_object_size_hint_weight_set(cbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(cbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 250 * elm_config_scale_get());
+   evas_object_size_hint_min_set(cbox, 350 * elm_config_scale_get(), 150 * elm_config_scale_get());
    evas_object_show(cbox);
    elm_object_content_set(frame, cbox);
    elm_box_pack_end(box, frame);
@@ -595,6 +585,11 @@ edi_scm_ui_add(Evas_Object *parent)
    text = edi_scm_diff(EINA_TRUE);
    _entry_lines_append(code, text);
    free(text);
+
+   sep = elm_separator_add(parent);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
 
    /* Start of confirm and cancel buttons */
    hbox = elm_box_add(parent);
