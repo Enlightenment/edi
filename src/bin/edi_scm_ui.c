@@ -12,6 +12,7 @@ typedef struct _Edi_Scm_Ui {
    Eio_Monitor  *monitor;
    Elm_Code     *code;
    const char   *workdir;
+   void         *data;
 
    Eina_Bool results_max;
    Eina_Bool is_configured;
@@ -83,8 +84,6 @@ _edi_scm_ui_screens_message_close_cb(void *data EINA_UNUSED,
    Evas_Object *popup = data;
 
    evas_object_del(popup);
-
-   elm_exit();
 }
 
 static void
@@ -404,6 +403,12 @@ _edi_scm_diff_thread_cancel_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 
    edi_scm->in_progress = EINA_FALSE;
    edi_scm->thread = NULL;
+
+   if (edi_scm->data)
+     {
+        free(edi_scm->data);
+        edi_scm->data = NULL;
+     }
 }
 
 static void
@@ -418,19 +423,19 @@ _edi_scm_diff_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 static void
 _edi_scm_diff_thread_cb(void *data, Ecore_Thread *thread)
 {
-   char *text;
    Edi_Scm_Ui *edi_scm = data;
 
    if (edi_scm->in_progress) return;
 
-   text = edi_scm_diff(!edi_scm->results_max);
+   edi_scm->data = edi_scm_diff(!edi_scm->results_max);
 
    edi_scm->in_progress = EINA_TRUE;
    edi_scm->thread = thread;
 
-   _entry_lines_append(thread, edi_scm->code, text);
+   _entry_lines_append(thread, edi_scm->code, edi_scm->data);
 
-   free(text);
+   free(edi_scm->data);
+   edi_scm->data = NULL;
 }
 
 static void
@@ -455,8 +460,8 @@ _edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
      }
    else
      {
-       elm_object_disabled_set(edi_scm->commit_button, !staged);
-       elm_entry_editable_set(edi_scm->commit_entry, staged);
+        elm_object_disabled_set(edi_scm->commit_button, !staged);
+        elm_entry_editable_set(edi_scm->commit_entry, staged);
      }
 
    elm_genlist_realized_items_update(edi_scm->list);
@@ -473,6 +478,12 @@ _edi_scm_ui_refresh_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, voi
      ecore_thread_cancel(edi_scm->thread);
 
    while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
+
+   if (edi_scm->data)
+     {
+        free(edi_scm->data);
+        edi_scm->data = NULL;
+     }
 
    _edi_scm_ui_refresh(edi_scm);
 }
