@@ -7,17 +7,17 @@
 #include "edi_scm_ui.h"
 #include "edi_private.h"
 
-static Evas_Object *_parent_obj, *_popup, *_edi_scm_ui_screens_message_popup;
-
 typedef struct _Edi_Scm_Ui {
-   Eio_Monitor *monitor;
-   Elm_Code *code;
+   Evas_Object *parent;
    Evas_Object *list;
    Evas_Object *check;
    Evas_Object *commit_button;
    Evas_Object *commit_entry;
 
+   Eio_Monitor *monitor;
+   Elm_Code *code;
    const char *workdir;
+
    Eina_Bool results_max;
    Eina_Bool is_configured;
 
@@ -87,11 +87,11 @@ _edi_scm_ui_screens_message_close_cb(void *data EINA_UNUSED,
 }
 
 static void
-_edi_scm_ui_screens_message_open(const char *message)
+_edi_scm_ui_screens_message_open(Evas_Object *parent, const char *message)
 {
    Evas_Object *popup, *button;
 
-   _edi_scm_ui_screens_message_popup = popup = elm_popup_add(_parent_obj);
+   popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text",
                             message);
 
@@ -105,10 +105,19 @@ _edi_scm_ui_screens_message_open(const char *message)
 }
 
 static void
-_edi_scm_ui_screens_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
+_edi_scm_ui_screens_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
-   evas_object_del((Evas_Object *) data);
+   Edi_Scm_Ui *edi_scm = data;
+
+   evas_object_del(edi_scm->parent);
+
+   if (edi_scm->monitor)
+     eio_monitor_del(edi_scm->monitor);
+
+   free(edi_scm);
+
+   elm_exit();
 }
 
 static void
@@ -130,14 +139,13 @@ _edi_scm_ui_screens_commit_cb(void *data,
    text = elm_object_text_get((Evas_Object *) edi_scm->commit_entry);
    if (!text || !text[0])
      {
-        _edi_scm_ui_screens_message_open(_("Please enter a valid commit message."));
+        _edi_scm_ui_screens_message_open(edi_scm->parent, _("Please enter a valid commit message."));
         return;
      }
 
    message = elm_entry_markup_to_utf8(text);
    edi_scm_commit(message);
 
-   evas_object_del(_popup);
    free(message);
 
    if (edi_scm->monitor)
@@ -432,8 +440,6 @@ edi_scm_ui_add(Evas_Object *parent)
    char *text;
    Eina_Bool staged_changes;
 
-   _parent_obj = parent;
-
    if (!edi_scm_generic_init())
      exit(1 << 2);
 
@@ -444,6 +450,7 @@ edi_scm_ui_add(Evas_Object *parent)
    edi_scm = calloc(1, sizeof(Edi_Scm_Ui));
    edi_scm->workdir = engine->workdir;
    edi_scm->monitor = eio_monitor_add(edi_scm->workdir);
+   edi_scm->parent = parent;
 
    ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, _edi_scm_ui_file_changes_cb, edi_scm);
    ecore_event_handler_add(EIO_MONITOR_FILE_MODIFIED, _edi_scm_ui_file_changes_cb, edi_scm);
@@ -523,7 +530,7 @@ edi_scm_ui_add(Evas_Object *parent)
    elm_object_content_set(frame, hbox);
    elm_box_pack_end(box, frame);
 
-   /* File listting */
+   /* File listing */
    hbox = elm_box_add(parent);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -644,7 +651,7 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(button);
    elm_object_text_set(button, _("Cancel"));
    evas_object_smart_callback_add(button, "clicked",
-                                  _edi_scm_ui_screens_popup_cancel_cb, parent);
+                                  _edi_scm_ui_screens_cancel_cb, edi_scm);
    elm_box_pack_end(hbox, button);
 
    edi_scm->commit_button = button = elm_button_add(parent);
@@ -659,11 +666,5 @@ edi_scm_ui_add(Evas_Object *parent)
 
    elm_box_pack_end(hbox, button);
    elm_box_pack_end(box, hbox);
- 
-   if (staged_changes && edi_scm->is_configured)
-     {
-        elm_entry_select_all(input);
-        elm_object_focus_set(input, EINA_TRUE);
-     }
 }
 

@@ -26,7 +26,7 @@ extern "C" {
  * Create the commit dialog UI.
  * 
  * @param parent Parent object to add the commit UI to.
- * @ingroup Lookup
+ * @ingroup SCM
  */
 void edi_scm_ui_add(Evas_Object *parent);
 
