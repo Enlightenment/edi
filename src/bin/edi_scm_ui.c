@@ -15,15 +15,14 @@ typedef struct _Edi_Scm_Ui {
    Evas_Object *commit_entry;
 
    Eio_Monitor *monitor;
-   Elm_Code *code;
-   const char *workdir;
+   Elm_Code    *code;
+   const char  *workdir;
 
    Eina_Bool results_max;
    Eina_Bool is_configured;
+   Eina_Bool in_progress;
 
 } Edi_Scm_Ui;
-
-static void _edi_scm_ui_refresh(Edi_Scm_Ui *);
 
 const char *
 _edi_scm_ui_avatar_cache_path_get(const char *email)
@@ -156,32 +155,6 @@ _edi_scm_ui_screens_commit_cb(void *data,
    elm_exit();
 }
 
-static void
-_entry_lines_append(Elm_Code *code, char *text)
-{
-   char *pos = text;
-   char *start, *end = NULL;
-
-   if (!*pos) return;
-
-   start = pos;
-   while (*pos++ != '\0')
-    {
-       if (*pos == '\n')
-         end = pos;
-
-       if (start && end)
-         {
-            elm_code_file_line_append(code->file, start, end - start, NULL);
-            start = end + 1;
-            end = NULL;
-         }
-    }
-    end = pos;
-    if (end > start)
-      elm_code_file_line_append(code->file, start, end - start, NULL);
-}
-
 static const char *
 _icon_status(Edi_Scm_Status_Code code)
 {
@@ -235,7 +208,7 @@ static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
    Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
-   const char *text, *icon_name, *icon_status, *mime;
+   const char *text, *icon_file, *icon_status, *mime;
    Edi_Scm_Status *status;
 
    if (strcmp(source, "elm.swallow.content"))
@@ -243,14 +216,12 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    status = (Edi_Scm_Status *) data;
 
-   icon_status = _icon_status(status->change);
-
    mime = efreet_mime_type_get(status->fullpath);
    if (mime)
-     icon_name = efreet_mime_type_icon_get(mime, elm_config_icon_theme_get(), 32);
+     icon_file = efreet_mime_type_icon_get(mime, elm_config_icon_theme_get(), 32);
  
-   if (!icon_name)
-     icon_name = "dialog-information";
+   if (!icon_file)
+     icon_file = "dialog-information";
 
    box = elm_box_add(obj);
    elm_box_horizontal_set(box, EINA_TRUE);
@@ -262,7 +233,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_show(lbox);
 
    ic = elm_icon_add(lbox);
-   elm_icon_standard_set(ic, icon_name);
+   elm_icon_standard_set(ic, icon_file);
    evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
    evas_object_show(ic);
    elm_box_pack_end(lbox, ic);
@@ -282,6 +253,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_box_padding_set(rbox, 5, 0);
    evas_object_show(rbox);
 
+   icon_status = _icon_status(status->change);
    if (icon_status)
      {
         ic = elm_icon_add(rbox);
@@ -377,9 +349,78 @@ _edi_scm_ui_status_list_fill(Edi_Scm_Ui *edi_scm)
 }
 
 static void
-_edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
+_entry_lines_append(Ecore_Thread *thread, Elm_Code *code, char *text)
+{
+   char *pos = text;
+   char *start, *end = NULL;
+
+   if (!*pos) return;
+
+   start = pos;
+   while (*pos++ != '\0')
+    {
+       if (*pos == '\n')
+         end = pos;
+
+       if (start && end)
+         {
+            ecore_thread_main_loop_begin();
+            elm_code_file_line_append(code->file, start, end - start, NULL);
+            ecore_thread_main_loop_end();
+            start = end + 1;
+            end = NULL;
+            if (ecore_thread_check(thread))
+              return;
+         }
+    }
+
+    end = pos;
+
+    if (end > start)
+      {
+         ecore_thread_main_loop_begin();
+         elm_code_file_line_append(code->file, start, end - start, NULL);
+         ecore_thread_main_loop_end();
+      }
+}
+
+static void
+_edi_scm_diff_thread_cancel_cb(void *data, Ecore_Thread *thread)
+{
+   Edi_Scm_Ui *edi_scm = data;
+   while ((ecore_thread_wait(thread, 0.1)) != EINA_TRUE);
+   edi_scm->in_progress = EINA_FALSE;
+   elm_exit();
+}
+
+static void
+_edi_scm_diff_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Scm_Ui *edi_scm = data;
+
+   edi_scm->in_progress = EINA_FALSE;
+}
+
+static void
+_edi_scm_diff_thread_cb(void *data, Ecore_Thread *thread)
 {
    char *text;
+   Edi_Scm_Ui *edi_scm = data;
+
+   if (edi_scm->in_progress) return;
+
+   text = edi_scm_diff(!edi_scm->results_max);
+
+   edi_scm->in_progress = EINA_TRUE;
+
+   _entry_lines_append(thread, edi_scm->code, text);
+
+   free(text);
+}
+
+static void
+_edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
+{
    Eina_Bool staged;
 
    edi_scm->results_max = elm_check_state_get(edi_scm->check);
@@ -402,9 +443,7 @@ _edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
 
    elm_genlist_realized_items_update(edi_scm->list);
 
-   text = edi_scm_diff(!edi_scm->results_max);
-   _entry_lines_append(edi_scm->code, text);
-   free(text); 
+   ecore_thread_run(_edi_scm_diff_thread_cb, _edi_scm_diff_thread_end_cb, _edi_scm_diff_thread_cancel_cb, edi_scm);
 }
 
 static void
@@ -431,21 +470,21 @@ edi_scm_ui_add(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
    Evas_Object *table, *rect, *list, *pbox, *check, *sep;
+   Evas_Object *logo;
    Elm_Code_Widget *entry;
    Elm_Code *code;
    Eina_Strbuf *string;
    Edi_Scm_Engine *engine;
    Edi_Scm_Ui *edi_scm;
    const char *remote_name, *remote_email;
-   char *text;
    Eina_Bool staged_changes;
 
    if (!edi_scm_generic_init())
-     exit(1 << 2);
+     exit(1 << 0);
 
    engine = edi_scm_engine_get();
    if (!engine)
-     exit(1 << 3);
+     exit(1 << 1);
 
    edi_scm = calloc(1, sizeof(Edi_Scm_Ui));
    edi_scm->workdir = engine->workdir;
@@ -478,10 +517,20 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(hbox);
 
+   logo = elm_image_add(parent);
+   string = eina_strbuf_new();
+   eina_strbuf_append_printf(string, "%s/images/welcome.png", PACKAGE_DATA_DIR);
+   elm_image_file_set(logo, eina_strbuf_string_get(string), NULL);
+   evas_object_size_hint_min_set(logo, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(logo, 0.1, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(logo, 1.0, EVAS_HINT_FILL);
+   evas_object_show(logo);
+   elm_box_pack_end(hbox, logo);
+
    /* General information*/
 
    label = elm_label_add(hbox);
-   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 1.0);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(label);
    elm_box_pack_end(hbox, label);
@@ -496,11 +545,11 @@ edi_scm_ui_add(Evas_Object *parent)
    remote_name = engine->remote_name_get();
    remote_email = engine->remote_email_get();
 
-   string = eina_strbuf_new();
+   eina_strbuf_reset(string);
 
    if (!remote_name[0] && !remote_email[0])
      {
-        eina_strbuf_append(string, _("<hilight>Unable to obtain user information.</hilight>"));
+        eina_strbuf_append(string, _("Unable to obtain user information."));
      }
    else
      {
@@ -629,9 +678,7 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_show(entry);
    elm_box_pack_end(cbox, entry);
 
-   text = edi_scm_diff(EINA_TRUE);
-   _entry_lines_append(code, text);
-   free(text);
+   ecore_thread_run(_edi_scm_diff_thread_cb, _edi_scm_diff_thread_end_cb, _edi_scm_diff_thread_cancel_cb, edi_scm);
 
    sep = elm_separator_add(parent);
    elm_separator_horizontal_set(sep, EINA_TRUE);
