@@ -32,7 +32,6 @@ _setup_win(void)
 
    evas_object_resize(win, DEFAULT_WIDTH * elm_config_scale_get(), DEFAULT_HEIGHT * elm_config_scale_get());
    evas_object_smart_callback_add(win, "delete,request", _win_del_cb, NULL);
-   evas_object_show(win);
 
    eina_strbuf_free(title);
    free(cwd);
@@ -50,6 +49,7 @@ int main(int argc, char **argv)
    win = _setup_win();
    edi_scm_ui_add(win);
    elm_win_center(win, EINA_TRUE, EINA_TRUE);
+   evas_object_show(win);
 
    ecore_main_loop_begin();
 
