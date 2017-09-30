@@ -83,6 +83,7 @@ _edi_scm_ui_screens_message_close_cb(void *data EINA_UNUSED,
    Evas_Object *popup = data;
 
    evas_object_del(popup);
+
    elm_exit();
 }
 
@@ -110,9 +111,11 @@ _edi_scm_ui_screens_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
 {
    Edi_Scm_Ui *edi_scm = data;
 
-   if (edi_scm->thread) ecore_thread_cancel(edi_scm->thread);
+   if (edi_scm->thread)
+     ecore_thread_cancel(edi_scm->thread);
 
    while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
+
    evas_object_del(edi_scm->parent);
 
    if (edi_scm->monitor)
@@ -150,7 +153,8 @@ _edi_scm_ui_screens_commit_cb(void *data,
 
    free(message);
 
-   if (edi_scm->thread) ecore_thread_cancel(edi_scm->thread);
+   if (edi_scm->thread)
+     ecore_thread_cancel(edi_scm->thread);
 
    while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
 
@@ -325,25 +329,25 @@ _edi_scm_ui_status_list_fill(Edi_Scm_Ui *edi_scm)
    itc->func.state_get = NULL;
    itc->func.del = _content_del;
 
-   if (edi_scm_status_get())
+   if (!edi_scm_status_get())
+     goto done;
+
+   EINA_LIST_FOREACH(e->statuses, l, status)
      {
-        EINA_LIST_FOREACH(e->statuses, l, status)
+        if (edi_scm->results_max)
           {
-             if (edi_scm->results_max)
-               {
-                  elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-               }
-             else
-               {
-                  if (status->staged)
-                    elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-                  else
-                    _edi_scm_ui_status_free(status);
-               }
-          
-             if (status->staged)
-               staged = EINA_TRUE;
+             elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
           }
+        else
+          {
+             if (status->staged)
+               elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+             else
+               _edi_scm_ui_status_free(status);
+          }
+
+        if (status->staged)
+          staged = EINA_TRUE;
      }
 
    if (e->statuses)
@@ -351,7 +355,7 @@ _edi_scm_ui_status_list_fill(Edi_Scm_Ui *edi_scm)
         eina_list_free(e->statuses);
         e->statuses = NULL;
      }
-
+done:
    elm_genlist_item_class_free(itc);
 
    return staged;
@@ -397,6 +401,7 @@ static void
 _edi_scm_diff_thread_cancel_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    Edi_Scm_Ui *edi_scm = data;
+
    edi_scm->in_progress = EINA_FALSE;
    edi_scm->thread = NULL;
 }
