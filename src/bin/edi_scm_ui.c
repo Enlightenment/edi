@@ -8,19 +8,20 @@
 #include "edi_private.h"
 
 typedef struct _Edi_Scm_Ui {
+   Ecore_Thread *thread;
+   Eio_Monitor  *monitor;
+   Elm_Code     *code;
+   const char   *workdir;
+
+   Eina_Bool results_max;
+   Eina_Bool is_configured;
+   Eina_Bool in_progress;
+
    Evas_Object *parent;
    Evas_Object *list;
    Evas_Object *check;
    Evas_Object *commit_button;
    Evas_Object *commit_entry;
-
-   Eio_Monitor *monitor;
-   Elm_Code    *code;
-   const char  *workdir;
-
-   Eina_Bool results_max;
-   Eina_Bool is_configured;
-   Eina_Bool in_progress;
 
 } Edi_Scm_Ui;
 
@@ -109,6 +110,9 @@ _edi_scm_ui_screens_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
 {
    Edi_Scm_Ui *edi_scm = data;
 
+   if (edi_scm->thread) ecore_thread_cancel(edi_scm->thread);
+
+   while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
    evas_object_del(edi_scm->parent);
 
    if (edi_scm->monitor)
@@ -130,7 +134,6 @@ _edi_scm_ui_screens_commit_cb(void *data,
    char *message;
 
    engine = edi_scm_engine_get();
-   // engine has been checked before now
    if (!engine)
      return;
 
@@ -385,12 +388,11 @@ _entry_lines_append(Ecore_Thread *thread, Elm_Code *code, char *text)
 }
 
 static void
-_edi_scm_diff_thread_cancel_cb(void *data, Ecore_Thread *thread)
+_edi_scm_diff_thread_cancel_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    Edi_Scm_Ui *edi_scm = data;
-   while ((ecore_thread_wait(thread, 0.1)) != EINA_TRUE);
    edi_scm->in_progress = EINA_FALSE;
-   elm_exit();
+   edi_scm->thread = NULL;
 }
 
 static void
@@ -399,6 +401,7 @@ _edi_scm_diff_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    Edi_Scm_Ui *edi_scm = data;
 
    edi_scm->in_progress = EINA_FALSE;
+   edi_scm->thread = NULL;
 }
 
 static void
@@ -412,6 +415,7 @@ _edi_scm_diff_thread_cb(void *data, Ecore_Thread *thread)
    text = edi_scm_diff(!edi_scm->results_max);
 
    edi_scm->in_progress = EINA_TRUE;
+   edi_scm->thread = thread;
 
    _entry_lines_append(thread, edi_scm->code, text);
 
@@ -450,6 +454,11 @@ static void
 _edi_scm_ui_refresh_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Scm_Ui *edi_scm = data;
+
+   if (edi_scm->thread)
+     ecore_thread_cancel(edi_scm->thread);
+
+   while ((ecore_thread_wait(edi_scm->thread, 0.1)) != EINA_TRUE);
 
    _edi_scm_ui_refresh(edi_scm);
 }
