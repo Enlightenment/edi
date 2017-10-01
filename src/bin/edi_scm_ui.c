@@ -223,6 +223,8 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    const char *text, *icon_file, *icon_status, *mime;
    Edi_Scm_Status *status;
 
+   icon_file = NULL;
+
    if (strcmp(source, "elm.swallow.content"))
      return NULL;
 
