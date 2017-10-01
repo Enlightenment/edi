@@ -24,7 +24,6 @@ edi_about_show(Evas_Object *mainwin)
 {
    Evas_Object *win, *vbox, *box, *table, *bg;
    Evas_Object *text, *title, *authors, *buttonbox, *button, *space;
-   int alpha, r, g, b;
    char buf[PATH_MAX];
 
    win = elm_win_add(mainwin, "about", ELM_WIN_BASIC);
@@ -45,17 +44,11 @@ edi_about_show(Evas_Object *mainwin)
    elm_bg_option_set(bg, ELM_BG_OPTION_CENTER);
    elm_bg_file_set(bg, buf, NULL);
    elm_bg_option_set(bg, ELM_BG_OPTION_SCALE);
+   evas_object_color_set(bg, 26, 26, 26, 255);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, bg, 0, 0, 1, 1);
    evas_object_show(bg);
-
-   evas_object_color_get(bg, &r, &g, &b, &alpha);
-   evas_color_argb_unpremul(alpha, &r, &g, &b);
-   alpha = 64;
-
-   evas_color_argb_premul(alpha, &r, &g, &b);
-   evas_object_color_set(bg, r, g, b, alpha);
 
    vbox = elm_box_add(win);
    elm_box_padding_set(vbox, 25, 0);
