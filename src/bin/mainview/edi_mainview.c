@@ -543,7 +543,7 @@ _edi_mainview_project_search_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EIN
 void
 edi_mainview_project_search_popup_show(void)
 {
-  Evas_Object *popup, *box, *input, *button, *sep, *label;
+   Evas_Object *popup, *frame, *box, *input, *button, *label;
 
    popup = elm_popup_add(_main_win);
    _edi_mainview_search_project_popup = popup;
@@ -552,20 +552,11 @@ edi_mainview_project_search_popup_show(void)
 
    box = elm_box_add(popup);
    evas_object_show(box);
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
 
    label = elm_label_add(popup);
-   elm_object_text_set(label, _("Please enter a term to search for within<br> the whole project."));
+   elm_object_text_set(label, _("Please enter a term to search for within<br> the whole project.<br>"));
    evas_object_show(label);
    elm_box_pack_end(box, label);
-
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
 
    input = elm_entry_add(box);
    elm_entry_single_line_set(input, EINA_TRUE);
@@ -578,12 +569,11 @@ edi_mainview_project_search_popup_show(void)
    elm_box_pack_end(box, input);
    evas_object_show(box);
 
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
+   frame = elm_frame_add(box);
+   evas_object_show(frame);
+   elm_object_content_set(frame, box);
+   elm_object_content_set(popup, frame);
 
-   elm_object_content_set(popup, box);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));
@@ -643,33 +633,23 @@ _edi_mainview_project_replace_cb(void *data,
 void
 edi_mainview_project_replace_popup_show(void)
 {
-   Evas_Object *popup, *table, *box, *label, *sep, *search, *replace, *button;
-
+   Evas_Object *popup, *table, *box, *label, *search, *replace, *button;
+   Evas_Object *frame;
    popup = elm_popup_add(_main_win);
    _edi_mainview_search_project_popup = popup;
-   elm_object_part_text_set(popup, "title,text", _("Search &amp; Replace"));
+   elm_object_part_text_set(popup, "title,text", _("Search & Replace"));
 
    box = elm_box_add(popup);
-   elm_object_content_set(popup, box);
-
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
 
    label = elm_label_add(box);
-   elm_object_text_set(label, _("Replace all occurences of text within the whole project."));
+   elm_object_text_set(label, _("Replace all occurences of text within <br>the whole project.<br>"));
    evas_object_show(label);
    elm_box_pack_end(box, label);
-
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
 
    table = elm_table_add(box);
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_padding_set(table, 5, 5);
    evas_object_show(table);
 
    label = elm_label_add(table);
@@ -699,11 +679,10 @@ edi_mainview_project_replace_popup_show(void)
    elm_table_pack(table, replace, 1, 1, 1, 1);
 
    elm_box_pack_end(box, table);
-
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
+   frame = elm_frame_add(table);
+   evas_object_show(frame);
+   elm_object_content_set(popup, frame);
+   elm_object_content_set(frame, box);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));
