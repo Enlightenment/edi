@@ -52,6 +52,10 @@ subdir('src')
 subdir('doc')
 subdir('data')
 
+install_data(['AUTHORS'],
+  install_dir :  join_paths(get_option('prefix'), get_option('infodir'), 'edi')
+)
+
 configure_file(
   output : 'config.h',
   install : false,
