@@ -7,6 +7,8 @@
 #include "edi_scm_ui.h"
 #include "edi_private.h"
 
+#define DEFAULT_USER_ICON "applications-development"
+
 typedef struct _Edi_Scm_Ui {
    Ecore_Thread *thread;
    Eio_Monitor  *monitor;
@@ -64,17 +66,18 @@ _edi_scm_ui_screens_avatar_load(Evas_Object *image, const char *email)
    cachedir = dirname(tmp);
    tmp2 = strdup(tmp);
    cacheparentdir = dirname(tmp2);
-   if (!ecore_file_exists(cacheparentdir) && !ecore_file_mkdir(cacheparentdir))
-     goto clear;
+   if ((ecore_file_exists(cacheparentdir) || ecore_file_mkdir(cacheparentdir))
+       && (ecore_file_exists(cachedir) || ecore_file_mkdir(cachedir)))
+     {
+        ecore_file_download(edi_scm_avatar_url_get(email), cache,
+                            _edi_scm_ui_screens_avatar_download_complete, NULL,
+                            image, NULL);
+     }
+   else
+     {
+        elm_icon_standard_set(image, DEFAULT_USER_ICON);
+     }
 
-   if (!ecore_file_exists(cachedir) && !ecore_file_mkdir(cachedir))
-     goto clear;
-
-   ecore_file_download(edi_scm_avatar_url_get(email), cache,
-                       _edi_scm_ui_screens_avatar_download_complete, NULL,
-                       image, NULL);
-
-clear:
    free(tmp2);
    free(tmp);
 }
@@ -509,7 +512,6 @@ edi_scm_ui_add(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
    Evas_Object *table, *rect, *list, *pbox, *check, *sep;
-   Evas_Object *logo;
    Elm_Code_Widget *entry;
    Elm_Code *code;
    Eina_Strbuf *string;
@@ -556,15 +558,12 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(hbox);
 
-   logo = elm_image_add(parent);
-   string = eina_strbuf_new();
-   eina_strbuf_append_printf(string, "%s/images/welcome.png", PACKAGE_DATA_DIR);
-   elm_image_file_set(logo, eina_strbuf_string_get(string), NULL);
-   evas_object_size_hint_min_set(logo, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
-   evas_object_size_hint_weight_set(logo, 0.1, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(logo, 1.0, EVAS_HINT_FILL);
-   evas_object_show(logo);
-   elm_box_pack_end(hbox, logo);
+   avatar = elm_icon_add(parent);
+   evas_object_size_hint_min_set(avatar, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(avatar, 0.1, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(avatar, 1.0, EVAS_HINT_FILL);
+   evas_object_show(avatar);
+   elm_box_pack_end(hbox, avatar);
 
    /* General information */
 
@@ -584,23 +583,19 @@ edi_scm_ui_add(Evas_Object *parent)
    remote_name = engine->remote_name_get();
    remote_email = engine->remote_email_get();
 
-   eina_strbuf_reset(string);
-
+   string = eina_strbuf_new();
    if (!remote_name[0] && !remote_email[0])
      {
         eina_strbuf_append(string, _("Unable to obtain user information."));
+
+        elm_icon_standard_set(avatar, DEFAULT_USER_ICON);
      }
    else
      {
         eina_strbuf_append_printf(string, "%s:<br><b>%s</b> &lt;%s&gt;", _("Author"),
                                   engine->remote_name_get(), engine->remote_email_get());
-        avatar = elm_image_add(hbox);
+
         _edi_scm_ui_screens_avatar_load(avatar, engine->remote_email_get());
-        evas_object_size_hint_min_set(avatar, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
-        evas_object_size_hint_weight_set(avatar, 0.1, EVAS_HINT_EXPAND);
-        evas_object_size_hint_align_set(avatar, 1.0, EVAS_HINT_FILL);
-        evas_object_show(avatar);
-        elm_box_pack_end(hbox, avatar);
 
         edi_scm->is_configured = EINA_TRUE;
      }
