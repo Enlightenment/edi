@@ -39,7 +39,7 @@ typedef struct _Edi_Panel_Slide_Effect
    Eina_Bool left;
 } Edi_Panel_Slide_Effect;
 
-#define COPYRIGHT "Copyright © 2014-2015 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
+#define COPYRIGHT "Copyright © 2014-2017 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
 static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel, *_edi_debugpanel;
@@ -1604,13 +1604,13 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      goto end;
 
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
-   if (args < 0)
+   if (quit_option)
+     {
+        exit(1);
+     }
+   else if (args < 0)
      {
         CRIT("Could not parse arguments.");
-        goto end;
-     }
-   else if (quit_option)
-     {
         goto end;
      }
 
