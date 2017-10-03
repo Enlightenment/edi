@@ -1,0 +1,2 @@
+option('libclang', type : 'boolean', value : true, description : 'Weather to have libclang support')
+option('bear', type : 'boolean', value : true, description : 'Weather to have bear support')
