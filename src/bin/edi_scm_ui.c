@@ -50,7 +50,8 @@ void _edi_scm_ui_screens_avatar_download_complete(void *data, const char *file,
 static void
 _edi_scm_ui_screens_avatar_load(Evas_Object *image, const char *email)
 {
-   const char *tmp, *cache, *cachedir, *cacheparentdir;
+   char *tmp, *tmp2;
+   const char *cache, *cachedir, *cacheparentdir;
 
    cache = _edi_scm_ui_avatar_cache_path_get(email);
    if (ecore_file_exists(cache))
@@ -59,9 +60,10 @@ _edi_scm_ui_screens_avatar_load(Evas_Object *image, const char *email)
         return;
      }
 
-   tmp = dirname((char *) cache);
-   cachedir = strdup(tmp);
-   cacheparentdir = dirname((char *) tmp);
+   tmp = strdup(cache);
+   cachedir = dirname(tmp);
+   tmp2 = strdup(tmp);
+   cacheparentdir = dirname(tmp2);
    if (!ecore_file_exists(cacheparentdir) && !ecore_file_mkdir(cacheparentdir))
      goto clear;
 
@@ -73,7 +75,8 @@ _edi_scm_ui_screens_avatar_load(Evas_Object *image, const char *email)
                        image, NULL);
 
 clear:
-   free((char *)cachedir);
+   free(tmp2);
+   free(tmp);
 }
 
 static void
@@ -233,7 +236,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    mime = efreet_mime_type_get(status->fullpath);
    if (mime)
      icon_file = efreet_mime_type_icon_get(mime, elm_config_icon_theme_get(), 32);
- 
+
    if (!icon_file)
      icon_file = "dialog-information";
 
@@ -598,7 +601,7 @@ edi_scm_ui_add(Evas_Object *parent)
         evas_object_size_hint_align_set(avatar, 1.0, EVAS_HINT_FILL);
         evas_object_show(avatar);
         elm_box_pack_end(hbox, avatar);
-   
+
         edi_scm->is_configured = EINA_TRUE;
      }
 
@@ -727,7 +730,7 @@ edi_scm_ui_add(Evas_Object *parent)
    evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    evas_object_show(hbox);
-   
+
    button = elm_button_add(parent);
    evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
