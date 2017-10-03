@@ -25,8 +25,14 @@ foreach package : packages
    subdir(package)
 endforeach
 
+deps = [elm, edi_lib]
+
+if get_option('libclang') == true
+   deps += [clang]
+endif
+
 executable('edi', src,
-  dependencies : [elm, edi_lib, clang],
+  dependencies : deps,
   install : true
 )
 

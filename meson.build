@@ -33,6 +33,8 @@ config_h.set_quoted('EFL_CFLAGS', run_command(find_program('pkg-config'), '--lib
 if get_option('bear') == true
   bear = find_program('bear')
   config_h.set_quoted('BEAR_COMMAND', 'bear')
+else
+  config_h.set_quoted('BEAR_COMMAND', '')
 endif
 
 if get_option('libclang') == true
