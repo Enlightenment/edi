@@ -604,7 +604,7 @@ edi_scm_ui_add(Evas_Object *parent)
    eina_strbuf_free(string);
 
    edi_scm->check = check = elm_check_add(parent);
-   elm_object_text_set(check, _("Show all changes?"));
+   elm_object_text_set(check, _("Show unstaged changes"));
    elm_check_state_set(check, EINA_FALSE);
    evas_object_show(check);
    evas_object_smart_callback_add(check, "changed",

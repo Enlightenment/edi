@@ -11,7 +11,6 @@ src/bin/screens/edi_file_screens.c
 src/bin/screens/edi_settings.c
 src/bin/screens/edi_about.c
 src/bin/screens/edi_settings_font.c
-src/bin/screens/edi_scm_screens.c
 src/bin/edi_debugpanel.c
 src/bin/language/edi_language_provider_c.c
 src/bin/language/edi_language_provider_python.c
@@ -23,5 +22,7 @@ src/bin/edi_file.c
 src/bin/edi_main.c
 src/bin/edi_logpanel.c
 src/bin/edi_searchpanel.c
+src/bin/edi_scm_main.c
+src/bin/edi_scm_ui.c
 src/bin/edi_config.c
 src/bin/edi_consolepanel.c
