@@ -40,15 +40,20 @@ edi_about_show(Evas_Object *mainwin)
    elm_win_resize_object_add(win, table);
    evas_object_show(table);
 
-   snprintf(buf, sizeof(buf), "%s/images/about.png", elm_app_data_dir_get());
    bg = elm_bg_add(win);
-   elm_bg_option_set(bg, ELM_BG_OPTION_CENTER);
-   elm_bg_file_set(bg, buf, NULL);
-   elm_bg_option_set(bg, ELM_BG_OPTION_SCALE);
+   evas_object_color_set(bg, 26, 26, 26, 255);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, bg, 0, 0, 1, 1);
    evas_object_show(bg);
+
+   snprintf(buf, sizeof(buf), "%s/images/about.png", elm_app_data_dir_get());
+   bg = elm_image_add(win);
+   elm_image_fill_outside_set(bg, EINA_TRUE);
+   elm_image_file_set(bg, buf, NULL);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_pack(table, bg, 0, 0, 1, 1);
 
    evas_object_color_get(bg, &r, &g, &b, &alpha);
    evas_color_argb_unpremul(alpha, &r, &g, &b);
@@ -56,6 +61,7 @@ edi_about_show(Evas_Object *mainwin)
 
    evas_color_argb_premul(alpha, &r, &g, &b);
    evas_object_color_set(bg, r, g, b, alpha);
+   evas_object_show(bg);
 
    vbox = elm_box_add(win);
    elm_box_padding_set(vbox, 25, 0);
@@ -84,7 +90,7 @@ edi_about_show(Evas_Object *mainwin)
    evas_object_show(text);
 
    title = elm_entry_add(box);
-   elm_object_text_set(title, _("EDI's lovely authors"));
+   elm_object_text_set(title, _("<hilight>EDI's lovely authors</hilight>"));
    elm_entry_editable_set(title, EINA_FALSE);
    elm_object_focus_allow_set(title, EINA_FALSE);
    evas_object_size_hint_weight_set(title, EVAS_HINT_EXPAND, 0.0);
@@ -147,7 +153,7 @@ edi_about_show(Evas_Object *mainwin)
    elm_box_pack_end(buttonbox, button);
    evas_object_show(button);
 
-   evas_object_resize(win, 520 * elm_config_scale_get(), 300 * elm_config_scale_get());
+   evas_object_resize(win, 520 * elm_config_scale_get(), 360 * elm_config_scale_get());
    evas_object_show(win);
 
    return win;
