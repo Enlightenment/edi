@@ -950,7 +950,9 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    Elm_Object_Item *parent_it;
 
    dir = ecore_file_dir_get(ev->filename);
-   if (strncmp(edi_project_get(), dir, strlen(edi_project_get())))
+   if (strncmp(edi_project_get(), dir, strlen(edi_project_get())) ||
+       ev->filename[strlen(edi_project_get()) + 1] == '.' ||
+       _file_path_hidden(ev->filename, EINA_FALSE))
      return;
 
    parent_it = _file_listing_item_find(dir);
