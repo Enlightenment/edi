@@ -11,6 +11,7 @@
 .dirstamp
 .edi
 
+/build
 /src/bin/edi
 /src/bin/edi_build
 /src/bin/edi_scm
