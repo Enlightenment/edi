@@ -30,15 +30,15 @@ cc = meson.get_compiler('c')
 
 config_h.set_quoted('EFL_CFLAGS', run_command(find_program('pkg-config'), '--libs', '--cflags', 'elementary').stdout().strip())
 
-if get_option('bear') == true
-  bear = find_program('bear')
+bear = find_program('bear', required : false)
+if get_option('bear') == true and bear.found()
   config_h.set_quoted('BEAR_COMMAND', 'bear')
 else
   config_h.set_quoted('BEAR_COMMAND', '')
 endif
 
 if get_option('libclang') == true
-  clang = cc.find_library('clang')
+  clang = cc.find_library('clang', dirs : ['/Library/Developer/CommandLineTools/usr/lib/'])
 
   clang_include_dir_command = run_command(find_program('scripts/clang_include_dir.sh'))
   clang_include_dir = clang_include_dir_command.stdout().strip()
