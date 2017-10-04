@@ -38,7 +38,7 @@ else
 endif
 
 if get_option('libclang') == true
-  clang = cc.find_library('clang', dirs : ['/Library/Developer/CommandLineTools/usr/lib/'])
+  clang = cc.find_library('clang', dirs : ['/usr/local/opt/llvm/lib'])
 
   clang_include_dir_command = run_command(find_program('scripts/clang_include_dir.sh'))
   clang_include_dir = clang_include_dir_command.stdout().strip()
