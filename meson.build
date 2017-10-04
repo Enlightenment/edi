@@ -30,6 +30,8 @@ cc = meson.get_compiler('c')
 
 config_h.set_quoted('EFL_CFLAGS', run_command(find_program('pkg-config'), '--libs', '--cflags', 'elementary').stdout().strip())
 
+intl = cc.find_library('intl')
+
 bear = find_program('bear', required : false)
 if get_option('bear') == true and bear.found()
   config_h.set_quoted('BEAR_COMMAND', 'bear')

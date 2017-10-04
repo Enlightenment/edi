@@ -25,7 +25,7 @@ foreach package : packages
    subdir(package)
 endforeach
 
-deps = [elm, edi_lib]
+deps = [elm, edi_lib, intl]
 libs = []
 
 if get_option('libclang') == true
@@ -46,11 +46,11 @@ edi_scm_src = files([
 ])
 
 executable('edi_scm', edi_scm_src,
-  dependencies : [elm, edi_lib],
+  dependencies : [elm, edi_lib, intl],
   install : true
 )
 
 executable('edi_build', 'edi_build_main.c',
-  dependencies : [elm, edi_lib],
+  dependencies : [elm, edi_lib, intl],
   install : true
 )
