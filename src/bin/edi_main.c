@@ -1606,7 +1606,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (quit_option)
      {
-        exit(1);
+        goto end;
      }
    else if (args < 0)
      {
