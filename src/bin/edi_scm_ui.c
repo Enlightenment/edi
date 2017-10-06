@@ -507,7 +507,32 @@ _edi_scm_ui_file_changes_cb(void *data EINA_UNUSED, int type EINA_UNUSED,
    return ECORE_CALLBACK_DONE;
 }
 
-void
+static char *
+_edi_scm_find_directory(Edi_Scm_Engine *engine)
+{
+   char *path;
+   char *directory = strdup(engine->workdir);
+
+   while (1)
+    {
+       if (!strcmp(directory, "/") || !strcmp(directory, "/home"))
+         break;
+
+       path = edi_path_append(directory, engine->directory);
+       if (ecore_file_exists(path))
+         {
+            free(path);
+            return directory;
+         }
+
+       free(path);
+       directory = ecore_file_dir_get(directory);
+    }
+
+   return NULL;
+}
+
+char *
 edi_scm_ui_add(Evas_Object *parent)
 {
    Evas_Object *box, *frame, *hbox, *cbox, *label, *avatar, *input, *button;
@@ -747,5 +772,7 @@ edi_scm_ui_add(Evas_Object *parent)
 
    elm_box_pack_end(hbox, button);
    elm_box_pack_end(box, hbox);
+
+   return _edi_scm_find_directory(engine);
 }
 

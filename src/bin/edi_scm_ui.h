@@ -24,11 +24,14 @@ extern "C" {
 
 /**
  * Create the commit dialog UI.
- * 
+ *
  * @param parent Parent object to add the commit UI to.
+ *
+ * @return Path of repository directory.
+ *
  * @ingroup SCM
  */
-void edi_scm_ui_add(Evas_Object *parent);
+char *edi_scm_ui_add(Evas_Object *parent);
 
 /**
  * @}

@@ -1,8 +1,8 @@
 #include <Edi.h>
 #include "edi_scm_ui.h"
 
-#define DEFAULT_WIDTH  460
-#define DEFAULT_HEIGHT 280
+#define DEFAULT_WIDTH  480
+#define DEFAULT_HEIGHT 360
 
 static void
 _win_del_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
@@ -12,20 +12,17 @@ _win_del_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static Evas_Object *
-_setup_win(void)
+window_setup(void)
 {
    Evas_Object *win, *icon;
    Eina_Strbuf *title;
-   char *cwd;
-
-   cwd = getcwd(NULL, PATH_MAX);
+   char *path;
 
    title = eina_strbuf_new();
-   eina_strbuf_append_printf(title, "Edi Source Control :: %s", cwd);
 
    elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
 
-   win = elm_win_util_standard_add(eina_strbuf_string_get(title), eina_strbuf_string_get(title));
+   win = elm_win_util_standard_add("edi_scm", "edi_scm");
    icon = elm_icon_add(win);
    elm_icon_standard_set(icon, "edi");
    elm_win_icon_object_set(win, icon);
@@ -33,23 +30,33 @@ _setup_win(void)
    evas_object_resize(win, DEFAULT_WIDTH * elm_config_scale_get(), DEFAULT_HEIGHT * elm_config_scale_get());
    evas_object_smart_callback_add(win, "delete,request", _win_del_cb, NULL);
 
+   path = edi_scm_ui_add(win);
+   if (!path)
+     {
+        fprintf(stderr, "ERR: unable to obtain path from SCM engine!\n");
+        exit(EXIT_FAILURE);
+     }
+
+   eina_strbuf_append_printf(title, "Edi Source Control :: %s", path);
+
+   elm_win_title_set(win, eina_strbuf_string_get(title));
+
+   elm_win_center(win, EINA_TRUE, EINA_TRUE);
+
+   evas_object_show(win);
+
    eina_strbuf_free(title);
-   free(cwd);
+   free(path);
 
    return win;
 }
 
 int main(int argc, char **argv)
 {
-   Evas_Object *win;
-
    ecore_init();
    elm_init(argc, argv);
 
-   win = _setup_win();
-   edi_scm_ui_add(win);
-   elm_win_center(win, EINA_TRUE, EINA_TRUE);
-   evas_object_show(win);
+   window_setup();
 
    ecore_main_loop_begin();
 
