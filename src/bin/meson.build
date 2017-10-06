@@ -26,13 +26,19 @@ foreach package : packages
 endforeach
 
 deps = [elm, edi_lib, intl]
+incls = []
 
 if get_option('libclang') == true
    deps += [clang]
+
+   clang_build_include_dir_command = run_command(find_program('../../scripts/clang_build_include_dir.sh'))
+   clang_build_include_dir = clang_include_dir_command.stdout().strip()
+   incls += include_directories(clang_build_include_dir)
 endif
 
 executable('edi', src,
   dependencies : deps,
+  include_directories : incls,
   install : true
 )
 
