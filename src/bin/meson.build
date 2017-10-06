@@ -26,16 +26,13 @@ foreach package : packages
 endforeach
 
 deps = [elm, edi_lib, intl]
-libs = []
 
 if get_option('libclang') == true
    deps += [clang]
-   libs += include_directories('/usr/local/opt/llvm/include')
 endif
 
 executable('edi', src,
   dependencies : deps,
-  include_directories : libs,
   install : true
 )
 
