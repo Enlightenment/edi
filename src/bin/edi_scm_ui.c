@@ -507,6 +507,48 @@ _edi_scm_ui_file_changes_cb(void *data EINA_UNUSED, int type EINA_UNUSED,
    return ECORE_CALLBACK_DONE;
 }
 
+char *
+_edi_scm_ui_workdir_get(void)
+{
+   Edi_Scm_Engine *engine;
+   char *directory, *workdir, *path, *tmp;
+
+   engine = edi_scm_engine_get();
+   if (!engine)
+     exit(1 << 1);
+
+   tmp = path = workdir = NULL;
+
+   directory = strdup(engine->workdir);
+
+   while (directory)
+     {
+        path = edi_path_append(directory, engine->directory);
+        if (ecore_file_exists(path) && ecore_file_is_dir(path))
+          {
+             if (!strcmp(directory, "/"))
+               workdir = strdup(directory);
+             else
+               workdir = strdup(ecore_file_file_get(directory));
+             break;
+          }
+
+        tmp = ecore_file_dir_get(directory);
+        free(directory);
+        directory = tmp;
+        free(path);
+        path = NULL;
+      }
+
+   if (path)
+     free(path);
+
+   if (directory)
+     free(directory);
+
+   return workdir;
+}
+
 void
 edi_scm_ui_add(Evas_Object *parent)
 {
@@ -519,9 +561,6 @@ edi_scm_ui_add(Evas_Object *parent)
    Edi_Scm_Ui *edi_scm;
    const char *remote_name, *remote_email;
    Eina_Bool staged_changes;
-
-   if (!edi_scm_generic_init())
-     exit(1 << 0);
 
    engine = edi_scm_engine_get();
    if (!engine)

@@ -532,6 +532,7 @@ edi_scm_shutdown()
    eina_stringshare_del(engine->name);
    eina_stringshare_del(engine->directory);
    eina_stringshare_del(engine->path);
+   free(engine->workdir);
    free(engine);
 
    _edi_scm_global_object = NULL;
@@ -741,7 +742,7 @@ _edi_scm_git_init()
    engine->status_get = _edi_scm_git_status_get;
 
    if (edi_project_get())
-     engine->workdir = (char *) edi_project_get();
+     engine->workdir = strdup(edi_project_get());
    else
      engine->workdir = getcwd(NULL, PATH_MAX);
 
