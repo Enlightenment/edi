@@ -27,7 +27,7 @@ _edi_scm_exec(const char *command)
 
    oldpwd = getcwd(NULL, PATH_MAX);
 
-   chdir(edi_project_get());
+   chdir(self->workdir);
    code = edi_exe_wait(command);
    chdir(oldpwd);
 
@@ -46,7 +46,7 @@ _edi_scm_exec_response(const char *command)
 
    oldpwd = getcwd(NULL, PATH_MAX);
 
-   chdir(edi_project_get());
+   chdir(self->workdir);
    response = edi_exe_response(command);
    chdir(oldpwd);
 
