@@ -341,6 +341,9 @@ _edi_scm_ui_status_list_fill(Edi_Scm_Ui *edi_scm)
 
    EINA_LIST_FOREACH(e->statuses, l, status)
      {
+        if (status->staged)
+          staged = EINA_TRUE;
+
         if (edi_scm->results_max)
           {
              elm_genlist_item_append(list, itc, status, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
@@ -352,9 +355,6 @@ _edi_scm_ui_status_list_fill(Edi_Scm_Ui *edi_scm)
              else
                _edi_scm_ui_status_free(status);
           }
-
-        if (status->staged)
-          staged = EINA_TRUE;
      }
 
    if (e->statuses)
