@@ -100,6 +100,27 @@ edi_mainview_panel_for_item_get(Edi_Mainview_Item *item)
    return NULL;
 }
 
+Edi_Mainview_Panel *
+edi_mainview_panel_for_path_get(const char *path)
+{
+   Eina_List *item;
+   Edi_Mainview_Panel *panel;
+   Edi_Mainview_Item *it;
+   int i;
+
+   for (i = 0; i < edi_mainview_panel_count(); i++)
+     {
+        panel = edi_mainview_panel_by_index(i);
+        EINA_LIST_FOREACH(panel->items, item, it)
+          {
+             if (it && !strcmp(it->path, path))
+               return panel;
+          }
+     }
+
+   return NULL;
+}
+
 unsigned int
 edi_mainview_panel_index_get(Edi_Mainview_Panel *panel)
 {
@@ -257,6 +278,62 @@ void
 edi_mainview_open_path(const char *path)
 {
    edi_mainview_panel_open_path(_current_panel, path);
+}
+
+static void
+_focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Elm_Code *code;
+   const char *path;
+   Edi_Mainview_Panel *panel;
+   Edi_Editor *editor = data;
+
+   code = elm_code_widget_code_get(editor->entry);
+   path = elm_code_file_path_get(code->file);
+   panel = edi_mainview_panel_for_path_get(path);
+
+   edi_mainview_panel_focus(panel);
+}
+
+static void
+_changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor = data;
+
+   editor->modified = EINA_TRUE;
+
+   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
+}
+
+void edi_mainview_split_current(void)
+{
+   Elm_Code *code;
+   Elm_Code_Widget *widget;
+   Edi_Editor *editor;
+   Edi_Mainview_Panel *panel;
+
+   if (edi_mainview_is_empty())
+     return;
+
+   panel = edi_mainview_panel_current_get();
+   edi_mainview_panel_focus(panel);
+
+   editor = evas_object_data_get(panel->current->view, "editor");
+   if (!editor)
+     return;
+
+   code = elm_code_widget_code_get(editor->entry);
+   widget = elm_code_widget_add(panel->content, code);
+   elm_code_widget_editable_set(widget, EINA_TRUE);
+   elm_code_widget_line_numbers_set(widget, EINA_TRUE);
+   evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "focused", _focused_cb, editor);
+   edi_editor_widget_config_get(widget);
+
+   evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(widget);
+   elm_box_pack_start(panel->current->container, widget);
 }
 
 void

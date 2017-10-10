@@ -1317,6 +1317,12 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    return ECORE_CALLBACK_RENEW;
 }
 
+void
+edi_editor_widget_config_get(Elm_Code_Widget *widget)
+{
+   _edi_editor_config_changed(widget, 0, NULL);
+}
+
 static void
 _editor_del_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *o, void *event_info EINA_UNUSED)
 {

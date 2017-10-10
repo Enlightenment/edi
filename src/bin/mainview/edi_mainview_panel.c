@@ -667,8 +667,20 @@ void
 edi_mainview_panel_goto_popup_show(Edi_Mainview_Panel *panel)
 {
    Evas_Object *popup, *box, *input, *sep, *button;
+   Edi_Editor *editor;
 
-   popup = elm_popup_add(_main_win);
+   if (edi_mainview_is_empty())
+     return;
+
+   if (!edi_mainview_panel_item_count(edi_mainview_panel_current_get()))
+     return;
+
+   editor = evas_object_data_get(panel->current->view, "editor");
+   if (!editor)
+     return;
+
+   popup = elm_popup_add(editor->entry);
+
    _edi_mainview_goto_popup = popup;
    elm_object_part_text_set(popup, "title,text",
                             _("Enter line number"));

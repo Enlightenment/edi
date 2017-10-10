@@ -105,6 +105,14 @@ void edi_mainview_open(Edi_Path_Options *options);
 void edi_mainview_open_window_path(const char *path);
 
 /**
+ * Open editable split view with the currently selected item.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_split_current(void);
+
+
+/**
  * Open the file described in the provided options in a new window - path and location etc.
  *
  * @param path The path and options of the file to open.
@@ -333,6 +341,16 @@ Edi_Mainview_Panel *edi_mainview_panel_append();
  * @ingroup Panels
  */
 Edi_Mainview_Panel *edi_mainview_panel_for_item_get(Edi_Mainview_Item *item);
+
+/*
+ * Return panel object from path.
+ *
+ * @param path the item path related to the returned panel.
+ * @return the mainview panel object associated with the path.
+ *
+ * @ingroup Panels
+ */
+Edi_Mainview_Panel *edi_mainview_panel_for_path_get(const char *path);
 
 /*
  * Return panel object from it's numeric index.

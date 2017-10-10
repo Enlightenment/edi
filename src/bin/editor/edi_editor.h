@@ -145,6 +145,17 @@ void edi_editor_save(Edi_Editor *editor);
 void edi_editor_doc_open(Edi_Editor *editor);
 
 /**
+ * Get global configuration values for code editor and
+ * apply them to an Elm_Code_Widget instance.
+ *
+ * @param widget The Elm_Code_Widget obj to update.
+ *
+ * @ingroup Widgets
+ */
+void edi_editor_widget_config_get(Elm_Code_Widget *widget);
+
+
+/**
  * @}
  */
 
