@@ -39,7 +39,7 @@ else
   config_h.set_quoted('BEAR_COMMAND', '')
 endif
 
-if get_option('libclang') == true
+if get_option('libclang') == true and cc.has_header('clang-c/Index.h')
   clang = cc.find_library('clang', dirs : ['/usr/local/opt/llvm/lib'])
 
   clang_include_dir_command = run_command(find_program('scripts/clang_include_dir.sh'))
