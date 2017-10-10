@@ -40,6 +40,7 @@ else
 endif
 
 if get_option('libclang') == true and cc.has_header('clang-c/Index.h')
+  has_clang_header = true
   clang = cc.find_library('clang', dirs : ['/usr/local/opt/llvm/lib'])
 
   clang_include_dir_command = run_command(find_program('scripts/clang_include_dir.sh'))
@@ -47,6 +48,8 @@ if get_option('libclang') == true and cc.has_header('clang-c/Index.h')
 
   config_h.set_quoted('CLANG_INCLUDES', clang_include_dir)
   config_h.set('HAVE_LIBCLANG', '1')
+else
+  has_clang_header = false
 endif
 
 subdir('po')
