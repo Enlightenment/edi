@@ -714,7 +714,7 @@ edi_mainview_project_replace_popup_show(void)
    Evas_Object *frame;
    popup = elm_popup_add(_main_win);
    _edi_mainview_search_project_popup = popup;
-   elm_object_part_text_set(popup, "title,text", _("Search & Replace"));
+   elm_object_part_text_set(popup, "title,text", _("Search &amp; Replace"));
 
    box = elm_box_add(popup);
 
