@@ -23,7 +23,7 @@ src = files([
   'md5.h',
 ])
 
-edi_lib_lib = library('edi_lib', src,
+edi_lib_lib = library('edi', src,
   dependencies : [elm],
   include_directories : top_inc,
   install : true
