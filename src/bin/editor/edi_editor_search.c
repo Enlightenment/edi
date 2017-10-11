@@ -439,7 +439,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    elm_box_pack_end(big_box, box);
 
    lbl = elm_label_add(parent);
-   elm_object_text_set(lbl, _("Search term:"));
+   elm_object_text_set(lbl, _("Search term"));
    evas_object_size_hint_align_set(lbl, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(lbl, 0.0, 0.0);
    elm_box_pack_end(box, lbl);
@@ -462,7 +462,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    elm_box_pack_end(big_box, replace_box);
 
    replace_lbl = elm_label_add(parent);
-   elm_object_text_set(replace_lbl, _("Replace term:"));
+   elm_object_text_set(replace_lbl, _("Replace term"));
    evas_object_size_hint_align_set(replace_lbl, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(replace_lbl, 0.0, 0.0);
    elm_box_pack_end(replace_box, replace_lbl);

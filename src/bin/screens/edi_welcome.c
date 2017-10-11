@@ -672,7 +672,7 @@ Evas_Object *edi_welcome_show()
    evas_object_show(box);
 
    frame = elm_frame_add(box);
-   elm_object_text_set(frame, _("Recent Projects:"));
+   elm_object_text_set(frame, _("Recent Projects"));
    evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(box, frame);

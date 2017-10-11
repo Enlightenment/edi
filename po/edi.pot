@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edi 0.6.99\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2017-10-03 15:21+0100\n"
+"POT-Creation-Date: 2017-10-11 15:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,8 +44,8 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:585 src/bin/editor/edi_editor_search.c:502
-#: src/bin/edi_main.c:428
+#: src/bin/mainview/edi_mainview.c:585 src/bin/mainview/edi_mainview.c:656
+#: src/bin/editor/edi_editor_search.c:502 src/bin/edi_main.c:428
 msgid "Search"
 msgstr ""
 
@@ -69,15 +69,8 @@ msgstr ""
 msgid "Replace all occurences of text within <br>the whole project.<br>"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:656
-msgid "Search: "
-msgstr ""
-
-#: src/bin/mainview/edi_mainview.c:669
-msgid "Replace: "
-msgstr ""
-
-#: src/bin/mainview/edi_mainview.c:695 src/bin/editor/edi_editor_search.c:510
+#: src/bin/mainview/edi_mainview.c:669 src/bin/mainview/edi_mainview.c:695
+#: src/bin/editor/edi_editor_search.c:510
 msgid "Replace"
 msgstr ""
 
@@ -143,20 +136,12 @@ msgstr ""
 msgid "Line:%d, Column:%d"
 msgstr ""
 
-#: src/bin/editor/edi_editor.c:940
-msgid "WIN"
-msgstr ""
-
-#: src/bin/editor/edi_editor.c:942
-msgid "UNIX"
-msgstr ""
-
 #: src/bin/editor/edi_editor_search.c:442
-msgid "Search term:"
+msgid "Search term"
 msgstr ""
 
 #: src/bin/editor/edi_editor_search.c:465
-msgid "Replace term:"
+msgid "Replace term"
 msgstr ""
 
 #: src/bin/editor/edi_editor_search.c:492
@@ -262,7 +247,7 @@ msgid "Welcome to Edi"
 msgstr ""
 
 #: src/bin/screens/edi_welcome.c:675
-msgid "Recent Projects:"
+msgid "Recent Projects"
 msgstr ""
 
 #: src/bin/screens/edi_welcome.c:684
@@ -382,11 +367,11 @@ msgid "Project Settings"
 msgstr ""
 
 #: src/bin/screens/edi_settings.c:443
-msgid "Author Name: "
+msgid "Author Name"
 msgstr ""
 
 #: src/bin/screens/edi_settings.c:468
-msgid "Author E-mail: "
+msgid "Author E-mail"
 msgstr ""
 
 #: src/bin/screens/edi_settings.c:490
@@ -394,7 +379,7 @@ msgid "Source Control"
 msgstr ""
 
 #: src/bin/screens/edi_settings.c:509
-msgid "Remote URL:"
+msgid "Remote URL"
 msgstr ""
 
 #: src/bin/screens/edi_settings.c:557 src/bin/screens/edi_settings.c:647
@@ -542,7 +527,7 @@ msgstr ""
 msgid "Untracked changes"
 msgstr ""
 
-#: src/bin/edi_filepanel.c:1072 src/bin/edi_main.c:1159
+#: src/bin/edi_filepanel.c:1074 src/bin/edi_main.c:1159
 msgid "Find file"
 msgstr ""
 

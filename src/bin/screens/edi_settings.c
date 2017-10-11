@@ -440,7 +440,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, _("Author Name: "));
+   elm_object_text_set(label, _("Author Name"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -465,7 +465,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, _("Author E-mail: "));
+   elm_object_text_set(label, _("Author E-mail"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);
@@ -506,7 +506,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(hbox);
 
    label = elm_label_add(hbox);
-   elm_object_text_set(label, _("Remote URL:"));
+   elm_object_text_set(label, _("Remote URL"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_box_pack_end(hbox, label);

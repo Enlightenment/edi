@@ -937,9 +937,9 @@ _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    lines = elm_label_add(panel);
    code = elm_code_widget_code_get(editor->entry);
    if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
-     elm_object_text_set(lines, _("WIN"));
+     elm_object_text_set(lines, "WIN");
    else
-     elm_object_text_set(lines, _("UNIX"));
+     elm_object_text_set(lines, "UNIX");
    evas_object_size_hint_align_set(lines, 0.0, 0.5);
    evas_object_size_hint_weight_set(lines, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(panel, lines);

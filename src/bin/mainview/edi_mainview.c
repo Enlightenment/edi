@@ -730,7 +730,7 @@ edi_mainview_project_replace_popup_show(void)
    evas_object_show(table);
 
    label = elm_label_add(table);
-   elm_object_text_set(label, _("Search: "));
+   elm_object_text_set(label, _("Search"));
    evas_object_show(label);
    elm_table_pack(table, label, 0, 0, 1, 1);
 
@@ -743,7 +743,7 @@ edi_mainview_project_replace_popup_show(void)
    elm_table_pack(table, search, 1, 0, 1, 1);
 
    label = elm_label_add(table);
-   elm_object_text_set(label, _("Replace: "));
+   elm_object_text_set(label, _("Replace"));
    evas_object_show(label);
    elm_table_pack(table, label, 0, 1, 1, 1);
 
