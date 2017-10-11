@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edi 0.6.99\n"
 "Report-Msgid-Bugs-To: enlightenment-devel@lists.sourceforge.net\n"
-"POT-Creation-Date: 2017-10-11 15:00+0100\n"
+"POT-Creation-Date: 2017-10-11 16:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,60 +16,60 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/bin/mainview/edi_mainview.c:490
+#: src/bin/mainview/edi_mainview.c:567
 #: src/bin/mainview/edi_mainview_panel.c:447 src/bin/screens/edi_screens.c:121
 #: src/bin/screens/edi_screens.c:162 src/bin/screens/edi_welcome.c:70
 #: src/bin/screens/edi_file_screens.c:29 src/bin/edi_scm_ui.c:105
 msgid "OK"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:517
+#: src/bin/mainview/edi_mainview.c:594
 msgid "Please enter a valid search term."
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:551
+#: src/bin/mainview/edi_mainview.c:628
 msgid "Search for (whole project)"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:557
+#: src/bin/mainview/edi_mainview.c:634
 msgid "Please enter a term to search for within<br> the whole project.<br>"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:579 src/bin/mainview/edi_mainview.c:688
-#: src/bin/mainview/edi_mainview_panel.c:700
+#: src/bin/mainview/edi_mainview.c:656 src/bin/mainview/edi_mainview.c:765
+#: src/bin/mainview/edi_mainview_panel.c:712
 #: src/bin/editor/edi_editor_search.c:518
 #: src/bin/screens/edi_file_screens.c:232
 #: src/bin/screens/edi_file_screens.c:293
-#: src/bin/screens/edi_file_screens.c:354 src/bin/edi_scm_ui.c:733
+#: src/bin/screens/edi_file_screens.c:354 src/bin/edi_scm_ui.c:772
 msgid "Cancel"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:585 src/bin/mainview/edi_mainview.c:656
+#: src/bin/mainview/edi_mainview.c:662 src/bin/mainview/edi_mainview.c:733
 #: src/bin/editor/edi_editor_search.c:502 src/bin/edi_main.c:428
 msgid "Search"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:605
+#: src/bin/mainview/edi_mainview.c:682
 msgid "Please enter a valid search string."
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:612
+#: src/bin/mainview/edi_mainview.c:689
 msgid "Please enter a valid replace string."
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:618
+#: src/bin/mainview/edi_mainview.c:695
 msgid "Strings cannot match."
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:640
-msgid "Search & Replace"
+#: src/bin/mainview/edi_mainview.c:717
+msgid "Search &amp; Replace"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:645
+#: src/bin/mainview/edi_mainview.c:722
 msgid "Replace all occurences of text within <br>the whole project.<br>"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview.c:669 src/bin/mainview/edi_mainview.c:695
+#: src/bin/mainview/edi_mainview.c:746 src/bin/mainview/edi_mainview.c:772
 #: src/bin/editor/edi_editor_search.c:510
 msgid "Replace"
 msgstr ""
@@ -84,11 +84,11 @@ msgid ""
 "menu options."
 msgstr ""
 
-#: src/bin/mainview/edi_mainview_panel.c:674
+#: src/bin/mainview/edi_mainview_panel.c:686
 msgid "Enter line number"
 msgstr ""
 
-#: src/bin/mainview/edi_mainview_panel.c:706
+#: src/bin/mainview/edi_mainview_panel.c:718
 msgid "Go"
 msgstr ""
 
@@ -108,8 +108,8 @@ msgstr ""
 msgid "No help available for this term"
 msgstr ""
 
-#: src/bin/editor/edi_editor_documentation.c:162 src/bin/edi_main.c:1143
-#: src/bin/edi_main.c:1223
+#: src/bin/editor/edi_editor_documentation.c:162 src/bin/edi_main.c:1150
+#: src/bin/edi_main.c:1231
 msgid "Close"
 msgstr ""
 
@@ -398,7 +398,7 @@ msgstr ""
 msgid "Edi Settings"
 msgstr ""
 
-#: src/bin/screens/edi_settings.c:638 src/bin/edi_main.c:1178
+#: src/bin/screens/edi_settings.c:638 src/bin/edi_main.c:1186
 msgid "Project"
 msgstr ""
 
@@ -421,7 +421,7 @@ msgstr ""
 msgid "<hilight>EDI's lovely authors</hilight>"
 msgstr ""
 
-#: src/bin/screens/edi_about.c:126 src/bin/edi_main.c:1188
+#: src/bin/screens/edi_about.c:126 src/bin/edi_main.c:1196
 msgid "Visit Website"
 msgstr ""
 
@@ -527,7 +527,7 @@ msgstr ""
 msgid "Untracked changes"
 msgstr ""
 
-#: src/bin/edi_filepanel.c:1074 src/bin/edi_main.c:1159
+#: src/bin/edi_filepanel.c:1074 src/bin/edi_main.c:1166
 msgid "Find file"
 msgstr ""
 
@@ -590,7 +590,7 @@ msgstr ""
 msgid "Tasks"
 msgstr ""
 
-#: src/bin/edi_main.c:436 src/bin/edi_main.c:1175 src/bin/edi_main.c:1250
+#: src/bin/edi_main.c:436 src/bin/edi_main.c:1183 src/bin/edi_main.c:1258
 msgid "Debug"
 msgstr ""
 
@@ -637,165 +637,169 @@ msgstr ""
 msgid "Passed"
 msgstr ""
 
-#: src/bin/edi_main.c:735 src/bin/edi_main.c:1171 src/bin/edi_main.c:1172
-#: src/bin/edi_main.c:1247
+#: src/bin/edi_main.c:735 src/bin/edi_main.c:1179 src/bin/edi_main.c:1180
+#: src/bin/edi_main.c:1255
 msgid "Build"
 msgstr ""
 
-#: src/bin/edi_main.c:746 src/bin/edi_main.c:1176
+#: src/bin/edi_main.c:746 src/bin/edi_main.c:1184
 msgid "Clean"
 msgstr ""
 
-#: src/bin/edi_main.c:757 src/bin/edi_main.c:1173 src/bin/edi_main.c:1248
+#: src/bin/edi_main.c:757 src/bin/edi_main.c:1181 src/bin/edi_main.c:1256
 msgid "Test"
 msgstr ""
 
-#: src/bin/edi_main.c:1074
+#: src/bin/edi_main.c:1081
 msgid "Are you sure you wish to stash these changes?"
 msgstr ""
 
-#: src/bin/edi_main.c:1137
+#: src/bin/edi_main.c:1144
 msgid "File"
 msgstr ""
 
-#: src/bin/edi_main.c:1138
+#: src/bin/edi_main.c:1145
 msgid "New Project ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1140
+#: src/bin/edi_main.c:1147
 msgid "New ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1141
+#: src/bin/edi_main.c:1148
 msgid "New Directory ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1142 src/bin/edi_main.c:1222
+#: src/bin/edi_main.c:1149 src/bin/edi_main.c:1230
 msgid "Save"
 msgstr ""
 
-#: src/bin/edi_main.c:1144
+#: src/bin/edi_main.c:1151
 msgid "Close all"
 msgstr ""
 
-#: src/bin/edi_main.c:1146 src/bin/edi_main.c:1255
+#: src/bin/edi_main.c:1153 src/bin/edi_main.c:1263
 msgid "Settings"
 msgstr ""
 
-#: src/bin/edi_main.c:1148
+#: src/bin/edi_main.c:1155
 msgid "Quit"
 msgstr ""
 
-#: src/bin/edi_main.c:1150
+#: src/bin/edi_main.c:1157
 msgid "Edit"
 msgstr ""
 
-#: src/bin/edi_main.c:1151 src/bin/edi_main.c:1228
+#: src/bin/edi_main.c:1158 src/bin/edi_main.c:1236
 msgid "Undo"
 msgstr ""
 
-#: src/bin/edi_main.c:1152 src/bin/edi_main.c:1229
+#: src/bin/edi_main.c:1159 src/bin/edi_main.c:1237
 msgid "Redo"
 msgstr ""
 
-#: src/bin/edi_main.c:1154 src/bin/edi_main.c:1234
+#: src/bin/edi_main.c:1161 src/bin/edi_main.c:1242
 msgid "Cut"
 msgstr ""
 
-#: src/bin/edi_main.c:1155 src/bin/edi_main.c:1235
+#: src/bin/edi_main.c:1162 src/bin/edi_main.c:1243
 msgid "Copy"
 msgstr ""
 
-#: src/bin/edi_main.c:1156 src/bin/edi_main.c:1236
+#: src/bin/edi_main.c:1163 src/bin/edi_main.c:1244
 msgid "Paste"
 msgstr ""
 
-#: src/bin/edi_main.c:1158
+#: src/bin/edi_main.c:1165
 msgid "Find & Replace"
 msgstr ""
 
-#: src/bin/edi_main.c:1160
+#: src/bin/edi_main.c:1167
 msgid "Goto Line ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1162
+#: src/bin/edi_main.c:1169
 msgid "Find in project ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1163
+#: src/bin/edi_main.c:1170
 msgid "Replace in project ..."
 msgstr ""
 
-#: src/bin/edi_main.c:1165
+#: src/bin/edi_main.c:1172
 msgid "View"
 msgstr ""
 
-#: src/bin/edi_main.c:1166
+#: src/bin/edi_main.c:1173
 msgid "New Window"
 msgstr ""
 
-#: src/bin/edi_main.c:1167
+#: src/bin/edi_main.c:1174
 msgid "New Panel"
 msgstr ""
 
-#: src/bin/edi_main.c:1169
+#: src/bin/edi_main.c:1175
+msgid "Split View"
+msgstr ""
+
+#: src/bin/edi_main.c:1177
 msgid "Open Tasks"
 msgstr ""
 
-#: src/bin/edi_main.c:1174 src/bin/edi_main.c:1249
+#: src/bin/edi_main.c:1182 src/bin/edi_main.c:1257
 msgid "Run"
 msgstr ""
 
-#: src/bin/edi_main.c:1179
+#: src/bin/edi_main.c:1187
 msgid "Init"
 msgstr ""
 
-#: src/bin/edi_main.c:1180 src/bin/edi_scm_ui.c:743
+#: src/bin/edi_main.c:1188 src/bin/edi_scm_ui.c:782
 msgid "Commit"
 msgstr ""
 
-#: src/bin/edi_main.c:1181
+#: src/bin/edi_main.c:1189
 msgid "Stash"
 msgstr ""
 
-#: src/bin/edi_main.c:1182
+#: src/bin/edi_main.c:1190
 msgid "Status"
 msgstr ""
 
-#: src/bin/edi_main.c:1183
+#: src/bin/edi_main.c:1191
 msgid "Push"
 msgstr ""
 
-#: src/bin/edi_main.c:1184
+#: src/bin/edi_main.c:1192
 msgid "Pull"
 msgstr ""
 
-#: src/bin/edi_main.c:1187
+#: src/bin/edi_main.c:1195
 msgid "Help"
 msgstr ""
 
-#: src/bin/edi_main.c:1190 src/bin/edi_main.c:1256
+#: src/bin/edi_main.c:1198 src/bin/edi_main.c:1264
 msgid "About"
 msgstr ""
 
-#: src/bin/edi_main.c:1221
+#: src/bin/edi_main.c:1229
 msgid "New File"
 msgstr ""
 
-#: src/bin/edi_main.c:1241
+#: src/bin/edi_main.c:1249
 msgid "Find..."
 msgstr ""
 
-#: src/bin/edi_main.c:1242
+#: src/bin/edi_main.c:1250
 msgid "Goto Line"
 msgstr ""
 
-#: src/bin/edi_main.c:1432
+#: src/bin/edi_main.c:1440
 #, c-format
 msgid "Project path must be a directory\n"
 msgstr ""
 
-#: src/bin/edi_main.c:1646
+#: src/bin/edi_main.c:1654
 #, c-format
 msgid "Could not open file of unsupported mime type (%s)\n"
 msgstr ""
@@ -804,35 +808,35 @@ msgstr ""
 msgid "Please enter a valid commit message."
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:550
+#: src/bin/edi_scm_ui.c:589
 msgid "User information"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:589
+#: src/bin/edi_scm_ui.c:628
 msgid "Unable to obtain user information."
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:595
+#: src/bin/edi_scm_ui.c:634
 msgid "Author"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:607
+#: src/bin/edi_scm_ui.c:646
 msgid "Show unstaged changes"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:645
+#: src/bin/edi_scm_ui.c:684
 msgid "File changes"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:669
+#: src/bin/edi_scm_ui.c:708
 msgid "Commit message"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:674
+#: src/bin/edi_scm_ui.c:713
 msgid "Enter commit summary<br><br>And change details<br>"
 msgstr ""
 
-#: src/bin/edi_scm_ui.c:693
+#: src/bin/edi_scm_ui.c:732
 msgid "Source changes"
 msgstr ""
 
