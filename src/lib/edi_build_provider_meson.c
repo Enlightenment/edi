@@ -79,12 +79,18 @@ _meson_project_runnable_is(const char *path)
    return ecore_file_can_exec(path);
 }
 
+static const char *
+_meson_ninja_cmd(Meson_Data *md, const char *arg)
+{
+   return eina_slstr_printf("ninja -C %s %s", md->fulldir, arg ?: "");
+}
+ 
 static void
 _meson_ninja_do(Meson_Data *md, const char *arg)
 {
    const char *cmd;
 
-   cmd = eina_slstr_printf("ninja -C %s %s", md->fulldir, arg ?: "");
+   cmd = _meson_ninja_cmd(md, arg);
    if (arg && !strcmp(arg, "clean"))
      edi_exe_notify("edi_clean", cmd);
    else
@@ -100,7 +106,6 @@ _meson_prepare_end(void *data, int evtype EINA_UNUSED, void *evinfo)
    if (!ev->exe) return ECORE_CALLBACK_RENEW;
    if (ecore_exe_data_get(ev->exe) != me) return ECORE_CALLBACK_RENEW;
 
-   _meson_ninja_do(me, NULL);
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -113,11 +118,12 @@ _meson_prepare(Meson_Data *md)
    if (_meson_configured_check(md->fulldir)) return EINA_TRUE;
    if (chdir(md->basedir) != 0) return EINA_FALSE;
 
-   cmd = eina_slstr_printf("meson %s", md->builddir);
+   cmd = eina_slstr_printf("meson %s && %s", md->builddir, _meson_ninja_cmd(md, ""));
+
    exe = ecore_exe_pipe_run(cmd,
                             ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                             ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                            ECORE_EXE_PIPE_WRITE /*| ECORE_EXE_USE_SH*/, md);
+                            ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, md);
 
    if (!exe) return EINA_FALSE;
    ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _meson_prepare_end, md);
