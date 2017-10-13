@@ -1,0 +1,23 @@
+data {
+    item: "title" "C EFL Project";
+    item: "file"  "eflproject.tar.gz";
+    item: "description"
+
+    "C EFL Project.<br><br>Begin your C programming EFL project. All content is freely modifiable and distributable and licensed in the public-domain.<br><br>Happy hacking!";    
+}
+
+collections {
+    group {
+       name: "logo";
+       max: 128 128;
+       parts {
+           part { name: "icon";
+                  description { state: "default" 0.0;
+                     max: 128 128;
+                     image.image: "c.png" COMP;
+                     image.normal: "c.png";
+                  }
+            }
+       }
+    }
+}

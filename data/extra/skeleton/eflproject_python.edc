@@ -1,0 +1,23 @@
+data {
+    item: "title" "Python EFL Project";
+    item: "file"  "eflproject_python.tar.gz";
+    item: "description"
+
+    "Python EFL Project.<br><br>Start your new EFL Python programming project. All code is in the public-domain, you are free to modify and distribute as you wish.";
+}
+
+collections {
+    group {
+       name: "logo";
+       max: 128 128;
+       parts {
+           part { name: "icon";
+                  description { state: "default" 0.0;
+                     max: 128 128;
+                     image.image: "python.png" COMP;
+                     image.normal: "python.png";
+                  }
+            }
+       }
+    }
+}
