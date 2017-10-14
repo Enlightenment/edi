@@ -305,6 +305,13 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
         edi_create_efl_project(template->skeleton_path, path, name, url, user, email,
                                _edi_welcome_project_new_create_done_cb);
      }
+   else
+     {
+        if (path && !path[0])
+          elm_object_focus_set(_create_inputs[0], EINA_TRUE);
+        else if (name && !name[0])
+          elm_object_focus_set(_create_inputs[1], EINA_TRUE);
+     }
 }
 
 static int
