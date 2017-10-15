@@ -416,6 +416,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
      return NULL;
 
    frame = elm_frame_add(obj);
+   elm_object_style_set(frame, "pad_medium");
    evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(frame);
@@ -423,6 +424,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    table = elm_table_add(obj);
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_padding_set(table, 5, 5);
    evas_object_show(table);
 
    label = elm_label_add(table);
@@ -439,7 +441,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    rect = evas_object_rectangle_add(table);
    evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(rect, 128 * elm_config_scale_get(), 128 * elm_config_scale_get());
+   evas_object_size_hint_min_set(rect, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_table_pack(table, rect, 0, 1, 1, 1);
 
    box = elm_box_add(obj);
@@ -449,7 +451,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    rect = evas_object_rectangle_add(table);
    evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(rect, 300 * elm_config_scale_get(), 128 * elm_config_scale_get());
+   evas_object_size_hint_min_set(rect, 300 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_table_pack(table, rect, 1, 1, 1, 1);
 
    entry = elm_entry_add(box);
