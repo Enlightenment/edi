@@ -487,9 +487,9 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    EINA_LIST_FREE(_available_templates, template)
      _edi_template_free(template);
 
-   snprintf(path, sizeof(path), "%s/skeleton", _edi_config_dir_get());
+   snprintf(path, sizeof(path), "%s/templates", _edi_config_dir_get());
 
-   _edi_templates_discover(PACKAGE_DATA_DIR "/skeleton");
+   _edi_templates_discover(PACKAGE_DATA_DIR "/templates");
    _edi_templates_discover(path);
 
    content = elm_box_add(naviframe);

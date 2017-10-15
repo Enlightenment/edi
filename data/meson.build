@@ -1,3 +1,3 @@
 subdir('desktop')
 subdir('images')
-subdir('extra/skeleton')
+subdir('extra/templates')

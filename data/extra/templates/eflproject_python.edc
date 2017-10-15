@@ -1,6 +1,6 @@
 data {
     item: "title" "Python EFL Project";
-    item: "file"  "eflproject_python.tar.gz";
+    item: "file"  "skeletons/eflproject_python.tar.gz";
     item: "description"
 
     "Python EFL Project.<br><br>Start your new EFL Python programming project. All code is in the public-domain, you are free to modify and distribute as you wish.";

@@ -6,6 +6,6 @@ With the exception of "edi" which constitutes all remaining work
 in this code base the licenses apply to projects within their
 own top level directory. The project licenses are as follows:
 
-data/extra/skeleton	No license - public domain
+data/extra/templates/	No license - public domain
 edi:			COPYING.GPLv2
 
