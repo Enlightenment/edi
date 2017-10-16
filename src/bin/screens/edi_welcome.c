@@ -404,8 +404,9 @@ _edi_welcome_button_clicked_cb(void *data, Evas_Object *obj EINA_UNUSED, void *e
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
-   Evas_Object *table, *box, *frame, *image, *label, *entry, *rect;
+   Evas_Object *frame, *table, *image, *entry;
    Edi_Template *template = (Edi_Template *) data;
+   Eina_Slstr *content;
 
    if (strcmp(source, "elm.swallow.content"))
      return NULL;
@@ -420,48 +421,30 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_padding_set(table, 5, 5);
+   elm_table_homogeneous_set(table, EINA_TRUE);
    evas_object_show(table);
-
-   label = elm_label_add(table);
-   elm_object_text_set(label, template->title);
-   evas_object_show(label);
-   elm_table_pack(table, label, 0, 0, 1, 1);
+   elm_object_content_set(frame, table);
 
    image = elm_image_add(table);
    evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_image_file_set(image, template->edje_path, "logo");
    evas_object_show(image);
-   elm_table_pack(table, image, 0, 1, 1, 1);
-   rect = evas_object_rectangle_add(table);
-   evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(rect, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
-   elm_table_pack(table, rect, 0, 1, 1, 1);
+   elm_table_pack(table, image, 0, 0, 1, 1);
 
-   box = elm_box_add(obj);
-   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(box);
-   rect = evas_object_rectangle_add(table);
-   evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(rect, 300 * elm_config_scale_get(), 96 * elm_config_scale_get());
-   elm_table_pack(table, rect, 1, 1, 1, 1);
-
-   entry = elm_entry_add(box);
+   entry = elm_entry_add(table);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_entry_editable_set(entry, EINA_FALSE);
-   elm_entry_scrollable_set(entry, EINA_TRUE);
+   elm_entry_scrollable_set(entry, EINA_FALSE);
    elm_entry_single_line_set(entry, EINA_FALSE);
    elm_entry_line_wrap_set(entry, ELM_WRAP_WORD);
-   elm_object_text_set(entry, template->desc);
-   elm_box_pack_end(box, entry);
+   elm_table_pack(table, entry, 1, 0, 3, 1);
    evas_object_show(entry);
 
-   elm_table_pack(table, box, 1, 1, 1, 1);
-   elm_object_content_set(frame, table);
+   content = eina_slstr_printf("<b>%s</b><br><br>%s", template->title, template->desc);
+   elm_object_text_set(entry, content);
 
    return frame;
 }
