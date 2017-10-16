@@ -322,17 +322,11 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
    unsigned int n;
 
    if (!username)
-     return -1;
+     return 0;
 
-   errno = 0;
    p = getpwnam(username);
    if (p == NULL || max == 0)
-     {
-        if (errno == 0)
-          return 0;
-        else
-          return -1;
-     }
+     return 0;
 
    pos = strchr(p->pw_gecos, ',');
    if (!pos)
@@ -347,6 +341,7 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 
    memcpy(fullname, p->pw_gecos, n);
    fullname[n] = '\0';
+
    return 1;
 }
 
@@ -370,7 +365,7 @@ _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
    _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
    _edi_welcome_project_new_input_row_add(_("Project URL"), NULL, row++, content);
-   if (_edi_welcome_user_fullname_get(username, fullname, 1024) > 0)
+   if (_edi_welcome_user_fullname_get(username, fullname, sizeof(fullname)))
       _edi_welcome_project_new_input_row_add(_("Creator Name"), fullname, row++, content);
    else
       _edi_welcome_project_new_input_row_add(_("Creator Name"), username, row++, content);
