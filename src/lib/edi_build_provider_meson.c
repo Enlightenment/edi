@@ -93,6 +93,8 @@ _meson_ninja_do(Meson_Data *md, const char *arg)
    cmd = _meson_ninja_cmd(md, arg);
    if (arg && !strcmp(arg, "clean"))
      edi_exe_notify("edi_clean", cmd);
+   else if (arg && !strcmp(arg, "test"))
+     edi_exe_notify("edi_test", cmd);
    else
      edi_exe_notify("edi_build", cmd);
 }
