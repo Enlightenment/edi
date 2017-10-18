@@ -1,3 +1,3 @@
 subdir('lib')
 subdir('bin')
-#subdir('tests')
+subdir('tests')

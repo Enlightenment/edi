@@ -9,6 +9,8 @@
 
 #define COPYRIGHT "Copyright © 2014-2017 Andy Williams <andy@andyilliams.me> and various contributors (see AUTHORS)."
 
+int _edi_log_dom = -1;
+
 static const struct {
    const char *name;
    void (*build)(TCase *tc);
