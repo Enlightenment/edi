@@ -84,7 +84,7 @@ _meson_ninja_cmd(Meson_Data *md, const char *arg)
 {
    return eina_slstr_printf("ninja -C %s %s", md->fulldir, arg ?: "");
 }
- 
+
 static void
 _meson_ninja_do(Meson_Data *md, const char *arg)
 {
@@ -145,8 +145,10 @@ _meson_build(void)
 static void
 _meson_test(void)
 {
-   edi_exe_notify("edi_test", "exit 1");
-   ERR("Edi doesn't support test with Meson/Ninja!");
+   Meson_Data *md = _meson_data_get();
+
+   //if (!_meson_configured_check(md->fulldir)) return;
+   _meson_ninja_do(md, "test");
 }
 
 static void
