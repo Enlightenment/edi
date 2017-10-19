@@ -16,7 +16,7 @@
 /src/bin/edi_build
 /src/bin/edi_scm
 /data/desktop/edi.desktop
-/data/extra/skeleton/*.tar.gz
+/data/extra/templates/*.tar.gz
 /doc/edi.1
 edi-*.tar.?z*
 po/*.gmo
