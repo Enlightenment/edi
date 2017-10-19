@@ -316,7 +316,9 @@ void edi_mainview_split_current(void)
      return;
 
    panel = edi_mainview_panel_current_get();
-   edi_mainview_panel_focus(panel);
+
+   if (!panel->current)
+     return;
 
    editor = evas_object_data_get(panel->current->view, "editor");
    if (!editor)
