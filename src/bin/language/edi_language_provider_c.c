@@ -107,7 +107,7 @@ _clang_autosuggest_setup(Edi_Editor *editor)
    editor->clang_idx = clang_createIndex(0, 0);
    editor->clang_unit = clang_parseTranslationUnit(editor->clang_idx, path,
                                   args, argc, NULL, 0,
-                                  clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord);
+                                  clang_defaultEditingTranslationUnitOptions() | CXTranslationUnit_DetailedPreprocessingRecord | CXTranslationUnit_KeepGoing);
 }
 
 static void
