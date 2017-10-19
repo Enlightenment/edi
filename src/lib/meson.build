@@ -23,9 +23,10 @@ src = files([
   'md5.h',
 ])
 
-edi_lib_lib = library('edi', src,
+edi_lib_lib = shared_library('edi', src,
   dependencies : [elm],
   include_directories : top_inc,
+  version : meson.project_version(),
   install : true
 )
 
