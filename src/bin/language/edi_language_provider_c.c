@@ -34,24 +34,21 @@ _clang_commands_get(const char *path, const char ***args, unsigned int *argc)
    CXCompilationDatabase database = NULL;
    CXCompileCommands commands;
    CXCompileCommand command;
+   char *working;
    const char** arguments;
    unsigned int i, numargs, ignored = 0;
 
-   if (edi_project_file_exists("compile_commands.json"))
-     {
-        database = clang_CompilationDatabase_fromDirectory(edi_project_get(), &error);
-     }
-   else if (edi_project_file_exists("build/compile_commands.json"))
-     {
-        char *build = edi_project_file_path_get("build");
-        database = clang_CompilationDatabase_fromDirectory(build, &error);
-        free(build);
-     }
+   if (edi_project_file_exists("build/compile_commands.json"))
+     working = edi_project_file_path_get("build");
+   else
+     working = strdup(edi_project_get());
 
+   database = clang_CompilationDatabase_fromDirectory(working, &error);
    if (database == NULL || error == CXCompilationDatabase_CanNotLoadDatabase)
      {
         INF("Could not load compile_commands.json in %s", edi_project_get());
         _clang_commands_fallback_get(args, argc);
+	free(working);
         return;
      }
 
@@ -63,10 +60,11 @@ _clang_commands_get(const char *path, const char ***args, unsigned int *argc)
      {
         INF("File %s not found in compile_commands.json", path);
         _clang_commands_fallback_get(args, argc);
+        free(working);
         return;
      }
 
-   arguments = malloc(sizeof(char*) * (numargs + 1));
+   arguments = malloc(sizeof(char*) * (numargs + 2));
    INF("Loading clang parameters for %s", path);
 
    arguments[0] = CLANG_INCLUDES;
@@ -85,10 +83,12 @@ _clang_commands_get(const char *path, const char ***args, unsigned int *argc)
         clang_disposeString(argument);
      }
 
+   arguments[i - ignored] = eina_slstr_printf("-working-directory=%s", working);
    *args = arguments;
-   *argc = numargs + 1 - ignored;
+   *argc = numargs + 2 - ignored;
 
    clang_CompilationDatabase_dispose(database);
+   free(working);
 }
 
 static void
