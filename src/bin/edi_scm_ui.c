@@ -741,7 +741,7 @@ edi_scm_ui_add(Evas_Object *parent)
    edi_scm->code = code = elm_code_create();
    entry = elm_code_widget_add(box, code);
    elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_DIFF);
-   elm_obj_code_widget_gravity_set(entry, 1.0, 0.0);
+   elm_obj_code_widget_gravity_set(entry, 0.0, 0.0);
    elm_obj_code_widget_editable_set(entry, EINA_FALSE);
    elm_obj_code_widget_line_numbers_set(entry, EINA_FALSE);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
