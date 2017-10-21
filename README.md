@@ -9,17 +9,19 @@ and in creating apps based on the EFL suite.
 
 ## Requirements
 
-autotools
-EFL & Elementary from git master (>= 1.14.99)
+meson
+ninja
+EFL from git master (>= 1.20.99)
 libclang-dev (or llvm-clang-devel)
 
 ## Installation
 
-Using autotools to install this software is the usual:
+Using meson and ninja to install this software is the usual:
 
-    ./autogen.sh
-    make
-    sudo make install
+    meson build/
+    cd build
+    ninja
+    sudo ninja install
 
 ## Usage
 
@@ -32,4 +34,9 @@ and it will prompt for a project (directory) location or you can specify like:
     edi ~/Code/myproject
 
 to open the specified project.
+
+Also included are handy utility apps that you can try
+
+    edi_build
+    edi_scm
 
