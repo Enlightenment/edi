@@ -1,5 +1,6 @@
 #include "Edi.h"
 #include "edi_file.h"
+#include "edi_config.h"
 #include "edi_private.h"
 
 Eina_Bool
@@ -23,9 +24,13 @@ edi_file_text_replace(const char *path, const char *search, const char *replace)
    char *map, *found;
    FILE *tempfile;
    Eina_File *f;
-   char tempfilepath[PATH_MAX];
+   char *tempfiledir, *tempfilepath;
    unsigned long long len, idx;
    unsigned int slen;
+
+   tempfiledir = edi_path_append(_edi_config_dir_get(), ".tmp");
+
+   ecore_file_mkdir(tempfiledir);
 
    f = eina_file_open(path, EINA_FALSE);
    if (!f) return;
@@ -44,7 +49,7 @@ edi_file_text_replace(const char *path, const char *search, const char *replace)
         return;
      }
 
-   snprintf(tempfilepath, sizeof(tempfilepath), "/tmp/%s.tmp", ecore_file_file_get(path));
+   tempfilepath = edi_path_append(tempfiledir, ecore_file_file_get(path));
 
    tempfile = fopen(tempfilepath, "wb");
    if (!tempfile) goto done;
@@ -78,9 +83,11 @@ edi_file_text_replace(const char *path, const char *search, const char *replace)
 
    fclose(tempfile);
    ecore_file_mv(tempfilepath, path);
+   free(tempfilepath);
 done:
    eina_file_map_free(f, map);
    eina_file_close(f);
+   free(tempfiledir);
 }
 
 static void
