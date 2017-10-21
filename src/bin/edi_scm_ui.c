@@ -456,8 +456,6 @@ _edi_scm_ui_refresh(Edi_Scm_Ui *edi_scm)
    elm_genlist_clear(edi_scm->list);
 
    elm_code_file_clear(edi_scm->code->file);
-   /* FIXME: Clears but does not render until it *has* to. */
-   elm_code_file_line_append(edi_scm->code->file, "\n", 1, NULL);
 
    staged = _edi_scm_ui_status_list_fill(edi_scm);
 
