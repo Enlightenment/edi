@@ -100,35 +100,16 @@ _meson_ninja_do(Meson_Data *md, const char *arg)
 }
 
 static Eina_Bool
-_meson_prepare_end(void *data, int evtype EINA_UNUSED, void *evinfo)
-{
-   Meson_Data *me = data;
-   Ecore_Exe_Event_Del *ev = evinfo;
-
-   if (!ev->exe) return ECORE_CALLBACK_RENEW;
-   if (ecore_exe_data_get(ev->exe) != me) return ECORE_CALLBACK_RENEW;
-
-   return ECORE_CALLBACK_RENEW;
-}
-
-static Eina_Bool
 _meson_prepare(Meson_Data *md)
 {
    const char *cmd;
-   Ecore_Exe *exe;
 
    if (_meson_configured_check(md->fulldir)) return EINA_TRUE;
    if (chdir(md->basedir) != 0) return EINA_FALSE;
 
    cmd = eina_slstr_printf("meson %s && %s", md->builddir, _meson_ninja_cmd(md, ""));
 
-   exe = ecore_exe_pipe_run(cmd,
-                            ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
-                            ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
-                            ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, md);
-
-   if (!exe) return EINA_FALSE;
-   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _meson_prepare_end, md);
+   edi_exe_notify("edi_build", cmd);
 
    return EINA_FALSE;
 }
