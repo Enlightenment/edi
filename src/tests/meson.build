@@ -13,8 +13,9 @@ check = dependency('check')
 
 deps = [elm, check, edi_lib]
 
-if get_option('libclang') == true and has_clang_header == true
+if get_option('libclang') == true
    deps += [clang]
+   incls += [clang_inc]
 endif
 
 exe = executable('edi_suite', src,

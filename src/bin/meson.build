@@ -28,14 +28,9 @@ endforeach
 deps = [elm, edi_lib, intl]
 incls = []
 
-if get_option('libclang') == true and has_clang_header == true
+if get_option('libclang') == true
    deps += [clang]
-
-   clang_build_include_dir_command = run_command(find_program('../../scripts/clang_build_include_dir.sh'))
-   clang_build_include_dir = clang_build_include_dir_command.stdout().strip()
-   if clang_build_include_dir != ''
-      incls += include_directories(clang_build_include_dir)
-   endif
+   incls += [clang_inc]
 endif
 
 executable('edi', src,

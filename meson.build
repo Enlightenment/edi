@@ -40,17 +40,37 @@ else
   config_h.set_quoted('BEAR_COMMAND', '')
 endif
 
-if get_option('libclang') == true and cc.has_header('clang-c/Index.h')
-  has_clang_header = true
-  clang = cc.find_library('clang', dirs : ['/usr/local/opt/llvm/lib'])
+opt_clang_header_dir = get_option('libclang-libdir')
+opt_clang_link_dir = get_option('libclang-headerdir')
+
+if get_option('libclang') == true
+
+  #check for the header
+  found = false
+  if opt_clang_header_dir != ''
+    found = cc.has_header('clang-c/Index.h', args : '-I'+opt_clang_header_dir)
+  else
+    found = cc.has_header('clang-c/Index.h')
+  endif
+
+  if found == false
+    error('Clang header not found!')
+  endif
+
+  clang_inc = include_directories(opt_clang_header_dir)
+
+  #check for the library to link
+  if opt_clang_link_dir != ''
+    clang = cc.find_library('clang', dirs : [opt_clang_link_dir])
+  else
+    clang = cc.find_library('clang')
+  endif
 
   clang_include_dir_command = run_command(find_program('scripts/clang_include_dir.sh'))
   clang_include_dir = clang_include_dir_command.stdout().strip()
 
   config_h.set_quoted('CLANG_INCLUDES', clang_include_dir)
   config_h.set('HAVE_LIBCLANG', '1')
-else
-  has_clang_header = false
 endif
 
 subdir('po')
