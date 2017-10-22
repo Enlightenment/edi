@@ -1,4 +1,2 @@
 option('libclang', type : 'boolean', value : true, description : 'Weather to have libclang support')
 option('bear', type : 'boolean', value : true, description : 'Weather to have bear support')
-option('libclang-libdir', type : 'string', value : '', description : 'Specify a none default location for your clang installation')
-option('libclang-headerdir', type : 'string', value : '', description : 'Specify a none default location for your clang installation')
