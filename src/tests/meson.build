@@ -12,6 +12,7 @@ src = files([
 check = dependency('check')
 
 deps = [elm, check, edi_lib]
+incls = [include_directories('../../../src/bin'), include_directories('../../../src/lib'), top_inc]
 
 if get_option('libclang') == true
    deps += [clang]
@@ -20,7 +21,7 @@ endif
 
 exe = executable('edi_suite', src,
   dependencies : deps,
-  include_directories : [include_directories('../../../src/bin'), include_directories('../../../src/lib'), top_inc],
+  include_directories : incls,
   install : false
 )
 test('Edi Test Suite', exe)
