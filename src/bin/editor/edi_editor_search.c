@@ -420,8 +420,8 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
 void
 edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *entry, *wrapped, *lbl, *btn, *box, *big_box;
-   Evas_Object *replace_entry, *replace_lbl, *replace_btn, *replace_box;
+   Evas_Object *entry, *wrapped, *lbl, *btn, *box, *big_box, *table;
+   Evas_Object *replace_entry, *replace_lbl, *replace_btn;
    Evas_Object *checkbox;
    Edi_Editor_Search *search;
 
@@ -438,11 +438,18 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(box);
    elm_box_pack_end(big_box, box);
 
+   table = elm_table_add(parent);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_table_padding_set(table, 5, 0);
+   evas_object_show(table);
+   elm_box_pack_end(box, table);
+
    lbl = elm_label_add(parent);
    elm_object_text_set(lbl, _("Search term"));
    evas_object_size_hint_align_set(lbl, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(lbl, 0.0, 0.0);
-   elm_box_pack_end(box, lbl);
+   elm_table_pack(table, lbl, 0, 0, 1, 1);
    evas_object_show(lbl);
 
    entry = elm_entry_add(parent);
@@ -450,22 +457,14 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    elm_entry_single_line_set(entry, EINA_TRUE);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(box, entry);
+   elm_table_pack(table, entry, 1, 0, 1, 1);
    evas_object_show(entry);
-
-   replace_box = elm_box_add(parent);
-   elm_box_padding_set(replace_box, 15, 0);
-   elm_box_horizontal_set(replace_box, EINA_TRUE);
-   evas_object_size_hint_align_set(replace_box, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(replace_box, EVAS_HINT_EXPAND, 0.0);
-   evas_object_show(replace_box);
-   elm_box_pack_end(big_box, replace_box);
 
    replace_lbl = elm_label_add(parent);
    elm_object_text_set(replace_lbl, _("Replace term"));
    evas_object_size_hint_align_set(replace_lbl, EVAS_HINT_FILL, 0.5);
    evas_object_size_hint_weight_set(replace_lbl, 0.0, 0.0);
-   elm_box_pack_end(replace_box, replace_lbl);
+   elm_table_pack(table, replace_lbl, 0, 1, 1, 1);
    evas_object_show(replace_lbl);
 
    replace_entry = elm_entry_add(parent);
@@ -473,7 +472,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
    elm_entry_single_line_set(replace_entry, EINA_TRUE);
    evas_object_size_hint_align_set(replace_entry, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(replace_entry, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(replace_box, replace_entry);
+   elm_table_pack(table, replace_entry, 1, 1, 1, 1);
    evas_object_show(replace_entry);
    evas_object_smart_callback_add(replace_entry, "changed", _edi_replace_entry_changed, editor);
 
