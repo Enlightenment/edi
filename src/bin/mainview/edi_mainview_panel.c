@@ -57,6 +57,39 @@ edi_mainview_panel_item_current_tab_get(Edi_Mainview_Panel *panel)
    return i;
 }
 
+static void
+_edi_mainview_panel_current_tab_hide(Edi_Mainview_Panel *panel)
+{
+   Edi_Editor *editor;
+
+   edi_mainview_panel_focus(panel);
+
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (editor)
+     {
+        elm_object_focus_set(editor->entry, EINA_FALSE);
+        evas_object_hide(editor->entry);
+     }
+}
+
+static void
+_edi_mainview_panel_current_tab_show(Edi_Mainview_Panel *panel)
+{
+   Edi_Editor *editor;
+
+   edi_mainview_panel_focus(panel);
+
+   if (!panel || !panel->current)
+     return;
+
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (editor)
+     {
+        evas_object_show(editor->entry);
+        elm_object_focus_set(editor->entry, EINA_TRUE);
+     }
+}
+
 Edi_Mainview_Item *
 _edi_mainview_panel_item_for_view_get(Edi_Mainview_Panel *panel, Evas_Object *view)
 {
@@ -205,8 +238,12 @@ _content_load(Edi_Mainview_Item *item)
 void
 edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item)
 {
+   int item_index;
+
    if (!item)
      return;
+
+   item_index = eina_list_data_idx(panel->items, item);
 
    edi_mainview_item_prev();
    if (item->view)
@@ -222,6 +259,20 @@ edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item
 
    if (eina_list_count(panel->items) == 0)
      _edi_mainview_panel_show(panel, panel->welcome);
+
+   if (panel == edi_mainview_panel_current_get())
+     {
+        if (eina_list_count(panel->items))
+          {
+             if (item_index)
+               item = eina_list_nth(panel->items, item_index - 1);
+             else
+               item = eina_list_nth(panel->items, item_index);
+
+             edi_mainview_panel_item_select(panel, item);
+             _edi_mainview_panel_current_tab_show(panel);
+          }
+     }
 }
 
 void
@@ -268,21 +319,15 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
          const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
    Edi_Mainview_Panel *panel;
-   Edi_Editor *editor;
    Edi_Mainview_Item *item = (Edi_Mainview_Item *) data;
 
    panel = edi_mainview_panel_for_item_get(item);
 
-   edi_mainview_panel_focus(panel);
-
-   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
-   if (editor)
-     elm_object_focus_set(editor->entry, EINA_FALSE);
+   _edi_mainview_panel_current_tab_hide(panel);
 
    edi_mainview_panel_item_select(panel, (Edi_Mainview_Item *)data);
-   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
-   if (editor)
-     elm_object_focus_set(editor->entry, EINA_TRUE);
+
+   _edi_mainview_panel_current_tab_show(panel);
 
    edi_filepanel_select_path(item->path);
 }
@@ -301,8 +346,12 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
         edi_mainview_panel_remove(panel);
         index = edi_mainview_panel_count() - 1;
         panel = edi_mainview_panel_by_index(index);
-        edi_mainview_panel_focus(panel);
      }
+
+   edi_mainview_panel_focus(panel);
+
+   if (eina_list_count(panel->items))
+     _edi_mainview_panel_current_tab_show(panel);
 }
 
 static Evas_Object *
@@ -331,6 +380,12 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    if (!panel) return;
 
    int id = edi_mainview_panel_id(panel);
+
+   if (panel == edi_mainview_panel_current_get())
+     {
+        if (eina_list_count(panel->items))
+          _edi_mainview_panel_current_tab_hide(panel);
+     }
 
    item = edi_mainview_item_add(options, mime, NULL, NULL);
    content = _edi_mainview_panel_content_create(item, panel->content);
@@ -365,6 +420,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    editor = (Edi_Editor *)evas_object_data_get(content, "editor");
    if (editor)
      {
+        evas_object_show(editor->entry);
         elm_object_focus_set(editor->entry, EINA_TRUE);
         code = elm_code_widget_code_get(editor->entry);
         editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
@@ -783,9 +839,8 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
                elm_object_focus_set(editor->entry, EINA_FALSE);
 
              edi_mainview_panel_item_select(panel, it);
-             editor = evas_object_data_get(panel->current->view, "editor");
-             if (editor)
-               elm_object_focus_set(editor->entry, EINA_TRUE);
+
+             _edi_mainview_panel_current_tab_show(panel);
 
              if (options->line)
                {
@@ -868,8 +923,8 @@ void
 edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
 {
    Eina_List *item;
-   int panel_id;
-   Edi_Mainview_Item *it, *prev = NULL;
+   int panel_id, it_index;
+   Edi_Mainview_Item *it;
 
    if (!panel) return;
 
@@ -877,9 +932,19 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
      {
         if (it && !strcmp(it->path, path))
           {
+             it_index = eina_list_data_idx(panel->items, it);
              edi_mainview_panel_item_close(panel, it);
-             if (prev)
-               edi_mainview_panel_item_select(panel, prev);
+             if (eina_list_count(panel->items))
+               {
+                  if (it_index)
+                    it = eina_list_nth(panel->items, it_index - 1);
+                  else
+                    it = eina_list_nth(panel->items, it_index);
+
+                   edi_mainview_panel_item_select(panel, it);
+               }
+
+             _edi_mainview_panel_current_tab_show(panel);
 
              if (edi_mainview_panel_item_count(panel) == 0 &&
                  edi_mainview_panel_count() > 1)
@@ -887,10 +952,9 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
                   edi_mainview_panel_remove(panel);
                   panel_id = edi_mainview_panel_count() -1;
                   panel = edi_mainview_panel_by_index(panel_id);
-                  edi_mainview_panel_focus(panel);
+                  _edi_mainview_panel_current_tab_show(panel);
                }
           }
-        prev = it;
      }
 }
 
