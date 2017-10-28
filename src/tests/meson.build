@@ -11,7 +11,7 @@ src = files([
 
 check = dependency('check')
 
-deps = [elm, check, edi_lib]
+deps = [elm, check, edi_lib, intl]
 incls = [include_directories('../../../src/bin'), include_directories('../../../src/lib'), top_inc]
 
 if get_option('libclang') == true
