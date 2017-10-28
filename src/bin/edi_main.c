@@ -732,6 +732,9 @@ _edi_build_display_status_cb(int status, void *data)
 static void
 _edi_build_project(void)
 {
+   if (!edi_build_provider_for_project_get())
+     return;
+
    if (edi_exe_notify_handle("edi_build", _edi_build_display_status_cb, _("Build")))
      {
         _edi_build_menu_items_disabled_set(EINA_TRUE);
@@ -743,6 +746,9 @@ _edi_build_project(void)
 static void
 _edi_build_clean_project(void)
 {
+   if (!edi_build_provider_for_project_get())
+     return;
+
    if (edi_exe_notify_handle("edi_clean", _edi_build_display_status_cb, _("Clean")))
      {
         _edi_build_menu_items_disabled_set(EINA_TRUE);
@@ -754,6 +760,9 @@ _edi_build_clean_project(void)
 static void
 _edi_build_test_project(void)
 {
+   if (!edi_build_provider_for_project_get())
+     return;
+
    if (edi_exe_notify_handle("edi_test", _edi_build_display_status_cb, _("Test")))
      {
         _edi_build_menu_items_disabled_set(EINA_TRUE);
