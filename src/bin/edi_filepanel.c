@@ -958,9 +958,15 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    parent_it = _file_listing_item_find(dir);
 
    if (type == EIO_MONITOR_FILE_CREATED)
-     _file_listing_item_insert(ev->filename, EINA_FALSE, parent_it);
+     {
+        _file_listing_item_insert(ev->filename, EINA_FALSE, parent_it);
+     }
    else if (type == EIO_MONITOR_FILE_DELETED)
-     _file_listing_item_delete(ev->filename);
+     {
+        _file_listing_item_delete(ev->filename);
+        edi_mainview_item_close_path(ev->filename);
+     }
+
    if (type == EIO_MONITOR_DIRECTORY_CREATED)
      _file_listing_item_insert(ev->filename, EINA_TRUE, parent_it);
    else if (type == EIO_MONITOR_DIRECTORY_DELETED)
