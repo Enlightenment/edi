@@ -24,13 +24,15 @@ edi_about_show(Evas_Object *mainwin)
 {
    Evas_Object *win, *vbox, *box, *table, *bg;
    Evas_Object *text, *title, *authors, *buttonbox, *button, *space;
+   const char *title_text;
    int alpha, r, g, b;
    char buf[PATH_MAX];
 
    win = elm_win_add(mainwin, "about", ELM_WIN_BASIC);
    if (!win) return NULL;
 
-   elm_win_title_set(win, _("About Edi"));
+   title_text = eina_slstr_printf(_("About Edi %s"), PACKAGE_VERSION);
+   elm_win_title_set(win, title_text);
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_about_exit, win);
 
