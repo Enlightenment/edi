@@ -1,11 +1,11 @@
-EDI - The Enlightened IDE
+Edi - The Enlightened IDE
 ===
 
 This is a project to create a complete IDE using the EFL.
 It aims to lower the barrier to getting involved in Enlightenment development
 and in creating apps based on the EFL suite.
 
-![EDI Logo](data/desktop/edi.png?raw=true)
+![Edi Logo](data/desktop/edi.png?raw=true)
 
 ## Requirements
 
