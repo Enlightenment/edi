@@ -1361,14 +1361,14 @@ edi_editor_reload(Edi_Editor *editor)
 }
 
 Evas_Object *
-edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
+_edi_editor_configure(Evas_Object *parent, Edi_Mainview_Item *item,
+                      Elm_Code *code, Evas_Object *preview)
 {
    Evas_Object *vbox, *box, *searchbar, *statusbar;
    Evas_Modifier_Mask ctrl, shift, alt;
    Ecore_Event_Handler *ev_handler;
    Evas *e;
 
-   Elm_Code *code;
    Elm_Code_Widget *widget;
    Edi_Editor *editor;
 
@@ -1395,10 +1395,10 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_box_pack_end(vbox, statusbar);
    evas_object_show(statusbar);
 
-   code = elm_code_create();
    widget = elm_code_widget_add(vbox, code);
    elm_code_widget_editable_set(widget, EINA_TRUE);
    elm_code_widget_line_numbers_set(widget, EINA_TRUE);
+   elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
    _edi_editor_config_changed(widget, 0, NULL);
 
    editor = calloc(1, sizeof(*editor));
@@ -1412,26 +1412,20 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_smart_callback_add(widget, "focused", _focused_cb, item);
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
 
-   elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
-   if (!strcmp(item->editortype, "code"))
-     {
-        elm_code_parser_add(code, _edi_editor_parse_line_cb,
-                            _edi_editor_parse_file_cb, editor);
-        elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
-     }
-   elm_code_file_open(code, item->path);
-   if (eina_str_has_extension(item->path, ".eo"))
-     {
-        code->file->mime = "text/x-eolian";
-        elm_code_widget_syntax_enabled_set(widget, EINA_TRUE);
-     }
-
    editor->save_time = ecore_file_mod_time(item->path);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
    elm_box_pack_end(box, widget);
+
+   if (!strcmp(item->editortype, "code"))
+     {
+        elm_code_parser_add(code, _edi_editor_parse_line_cb,
+                            _edi_editor_parse_file_cb, editor);
+     }
+   if (preview)
+     elm_box_pack_end(box, preview);
 
    edi_editor_search_add(searchbar, editor);
    _edi_editor_statusbar_add(statusbar, editor, item);
@@ -1460,3 +1454,60 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 
    return vbox;
 }
+
+Evas_Object *
+edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
+{
+   Elm_Code *code;
+
+   code = elm_code_create();
+   elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
+   elm_code_file_open(code, item->path);
+   if (eina_str_has_extension(item->path, ".eo"))
+     {
+        code->file->mime = "text/x-eolian";
+     }
+
+   return _edi_editor_configure(parent, item, code, NULL);
+}
+
+static void
+_edi_editor_markdown_parse_cb(Elm_Code_File *file, void *data)
+{
+   Evas_Object *preview;
+
+   preview = (Evas_Object *)data;
+   if (eina_list_count(file->lines) == 0)
+     {
+        elm_object_text_set(preview, "<title>Preview</title>");
+     }
+   else
+     {
+        const char *content;
+        unsigned int len;
+
+        content = elm_code_line_text_get(eina_list_nth(file->lines, 0), &len);
+        elm_object_text_set(preview, eina_slstr_printf("<title>%s</title>", strndup(content, len)));
+     }
+}
+
+Evas_Object *
+edi_editor_markdown_add(Evas_Object *parent, Edi_Mainview_Item *item)
+{
+   Elm_Code *code;
+   Evas_Object *preview;
+
+   preview = elm_entry_add(parent);
+   elm_entry_editable_set(preview, EINA_FALSE);
+   evas_object_size_hint_weight_set(preview, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(preview, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(preview);
+
+   code = elm_code_create();
+   elm_code_parser_standard_add(code, ELM_CODE_PARSER_STANDARD_TODO);
+   elm_code_parser_add(code, NULL, _edi_editor_markdown_parse_cb, preview);
+   elm_code_file_open(code, item->path);
+
+   return _edi_editor_configure(parent, item, code, preview);
+}
+

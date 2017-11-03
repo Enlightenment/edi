@@ -65,6 +65,7 @@ static Edi_Content_Provider _edi_content_provider_registry[] =
 {
    {"text", "text-x-generic", EINA_TRUE, EINA_TRUE, edi_editor_add},
    {"code", "text-x-csrc", EINA_TRUE, EINA_TRUE, edi_editor_add},
+   {"markdown", "text-enriched", EINA_TRUE, EINA_TRUE, edi_editor_markdown_add},
    {"image", "image-x-generic", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
    {"diff", "text-x-source", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
 
@@ -83,6 +84,8 @@ Edi_Content_Provider *edi_content_provider_for_mime_get(const char *mime)
 
    if (!!provider)
      id = "code";
+   else if (!strcasecmp(mime, "text/markdown"))
+     id = "markdown";
    else if (!strcasecmp(mime, "text/plain") || !strcasecmp(mime, "application/x-shellscript"))
      id = "text";
    else if (!strncasecmp(mime, "image/", 6))
