@@ -40,20 +40,24 @@ else
   config_h.set_quoted('BEAR_COMMAND', '')
 endif
 
-clang_header_dir = ''
-clang_link_dir = ''
+opt_clang_header_dir = get_option('libclang-headerdir')
+opt_clang_link_dir = get_option('libclang-libdir')
 
 if build_machine.system() == 'darwin'
-  clang_header_dir = '/usr/local/opt/llvm/include'
-  clang_link_dir = '/usr/local/opt/llvm/lib'
+   if opt_clang_header_dir == ''
+     opt_clang_header_dir = '/usr/local/opt/llvm/include'
+   endif
+   if opt_clang_link_dir == ''
+     opt_clang_link_dir = '/usr/local/opt/llvm/lib'
+   endif
 endif
 
 if get_option('libclang') == true
 
   #check for the header
   found = false
-  if clang_header_dir != ''
-    found = cc.has_header('clang-c/Index.h', args : '-I'+clang_header_dir)
+  if opt_clang_header_dir != ''
+    found = cc.has_header('clang-c/Index.h', args : '-I'+opt_clang_header_dir)
   else
     found = cc.has_header('clang-c/Index.h')
   endif
@@ -62,11 +66,11 @@ if get_option('libclang') == true
     error('Clang header not found!')
   endif
 
-  clang_inc = include_directories(clang_header_dir)
+  clang_inc = include_directories(opt_clang_header_dir)
 
   #check for the library to link
-  if clang_link_dir != ''
-    clang = cc.find_library('clang', dirs : [clang_link_dir])
+  if opt_clang_link_dir != ''
+    clang = cc.find_library('clang', dirs : [opt_clang_link_dir])
   else
     clang = cc.find_library('clang')
   endif
