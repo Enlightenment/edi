@@ -12,7 +12,7 @@ src = files([
 check = dependency('check')
 
 deps = [elm, check, edi_lib, intl]
-incls = [include_directories('../../../src/bin'), include_directories('../../../src/lib'), top_inc]
+incls = [lib_dir, bin_dir, top_inc]
 
 if get_option('libclang') == true
    deps += [clang]
