@@ -21,6 +21,8 @@ src = files([
   'edi_searchpanel.h',
 ])
 
+bin_dir = include_directories('.')
+
 foreach package : packages
    subdir(package)
 endforeach

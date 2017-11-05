@@ -23,6 +23,8 @@ src = files([
   'md5.h',
 ])
 
+lib_dir = include_directories('.')
+
 edi_lib_lib = shared_library('edi', src,
   dependencies : [elm],
   include_directories : top_inc,
