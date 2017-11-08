@@ -563,6 +563,17 @@ edi_launcher_config_missing()
    edi_screens_message(_edi_main_win, title, message);
 }
 
+void
+edi_debug_exe_missing(void)
+{
+   const char *title, *message;
+
+   title = _("Unable to launch debugger");
+   message = _("No debug binary found, please check system configuration and Settings.");
+
+   edi_screens_message(_edi_main_win, title, message);
+}
+
 static void
 _edi_project_credentials_missing()
 
@@ -730,6 +741,12 @@ _edi_build_display_status_cb(int status, void *data)
 }
 
 static void
+_edi_debug_project(void)
+{
+   edi_debugpanel_start(_edi_project_config_debug_command_get());
+}
+
+static void
 _edi_build_project(void)
 {
    if (!edi_build_provider_for_project_get())
@@ -796,7 +813,7 @@ static void
 _tb_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    edi_debugpanel_show();
-   edi_debugpanel_start();
+   _edi_debug_project();
 }
 
 static void
@@ -1013,11 +1030,20 @@ _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_memcheck_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   edi_debugpanel_show();
+   edi_debugpanel_stop();
+   edi_debugpanel_start("memcheck");
+}
+
+static void
 _edi_menu_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
    edi_debugpanel_show();
-   edi_debugpanel_start();
+   _edi_debug_project();
 }
 
 static void
@@ -1189,8 +1215,11 @@ _edi_menu_setup(Evas_Object *win)
    _edi_menu_build = elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
    _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debug"), _edi_menu_debug_cb, NULL);
    _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Debug"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debugger"), _edi_menu_debug_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "applications-electronics", _("Memcheck"), _edi_menu_memcheck_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
    _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Init"), _edi_menu_scm_init_cb, NULL);

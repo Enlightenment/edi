@@ -88,6 +88,7 @@ struct _Edi_Project_Config
      } gui;
 
    Edi_Project_Config_Launch launch;
+   Eina_Stringshare *debug_command;
    Eina_Stringshare *user_fullname;
    Eina_Stringshare *user_email;
 
@@ -103,6 +104,7 @@ extern Edi_Project_Config *_edi_project_config;
 Eina_Bool _edi_config_init(void);
 Eina_Bool _edi_config_shutdown(void);
 const char *_edi_config_dir_get(void);
+const char *_edi_project_config_debug_command_get(void);
 
 // Global configuration handling
 

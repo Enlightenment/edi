@@ -8,6 +8,7 @@
 #include "Edi.h"
 #include "edi_screens.h"
 #include "edi_config.h"
+#include "edi_debug.h"
 
 #include "edi_private.h"
 
@@ -293,75 +294,138 @@ _edi_settings_builds_args_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+static char *
+_edi_settings_builds_debug_tool_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED, const char *part EINA_UNUSED)
+{
+   Edi_Debug_Tool *tool;
+   int i;
+
+   i = (int)(uintptr_t) data;
+
+   tool = &edi_debug_tools_get()[i];
+
+   return strdup(tool->name);
+}
+
+static void _edi_settings_builds_debug_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info)
+{
+   const char *text = elm_object_item_text_get(event_info);
+
+   if (_edi_project_config->debug_command)
+     eina_stringshare_del(_edi_project_config->debug_command);
+
+   _edi_project_config->debug_command = eina_stringshare_add(text);
+   _edi_project_config_save();
+
+   elm_object_text_set(obj, text);
+   elm_combobox_hover_end(obj);
+}
+
 static Evas_Object *
 _edi_settings_builds_create(Evas_Object *parent)
 {
-   Evas_Object *box, *frame, *hbox, *label, *ic, *selector, *file, *entry;
+   Evas_Object *box, *frame, *table, *label, *ic, *selector, *file, *entry;
+   Evas_Object *combobox;
+   Elm_Genlist_Item_Class *itc;
+   Edi_Debug_Tool *tools;
+   int i;
 
    frame = _edi_settings_panel_create(parent, _("Builds"));
    box = elm_object_part_content_get(frame, "default");
 
-   hbox = elm_box_add(parent);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, hbox);
-   evas_object_show(hbox);
+   table = elm_table_add(parent);
+   elm_table_padding_set(table, 5, 5);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(table);
+   elm_box_pack_end(box, table);
 
-   label = elm_label_add(hbox);
-   elm_object_text_set(label, _("Runtime binary"));
+   label = elm_label_add(box);
+   elm_object_text_set(label, _("Runtime binary:"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
-   elm_box_pack_end(hbox, label);
+   elm_table_pack(table, label, 0, 0, 1, 1);
    evas_object_show(label);
 
-   ic = elm_icon_add(hbox);
+   ic = elm_icon_add(box);
    elm_icon_standard_set(ic, "file");
    evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_show(ic);
 
    selector = elm_fileselector_button_add(box);
    elm_object_text_set(selector, _("Select"));
    elm_object_part_content_set(selector, "icon", ic);
    elm_fileselector_path_set(selector, edi_project_get());
-   evas_object_size_hint_weight_set(selector, 0.25, 0.0);
    evas_object_size_hint_align_set(selector, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbox, selector);
+   elm_table_pack(table, selector, 1, 0, 1, 1);
    evas_object_show(selector);
 
-   elm_object_focus_set(selector, EINA_TRUE);
-
-   file = elm_label_add(hbox);
+   file = elm_entry_add(box);
+   elm_entry_editable_set(file, EINA_FALSE);
+   elm_entry_single_line_set(file, EINA_TRUE);
+   elm_entry_scrollable_set(file, EINA_TRUE);
    elm_object_text_set(file, _edi_project_config->launch.path);
    evas_object_size_hint_weight_set(file, 0.75, 0.0);
    evas_object_size_hint_align_set(file, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbox, file);
+   elm_table_pack(table, file, 2, 0, 1, 1);
    evas_object_show(file);
 
    evas_object_smart_callback_add(selector, "file,chosen",
                                   _edi_settings_builds_binary_chosen_cb, file);
 
-   hbox = elm_box_add(parent);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(box, hbox);
-   evas_object_show(hbox);
-
-   label = elm_label_add(hbox);
-   elm_object_text_set(label, _("Runtime arguments"));
+   label = elm_label_add(box);
+   elm_object_text_set(label, _("Runtime arguments:"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
-   elm_box_pack_end(hbox, label);
+   elm_table_pack(table, label, 0, 1, 1, 1);
    evas_object_show(label);
 
-   entry = elm_entry_add(hbox);
+   entry = elm_entry_add(box);
    elm_object_text_set(entry, _edi_project_config->launch.args);
+   elm_entry_editable_set(entry, EINA_TRUE);
+   elm_entry_single_line_set(entry, EINA_TRUE);
+   elm_entry_scrollable_set(entry, EINA_TRUE);
    evas_object_size_hint_weight_set(entry, 0.75, 0.0);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbox, entry);
+   elm_table_pack(table, entry, 1, 1, 2, 1);
    evas_object_show(entry);
    evas_object_smart_callback_add(entry, "changed",
                                   _edi_settings_builds_args_cb, NULL);
+
+   label = elm_label_add(box);
+   elm_object_text_set(label, _("Default debugger:"));
+   evas_object_size_hint_weight_set(label, 0.0, 0.0);
+   evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
+   elm_table_pack(table, label, 0, 2, 1, 1);
+   evas_object_show(label);
+
+   combobox = elm_combobox_add(box);
+   if (_edi_project_config->debug_command)
+     elm_object_part_text_set(combobox, "guide", _edi_project_config->debug_command);
+   else
+     elm_object_part_text_set(combobox, "guide", _("Please choose ..."));
+
+   evas_object_size_hint_weight_set(combobox, 0.75, 0.0);
+   evas_object_size_hint_align_set(combobox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(combobox);
+   evas_object_smart_callback_add(combobox, "item,pressed",
+                                 _edi_settings_builds_debug_pressed_cb, NULL);
+
+   elm_table_pack(table, combobox, 1, 2, 2, 1);
+
+   itc = elm_genlist_item_class_new();
+   itc->item_style = "default";
+   itc->func.text_get = _edi_settings_builds_debug_tool_text_get_cb;
+
+   tools = edi_debug_tools_get();
+   for (i = 0; tools[i].name; i++)
+     {
+        if (ecore_file_app_installed(tools[i].exec))
+          elm_genlist_item_append(combobox, itc, (void *)(uintptr_t) i, NULL, ELM_GENLIST_ITEM_NONE, NULL, (void *)(uintptr_t) i);
+     }
+
+   elm_genlist_realized_items_update(combobox);
+   elm_genlist_item_class_free(itc);
 
    return frame;
 }

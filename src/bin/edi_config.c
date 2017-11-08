@@ -85,6 +85,12 @@ _edi_project_config_dir_get(void)
    return dir;
 }
 
+const char *
+_edi_project_config_debug_command_get(void)
+{
+   return _edi_project_config->debug_command;
+}
+
 /* local functions */
 static Edi_Config_DD *
 _edi_config_descriptor_new(const char *name, int size)
@@ -278,6 +284,7 @@ _edi_config_init(void)
 
    EDI_CONFIG_VAL(D, T, launch.path, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, launch.args, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, debug_command, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, user_fullname, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, user_email, EET_T_STRING);
 
