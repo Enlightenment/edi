@@ -125,6 +125,21 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
 }
 
 static void
+_edi_debugpanel_icons_update(Edi_Debug_Process_State state)
+{
+   Evas_Object *ico_int;
+
+   ico_int = elm_icon_add(_button_int);
+
+   if (state == EDI_DEBUG_PROCESS_ACTIVE)
+     elm_icon_standard_set(ico_int, "media-playback-pause");
+   else
+     elm_icon_standard_set(ico_int, "media-playback-start");
+
+   elm_object_part_content_set(_button_int, "icon", ico_int);
+}
+
+static void
 _edi_debugpanel_bt_sigterm_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    pid_t pid;
@@ -145,21 +160,6 @@ _edi_debugpanel_bt_sigterm_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUS
 }
 
 static void
-_edi_debugpanel_icons_update(Edi_Debug_Process_State state)
-{
-   Evas_Object *ico_int;
-
-   ico_int = elm_icon_add(_button_int);
-
-   if (state == EDI_DEBUG_PROCESS_ACTIVE)
-     elm_icon_standard_set(ico_int, "media-playback-pause");
-   else
-     elm_icon_standard_set(ico_int, "media-playback-start");
-
-   elm_object_part_content_set(_button_int, "icon", ico_int);
-}
-
-static void
 _edi_debugpanel_bt_sigint_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    pid_t pid;
@@ -169,14 +169,17 @@ _edi_debugpanel_bt_sigint_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSE
    if (!debug) return;
 
    pid = edi_debug_process_id(debug);
-   if (pid <= 0) return;
+   if (pid <= 0)
+     {
+        if (debug->tool->command_start)
+          ecore_exe_send(debug->exe, debug->tool->command_start, strlen(debug->tool->command_start));
+        return;
+     }
 
    if (debug->state == EDI_DEBUG_PROCESS_ACTIVE)
      kill(pid, SIGINT);
    else if (debug->tool->command_continue)
      ecore_exe_send(debug->exe, debug->tool->command_continue, strlen(debug->tool->command_continue));
-
-    _edi_debugpanel_icons_update(debug->state);
 }
 
 static void
@@ -207,11 +210,12 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
         elm_object_disabled_set(_button_int, EINA_TRUE);
         elm_object_disabled_set(_button_term, EINA_TRUE);
      }
-   else
-     {
-        if (edi_debug_process_id(debug) > 0)
-          _edi_debugpanel_icons_update(debug->state);
-     }
+
+   if (!debug)
+     return ECORE_CALLBACK_RENEW;
+
+   pid = edi_debug_process_id(debug);
+   _edi_debugpanel_icons_update(pid > 0 ? debug->state : 0);
 
    return ECORE_CALLBACK_RENEW;
 }
