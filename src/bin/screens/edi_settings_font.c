@@ -52,7 +52,8 @@ static Eina_Bool
 _font_monospaced_check(const char *name, Evas_Object *parent)
 {
    Evas_Object *textblock;
-   Evas_Coord w1, w2, h1, h2;
+   Evas_Coord w1, w2;
+   int diff;
 
    textblock = evas_object_text_add(parent);
    evas_object_size_hint_weight_set(textblock, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -62,17 +63,18 @@ _font_monospaced_check(const char *name, Evas_Object *parent)
    evas_object_text_font_set(textblock, name, 14);
    evas_object_text_text_set(textblock, "i");
 
-   // check width is consistent - i.e. monospaced
-   evas_object_geometry_get(textblock, NULL, NULL, &w1, &h1);
+   evas_object_geometry_get(textblock, NULL, NULL, &w1, NULL);
 
    evas_object_text_text_set(textblock, "m");
    evas_object_geometry_get(textblock, NULL, NULL, &w2, NULL);
 
-   // also check that height varies i.e. not fixed
-   evas_object_text_font_set(textblock, name, 4);
-   evas_object_geometry_get(textblock, NULL, NULL, NULL, &h2);
+   // check width difference is small or zero.
+   diff = (w2 >= w1) ? w2 - w1 : w1 - w2;
 
-   return w1 == w2 && h1 != h2;
+   if (diff > 3)
+     return EINA_FALSE;
+
+   return EINA_TRUE;
 }
 
 static void
