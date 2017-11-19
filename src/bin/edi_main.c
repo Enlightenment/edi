@@ -1218,8 +1218,7 @@ _edi_menu_setup(Evas_Object *win)
    _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
    _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
-
-   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Debug"), NULL, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debugger"), _edi_menu_debug_cb, NULL);
    elm_menu_item_add(menu, menu_it, "applications-electronics", _("Memcheck"), _edi_menu_memcheck_cb, NULL);
 

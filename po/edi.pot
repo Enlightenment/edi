@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edi\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-19 22:01+0000\n"
+"POT-Creation-Date: 2017-11-19 22:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -110,7 +110,7 @@ msgid "No help available for this term"
 msgstr ""
 
 #: src/bin/editor/edi_editor_documentation.c:162 src/bin/edi_main.c:1187
-#: src/bin/edi_main.c:1271
+#: src/bin/edi_main.c:1270
 msgid "Close"
 msgstr ""
 
@@ -407,7 +407,7 @@ msgstr ""
 msgid "Edi Settings"
 msgstr ""
 
-#: src/bin/screens/edi_settings.c:702 src/bin/edi_main.c:1226
+#: src/bin/screens/edi_settings.c:702 src/bin/edi_main.c:1225
 msgid "Project"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr ""
 msgid "<hilight>EDI's lovely authors</hilight>"
 msgstr ""
 
-#: src/bin/screens/edi_about.c:128 src/bin/edi_main.c:1236
+#: src/bin/screens/edi_about.c:128 src/bin/edi_main.c:1235
 msgid "Visit Website"
 msgstr ""
 
@@ -592,7 +592,7 @@ msgstr ""
 msgid "Tasks"
 msgstr ""
 
-#: src/bin/edi_main.c:438 src/bin/edi_main.c:1222 src/bin/edi_main.c:1298
+#: src/bin/edi_main.c:438 src/bin/edi_main.c:1297
 msgid "Debug"
 msgstr ""
 
@@ -648,7 +648,7 @@ msgid "Passed"
 msgstr ""
 
 #: src/bin/edi_main.c:757 src/bin/edi_main.c:1216 src/bin/edi_main.c:1217
-#: src/bin/edi_main.c:1295
+#: src/bin/edi_main.c:1294
 msgid "Build"
 msgstr ""
 
@@ -656,7 +656,7 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-#: src/bin/edi_main.c:785 src/bin/edi_main.c:1218 src/bin/edi_main.c:1296
+#: src/bin/edi_main.c:785 src/bin/edi_main.c:1218 src/bin/edi_main.c:1295
 msgid "Test"
 msgstr ""
 
@@ -680,7 +680,7 @@ msgstr ""
 msgid "New Directory"
 msgstr ""
 
-#: src/bin/edi_main.c:1186 src/bin/edi_main.c:1270
+#: src/bin/edi_main.c:1186 src/bin/edi_main.c:1269
 msgid "Save"
 msgstr ""
 
@@ -688,7 +688,7 @@ msgstr ""
 msgid "Close all"
 msgstr ""
 
-#: src/bin/edi_main.c:1190 src/bin/edi_main.c:1303
+#: src/bin/edi_main.c:1190 src/bin/edi_main.c:1302
 msgid "Settings"
 msgstr ""
 
@@ -700,23 +700,23 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: src/bin/edi_main.c:1195 src/bin/edi_main.c:1276
+#: src/bin/edi_main.c:1195 src/bin/edi_main.c:1275
 msgid "Undo"
 msgstr ""
 
-#: src/bin/edi_main.c:1196 src/bin/edi_main.c:1277
+#: src/bin/edi_main.c:1196 src/bin/edi_main.c:1276
 msgid "Redo"
 msgstr ""
 
-#: src/bin/edi_main.c:1198 src/bin/edi_main.c:1282
+#: src/bin/edi_main.c:1198 src/bin/edi_main.c:1281
 msgid "Cut"
 msgstr ""
 
-#: src/bin/edi_main.c:1199 src/bin/edi_main.c:1283
+#: src/bin/edi_main.c:1199 src/bin/edi_main.c:1282
 msgid "Copy"
 msgstr ""
 
-#: src/bin/edi_main.c:1200 src/bin/edi_main.c:1284
+#: src/bin/edi_main.c:1200 src/bin/edi_main.c:1283
 msgid "Paste"
 msgstr ""
 
@@ -724,7 +724,7 @@ msgstr ""
 msgid "Find & Replace"
 msgstr ""
 
-#: src/bin/edi_main.c:1204 src/bin/edi_main.c:1290
+#: src/bin/edi_main.c:1204 src/bin/edi_main.c:1289
 msgid "Goto Line"
 msgstr ""
 
@@ -756,64 +756,64 @@ msgstr ""
 msgid "Open Tasks"
 msgstr ""
 
-#: src/bin/edi_main.c:1219 src/bin/edi_main.c:1297
+#: src/bin/edi_main.c:1219 src/bin/edi_main.c:1296
 msgid "Run"
 msgstr ""
 
-#: src/bin/edi_main.c:1223
+#: src/bin/edi_main.c:1222
 msgid "Debugger"
 msgstr ""
 
-#: src/bin/edi_main.c:1224
+#: src/bin/edi_main.c:1223
 msgid "Memcheck"
 msgstr ""
 
-#: src/bin/edi_main.c:1227
+#: src/bin/edi_main.c:1226
 msgid "Init"
 msgstr ""
 
-#: src/bin/edi_main.c:1228 src/bin/edi_scm_ui.c:780
+#: src/bin/edi_main.c:1227 src/bin/edi_scm_ui.c:780
 msgid "Commit"
 msgstr ""
 
-#: src/bin/edi_main.c:1229
+#: src/bin/edi_main.c:1228
 msgid "Stash"
 msgstr ""
 
-#: src/bin/edi_main.c:1230
+#: src/bin/edi_main.c:1229
 msgid "Status"
 msgstr ""
 
-#: src/bin/edi_main.c:1231
+#: src/bin/edi_main.c:1230
 msgid "Push"
 msgstr ""
 
-#: src/bin/edi_main.c:1232
+#: src/bin/edi_main.c:1231
 msgid "Pull"
 msgstr ""
 
-#: src/bin/edi_main.c:1235
+#: src/bin/edi_main.c:1234
 msgid "Help"
 msgstr ""
 
-#: src/bin/edi_main.c:1238 src/bin/edi_main.c:1304
+#: src/bin/edi_main.c:1237 src/bin/edi_main.c:1303
 msgid "About"
 msgstr ""
 
-#: src/bin/edi_main.c:1269
+#: src/bin/edi_main.c:1268
 msgid "New File"
 msgstr ""
 
-#: src/bin/edi_main.c:1289
+#: src/bin/edi_main.c:1288
 msgid "Find"
 msgstr ""
 
-#: src/bin/edi_main.c:1480
+#: src/bin/edi_main.c:1479
 #, c-format
 msgid "Project path must be a directory\n"
 msgstr ""
 
-#: src/bin/edi_main.c:1694
+#: src/bin/edi_main.c:1693
 #, c-format
 msgid "Could not open file of unsupported mime type (%s)\n"
 msgstr ""
