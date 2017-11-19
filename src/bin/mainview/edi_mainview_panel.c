@@ -284,13 +284,14 @@ void
 edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item)
 {
    int item_index;
+   Eina_Bool current;
 
    if (!item)
      return;
 
+   current = (item == panel->current);
    item_index = eina_list_data_idx(panel->items, item);
 
-   edi_mainview_item_prev();
    if (item->view)
      evas_object_del(item->view);
    elm_box_unpack(panel->tabs, item->tab);
@@ -302,22 +303,22 @@ edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item
    eina_stringshare_del(item->path);
    free(item);
 
+   if (!current)
+     return;
+
    if (eina_list_count(panel->items) == 0)
-     _edi_mainview_panel_show(panel, panel->welcome);
-
-   if (panel == edi_mainview_panel_current_get())
      {
-        if (eina_list_count(panel->items))
-          {
-             if (item_index)
-               item = eina_list_nth(panel->items, item_index - 1);
-             else
-               item = eina_list_nth(panel->items, item_index);
-
-             edi_mainview_panel_item_select(panel, item);
-             _edi_mainview_panel_current_tab_show(panel);
-          }
+        _edi_mainview_panel_show(panel, panel->welcome);
+        return;
      }
+
+   if (item_index)
+     item = eina_list_nth(panel->items, item_index - 1);
+   else
+     item = eina_list_nth(panel->items, item_index);
+
+   edi_mainview_panel_item_select(panel, item);
+   _edi_mainview_panel_current_tab_show(panel);
 }
 
 void
