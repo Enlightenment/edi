@@ -361,10 +361,14 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
 
 static void
 _promote(void *data, Evas_Object *obj EINA_UNUSED,
-         const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
+         const char *emission EINA_UNUSED, const char *source)
 {
    Edi_Mainview_Panel *panel;
    Edi_Mainview_Item *item = (Edi_Mainview_Item *) data;
+
+   // ignore if we clicked the delete part of the button
+   if (!strcmp(source, "del"))
+     return;
 
    panel = edi_mainview_panel_for_item_get(item);
 
