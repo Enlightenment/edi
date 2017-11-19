@@ -348,7 +348,7 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
         elm_object_signal_emit(item->tab, "mouse,down,1", "base");
 
         evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
-        elm_scroller_region_bring_in(panel->tabs, region_x, 0, tabw, 0);
+        elm_scroller_region_bring_in(efl_parent_get(panel->tabs), region_x, 0, tabw, 0);
 
         _edi_project_config_tab_current_set(edi_mainview_panel_index_get(panel),
                                             edi_mainview_panel_item_current_tab_get(panel));
