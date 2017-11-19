@@ -26,6 +26,8 @@
 
 #include "edi_private.h"
 
+#define MENU_ELLIPSIS(S) eina_slstr_printf("%s...", S)
+
 int EDI_EVENT_TAB_CHANGED;
 int EDI_EVENT_FILE_CHANGED;
 int EDI_EVENT_FILE_SAVED;
@@ -1177,10 +1179,10 @@ _edi_menu_setup(Evas_Object *win)
    menu = elm_win_main_menu_get(win);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("File"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", _("New Project ..."), _edi_menu_project_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Project")), _edi_menu_project_new_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "document-new", _("New ..."), _edi_menu_new_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", _("New Directory ..."), _edi_menu_new_dir_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-new", MENU_ELLIPSIS(_("New")), _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Directory")), _edi_menu_new_dir_cb, NULL);
    _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", _("Save"), _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-close", _("Close"), _edi_menu_close_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-close", _("Close all"), _edi_menu_closeall_cb, NULL);
@@ -1199,10 +1201,10 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Find & Replace"), _edi_menu_find_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-find", _("Find file"), _edi_menu_findfile_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "go-jump", _("Goto Line ..."), _edi_menu_goto_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "go-jump", MENU_ELLIPSIS(_("Goto Line")), _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", _("Find in project ..."), _edi_menu_find_project_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Replace in project ..."), _edi_menu_find_replace_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find-replace", MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", _("New Window"), _edi_menu_view_open_window_cb, NULL);
@@ -1284,7 +1286,7 @@ edi_toolbar_setup(Evas_Object *parent)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "edit-find-replace", _("Find..."), _tb_search_cb);
+   _edi_toolbar_item_add(tb, "edit-find-replace", MENU_ELLIPSIS(_("Find")), _tb_search_cb);
    _edi_toolbar_item_add(tb, "go-jump", _("Goto Line"), _tb_goto_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);

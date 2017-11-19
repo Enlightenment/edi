@@ -341,7 +341,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    elm_box_pack_end(box, table);
 
    label = elm_label_add(box);
-   elm_object_text_set(label, _("Runtime binary:"));
+   elm_object_text_set(label, _("Runtime binary"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_table_pack(table, label, 0, 0, 1, 1);
@@ -374,7 +374,7 @@ _edi_settings_builds_create(Evas_Object *parent)
                                   _edi_settings_builds_binary_chosen_cb, file);
 
    label = elm_label_add(box);
-   elm_object_text_set(label, _("Runtime arguments:"));
+   elm_object_text_set(label, _("Runtime arguments"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_table_pack(table, label, 0, 1, 1, 1);
@@ -393,7 +393,7 @@ _edi_settings_builds_create(Evas_Object *parent)
                                   _edi_settings_builds_args_cb, NULL);
 
    label = elm_label_add(box);
-   elm_object_text_set(label, _("Default debugger:"));
+   elm_object_text_set(label, _("Default debugger"));
    evas_object_size_hint_weight_set(label, 0.0, 0.0);
    evas_object_size_hint_align_set(label, 0.0, EVAS_HINT_FILL);
    elm_table_pack(table, label, 0, 2, 1, 1);
@@ -403,7 +403,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    if (_edi_project_config->debug_command)
      elm_object_part_text_set(combobox, "guide", _edi_project_config->debug_command);
    else
-     elm_object_part_text_set(combobox, "guide", _("Please choose ..."));
+     elm_object_part_text_set(combobox, "guide", eina_slstr_printf("%s...", _("Please choose")));
 
    evas_object_size_hint_weight_set(combobox, 0.75, 0.0);
    evas_object_size_hint_align_set(combobox, EVAS_HINT_FILL, EVAS_HINT_FILL);

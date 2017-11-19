@@ -429,7 +429,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
 
    menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", _("Open in New Panel"), _item_menu_open_panel_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Open as ..."), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, NULL, eina_slstr_printf("%s...", _("Open as")), NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
@@ -440,7 +440,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    elm_menu_item_separator_add(menu, NULL);
    if (edi_scm_enabled())
      {
-        menu_it = elm_menu_item_add(menu, NULL, NULL, _("Source Control ..."), NULL, NULL);
+        menu_it = elm_menu_item_add(menu, NULL, NULL, eina_slstr_printf("%s...", _("Source Control")), NULL, NULL);
         elm_menu_item_add(menu, menu_it, "document-save-as", _("Add Changes"), _item_menu_scm_add_cb, sd);
         elm_menu_item_add(menu, menu_it, "document-save-as", _("Rename File"), _item_menu_rename_cb, sd);
         elm_menu_item_add(menu, menu_it, "edit-delete", _("Delete File"), _item_menu_scm_del_cb, sd);
