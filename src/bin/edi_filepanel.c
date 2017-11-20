@@ -1100,6 +1100,7 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_object_part_content_set(cancel, "icon", icon);
 
    _list = list = elm_genlist_add(parent);
+   elm_object_focus_allow_set(list, EINA_FALSE);
    elm_genlist_homogeneous_set(list, EINA_TRUE);
    elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_genlist_filter_set(list, "");
