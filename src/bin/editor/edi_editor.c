@@ -1212,7 +1212,7 @@ _focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
      {
         ecore_timer_del(editor->save_timer);
         editor->save_timer = NULL;
-        _edi_editor_file_change_popup(evas_object_smart_parent_get(obj), editor);
+        _edi_editor_file_change_popup(obj, editor);
         editor->modified = EINA_FALSE;
         return;
      }
