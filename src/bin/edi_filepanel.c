@@ -1034,7 +1034,10 @@ edi_filepanel_select_path(const char *path)
    if (!item)
      return;
 
-  elm_genlist_item_selected_set(item, EINA_TRUE);
+   if (elm_genlist_item_selected_get(item))
+     return;
+
+   elm_genlist_item_selected_set(item, EINA_TRUE);
 }
 
 void
