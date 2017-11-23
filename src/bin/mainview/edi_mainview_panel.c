@@ -21,7 +21,7 @@
 
 typedef struct _Edi_Mainview_State {
    Edi_Mainview_Panel *panel;
-   Edi_Mainview_Item  *item;
+   char *path;
 }  Edi_Mainview_State;
 
 static Edi_Mainview_State *_cached = NULL;
@@ -36,17 +36,27 @@ dummy()
 static void
 _edi_mainview_panel_cache_set(void)
 {
+   Edi_Mainview_Item *item;
+
    if (!_cached)
      _cached = calloc(1, sizeof(Edi_Mainview_State));
 
+   if (_cached->path)
+     {
+        free(_cached->path);
+        _cached->path = NULL;
+     }
+
    _cached->panel = edi_mainview_panel_current_get();
-   _cached->item  = edi_mainview_item_current_get();
+   item = edi_mainview_item_current_get();
+   if (item)
+     _cached->path = strdup(item->path);
 }
 
 static Edi_Mainview_State *
 _edi_mainview_panel_cache_get(void)
 {
-   if (!_cached || !_cached->panel || !_cached->item)
+   if (!_cached || !_cached->panel || !_cached->path)
      return NULL;
 
    return _cached;
@@ -408,9 +418,9 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
 
    /* When closing tabs keep current tab */
    last = _edi_mainview_panel_cache_get();
-   if (last && last->panel == panel && last->item)
+   if (last && last->panel == panel && last->path)
      {
-        item  = _get_item_for_path(panel, last->item->path);
+        item  = _get_item_for_path(panel, last->path);
         if (item)
           {
              _edi_mainview_panel_current_tab_hide(panel);
