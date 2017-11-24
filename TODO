@@ -1,9 +1,7 @@
 This project is in heavy development, we are currenty working towards the
 "Code aware editor" phase, the following work is still to be done:
 
-* Replace text (project-wide)
 * Code folding
-* Split pane view (split a tab to multiple views on a file)
 * Automatic code indenting / formatting
 * notepad, emacs and vim and editing modes (key bindings)
 * LLVM parsing
