@@ -281,21 +281,6 @@ edi_mainview_open_path(const char *path)
 }
 
 static void
-_focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   Elm_Code *code;
-   const char *path;
-   Edi_Mainview_Panel *panel;
-   Edi_Editor *editor = data;
-
-   code = elm_code_widget_code_get(editor->entry);
-   path = elm_code_file_path_get(code->file);
-   panel = edi_mainview_panel_for_path_get(path);
-
-   edi_mainview_panel_focus(panel);
-}
-
-static void
 _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Edi_Editor *editor = data;
@@ -329,13 +314,14 @@ void edi_mainview_split_current(void)
    elm_code_widget_editable_set(widget, EINA_TRUE);
    elm_code_widget_line_numbers_set(widget, EINA_TRUE);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
-   evas_object_smart_callback_add(widget, "focused", _focused_cb, editor);
    edi_editor_widget_config_get(widget);
 
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
    elm_box_pack_start(panel->current->container, widget);
+
+   editor->split_views = eina_list_append(editor->split_views, widget);
 }
 
 void

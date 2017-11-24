@@ -401,11 +401,23 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Mainview_Panel *panel;
    Edi_Mainview_Item *item;
    Edi_Mainview_State *last;
+   Edi_Editor *editor;
    int index;
 
    item = (Edi_Mainview_Item *) data;
-
    panel = edi_mainview_panel_for_item_get(item);
+
+   editor = (Edi_Editor *) evas_object_data_get(panel->current->view, "editor");
+   if (editor && eina_list_count(editor->split_views))
+     {
+        Elm_Code_Widget *widget = eina_list_nth(editor->split_views, 0);
+        elm_box_unpack(panel->current->container, widget);
+        editor->split_views = eina_list_remove(editor->split_views, widget);
+        evas_object_del(widget);
+
+        return;
+     }
+
    edi_mainview_panel_item_close(panel, item);
    if (eina_list_count(panel->items)== 0 && edi_mainview_panel_count() > 1)
      {
