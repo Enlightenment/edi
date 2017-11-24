@@ -403,7 +403,7 @@ _edi_settings_builds_create(Evas_Object *parent)
    if (_edi_project_config->debug_command)
      elm_object_part_text_set(combobox, "guide", _edi_project_config->debug_command);
    else
-     elm_object_part_text_set(combobox, "guide", eina_slstr_printf("%s...", _("Please choose")));
+     elm_object_part_text_set(combobox, "guide", edi_debug_tools_get()[0].name);
 
    evas_object_size_hint_weight_set(combobox, 0.75, 0.0);
    evas_object_size_hint_align_set(combobox, EVAS_HINT_FILL, EVAS_HINT_FILL);
