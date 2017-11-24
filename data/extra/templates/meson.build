@@ -22,15 +22,16 @@ cmd = [ edje_cc,
 
 skeleton_meta = ['eflproject', 'eflproject_python']
 
+template_dir = join_paths(get_option('datadir'), 'edi', 'templates')
 foreach meta : skeleton_meta
     custom_target('meta ' + meta,
         input   : meta + '.edc',
         output  : meta + '.edj',
         command : cmd,
-        install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'templates'),
+        install_dir: template_dir,
         install: true,
     )
-    out = join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'templates') + '/' + meta + '.edj'
+    out = join_paths(get_option('prefix'), template_dir, meta + '.edj')
     meson.add_install_script('chmod', 'a+r', out)
 endforeach
 
