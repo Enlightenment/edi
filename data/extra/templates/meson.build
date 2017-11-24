@@ -32,6 +32,6 @@ foreach meta : skeleton_meta
         install: true,
     )
     out = join_paths(get_option('prefix'), template_dir, meta + '.edj')
-    meson.add_install_script('chmod', 'a+r', out)
+    meson.add_install_script('../../../scripts/world_read.sh', out)
 endforeach
 
