@@ -9,6 +9,7 @@
 #include "edi_screens.h"
 #include "edi_config.h"
 #include "edi_debug.h"
+#include "edi_theme.h"
 
 #include "edi_private.h"
 
@@ -142,39 +143,110 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    return widget;
 }
 
+static void
+_edi_settings_display_theme_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info)
+{
+   const char *text = elm_object_item_text_get(event_info);
+
+   if (_edi_project_config->gui.theme)
+     eina_stringshare_del(_edi_project_config->gui.theme);
+
+   _edi_project_config->gui.theme = eina_stringshare_add(text);
+   _edi_project_config_save();
+
+   elm_object_text_set(obj, text);
+   elm_combobox_hover_end(obj);
+}
+
+static char *
+_edi_settings_display_theme_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED, const char *part EINA_UNUSED)
+{
+   Edi_Theme *current;
+   int i;
+
+   i = (int)(uintptr_t) data;
+   current = eina_list_nth(edi_theme_themes_get(), i);
+
+   if (!current) return NULL;
+
+   return strdup(current->name);
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
    Evas_Object *box, *hbox, *frame, *label, *spinner, *check, *button, *preview;
+   Evas_Object *table, *combobox;
+   Elm_Genlist_Item_Class *itc;
+   Edi_Theme *theme;
+   Eina_List *themes, *l;
+   int i = 0;
 
    frame = _edi_settings_panel_create(parent, _("Display"));
    box = elm_object_part_content_get(frame, "default");
 
-   hbox = elm_box_add(parent);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.5);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 1.0);
-   elm_box_pack_end(box, hbox);
-   evas_object_show(hbox);
+   table = elm_table_add(parent);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(table);
 
-   label = elm_label_add(hbox);
+   label = elm_label_add(table);
    elm_object_text_set(label, _("Font"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_box_pack_end(hbox, label);
+   elm_table_pack(table, label, 0, 0, 1, 1);
    evas_object_show(label);
 
-   button = elm_button_add(hbox);
-   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   button = elm_button_add(table);
+   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, 0); // EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(button);
-   preview = _edi_settings_font_preview_add(hbox, _edi_project_config->font.name,
+   preview = _edi_settings_font_preview_add(table, _edi_project_config->font.name,
                                             _edi_project_config->font.size);
    elm_layout_content_set(button, "elm.swallow.content", preview);
-   elm_box_pack_end(hbox, button);
+   elm_table_pack(table, button, 1, 0, 1, 1);
    evas_object_smart_callback_add(button, "clicked",
                                   _edi_settings_font_choose_cb, parent);
 
    elm_object_focus_set(button, EINA_TRUE);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Color theme"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 1, 1, 1);
+   evas_object_show(label);
+
+   // START OF COLOR SELECTOR
+
+   combobox = elm_combobox_add(table);
+   evas_object_size_hint_weight_set(combobox, 0.75, 0.0);
+   evas_object_size_hint_align_set(combobox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(combobox);
+   evas_object_smart_callback_add(combobox, "item,pressed",
+                                 _edi_settings_display_theme_pressed_cb, NULL);
+
+   if (!_edi_project_config->gui.theme)
+     elm_object_text_set(combobox, _("default"));
+   else
+     elm_object_text_set(combobox, _edi_project_config->gui.theme);
+
+   elm_table_pack(table, combobox, 1, 1, 1, 1);
+   elm_box_pack_end(box, table);
+   itc = elm_genlist_item_class_new();
+   itc->item_style = "default";
+   itc->func.text_get = _edi_settings_display_theme_text_get_cb;
+
+   themes = edi_theme_themes_get();
+
+   EINA_LIST_FOREACH(themes, l, theme)
+     {
+        elm_genlist_item_append(combobox, itc, (void *)(uintptr_t) i, NULL, ELM_GENLIST_ITEM_NONE, NULL, (void *)(uintptr_t) i);
+        i++;
+     }
+
+   elm_genlist_realized_items_update(combobox);
+   elm_genlist_item_class_free(itc);
+
+   // END OF COLOR SELECTOR
 
    check = elm_check_add(box);
    elm_object_text_set(check, _("Display whitespace"));

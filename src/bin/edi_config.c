@@ -269,6 +269,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, font.name, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, font.size, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.translucent, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.theme, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, gui.width, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.height, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.leftsize, EET_T_DOUBLE);

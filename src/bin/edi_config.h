@@ -77,6 +77,7 @@ struct _Edi_Project_Config
    struct
      {
         Eina_Bool translucent;
+        const char *theme;
         int width, height, bottomtab;
         double leftsize, bottomsize;
         Eina_Bool leftopen, bottomopen;
