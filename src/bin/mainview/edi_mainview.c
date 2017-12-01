@@ -292,7 +292,7 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 }
 
 static Eina_Bool
-_edi_mainview_split_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+_edi_mainview_split_config_changed_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    Elm_Code_Widget *widget = data;
 
