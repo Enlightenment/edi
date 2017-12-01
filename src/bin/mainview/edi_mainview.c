@@ -16,6 +16,7 @@
 #include "edi_content_provider.h"
 #include "edi_searchpanel.h"
 #include "edi_file.h"
+#include "edi_theme.h"
 
 #include "edi_private.h"
 #include "edi_config.h"
@@ -290,6 +291,17 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
    ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
 }
 
+static Eina_Bool
+_edi_mainview_split_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
+{
+   Elm_Code_Widget *widget = data;
+
+   elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
+
+   return ECORE_CALLBACK_RENEW;
+}
+
 void edi_mainview_split_current(void)
 {
    Elm_Code *code;
@@ -312,14 +324,17 @@ void edi_mainview_split_current(void)
 
    code = elm_code_widget_code_get(editor->entry);
    widget = elm_code_widget_add(panel->content, code);
+
    elm_code_widget_editable_set(widget, EINA_TRUE);
    elm_code_widget_line_numbers_set(widget, EINA_TRUE);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
    edi_editor_widget_config_get(widget);
-
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
+
+   ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_mainview_split_config_changed_cb, widget);
+
    elm_box_pack_start(panel->current->container, widget);
    path = elm_code_file_path_get(code->file);
 
