@@ -142,6 +142,7 @@ _edi_project_config_cb_free(void)
         EINA_LIST_FREE(panel->tabs, tab)
           {
              if (tab->path) eina_stringshare_del(tab->path);
+             if (tab->fullpath) eina_stringshare_del(tab->fullpath);
              if (tab->type) eina_stringshare_del(tab->type);
              free(tab);
           }
@@ -150,6 +151,7 @@ _edi_project_config_cb_free(void)
    EINA_LIST_FREE(_edi_project_config->windows, tab)
      {
         if (tab->path) eina_stringshare_del(tab->path);
+        if (tab->fullpath) eina_stringshare_del(tab->fullpath);
         if (tab->type) eina_stringshare_del(tab->type);
         free(tab);
      }
@@ -250,7 +252,9 @@ _edi_config_init(void)
    #define T Edi_Project_Config_Tab
    #define D _edi_proj_cfg_tab_edd
    EDI_CONFIG_VAL(D, T, path, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, fullpath, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, type, EET_T_STRING);
+   EDI_CONFIG_VAL(D, T, split_views, EET_T_INT);
 
    _edi_proj_cfg_panel_edd = EDI_CONFIG_DD_NEW("Project_Config_Panel", Edi_Project_Config_Panel);
    #undef T
@@ -584,13 +588,16 @@ _edi_project_config_tab_add(const char *path, const char *type,
    Edi_Project_Config_Tab *tab;
    Eina_List **tabs;
 
-   tab = malloc(sizeof(*tab));
+   tab = calloc(1, sizeof(*tab));
 
    // let's keep paths relative
    if (!strncmp(path, edi_project_get(), strlen(edi_project_get())))
      tab->path = eina_stringshare_add(path + strlen(edi_project_get()) + 1);
    else
      tab->path = eina_stringshare_add(path);
+
+   tab->fullpath = eina_stringshare_add(ecore_file_realpath(path));
+
    tab->type = eina_stringshare_add(type);
 
    tabs = _tablist_get(windowed, panel_id);
@@ -619,6 +626,7 @@ _edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_i
    _edi_project_config_save_no_notify();
 
    eina_stringshare_del(tab->path);
+   eina_stringshare_del(tab->fullpath);
    if (tab->type)
      eina_stringshare_del(tab->type);
    free(tab);
@@ -639,6 +647,8 @@ _edi_project_config_panel_remove(int panel_id)
      {
         if (tab->path)
           eina_stringshare_del(tab->path);
+        if (tab->fullpath)
+          eina_stringshare_del(tab->fullpath);
         if (tab->type)
           eina_stringshare_del(tab->type);
         free(tab);
@@ -647,4 +657,25 @@ _edi_project_config_panel_remove(int panel_id)
    free(panel);
 
    _edi_project_config_save_no_notify();
+}
+
+void
+_edi_project_config_tab_split_view_count_set(const char *path, int panel_id, int count)
+{
+   Edi_Project_Config_Tab *tab;
+   Eina_List *list, *next;
+   Edi_Project_Config_Panel *panel = eina_list_nth(_edi_project_config->panels, panel_id);
+
+   if (!panel)
+     return;
+
+   EINA_LIST_FOREACH_SAFE(panel->tabs, list, next, tab)
+     {
+        if (!strcmp(tab->fullpath, path))
+          {
+             tab->split_views = count;
+             _edi_project_config_save_no_notify();
+             return;
+          }
+     }
 }

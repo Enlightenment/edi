@@ -296,6 +296,7 @@ void edi_mainview_split_current(void)
    Elm_Code_Widget *widget;
    Edi_Editor *editor;
    Edi_Mainview_Panel *panel;
+   const char *path;
 
    if (edi_mainview_is_empty())
      return;
@@ -320,8 +321,10 @@ void edi_mainview_split_current(void)
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
    elm_box_pack_start(panel->current->container, widget);
+   path = elm_code_file_path_get(code->file);
 
    editor->split_views = eina_list_append(editor->split_views, widget);
+   _edi_project_config_tab_split_view_count_set(path, edi_mainview_panel_id(panel), eina_list_count(editor->split_views));
 }
 
 void

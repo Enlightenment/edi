@@ -410,9 +410,16 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
    editor = (Edi_Editor *) evas_object_data_get(panel->current->view, "editor");
    if (editor && eina_list_count(editor->split_views))
      {
+        Elm_Code *code;
+        const char *path;
         Elm_Code_Widget *widget = eina_list_nth(editor->split_views, 0);
         elm_box_unpack(panel->current->container, widget);
+        code = elm_code_widget_code_get(editor->entry);
+        path = elm_code_file_path_get(code->file);
+
         editor->split_views = eina_list_remove(editor->split_views, widget);
+         _edi_project_config_tab_split_view_count_set(path, edi_mainview_panel_id(panel), eina_list_count(editor->split_views));
+
         evas_object_del(widget);
 
         return;

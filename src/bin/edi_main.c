@@ -1400,6 +1400,7 @@ _edi_open_tabs()
    Eina_List *tabs, *panels, *list, *sublist;
    Edi_Mainview_Panel *panel_obj;
    char *path;
+   int i;
    unsigned int tab_id = 0, panel_id = 0;
 
    panels = _edi_project_config->panels;
@@ -1410,7 +1411,7 @@ _edi_open_tabs()
           /* Make sure we have enough panels */
           edi_mainview_panel_append();
         panel_obj = edi_mainview_panel_by_index(panel_id);
-
+        edi_mainview_panel_focus(panel_obj);
         tabs = panel->tabs;
         panel->tabs = NULL;
         tab_id = 0;
@@ -1425,9 +1426,13 @@ _edi_open_tabs()
              options->type = eina_stringshare_add(tab->type);
              options->background = tab_id != panel->current_tab;
 
-             edi_mainview_panel_open(panel_obj, options);
-
              tab_id++;
+             edi_mainview_panel_open(panel_obj, options);
+             for (i = 0; i < tab->split_views; i++)
+                {
+                   edi_mainview_panel_tab_select(panel_obj, tab_id);
+                   edi_mainview_split_current();
+                }
              free(path);
           }
 
