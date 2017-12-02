@@ -7,6 +7,7 @@
 typedef struct _Edi_Theme {
         char *name;
         char *path;
+        char *title;
 } Edi_Theme;
 
 #ifdef __cplusplus
@@ -46,6 +47,16 @@ void edi_theme_elm_code_set(Evas_Object *obj, const char *name);
  * @ingroup Theme
  */
 Eina_List *edi_theme_themes_get(void);
+
+/**
+ * Get theme obj by its name.
+ *
+ * @return the theme obj matching the name.
+ *
+ * @ingroup Theme
+ */
+Edi_Theme *edi_theme_theme_by_name(const char *name);
+
 
 /**
  * @}

@@ -1,5 +1,8 @@
-collections {
+data {
+    item: "title" "Black theme";
+}
 
+collections {
 /* simple layout to pack our scrolling content into an elm_layout */
 group { name: "elm/code/layout/default";
    data {
