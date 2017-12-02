@@ -223,7 +223,7 @@ _edi_settings_display_create(Evas_Object *parent)
                                  _edi_settings_display_theme_pressed_cb, NULL);
 
    if (!_edi_project_config->gui.theme)
-     elm_object_text_set(combobox, _("default"));
+     elm_object_text_set(combobox, edi_theme_theme_by_name("default")->title);
    else
      elm_object_text_set(combobox, edi_theme_theme_by_name(_edi_project_config->gui.theme)->title);
 
