@@ -54,6 +54,18 @@ edi_theme_theme_by_name(const char *name)
     return NULL;
 }
 
+static int
+_theme_sort_cb(const void *t1, const void *t2)
+{
+   const Edi_Theme *theme1 = t1;
+   const Edi_Theme *theme2 = t2;
+
+   if (!theme1) return 1;
+   if (!theme2) return -1;
+
+   return strcmp(theme1->title, theme2->title);
+}
+
 Eina_List *
 edi_theme_themes_get(void)
 {
@@ -68,7 +80,7 @@ edi_theme_themes_get(void)
    theme = malloc(sizeof(Edi_Theme));
    theme->name = strdup("default");
    theme->path = edi_path_append(elm_theme_system_dir_get(), "default.edj");
-   theme->title = strdup("Default");
+   theme->title = strdup("Default EFL");
 
    _edi_themes = eina_list_append(_edi_themes, theme);
 
@@ -90,6 +102,8 @@ edi_theme_themes_get(void)
 
    if (files)
      eina_list_free(files);
+
+   _edi_themes = eina_list_sort(_edi_themes, eina_list_count(_edi_themes), _theme_sort_cb);
 
    return _edi_themes;
 }
