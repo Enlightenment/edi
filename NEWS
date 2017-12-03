@@ -1,4 +1,18 @@
 =======
+Edi 0.7
+=======
+
+Features:
+
+  * Added theme support and new themes.
+  * Added notification support.
+  * Added split-view option for editors.
+  * Project wizard and new project templates.
+  * Improved debugging support.
+  * Added edi_scm helper command.
+  * Replace all in project.
+
+=======
 Edi 0.6
 =======
 
