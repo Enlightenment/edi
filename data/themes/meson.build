@@ -5,7 +5,7 @@ cmd = [ edje_cc,
         '@INPUT@', '@OUTPUT@'
       ]
 
-theme_names = ['black', 'white']
+theme_names = ['white', 'solarized', 'solarized_dark']
 
 foreach theme_name : theme_names
   custom_target('theme ' + theme_name,

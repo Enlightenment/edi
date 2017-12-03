@@ -146,12 +146,15 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
 static void
 _edi_settings_display_theme_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info)
 {
+   Edi_Theme *theme;
    const char *text = elm_object_item_text_get(event_info);
+
+   theme = elm_object_item_data_get(event_info);
 
    if (_edi_project_config->gui.theme)
      eina_stringshare_del(_edi_project_config->gui.theme);
 
-   _edi_project_config->gui.theme = eina_stringshare_add(text);
+   _edi_project_config->gui.theme = eina_stringshare_add(theme->name);
    _edi_project_config_save();
 
    elm_object_text_set(obj, text);
@@ -162,14 +165,10 @@ static char *
 _edi_settings_display_theme_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED, const char *part EINA_UNUSED)
 {
    Edi_Theme *current;
-   int i;
 
-   i = (int)(uintptr_t) data;
-   current = eina_list_nth(edi_theme_themes_get(), i);
+   current = data;
 
-   if (!current) return NULL;
-
-   return strdup(current->name);
+   return strdup(current->title);
 }
 
 static Evas_Object *
@@ -180,7 +179,6 @@ _edi_settings_display_create(Evas_Object *parent)
    Elm_Genlist_Item_Class *itc;
    Edi_Theme *theme;
    Eina_List *themes, *l;
-   int i = 0;
 
    frame = _edi_settings_panel_create(parent, _("Display"));
    box = elm_object_part_content_get(frame, "default");
@@ -225,9 +223,9 @@ _edi_settings_display_create(Evas_Object *parent)
                                  _edi_settings_display_theme_pressed_cb, NULL);
 
    if (!_edi_project_config->gui.theme)
-     elm_object_text_set(combobox, _("default"));
+     elm_object_text_set(combobox, edi_theme_theme_by_name("default")->title);
    else
-     elm_object_text_set(combobox, _edi_project_config->gui.theme);
+     elm_object_text_set(combobox, edi_theme_theme_by_name(_edi_project_config->gui.theme)->title);
 
    elm_table_pack(table, combobox, 1, 1, 1, 1);
    elm_box_pack_end(box, table);
@@ -239,8 +237,7 @@ _edi_settings_display_create(Evas_Object *parent)
 
    EINA_LIST_FOREACH(themes, l, theme)
      {
-        elm_genlist_item_append(combobox, itc, (void *)(uintptr_t) i, NULL, ELM_GENLIST_ITEM_NONE, NULL, (void *)(uintptr_t) i);
-        i++;
+        elm_genlist_item_append(combobox, itc, theme, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
      }
 
    elm_genlist_realized_items_update(combobox);
