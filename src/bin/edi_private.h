@@ -48,6 +48,8 @@ extern int EDI_EVENT_FILE_SAVED;
 
 Eina_Bool edi_open(const char *path);
 
+Evas_Object *edi_main_win_get(void);
+
 void edi_close();
 
 void edi_open_url();
