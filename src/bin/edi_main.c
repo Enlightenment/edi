@@ -8,12 +8,10 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
-#include <Efl_Ui.h>
 #include <Eio.h>
 
 #include "Edi.h"
 #include "edi_config.h"
-#include "edi_theme.h"
 #include "edi_filepanel.h"
 #include "edi_file.h"
 #include "edi_logpanel.h"
@@ -1474,11 +1472,6 @@ _win_delete_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event
    edi_close();
 }
 
-Evas_Object *edi_main_win_get(void)
-{
-   return _edi_main_win;
-}
-
 Eina_Bool
 edi_open(const char *inputpath)
 {
@@ -1514,8 +1507,6 @@ edi_open(const char *inputpath)
    evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_win_resize_object_add(win, hbx);
    evas_object_show(hbx);
-
-   edi_theme_window_alpha_set();
 
    tb = edi_toolbar_setup(hbx);
    elm_box_pack_start(hbx, tb);

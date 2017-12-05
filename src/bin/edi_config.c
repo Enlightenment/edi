@@ -273,7 +273,6 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, font.name, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, font.size, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.translucent, EET_T_UCHAR);
-   EDI_CONFIG_VAL(D, T, gui.alpha, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.theme, EET_T_STRING);
    EDI_CONFIG_VAL(D, T, gui.width, EET_T_INT);
    EDI_CONFIG_VAL(D, T, gui.height, EET_T_INT);
@@ -507,8 +506,7 @@ _edi_project_config_load()
 
    /* setup defaults */
    IFPCFG(0x0001);
-   _edi_project_config->gui.translucent = EINA_FALSE;
-   _edi_project_config->gui.alpha = 255;
+   _edi_project_config->gui.translucent = EINA_TRUE;
    _edi_project_config->gui.width = 640;
    _edi_project_config->gui.height = 480;
    _edi_project_config->gui.leftsize = 0.25;

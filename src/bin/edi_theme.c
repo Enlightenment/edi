@@ -3,7 +3,6 @@
 #endif
 
 #include <Elementary.h>
-#include <Efl_Ui.h>
 
 #include "Edi.h"
 #include "edi_theme.h"
@@ -16,40 +15,12 @@ static Eina_List *_edi_themes = NULL;
 Efl_Ui_Theme_Apply efl_ui_widget_theme_apply(Eo *obj);
 
 void
-edi_theme_window_alpha_set(void)
-{
-   Evas_Object *win;
-   Eina_Bool enabled = _edi_project_config->gui.translucent;
-
-   win = edi_main_win_get();
-
-   elm_win_alpha_set(win, enabled);
-   efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, _edi_project_config->gui.alpha);
-}
-
-void edi_theme_elm_code_alpha_set(Evas_Object *obj)
-{
-   edi_theme_window_alpha_set();
-
-   if (_edi_project_config->gui.translucent)
-     evas_object_color_set(obj, 255, 255, 255, 1);
-   else
-     evas_object_color_set(obj, 255, 255, 255, 255);
-
-   edi_theme_window_alpha_set();
-   if (_edi_project_config->gui.translucent)
-     elm_code_widget_alpha_set(obj, _edi_project_config->gui.alpha);
-   else
-     elm_code_widget_alpha_set(obj, 255);
-}
-
-void
 edi_theme_elm_code_set(Evas_Object *obj, const char *name)
 {
    Eina_List *l;
    Edi_Theme *theme;
 
-   if (!obj || !name)
+   if (!name)
      return;
 
    edi_theme_themes_get();
@@ -62,7 +33,6 @@ edi_theme_elm_code_set(Evas_Object *obj, const char *name)
         elm_layout_file_set(obj, theme->path, "elm/code/layout/default");
         efl_ui_widget_theme_apply(obj);
      }
-
 }
 
 Edi_Theme *
