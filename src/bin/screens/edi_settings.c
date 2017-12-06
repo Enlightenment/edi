@@ -109,19 +109,6 @@ _edi_settings_toolbar_hidden_cb(void *data EINA_UNUSED, Evas_Object *obj,
 }
 
 static void
-_edi_settings_translucent_state_cb(void *data EINA_UNUSED, Evas_Object *obj,
-                                    void *event EINA_UNUSED)
-{
-   Evas_Object *check = obj;
-   int state = elm_check_state_get(check);
-
-   _edi_project_config->gui.translucent = state;
-   _edi_project_config_save();
-
-   elm_object_disabled_set((Evas_Object *) data, !state);
-}
-
-static void
 _edi_settings_font_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *naviframe, *box;
@@ -184,6 +171,24 @@ _edi_settings_display_theme_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED
    current = data;
 
    return strdup(current->title);
+}
+
+static void
+_edi_settings_display_translucent_state_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                    void *event EINA_UNUSED)
+{
+   Evas_Object *slider, *check;
+   int state;
+
+   check = obj;
+   slider = data;
+
+   state = elm_check_state_get(check);
+
+   _edi_project_config->gui.translucent = state;
+   _edi_project_config_save();
+
+   elm_object_disabled_set(slider, !state);
 }
 
 static void
@@ -280,7 +285,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_table_pack(table, check, 1, 2, 1, 1);
    evas_object_show(check);
    evas_object_smart_callback_add(check, "changed",
-                                  _edi_settings_translucent_state_cb, slider);
+                                  _edi_settings_display_translucent_state_cb, slider);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Alpha"));
