@@ -33,8 +33,6 @@ edi_theme_window_alpha_set(void)
 
 void edi_theme_elm_code_alpha_set(Evas_Object *obj)
 {
-   edi_theme_window_alpha_set();
-
    if (_edi_project_config->gui.translucent)
      elm_code_widget_alpha_set(obj, _edi_project_config->gui.alpha);
    else
@@ -60,7 +58,6 @@ edi_theme_elm_code_set(Evas_Object *obj, const char *name)
         elm_layout_file_set(obj, theme->path, "elm/code/layout/default");
         efl_ui_widget_theme_apply(obj);
      }
-
 }
 
 Edi_Theme *
