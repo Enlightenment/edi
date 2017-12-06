@@ -58,7 +58,6 @@ Eina_List *edi_theme_themes_get(void);
 Edi_Theme *edi_theme_theme_by_name(const char *name);
 
 void edi_theme_window_alpha_set(void);
-
 void edi_theme_elm_code_alpha_set(Evas_Object *obj);
 /**
  * @}

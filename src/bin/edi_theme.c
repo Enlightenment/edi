@@ -24,19 +24,17 @@ edi_theme_window_alpha_set(void)
    win = edi_main_win_get();
 
    elm_win_alpha_set(win, enabled);
-   efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, _edi_project_config->gui.alpha);
+
+   if (enabled)
+     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, _edi_project_config->gui.alpha);
+   else
+     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, 255);
 }
 
 void edi_theme_elm_code_alpha_set(Evas_Object *obj)
 {
    edi_theme_window_alpha_set();
 
-   if (_edi_project_config->gui.translucent)
-     evas_object_color_set(obj, 255, 255, 255, 1);
-   else
-     evas_object_color_set(obj, 255, 255, 255, 255);
-
-   edi_theme_window_alpha_set();
    if (_edi_project_config->gui.translucent)
      elm_code_widget_alpha_set(obj, _edi_project_config->gui.alpha);
    else

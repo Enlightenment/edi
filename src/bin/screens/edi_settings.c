@@ -283,7 +283,7 @@ _edi_settings_display_create(Evas_Object *parent)
                                   _edi_settings_translucent_state_cb, slider);
 
    label = elm_label_add(table);
-   elm_object_text_set(label, _("Shine"));
+   elm_object_text_set(label, _("Alpha"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_table_pack(table, label, 0, 3, 1, 1);
    evas_object_show(label);
