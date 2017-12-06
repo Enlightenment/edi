@@ -1368,6 +1368,8 @@ static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   edi_theme_window_alpha_set();
+
    return ECORE_CALLBACK_RENEW;
 }
 
