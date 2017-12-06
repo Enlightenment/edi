@@ -42,7 +42,7 @@
    ((EDI_CONFIG_FILE_EPOCH << 16) | EDI_CONFIG_FILE_GENERATION)
 
 #  define EDI_PROJECT_CONFIG_FILE_EPOCH 0x0002
-#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0004
+#  define EDI_PROJECT_CONFIG_FILE_GENERATION 0x0005
 #  define EDI_PROJECT_CONFIG_FILE_VERSION \
    ((EDI_PROJECT_CONFIG_FILE_EPOCH << 16) | EDI_PROJECT_CONFIG_FILE_GENERATION)
 
@@ -507,8 +507,6 @@ _edi_project_config_load()
 
    /* setup defaults */
    IFPCFG(0x0001);
-   _edi_project_config->gui.translucent = EINA_FALSE;
-   _edi_project_config->gui.alpha = 255;
    _edi_project_config->gui.width = 640;
    _edi_project_config->gui.height = 480;
    _edi_project_config->gui.leftsize = 0.25;
@@ -531,6 +529,17 @@ _edi_project_config_load()
    _edi_project_config->gui.tab_inserts_spaces = EINA_TRUE;
    IFPCFGEND;
 
+   IFPCFG(0x0004);
+   _edi_project_config->panels = NULL;
+   _panel_add();
+   _edi_project_config->windows = NULL;
+   IFPCFGEND;
+
+   IFPCFG(0x0005);
+   _edi_project_config->gui.translucent = EINA_FALSE;
+   _edi_project_config->gui.alpha = 255;
+   IFPCFGEND;
+
    /* limit config values so they are sane */
    EDI_CONFIG_LIMIT(_edi_project_config->font.size, EDI_FONT_MIN, EDI_FONT_MAX);
    EDI_CONFIG_LIMIT(_edi_project_config->gui.width, 150, 10000);
@@ -540,12 +549,6 @@ _edi_project_config_load()
    EDI_CONFIG_LIMIT(_edi_project_config->gui.tabstop, 1, 32);
 
    _edi_project_config->version = EDI_PROJECT_CONFIG_FILE_VERSION;
-
-   IFPCFG(0x0004);
-   _edi_project_config->panels = NULL;
-   _panel_add();
-   _edi_project_config->windows = NULL;
-   IFPCFGEND;
 
    if (save) _edi_project_config_save_no_notify();
 }
