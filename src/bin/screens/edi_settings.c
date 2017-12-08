@@ -199,6 +199,12 @@ _edi_settings_display_alpha_changed_cb(void *data EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+static char *
+_edi_settings_display_alpha_format(double value)
+{
+   return (char*)eina_stringshare_printf("%1.0f%%", (value/255)*100);
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
@@ -275,11 +281,15 @@ _edi_settings_display_create(Evas_Object *parent)
    // END OF THEME SELECTOR
 
    // START OF ALPHA SELECTOR
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Translucent"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 2, 1, 1);
+   evas_object_show(label);
 
    slider = elm_slider_add(table);
    check = elm_check_add(box);
    elm_check_state_set(check, _edi_project_config->gui.translucent);
-   elm_object_text_set(check, _("Translucent"));
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, check, 1, 2, 1, 1);
@@ -300,10 +310,13 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_slider_value_set(slider, _edi_project_config->gui.alpha);
    elm_slider_span_size_set(slider, 255);
    elm_slider_step_set(slider, 1);
-   elm_slider_indicator_format_set(slider, "%1.0f");
+   elm_slider_units_format_function_set(slider, _edi_settings_display_alpha_format,
+                                        (void(*)(char*))eina_stringshare_del);
+   elm_slider_indicator_format_function_set(slider, _edi_settings_display_alpha_format,
+                                            (void(*)(char*))eina_stringshare_del);
    elm_table_pack(table, slider, 1, 3, 1, 1);
    evas_object_show(slider);
-   evas_object_smart_callback_add(slider, "delay,changed", _edi_settings_display_alpha_changed_cb, NULL);
+   evas_object_smart_callback_add(slider, "slider,drag,stop", _edi_settings_display_alpha_changed_cb, NULL);
 
    // END OF ALPHA SELECTOR
 
