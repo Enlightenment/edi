@@ -297,6 +297,7 @@ _edi_mainview_split_config_changed_cb(void *data, int type EINA_UNUSED, void *ev
    Elm_Code_Widget *widget = data;
 
    elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_alpha_set(widget);
    edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
 
    return ECORE_CALLBACK_RENEW;
