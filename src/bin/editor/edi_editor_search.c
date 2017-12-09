@@ -40,7 +40,7 @@ struct _Edi_Editor_Search
    Evas_Object *widget; /**< The search UI panel we wish to show and hide */
    Evas_Object *parent; /**< The parent panel we will insert into */
    Evas_Object *checkbox; /**< The checkbox for wrapping search */
-   Evas_Object *wrapped; /**< A display that shows the user that the search wrapped */
+   Evas_Object *wrapped_text; /**< A display that shows the user that the search wrapped */
    unsigned int current_search_line; /**< The current search cursor line for this session */
    unsigned int current_search_col; /**< The current search cursor column for this session */
    Eina_Bool term_found;
@@ -49,6 +49,7 @@ struct _Edi_Editor_Search
    Evas_Object *replace_btn; /**< The replace button for our search */
    struct _Edi_Search_Result cache; /**< The first found search instance */
    /* Add new members here. */
+   Eina_Bool wrapped;
 };
 
 static void
@@ -225,17 +226,28 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    // EOF reached so go to search found before cursor (first inst).
    if (search->wrap && !search->term_found && _edi_search_cache_exists(search))
      {
-        evas_object_show(search->wrapped);
-        elm_code_widget_cursor_position_set(entry, 1, 1);
+        elm_code_widget_cursor_position_set(entry, 0, 0);
         elm_code_widget_selection_clear(entry);
         line = elm_code_file_line_get(elm_code_widget_code_get(entry)->file, 1);
         _edi_search_cache_reset(search);
         _edi_search_cache_use(search, &text, &line, &found);
+        search->wrapped = EINA_TRUE;
+        _edi_search_in_entry(entry, search);
         free(text);
         return EINA_TRUE;
      }
    else
-     evas_object_hide(search->wrapped);
+     {
+       if (search->wrapped)
+         {
+            evas_object_show(search->wrapped_text);
+            search->wrapped = EINA_FALSE;
+         }
+       else
+         {
+            evas_object_hide(search->wrapped_text);
+         }
+     }
 
    line = elm_code_file_line_get(elm_code_widget_code_get(entry)->file, search->current_search_line);
    elm_code_widget_cursor_position_set(entry, search->current_search_line,
@@ -420,7 +432,7 @@ _edi_search_key_up_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
 void
 edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 {
-   Evas_Object *entry, *wrapped, *lbl, *btn, *box, *big_box, *table;
+   Evas_Object *entry, *wrapped_text, *lbl, *btn, *box, *big_box, *table;
    Evas_Object *replace_entry, *replace_lbl, *replace_btn;
    Evas_Object *checkbox;
    Edi_Editor_Search *search;
@@ -487,9 +499,9 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_UP, _edi_search_key_up_cb, editor);
 
-   wrapped = elm_label_add(parent);
-   elm_object_text_set(wrapped, _("Reached end of file, starting from beginning"));
-   elm_box_pack_end(box, wrapped);
+   wrapped_text = elm_label_add(parent);
+   elm_object_text_set(wrapped_text, _("Reached end of file, starting from beginning"));
+   elm_box_pack_end(box, wrapped_text);
 
    checkbox = elm_check_add(parent);
    elm_object_text_set(checkbox, _("Wrap search?"));
@@ -523,7 +535,7 @@ edi_editor_search_add(Evas_Object *parent, Edi_Editor *editor)
 
    search = calloc(1, sizeof(*search));
    search->entry = entry;
-   search->wrapped = wrapped;
+   search->wrapped_text = wrapped_text;
    search->replace_entry = replace_entry;
    search->replace_btn = replace_btn;
    search->parent = parent;
