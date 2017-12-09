@@ -226,7 +226,9 @@ _edi_search_in_entry(Evas_Object *entry, Edi_Editor_Search *search)
    // EOF reached so go to search found before cursor (first inst).
    if (search->wrap && !search->term_found && _edi_search_cache_exists(search))
      {
+        // RESET CURSOR TO BEGINNING OF WIDGET. VISIBLE WIDGET STARTS AT 1, 1.
         elm_code_widget_cursor_position_set(entry, 0, 0);
+
         elm_code_widget_selection_clear(entry);
         line = elm_code_file_line_get(elm_code_widget_code_get(entry)->file, 1);
         _edi_search_cache_reset(search);
