@@ -1060,7 +1060,9 @@ edi_filepanel_select_path(const char *path)
 void
 edi_filepanel_search()
 {
-   elm_box_pack_start(_filepanel_box, _filter_box);
+   if (!evas_object_visible_get(_filter_box))
+     elm_box_pack_start(_filepanel_box, _filter_box);
+
    evas_object_show(_filter_box);
    elm_object_focus_set(_filter, EINA_TRUE);
 }
