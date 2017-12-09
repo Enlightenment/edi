@@ -543,7 +543,7 @@ _edi_welcome_clone_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    elm_object_disabled_set(wd->button, EINA_FALSE);
 
    if (wd->status)
-     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_TRUE);
+     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_FALSE);
    else
      _edi_welcome_project_open(wd->dir, EINA_FALSE);
 
@@ -566,15 +566,34 @@ static void
 _edi_welcome_project_clone_click_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *entry;
-   const char *parent, *name;
+   const char *parent, *name, *url;
    Edi_Welcome_Data *wd = data;
 
+   url = elm_object_text_get(_create_inputs[0]);
    entry = elm_layout_content_get(_create_inputs[1], "elm.swallow.entry");
    parent = elm_object_text_get(entry);
    name = elm_object_text_get(_create_inputs[2]);
 
+   if (!url || !url[0])
+     {
+        elm_object_focus_set(_create_inputs[0], EINA_TRUE);
+        return;
+     }
+
+   if (!parent || !parent[0])
+     {
+        elm_object_focus_set(_create_inputs[1], EINA_TRUE);
+        return;
+     }
+
+   if (!name || !name[0])
+     {
+        elm_object_focus_set(_create_inputs[2], EINA_TRUE);
+        return;
+     }
+
    wd->dir = edi_path_append(parent, name);
-   wd->url = strdup(elm_object_text_get(_create_inputs[0]));
+   wd->url = strdup(url);
 
    elm_object_disabled_set(wd->button, EINA_TRUE);
    elm_progressbar_pulse(wd->pb, EINA_TRUE);
