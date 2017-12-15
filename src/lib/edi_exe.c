@@ -60,11 +60,25 @@ edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data)
 static Eina_Bool
 _edi_exe_notify_server_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
+   Edi_Exe_Args *args;
+   char *path;
    Ecore_Con_Event_Server_Data *ev = event;
-   Edi_Exe_Args *args = data;
+
+   path = ecore_con_local_path_new(ECORE_CON_LOCAL_USER, ecore_con_server_name_get(ev->server), 0);
+
+   args = data;
 
    ecore_event_handler_del(args->handler);
    ecore_con_server_del(ev->server);
+
+   // FIXME: workaround.
+   if (path)
+     {
+        if (ecore_file_exists(path))
+          unlink(path);
+
+        free(path);
+     }
 
    free(args);
 
