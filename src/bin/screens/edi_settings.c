@@ -315,7 +315,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_slider_min_max_set(slider, 0, 255);
    elm_slider_value_set(slider, _edi_project_config->gui.alpha);
    elm_slider_span_size_set(slider, 255);
-   elm_slider_step_set(slider, 1);
+   elm_slider_step_set(slider, 0.01);
    elm_slider_units_format_function_set(slider, _edi_settings_display_alpha_format,
                                         (void(*)(char*))eina_stringshare_del);
    elm_slider_indicator_format_function_set(slider, _edi_settings_display_alpha_format,
@@ -323,6 +323,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_table_pack(table, slider, 1, 3, 1, 1);
    evas_object_show(slider);
    evas_object_smart_callback_add(slider, "slider,drag,stop", _edi_settings_display_alpha_changed_cb, NULL);
+   evas_object_smart_callback_add(slider, "delay,changed", _edi_settings_display_alpha_changed_cb, NULL);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Hide Toolbar"));
