@@ -86,7 +86,7 @@ edi_scm_git_clone(const char *url, const char *dir)
 }
 
 static int
-_edi_scm_git_file_add(const char *path)
+_edi_scm_git_file_stage(const char *path)
 {
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
@@ -98,6 +98,21 @@ _edi_scm_git_file_add(const char *path)
    eina_strbuf_free(command);
 
    return code;
+}
+
+static int
+_edi_scm_git_file_unstage(const char *path)
+{
+   int code;
+   Eina_Strbuf *command = eina_strbuf_new();
+
+   eina_strbuf_append_printf(command, "git reset HEAD %s", path);
+
+   code = _edi_scm_exec(eina_strbuf_string_get(command));
+
+   eina_strbuf_free(command);
+
+  return code;
 }
 
 static int
@@ -539,7 +554,7 @@ edi_scm_shutdown()
 }
 
 EAPI int
-edi_scm_add(const char *path)
+edi_scm_stage(const char *path)
 {
    char *escaped;
    int result;
@@ -547,7 +562,7 @@ edi_scm_add(const char *path)
 
    escaped = ecore_file_escape_name(path);
 
-   result = e->file_add(escaped);
+   result = e->file_stage(escaped);
 
    free(escaped);
 
@@ -564,6 +579,22 @@ edi_scm_del(const char *path)
    escaped = ecore_file_escape_name(path);
 
    result = e->file_del(escaped);
+
+   free(escaped);
+
+   return result;
+}
+
+EAPI int
+edi_scm_unstage(const char *path)
+{
+   char *escaped;
+   int result;
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   escaped = ecore_file_escape_name(path);
+
+   result = e->file_unstage(escaped);
 
    free(escaped);
 
@@ -722,9 +753,10 @@ _edi_scm_git_init()
    _edi_scm_global_object = engine = calloc(1, sizeof(Edi_Scm_Engine));
    engine->name = eina_stringshare_add("git");
    engine->directory = eina_stringshare_add(".git");
-   engine->file_add = _edi_scm_git_file_add;
+   engine->file_stage = _edi_scm_git_file_stage;
    engine->file_mod = _edi_scm_git_file_mod;
    engine->file_del = _edi_scm_git_file_del;
+   engine->file_unstage = _edi_scm_git_file_unstage;
    engine->move = _edi_scm_git_file_move;
    engine->status = _edi_scm_git_status;
    engine->diff = _edi_scm_git_diff;

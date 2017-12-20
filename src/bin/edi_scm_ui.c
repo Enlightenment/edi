@@ -547,6 +547,108 @@ _edi_scm_ui_workdir_get(void)
    return workdir;
 }
 
+static void
+_item_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                        void *ev EINA_UNUSED)
+{
+   evas_object_del(obj);
+}
+
+static void
+_item_menu_scm_stage_cb(void *data, Evas_Object *obj,
+                      void *event_info EINA_UNUSED)
+{
+   Edi_Scm_Status *status;
+   Edi_Scm_Ui *edi_scm = evas_object_data_get(obj, "edi_scm_ui");
+
+   status = data;
+
+   edi_scm_stage(status->path);
+
+  _edi_scm_ui_refresh(edi_scm);
+}
+
+static void
+_item_menu_scm_unstage_cb(void *data, Evas_Object *obj,
+                      void *event_info EINA_UNUSED)
+{
+   Edi_Scm_Status *status;
+   Edi_Scm_Ui *edi_scm = evas_object_data_get(obj, "edi_scm_ui");
+
+   status = data;
+
+   edi_scm_unstage(status->path);
+
+  _edi_scm_ui_refresh(edi_scm);
+}
+
+static void
+_item_menu_scm_staged_toggle(Edi_Scm_Status *status, Edi_Scm_Ui *edi_scm)
+{
+   if (status->staged)
+     edi_scm_unstage(status->path);
+   else
+     edi_scm_stage(status->path);
+
+  _edi_scm_ui_refresh(edi_scm);
+}
+
+static Evas_Object *
+_item_menu_create(Edi_Scm_Ui *edi_scm, Edi_Scm_Status *status)
+{
+   Evas_Object *menu, *parent;
+   Elm_Object_Item *menu_it;
+
+   parent = edi_scm->parent;
+
+   menu = elm_menu_add(parent);
+   evas_object_data_set(menu, "edi_scm_ui", edi_scm);
+   evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, "document-properties", basename((char *)status->path), NULL, NULL);
+   elm_object_item_disabled_set(menu_it, EINA_TRUE);
+   elm_menu_item_separator_add(menu, NULL);
+
+   menu_it = elm_menu_item_add(menu, NULL, "document-save-as", _("Stage Changes"), _item_menu_scm_stage_cb, status);
+   if (status->staged)
+     elm_object_item_disabled_set(menu_it, EINA_TRUE);
+
+   menu_it = elm_menu_item_add(menu, NULL, "edit-undo", _("Unstage Changes"), _item_menu_scm_unstage_cb, status);
+   if (!status->staged)
+     elm_object_item_disabled_set(menu_it, EINA_TRUE);
+
+   return menu;
+}
+
+static void
+_list_item_clicked_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
+                 void *event_info)
+{
+   Evas_Object *menu;
+   Evas_Event_Mouse_Up *ev;
+   Elm_Object_Item *it;
+   Edi_Scm_Status *status;
+   Edi_Scm_Ui *edi_scm = data;
+
+   ev = event_info;
+   it = elm_genlist_at_xy_item_get(obj, ev->output.x, ev->output.y, NULL);
+   status = elm_object_item_data_get(it);
+
+   if (!status)
+     return;
+
+   if (ev->button != 3)
+     {
+        if (ev->button == 1 && ev->flags & EVAS_BUTTON_DOUBLE_CLICK)
+          _item_menu_scm_staged_toggle(status, edi_scm);
+        return;
+     }
+
+   menu = _item_menu_create(edi_scm, status);
+   elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
+   evas_object_show(menu);
+}
+
 void
 edi_scm_ui_add(Evas_Object *parent)
 {
@@ -568,6 +670,7 @@ edi_scm_ui_add(Evas_Object *parent)
    edi_scm->workdir = engine->workdir;
    edi_scm->monitor = eio_monitor_add(edi_scm->workdir);
    edi_scm->parent = parent;
+   edi_scm->results_max = isatty(fileno(stdin));
 
    ecore_event_handler_add(EIO_MONITOR_FILE_CREATED, _edi_scm_ui_file_changes_cb, edi_scm);
    ecore_event_handler_add(EIO_MONITOR_FILE_MODIFIED, _edi_scm_ui_file_changes_cb, edi_scm);
@@ -642,7 +745,7 @@ edi_scm_ui_add(Evas_Object *parent)
 
    edi_scm->check = check = elm_check_add(parent);
    elm_object_text_set(check, _("Show unstaged changes"));
-   elm_check_state_set(check, EINA_FALSE);
+   elm_check_state_set(check, edi_scm->results_max);
    evas_object_show(check);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_scm_ui_refresh_cb, edi_scm);
@@ -659,12 +762,13 @@ edi_scm_ui_add(Evas_Object *parent)
 
    edi_scm->list = list = elm_genlist_add(box);
    elm_genlist_mode_set(list, ELM_LIST_SCROLL);
-   elm_list_select_mode_set(list, ELM_OBJECT_SELECT_MODE_NONE);
+   elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_NONE);
    elm_scroller_bounce_set(list, EINA_TRUE, EINA_TRUE);
    elm_scroller_policy_set(list, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_ON);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
+   evas_object_event_callback_add(list, EVAS_CALLBACK_MOUSE_UP, _list_item_clicked_cb, edi_scm);
 
    table = elm_table_add(parent);
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);

@@ -33,7 +33,8 @@ typedef struct _Edi_Scm_Status
    Eina_Bool staged;
 } Edi_Scm_Status;
 
-typedef int (scm_fn_add)(const char *path);
+typedef int (scm_fn_stage)(const char *path);
+typedef int (scm_fn_unstage)(const char *path);
 typedef int (scm_fn_mod)(const char *path);
 typedef int (scm_fn_del)(const char *path);
 typedef int (scm_fn_move)(const char *src, const char *dest);
@@ -60,7 +61,8 @@ typedef struct _Edi_Scm_Engine
    char           *workdir;
    Eina_List      *statuses;
 
-   scm_fn_add         *file_add;
+   scm_fn_stage       *file_stage;
+   scm_fn_unstage     *file_unstage;
    scm_fn_mod         *file_mod;
    scm_fn_del         *file_del;
    scm_fn_move        *move;
@@ -142,14 +144,24 @@ EAPI int edi_scm_git_clone(const char *url, const char *dir);
 Edi_Scm_Engine *edi_scm_engine_get(void);
 
 /**
- * Add file to be monitored by SCM.
+ * Stage file for commit with SCM.
  *
  * @param path The file path.
  * @return The status code of command executed.
  *
  * @ingroup Scm
  */
-int edi_scm_add(const char *path);
+int edi_scm_stage(const char *path);
+
+/**
+ * Unstage file from commit.
+ *
+ * @param path The file path.
+ * @return The status code of command executed.
+ *
+ * @ingroup Scm
+*/
+int edi_scm_unstage(const char *path);
 
 /**
  * Del file from those monitored by SCM.
