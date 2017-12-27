@@ -742,6 +742,45 @@ edi_scm_push(void)
    ecore_thread_run(_edi_scm_push_thread_cb, NULL, NULL, e);
 }
 
+static char *
+_edi_scm_git_project_root_get(void)
+{
+   Edi_Scm_Engine *engine;
+   char *directory, *engine_root, *path, *tmp;
+
+   engine = edi_scm_engine_get();
+   if (!engine)
+     return NULL;
+
+   tmp = path = engine_root = NULL;
+
+   directory = getcwd(NULL, PATH_MAX);
+
+   while (directory)
+     {
+        path = edi_path_append(directory, engine->directory);
+        if (ecore_file_exists(path) && ecore_file_is_dir(path))
+          {
+             engine_root = strdup(directory);
+             break;
+          }
+
+        tmp = ecore_file_dir_get(directory);
+        free(directory);
+        directory = tmp;
+        free(path);
+        path = NULL;
+     }
+
+   if (path)
+     free(path);
+
+   if (directory)
+     free(directory);
+
+   return engine_root;
+}
+
 static Edi_Scm_Engine *
 _edi_scm_git_init()
 {
@@ -776,7 +815,7 @@ _edi_scm_git_init()
    if (edi_project_get())
      engine->workdir = strdup(edi_project_get());
    else
-     engine->workdir = getcwd(NULL, PATH_MAX);
+     engine->workdir = _edi_scm_git_project_root_get();
 
    engine->initialized = EINA_TRUE;
 

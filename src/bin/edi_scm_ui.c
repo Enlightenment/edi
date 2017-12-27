@@ -506,45 +506,6 @@ _edi_scm_ui_file_changes_cb(void *data EINA_UNUSED, int type EINA_UNUSED,
 }
 
 char *
-_edi_scm_engine_root_dir_get(void)
-{
-   Edi_Scm_Engine *engine;
-   char *directory, *engine_root, *path, *tmp;
-
-   engine = edi_scm_engine_get();
-   if (!engine)
-     exit(2 << 1);
-
-   tmp = path = engine_root = NULL;
-
-   directory = strdup(engine->workdir);
-
-   while (directory)
-     {
-        path = edi_path_append(directory, engine->directory);
-        if (ecore_file_exists(path) && ecore_file_is_dir(path))
-          {
-             engine_root = strdup(directory);
-             break;
-          }
-
-        tmp = ecore_file_dir_get(directory);
-        free(directory);
-        directory = tmp;
-        free(path);
-        path = NULL;
-     }
-
-   if (path)
-     free(path);
-
-   if (directory)
-     free(directory);
-
-   return engine_root;
-}
-
-char *
 _edi_scm_ui_workdir_get(void)
 {
    Edi_Scm_Engine *engine;
@@ -706,7 +667,6 @@ edi_scm_ui_add(Evas_Object *parent)
      exit(1 << 1);
 
    edi_scm = calloc(1, sizeof(Edi_Scm_Ui));
-   engine->workdir = _edi_scm_engine_root_dir_get();
    edi_scm->workdir = engine->workdir;
    edi_scm->monitor = eio_monitor_add(edi_scm->workdir);
    edi_scm->parent = parent;
