@@ -27,7 +27,7 @@ _edi_scm_exec(const char *command)
 
    oldpwd = getcwd(NULL, PATH_MAX);
 
-   chdir(self->workdir);
+   chdir(self->root_directory);
    code = edi_exe_wait(command);
    chdir(oldpwd);
 
@@ -46,7 +46,7 @@ _edi_scm_exec_response(const char *command)
 
    oldpwd = getcwd(NULL, PATH_MAX);
 
-   chdir(self->workdir);
+   chdir(self->root_directory);
    response = edi_exe_response(command);
    chdir(oldpwd);
 
@@ -232,7 +232,7 @@ _parse_line(char *line)
 
    esc_path = ecore_file_escape_name(path);
    status->path = eina_stringshare_add(esc_path);
-   fullpath = edi_path_append(edi_scm_engine_get()->workdir, esc_path);
+   fullpath = edi_path_append(edi_scm_engine_get()->root_directory, esc_path);
    status->fullpath = eina_stringshare_add(fullpath);
    status->unescaped = eina_stringshare_add(path);
 
@@ -547,7 +547,7 @@ edi_scm_shutdown()
    eina_stringshare_del(engine->name);
    eina_stringshare_del(engine->directory);
    eina_stringshare_del(engine->path);
-   free(engine->workdir);
+   free(engine->root_directory);
    free(engine);
 
    _edi_scm_global_object = NULL;
@@ -742,6 +742,17 @@ edi_scm_push(void)
    ecore_thread_run(_edi_scm_push_thread_cb, NULL, NULL, e);
 }
 
+EAPI const char *
+edi_scm_root_directory_get(void)
+{
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   if (!e->root_directory)
+     return NULL;
+
+   return e->root_directory;
+}
+
 static char *
 _edi_scm_git_project_root_get(void)
 {
@@ -813,9 +824,9 @@ _edi_scm_git_init()
    engine->status_get = _edi_scm_git_status_get;
 
    if (edi_project_get())
-     engine->workdir = strdup(edi_project_get());
+     engine->root_directory = strdup(edi_project_get());
    else
-     engine->workdir = _edi_scm_git_project_root_get();
+     engine->root_directory = _edi_scm_git_project_root_get();
 
    engine->initialized = EINA_TRUE;
 

@@ -58,7 +58,7 @@ typedef struct _Edi_Scm_Engine
    const char     *name;
    const char     *directory;
    const char     *path;
-   char           *workdir;
+   char           *root_directory;
    Eina_List      *statuses;
 
    scm_fn_stage       *file_stage;
@@ -296,6 +296,16 @@ Eina_Bool edi_scm_remote_enabled(void);
  * @ingroup Scm
  */
 const char *edi_scm_avatar_url_get(const char *email);
+
+
+/**
+ * Return the root directory of the SCM.
+ *
+ * @return The location of the SCM's root working directory.
+ *
+ * @ingroup Scm
+ */
+const char *edi_scm_root_directory_get(void);
 
 /**
  * @}

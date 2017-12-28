@@ -15,18 +15,24 @@ static void
 _win_title_set(Evas_Object *win)
 {
    Eina_Strbuf *title;
-   char *workdir;
+   const char *directory;
+   char *project_root;
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+   if (!e)
+     exit(1 << 1);
 
-   workdir = _edi_scm_ui_workdir_get();
-   if (!workdir)
-     workdir = getcwd(NULL, PATH_MAX);
+   directory = edi_scm_root_directory_get();
+   if (!directory)
+     project_root = getcwd(NULL, PATH_MAX);
+   else
+     project_root = strdup(ecore_file_file_get(directory));
 
    title = eina_strbuf_new();
-   eina_strbuf_append_printf(title, "Edi Source Control :: %s", workdir);
+   eina_strbuf_append_printf(title, "Edi Source Control :: %s", project_root);
    elm_win_title_set(win, eina_strbuf_string_get(title));
    eina_strbuf_free(title);
 
-   free(workdir);
+   free(project_root);
 }
 
 static Evas_Object *
