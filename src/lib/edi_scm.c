@@ -796,6 +796,7 @@ static Edi_Scm_Engine *
 _edi_scm_git_init()
 {
    Edi_Scm_Engine *engine;
+   char *current_directory = NULL;
 
    if (!ecore_file_app_installed("git"))
      return NULL;
@@ -824,9 +825,18 @@ _edi_scm_git_init()
    engine->status_get = _edi_scm_git_status_get;
 
    if (edi_project_get())
-     engine->root_directory = strdup(edi_project_get());
-   else
-     engine->root_directory = _edi_scm_git_project_root_get();
+     {
+        current_directory = getcwd(NULL, PATH_MAX);
+        chdir(edi_project_get());
+     }
+
+   engine->root_directory = _edi_scm_git_project_root_get();
+
+   if (current_directory)
+     {
+        chdir(current_directory);
+        free(current_directory);
+     }
 
    engine->initialized = EINA_TRUE;
 
