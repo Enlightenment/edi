@@ -46,7 +46,7 @@ void _edi_scm_ui_screens_avatar_download_complete(void *data, const char *file,
         return;
      }
 
-   elm_image_file_set(image, file, NULL);
+   elm_photo_file_set(image, file);
 }
 
 static void
@@ -58,7 +58,7 @@ _edi_scm_ui_screens_avatar_load(Evas_Object *image, const char *email)
    cache = _edi_scm_ui_avatar_cache_path_get(email);
    if (ecore_file_exists(cache))
      {
-        elm_image_file_set(image, cache, NULL);
+        elm_photo_file_set(image, cache);
         return;
      }
 
@@ -608,6 +608,25 @@ _list_item_clicked_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj,
    evas_object_show(menu);
 }
 
+static void
+_avatar_effect(Evas_Object *avatar)
+{
+   Evas_Map *map;
+   int w, h;
+
+   evas_object_move(avatar, 20 * elm_config_scale_get(), 20 * elm_config_scale_get());
+   evas_object_resize(avatar, 72 * elm_config_scale_get(), 72 * elm_config_scale_get());
+   evas_object_geometry_get(avatar, NULL, NULL, &w, &h);
+
+   map = evas_map_new(4);
+   evas_map_smooth_set(map, EINA_TRUE);
+   evas_map_util_points_populate_from_object(map, avatar);
+   evas_map_util_rotate(map, 8, w, h);
+   evas_object_map_set(avatar, map);
+   evas_object_map_enable_set(avatar, EINA_TRUE);
+   evas_map_free(map);
+}
+
 void
 edi_scm_ui_add(Evas_Object *parent)
 {
@@ -660,9 +679,12 @@ edi_scm_ui_add(Evas_Object *parent)
    remote_name = engine->remote_name_get();
    remote_email = engine->remote_email_get();
 
-   avatar = elm_icon_add(parent);
+   if (remote_name[0] && remote_email[0])
+     avatar = elm_photo_add(parent);
+   else
+     avatar = elm_icon_add(parent);
 
-   evas_object_size_hint_min_set(avatar, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_min_set(avatar, 72 * elm_config_scale_get(), 72 * elm_config_scale_get());
    evas_object_size_hint_weight_set(avatar, 0.1, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(avatar, 1.0, EVAS_HINT_FILL);
    evas_object_show(avatar);
@@ -696,6 +718,7 @@ edi_scm_ui_add(Evas_Object *parent)
                                   engine->remote_name_get(), engine->remote_email_get());
 
         _edi_scm_ui_screens_avatar_load(avatar, engine->remote_email_get());
+        _avatar_effect(avatar);
         pd->is_configured = EINA_TRUE;
      }
 
