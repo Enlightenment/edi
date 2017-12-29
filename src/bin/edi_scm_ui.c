@@ -716,8 +716,7 @@ edi_scm_ui_add(Evas_Object *parent)
      {
         eina_strbuf_append_printf(string, "%s:<br><b>%s</b> &lt;%s&gt;", _("Author"),
                                   remote_name, remote_email);
-
-        _edi_scm_ui_screens_avatar_load(avatar, engine->remote_email_get());
+        _edi_scm_ui_screens_avatar_load(avatar, remote_email);
         _avatar_effect(avatar);
         pd->is_configured = EINA_TRUE;
      }
