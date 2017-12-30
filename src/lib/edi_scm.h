@@ -101,11 +101,13 @@ typedef struct _Edi_Scm_Engine
 Edi_Scm_Engine *edi_scm_init();
 
 /**
- * Init the SCM system.
+ * Init the SCM system for the specified path.
+ *
+ * @param path The location to find the scm information.
  *
  * @ingroup Scm
  */
-EAPI Edi_Scm_Engine *edi_scm_generic_init(void);
+EAPI Edi_Scm_Engine *edi_scm_init_path(const char *path);
 
 /**
  * Shutdown and free memory in use by SCM system.

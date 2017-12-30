@@ -53,8 +53,7 @@ int main(int argc, char **argv)
 
    ecore_init();
    elm_init(argc, argv);
-
-   if (!edi_scm_generic_init())
+   if (!edi_scm_init())
      exit(1 << 0);
 
    win = _win_add(engine);

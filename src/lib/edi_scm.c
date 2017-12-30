@@ -529,11 +529,7 @@ edi_scm_enabled(void)
 EAPI Edi_Scm_Engine *
 edi_scm_engine_get(void)
 {
-   Edi_Scm_Engine *engine = _edi_scm_global_object;
-   if (!engine)
-     return NULL;
-
-   return engine;
+   return _edi_scm_global_object;
 }
 
 EAPI void
@@ -544,8 +540,6 @@ edi_scm_shutdown()
    if (!engine)
      return;
 
-   eina_stringshare_del(engine->name);
-   eina_stringshare_del(engine->directory);
    eina_stringshare_del(engine->path);
    free(engine->root_directory);
    free(engine);
@@ -747,63 +741,20 @@ edi_scm_root_directory_get(void)
 {
    Edi_Scm_Engine *e = edi_scm_engine_get();
 
-   if (!e->root_directory)
-     return NULL;
-
    return e->root_directory;
 }
 
-static char *
-_edi_scm_git_project_root_get(void)
-{
-   Edi_Scm_Engine *engine;
-   char *directory, *engine_root, *path, *tmp;
-
-   engine = edi_scm_engine_get();
-   if (!engine)
-     return NULL;
-
-   tmp = path = engine_root = NULL;
-
-   directory = getcwd(NULL, PATH_MAX);
-
-   while (directory)
-     {
-        path = edi_path_append(directory, engine->directory);
-        if (ecore_file_exists(path) && ecore_file_is_dir(path))
-          {
-             engine_root = strdup(directory);
-             break;
-          }
-
-        tmp = ecore_file_dir_get(directory);
-        free(directory);
-        directory = tmp;
-        free(path);
-        path = NULL;
-     }
-
-   if (path)
-     free(path);
-
-   if (directory)
-     free(directory);
-
-   return engine_root;
-}
-
 static Edi_Scm_Engine *
-_edi_scm_git_init()
+_edi_scm_git_init(const char *rootdir)
 {
    Edi_Scm_Engine *engine;
-   char *current_directory = NULL;
 
    if (!ecore_file_app_installed("git"))
      return NULL;
 
    _edi_scm_global_object = engine = calloc(1, sizeof(Edi_Scm_Engine));
-   engine->name = eina_stringshare_add("git");
-   engine->directory = eina_stringshare_add(".git");
+   engine->name = "git";
+   engine->directory = ".git";
    engine->file_stage = _edi_scm_git_file_stage;
    engine->file_mod = _edi_scm_git_file_mod;
    engine->file_del = _edi_scm_git_file_del;
@@ -824,41 +775,70 @@ _edi_scm_git_init()
    engine->credentials_set = _edi_scm_git_credentials_set;
    engine->status_get = _edi_scm_git_status_get;
 
-   if (edi_project_get())
-     {
-        current_directory = getcwd(NULL, PATH_MAX);
-        chdir(edi_project_get());
-     }
-
-   engine->root_directory = _edi_scm_git_project_root_get();
-
-   if (current_directory)
-     {
-        chdir(current_directory);
-        free(current_directory);
-     }
-
+   engine->root_directory = strdup(rootdir);
    engine->initialized = EINA_TRUE;
 
    return engine;
 }
 
-EAPI Edi_Scm_Engine *
-edi_scm_generic_init(void)
+static char *
+_edi_scm_root_find(const char *dir, const char *scmdir)
 {
-   if (!edi_exe_wait("git status"))
-     return _edi_scm_git_init();
+   char *directory, *engine_root, *path, *tmp;
 
-   return NULL;
+   engine_root = NULL;
+   directory = strdup(dir);
+   while (directory && strlen(directory) > 1)
+     {
+        path = edi_path_append(directory, scmdir);
+        if (ecore_file_exists(path) && ecore_file_is_dir(path))
+          {
+             engine_root = strdup(directory);
+
+             free(directory);
+             free(path);
+             break;
+          }
+
+        tmp = ecore_file_dir_get(directory);
+        free(directory);
+        directory = tmp;
+        free(path);
+     }
+
+   return engine_root;
+}
+
+EAPI Edi_Scm_Engine *
+edi_scm_init_path(const char *path)
+{
+   char *location;
+   Edi_Scm_Engine *engine;
+
+   engine = NULL;
+   location = _edi_scm_root_find(path, ".git");
+   if (location)
+     {
+        engine = _edi_scm_git_init(location);
+        free(location);
+     }
+
+   return engine;
 }
 
 EAPI Edi_Scm_Engine *
 edi_scm_init(void)
 {
-   if (edi_project_file_exists(".git"))
-     return _edi_scm_git_init();
+   char *cwd;
+   Edi_Scm_Engine *engine;
 
-   return NULL;
+   if (edi_project_get())
+     return edi_scm_init_path(edi_project_get());
+
+   cwd = getcwd(NULL, PATH_MAX);
+   engine = edi_scm_init_path(cwd);
+   free(cwd);
+   return engine;
 }
 
 EAPI const char *
