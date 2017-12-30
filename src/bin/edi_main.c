@@ -1320,12 +1320,12 @@ _edi_win_title_get()
    if (provider)
      type = provider->id;
    else
-     type = "unknown";
+     type = _("unknown");
 
    name = edi_project_name_get();
    len = 8 + 3 + strlen(name) + strlen(type);
    winname = malloc(len * sizeof(char));
-   snprintf(winname, len, "Edi :: %s (%s)", name, type);
+   snprintf(winname, len, _("Edi :: %s (%s)"), name, type);
 
    return winname;
 }
