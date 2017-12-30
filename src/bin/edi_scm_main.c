@@ -17,9 +17,6 @@ _win_title_set(Evas_Object *win)
    Eina_Strbuf *title;
    const char *directory;
    char *project_root;
-   Edi_Scm_Engine *e = edi_scm_engine_get();
-   if (!e)
-     exit(1 << 1);
 
    directory = edi_scm_root_directory_get();
    if (!directory)
