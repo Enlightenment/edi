@@ -50,11 +50,53 @@ int main(int argc, char **argv)
 {
    Evas_Object *win;
    Edi_Scm_Engine *engine;
+   const char *arg, *root;
 
    ecore_init();
    elm_init(argc, argv);
-   if (!edi_scm_init())
-     exit(1 << 0);
+   root = NULL;
+
+   if (argc >= 2)
+     {
+        arg = argv[1];
+        if (!strcmp("-h", arg) || !strcmp("--help", arg))
+          {
+             printf("Usage: edi_scm [directory]\n\n");
+             printf("The Enlightened IDE Source Control\n\n");
+
+             printf("Options:\n");
+             printf("  -c, --commit\t\topen with the commit screen.\n");
+             printf("  -h, --help\t\tshow this message.\n");
+             return 0;
+          }
+
+        if (!strcmp("-c", arg) || !strcmp("--commit", arg))
+          {
+             if (argc >= 3)
+               root = argv[2];
+          }
+        else
+          {
+             root = arg;
+          }
+     }
+
+   if (root)
+     {
+        if (!ecore_file_is_dir(root))
+          {
+             fprintf(stderr, _("Root path must be a directory\n"));
+             exit(1 << 0);
+          }
+        engine = edi_scm_init_path(realpath(root, NULL));
+     }
+   else
+     {
+        engine = edi_scm_init();
+     }
+
+   if (!engine)
+     exit(1 << 2);
 
    win = _win_add(engine);
    edi_scm_ui_add(win);
