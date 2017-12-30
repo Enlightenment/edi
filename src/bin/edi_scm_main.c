@@ -3,8 +3,8 @@
 #include "edi_scm_ui.h"
 #include "edi_private.h"
 
-#define DEFAULT_WIDTH  480
-#define DEFAULT_HEIGHT 240
+#define DEFAULT_WIDTH  560
+#define DEFAULT_HEIGHT 480
 
 static void
 _win_del_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
