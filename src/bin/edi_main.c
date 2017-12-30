@@ -593,10 +593,15 @@ _edi_project_credentials_missing()
 static Eina_Bool
 _edi_project_credentials_check(void)
 {
-   if (!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0)
+   Edi_Scm_Engine *eng;
+
+   eng = edi_scm_engine_get();
+   if ((!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0) &&
+        !eng->remote_name_get())
      return EINA_FALSE;
 
-   if (!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0)
+   if ((!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0) &&
+        !eng->remote_email_get())
      return EINA_FALSE;
 
    return EINA_TRUE;
@@ -1092,8 +1097,6 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
         _edi_project_credentials_missing();
         return;
      }
-
-   edi_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
 
    chdir(edi_project_get());
 
