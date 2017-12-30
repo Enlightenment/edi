@@ -614,16 +614,16 @@ _avatar_effect(Evas_Object *avatar)
    Evas_Map *map;
    int w, h;
 
-   evas_object_move(avatar, 20 * elm_config_scale_get(), 20 * elm_config_scale_get());
+   evas_object_move(avatar, 15 * elm_config_scale_get(), 15 * elm_config_scale_get());
    evas_object_resize(avatar, 72 * elm_config_scale_get(), 72 * elm_config_scale_get());
    evas_object_geometry_get(avatar, NULL, NULL, &w, &h);
 
    map = evas_map_new(4);
    evas_map_smooth_set(map, EINA_TRUE);
    evas_map_util_points_populate_from_object(map, avatar);
-   evas_map_util_rotate(map, 8, w, h);
-   evas_object_map_set(avatar, map);
+   evas_map_util_rotate(map, 5, w/2, h/2);
    evas_object_map_enable_set(avatar, EINA_TRUE);
+   evas_object_map_set(avatar, map);
    evas_map_free(map);
 }
 
