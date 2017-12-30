@@ -1099,7 +1099,7 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 
    /* when program terminates update the filepanel */
    if (edi_exe_notify_handle("edi_scm_status", _edi_scm_program_exited_cb, NULL))
-     edi_exe_notify("edi_scm_status", "edi_scm");
+     edi_exe_notify("edi_scm_status", "edi_scm --commit");
 
    chdir(workdir);
 
