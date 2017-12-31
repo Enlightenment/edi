@@ -176,16 +176,10 @@ _edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_inf
    free(it);
 }
 
-static char *
+static const char *
 _edi_mainview_win_title_get(const char *path)
 {
-   char *winname, *filename;
-
-   filename = basename((char*)path);
-   winname = malloc((8 + strlen(filename)) * sizeof(char));
-   snprintf(winname, 8 + strlen(filename), "Edi :: %s", filename);
-
-   return winname;
+   return eina_slstr_printf(_("Edi :: %s"), ecore_file_file_get(path));
 }
 
 static Evas_Object *

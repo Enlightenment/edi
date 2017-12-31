@@ -20,7 +20,7 @@ _win_title_set(Evas_Object *win, Edi_Scm_Engine *engine)
 
    title = eina_strbuf_new();
    eina_strbuf_append_printf(title, _("Edi Source Control :: %s (%s)"),
-                             basename((char *)engine->root_directory),
+                             ecore_file_file_get((char *)engine->root_directory),
                              engine->name ?: _("unknown"));
    elm_win_title_set(win, eina_strbuf_string_get(title));
    eina_strbuf_free(title);

@@ -537,7 +537,7 @@ _item_menu_create(Edi_Scm_Ui_Data *pd, Edi_Scm_Status *status)
    evas_object_data_set(menu, "edi_scm_ui", pd);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "document-properties", basename((char *)status->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "document-properties", ecore_file_file_get(status->path), NULL, NULL);
    elm_object_item_disabled_set(menu_it, EINA_TRUE);
    elm_menu_item_separator_add(menu, NULL);
 

@@ -113,7 +113,7 @@ edi_project_get()
 EAPI const char *
 edi_project_name_get()
 {
-   return basename((char*)edi_project_get());
+   return ecore_file_file_get(edi_project_get());
 }
 
 EAPI char *

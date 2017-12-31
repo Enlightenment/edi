@@ -456,7 +456,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "document-properties", basename((char *)sd->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "document-properties", ecore_file_file_get(sd->path), NULL, NULL);
    elm_object_item_disabled_set(menu_it, EINA_TRUE);
    elm_menu_item_separator_add(menu, NULL);
 
@@ -584,7 +584,7 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "folder", basename((char *)sd->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "folder", ecore_file_file_get(sd->path), NULL, NULL);
    elm_object_item_disabled_set(menu_it, EINA_TRUE);
    elm_menu_item_separator_add(menu, NULL);
 
@@ -646,7 +646,7 @@ _text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUS
 {
    Edi_Dir_Data *sd = data;
 
-   return strdup(basename((char *)sd->path));
+   return strdup(ecore_file_file_get(sd->path));
 }
 
 static Evas_Object *
@@ -656,23 +656,20 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    Edi_Dir_Data *sd = data;
    Evas_Object *box, *lbox, *mbox, *rbox, *label, *ic;
    Edi_Scm_Status_Code *code;
-   char *text, *escaped;
+   char *escaped;
    const char *icon_name, *icon_status;
    Eina_Bool staged = EINA_FALSE;
 
    if (strcmp(source, "elm.swallow.content"))
      return NULL;
 
-   text = NULL; icon_name = icon_status = NULL;
-
+   icon_name = icon_status = NULL;
    escaped = ecore_file_escape_name(sd->path);
    code = _file_status_item_find(escaped);
    if (code)
      icon_status = _icon_status(*code, &staged);
 
    free(escaped);
-
-   text = strdup(basename((char *)sd->path));
 
    provider = _get_provider_from_hashset(sd->path);
    if (provider)
@@ -696,7 +693,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_box_pack_end(lbox, ic);
 
    label = elm_label_add(lbox);
-   elm_object_text_set(label, text);
+   elm_object_text_set(label, ecore_file_file_get(sd->path));
    evas_object_show(label);
    elm_box_pack_end(lbox, label);
 
@@ -742,8 +739,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
                elm_object_tooltip_text_set(box, _("Untracked changes"));
           }
       }
-
-   free(text);
 
    elm_box_pack_end(box, lbox);
    elm_box_pack_end(box, mbox);

@@ -392,7 +392,7 @@ _edi_config_project_add(const char *path)
 
    project = malloc(sizeof(*project));
    project->path = eina_stringshare_add(path);
-   project->name = eina_stringshare_add(basename((char*) path));
+   project->name = eina_stringshare_add(ecore_file_file_get(path));
    _edi_config->projects = eina_list_prepend(_edi_config->projects, project);
    _edi_config_save();
 }

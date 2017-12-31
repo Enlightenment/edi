@@ -496,7 +496,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    elm_object_focus_allow_set(tab, EINA_FALSE);
 
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
-   elm_object_part_text_set(tab, "elm.btn.text", basename((char*)options->path));
+   elm_object_part_text_set(tab, "elm.btn.text", ecore_file_file_get(options->path));
 /*
    icon = elm_icon_add(tab);
    elm_icon_standard_set(icon, provider->icon);
