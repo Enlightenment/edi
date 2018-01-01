@@ -1,0 +1,23 @@
+data {
+    item: "hellogui.title" "C EFL Beta Hello World";
+    item: "hellogui.directory"  "tutorials/c/hellogui/";
+    item: "hellogui.description"
+          "Hello World using the EFL Beta APIs";
+}
+
+collections {
+    group {
+        name: "hellogui";
+        max: 128 128;
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "hellogui.png" COMP;
+                    image.normal: "hellogui.png";
+                }
+            }
+        }
+    }
+}
