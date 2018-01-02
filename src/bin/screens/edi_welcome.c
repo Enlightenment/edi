@@ -279,20 +279,24 @@ _edi_templates_discover(const char *directory)
 }
 
 Edi_Example *
-_edi_example_add(const char *examples, const char *group)
+_edi_example_add(const char *examples, const char *groupname)
 {
    Edi_Example *e;
+   Evas_Object *group;
+   Ecore_Evas *evas; // TODO find a way to not need this!
 
    e = malloc(sizeof(Edi_Example));
+   evas = ecore_evas_buffer_new(0, 0);
+   group = edje_object_add(ecore_evas_get(evas));
+   edje_object_file_set(group, examples, groupname);
 
-   printf("EXITS %s, %s\n", edje_file_data_get(examples, "title"),
-                            edje_file_data_get(examples, eina_slstr_printf("%s.title", group)));
-   e->title = edje_file_data_get(examples, eina_slstr_printf("%s.title", group));
-   e->desc = edje_file_data_get(examples, eina_slstr_printf("%s.description", group));
-   e->example_path = edje_file_data_get(examples, eina_slstr_printf("%s.directory", group));
+   e->title = strdup(edje_object_data_get(group, "title"));
+   e->desc = strdup(edje_object_data_get(group, "description"));
+   e->example_path = strdup(edje_object_data_get(group, "directory"));
    e->edje_path = strdup(examples);
-   e->edje_id = strdup(group);
+   e->edje_id = strdup(groupname);
 
+   ecore_evas_free(evas);
    return e;
 }
 
@@ -324,7 +328,6 @@ _edi_examples_discover(const char *directory)
    collection = edje_file_collection_list(path);
    EINA_LIST_FOREACH(collection, list, groupname)
      {
-        printf("Found group %s\n", groupname);
         Edi_Example *example = _edi_example_add(path, groupname);
         if (example)
           _available_examples = eina_list_append(_available_examples, example);

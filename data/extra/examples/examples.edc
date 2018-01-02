@@ -1,24 +1,14 @@
-data {
-    item: "hellogui.title" "C EFL Beta Hello World";
-    item: "hellogui.directory" "tutorials/c/hellogui/";
-    item: "hellogui.description"
-          "Hello World using the EFL Beta APIs";
-
-    item: "life.title" "C EFL Beta Game of Life";
-    item: "life.directory" "apps/c/life/";
-    item: "life.description"
-          "Game of Life using the EFL Beta APIs";
-
-    item: "texteditor.title" "C EFL Beta Basic Text Editor";
-    item: "texteditor.directory" "apps/c/texteditor/";
-    item: "texteditor.description"
-          "A basic text editor app using the EFL Beta APIs";
-}
-
 collections {
     group {
         name: "hellogui";
         max: 128 128;
+
+        data {
+            item: "title" "C EFL Beta Hello World";
+            item: "directory" "tutorials/c/hellogui/";
+            item: "description"
+                  "Hello World using the EFL Beta APIs";
+        }
 
         parts {
             part { name: "icon";
@@ -35,6 +25,13 @@ collections {
         name: "life";
         max: 128 128;
 
+        data {
+            item: "title" "C EFL Beta Game of Life";
+            item: "directory" "apps/c/life/";
+            item: "description"
+                  "Game of Life using the EFL Beta APIs";
+        }
+
         parts {
             part { name: "icon";
                 description { state: "default" 0.0;
@@ -49,6 +46,13 @@ collections {
     group {
         name: "texteditor";
         max: 128 128;
+
+        data {
+            item: "title" "C EFL Beta Basic Text Editor";
+            item: "directory" "apps/c/texteditor/";
+            item: "description"
+                  "A basic text editor app using the EFL Beta APIs";
+        }
 
         parts {
             part { name: "icon";
