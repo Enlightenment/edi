@@ -523,12 +523,6 @@ _header_text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EI
    return strdup((char *)data);
 }
 
-static void
-_header_del(void *data, Evas_Object *obj EINA_UNUSED)
-{
-   free(data);
-}
-
 static Evas_Object *
 _example_content_get(void *data, Evas_Object *obj, const char *source)
 {
@@ -638,7 +632,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    ith = elm_genlist_item_class_new();
    ith->item_style = "group_index";
    ith->func.text_get = _header_text_get;
-   ith->func.del = _header_del;
+   ith->func.del = NULL;
    elm_genlist_item_append(list, ith, _("Templates"), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
    itc = elm_genlist_item_class_new();
