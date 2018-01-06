@@ -339,14 +339,14 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
 
    if (template && path && path[0] && name && name[0])
      {
-        edi_create_efl_project(template->skeleton_path, path, name, url, user, email,
-                               _edi_welcome_project_new_create_done_cb);
+          edi_create_example(template->path, path, name,
+                             _edi_welcome_project_new_create_done_cb);
      }
    else
      {
-        if (path && !path[0])
+        if (!path || !path[0])
           elm_object_focus_set(_create_inputs[0], EINA_TRUE);
-        else if (name && !name[0])
+        else if (!name || !name[0])
           elm_object_focus_set(_create_inputs[1], EINA_TRUE);
      }
 }
@@ -508,13 +508,8 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    EINA_LIST_FREE(_available_templates, template)
      _edi_template_free(template);
 
-   snprintf(path, sizeof(path), "%s/templates", _edi_config_dir_get());
    _edi_templates_discover(PACKAGE_DATA_DIR "/templates");
-   _edi_templates_discover(path);
-
-   snprintf(path, sizeof(path), "%s/examples", _edi_config_dir_get());
    _edi_examples_discover(PACKAGE_DATA_DIR "/examples");
-   _edi_examples_discover(path);
 
    content = elm_box_add(naviframe);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);

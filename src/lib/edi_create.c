@@ -298,18 +298,20 @@ _edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
 }
 
 EAPI void
-edi_create_efl_project(const char *skelpath, const char *parentdir,
-                       const char *name, const char *url, const char *user,
-                       const char *email, Edi_Create_Cb func)
+edi_create_project(const char *template_name, const char *parentdir,
+                   const char *name, const char *url, const char *user,
+                   const char *email, Edi_Create_Cb func)
 {
    char *cmd, *extract;
-   char tmp[PATH_MAX], dest[PATH_MAX];
+   char tmp[PATH_MAX], dest[PATH_MAX], skelpath[PATH_MAX];
    Edi_Create *data;
    Ecore_Event_Handler *handler;
 
    extract = "tar zxf %s -C %s";
    snprintf(tmp, sizeof(tmp), "%s/edi_%s", eina_environment_tmp_get(), name);
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
+
+   snprintf(skelpath, sizeof(skelpath), PACKAGE_DATA_DIR "/templates/%s.tar.gz", template_name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);
    DBG("Extracting project files from %s\n", skelpath);

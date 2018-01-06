@@ -9,7 +9,7 @@ foreach skeleton_name : skeleton_names
      command : [tar, 'zcf', '@OUTPUT@', '-C', '../data/extra/templates/skeletons', skeleton_name],
      input : 'skeletons' + '/' + skeleton_name,
      output : skeleton_name + '.tar.gz',
-     install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'templates', 'skeletons'),
+     install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'templates'),
      install : true,
   )
 

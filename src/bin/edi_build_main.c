@@ -107,9 +107,9 @@ static void
 _edi_build_create_start(int argc, int arg0, char **argv)
 {
    elm_init(argc, argv);
-   edi_create_efl_project(argv[arg0 + 1], argv[arg0 + 2], argv[arg0 + 3],
-                          argv[arg0 + 4], argv[arg0 + 5], argv[arg0 + 6],
-                          _edi_build_create_done_cb);
+   edi_create_project(argv[arg0 + 1], argv[arg0 + 2], argv[arg0 + 3],
+                      argv[arg0 + 4], argv[arg0 + 5], argv[arg0 + 6],
+                      _edi_build_create_done_cb);
 }
 
 EAPI_MAIN int
@@ -165,7 +165,7 @@ main(int argc, char **argv)
         if (argc - args != 7)
           {
              fprintf(stderr, _("create requires 6 additional parameters:\n"));
-             fprintf(stderr, "  skeleton, parent_path, project_name, "
+             fprintf(stderr, "  template_name, parent_path, project_name, "
                              "project_url, creator_name, creator_email\n");
              goto end;
           }
