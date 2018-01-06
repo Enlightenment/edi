@@ -16,20 +16,14 @@
 
 typedef struct _Edi_Template
 {
-   char *edje_path;
-   char *skeleton_path;
-   char *title;
-   char *desc;
-} Edi_Template;
-
-typedef struct _Edi_Example
-{
    char *edje_id;
-   char *edje_path;
-   char *example_path;
+   char *edje_path; // TODO fix
+   char *path; // file path for skeleton, directory for example
    char *title;
    char *desc;
-} Edi_Example;
+
+   Eina_Bool is_template;
+} Edi_Template;
 
 typedef struct _Edi_Welcome_Data {
    Evas_Object *pb;
@@ -174,7 +168,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
 
 static void
 _edi_welcome_project_new_directory_row_add(const char *text, int row,
-   Evas_Object *parent)
+                                           Evas_Object *parent)
 {
    Evas_Object *label, *input;
 
@@ -196,9 +190,9 @@ _edi_welcome_project_new_directory_row_add(const char *text, int row,
    _create_inputs[row] = input;
 }
 
-static void
-_edi_welcome_project_new_input_row_add(const char *text, const char *placeholder, int row,
-   Evas_Object *parent)
+static Evas_Object *
+_edi_welcome_project_new_input_row_add(const char *text, const char *placeholder,
+                                       Eina_Bool show, int row, Evas_Object *parent)
 {
    Evas_Object *label, *input;
 
@@ -225,19 +219,22 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
 }
 
 Edi_Template *
-_edi_template_add(const char *directory, const char *file)
+_edi_template_add(const char *templates, const char *groupname)
 {
    Edi_Template *t;
-   char *path = edi_path_append(directory, file);
-
-   if (!ecore_file_exists(path))
-     return NULL;
+   Evas_Object *group;
+   Ecore_Evas *evas; // TODO find a way to not need this!
 
    t = malloc(sizeof(Edi_Template));
-   t->title = edje_file_data_get(path, "title");
-   t->desc = edje_file_data_get(path, "description");
-   t->skeleton_path = edi_path_append(directory, edje_file_data_get(path, "file"));
-   t->edje_path = path;
+   evas = ecore_evas_buffer_new(0, 0);
+   group = edje_object_add(ecore_evas_get(evas));
+   edje_object_file_set(group, templates, groupname);
+
+   t->title = strdup(edje_object_data_get(group, "title"));
+   t->desc = strdup(edje_object_data_get(group, "description"));
+   t->path = strdup(edje_object_data_get(group, "path"));
+   t->edje_path = strdup(templates);
+   t->edje_id = strdup(groupname);
 
    return t;
 }
@@ -251,67 +248,34 @@ _edi_template_free(Edi_Template *t)
    free(t->title);
    free(t->desc);
    free(t->edje_path);
-   free(t->skeleton_path);
+   free(t->edje_id);
+   free(t->path);
    free(t);
 }
 
 static void
 _edi_templates_discover(const char *directory)
 {
-   Eina_List *files;
-   char *file;
+   Eina_List *collection, *list;
+   char path[PATH_MAX];
+   const char *groupname;
 
-   files = ecore_file_ls(directory);
-   EINA_LIST_FREE(files, file)
-     {
-        if (eina_str_has_extension(file, ".edj"))
-          {
-             Edi_Template *template = _edi_template_add(directory, file);
-             if (template)
-               _available_templates = eina_list_append(_available_templates, template);
-          }
-
-        free(file);
-     }
-
-   if (files)
-     eina_list_free(files);
-}
-
-Edi_Example *
-_edi_example_add(const char *examples, const char *groupname)
-{
-   Edi_Example *e;
-   Evas_Object *group;
-   Ecore_Evas *evas; // TODO find a way to not need this!
-
-   e = malloc(sizeof(Edi_Example));
-   evas = ecore_evas_buffer_new(0, 0);
-   group = edje_object_add(ecore_evas_get(evas));
-   edje_object_file_set(group, examples, groupname);
-
-   e->title = strdup(edje_object_data_get(group, "title"));
-   e->desc = strdup(edje_object_data_get(group, "description"));
-   e->example_path = strdup(edje_object_data_get(group, "directory"));
-   e->edje_path = strdup(examples);
-   e->edje_id = strdup(groupname);
-
-   ecore_evas_free(evas);
-   return e;
-}
-
-static void
-_edi_example_free(Edi_Example *e)
-{
-   if (!e)
+   eina_file_path_join(path, sizeof(path), directory, "templates.edj");
+   if (!ecore_file_exists(path))
      return;
 
-   free(e->title);
-   free(e->desc);
-   free(e->edje_path);
-   free(e->edje_id);
-   free(e->example_path);
-   free(e);
+   collection = edje_file_collection_list(path);
+   EINA_LIST_FOREACH(collection, list, groupname)
+     {
+        Edi_Template *template = _edi_template_add(path, groupname);
+        if (!template)
+          continue;
+
+        template->is_template = EINA_TRUE;
+        _available_templates = eina_list_append(_available_templates, template);
+     }
+
+   edje_mmap_collection_list_free(collection);
 }
 
 static void
@@ -328,9 +292,12 @@ _edi_examples_discover(const char *directory)
    collection = edje_file_collection_list(path);
    EINA_LIST_FOREACH(collection, list, groupname)
      {
-        Edi_Example *example = _edi_example_add(path, groupname);
-        if (example)
-          _available_examples = eina_list_append(_available_examples, example);
+        Edi_Template *example = _edi_template_add(path, groupname);
+        if (!example)
+          continue;
+
+        example->is_template = EINA_FALSE;
+        _available_examples = eina_list_append(_available_examples, example);
      }
 
    edje_mmap_collection_list_free(collection);
@@ -339,8 +306,7 @@ _edi_examples_discover(const char *directory)
 static void
 _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
 {
-   Edi_Template *template;
-   Edi_Example *example;
+   Edi_Template *template, *example;
 
    if (!success)
      {
@@ -352,7 +318,7 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
     EINA_LIST_FREE(_available_templates, template)
       _edi_template_free(template);
     EINA_LIST_FREE(_available_examples, example)
-      _edi_example_free(example);
+      _edi_template_free(example);
 
    _edi_welcome_project_open(path, EINA_TRUE);
 }
@@ -500,7 +466,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
-   elm_image_file_set(image, template->edje_path, "logo");
+   elm_image_file_set(image, template->edje_path, template->edje_id);
    evas_object_show(image);
    elm_table_pack(table, image, 0, 0, 1, 1);
 
@@ -526,54 +492,6 @@ _header_text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EI
    return strdup((char *)data);
 }
 
-static Evas_Object *
-_example_content_get(void *data, Evas_Object *obj, const char *source)
-{
-   Evas_Object *frame, *table, *image, *entry;
-   Edi_Example *example = (Edi_Example *) data;
-   Eina_Slstr *content;
-
-   if (strcmp(source, "elm.swallow.content"))
-     return NULL;
-
-   frame = elm_frame_add(obj);
-   elm_object_style_set(frame, "pad_medium");
-   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(frame);
-
-   table = elm_table_add(obj);
-   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_table_padding_set(table, 5, 5);
-   elm_table_homogeneous_set(table, EINA_TRUE);
-   evas_object_show(table);
-   elm_object_content_set(frame, table);
-
-   image = elm_image_add(table);
-   evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
-   elm_image_file_set(image, example->edje_path, example->edje_id);
-   evas_object_show(image);
-   elm_table_pack(table, image, 0, 0, 1, 1);
-
-   entry = elm_entry_add(table);
-   evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_entry_editable_set(entry, EINA_FALSE);
-   elm_entry_scrollable_set(entry, EINA_FALSE);
-   elm_entry_single_line_set(entry, EINA_FALSE);
-   elm_entry_line_wrap_set(entry, ELM_WRAP_WORD);
-   elm_table_pack(table, entry, 1, 0, 3, 1);
-   evas_object_show(entry);
-
-   content = eina_slstr_printf("<b>%s</b><br><br>%s", example->title, example->desc);
-   elm_object_text_set(entry, content);
-
-   return frame;
-}
-
 static void
 _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
@@ -581,10 +499,9 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *content, *button, *naviframe;
    Evas_Object *table, *list, *rect, *hbox;
    Elm_Object_Item *item;
-   Edi_Template *template;
-   Edi_Example *example;
-   Elm_Genlist_Item_Class *ith, *itc, *itc2;
    char path[PATH_MAX];
+   Edi_Template *template, *example;
+   Elm_Genlist_Item_Class *ith, *itc;
 
    naviframe = (Evas_Object *) data;
 
@@ -650,19 +567,8 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
 
    elm_genlist_item_append(list, ith, _("Examples"), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
-   itc2 = elm_genlist_item_class_new();
-   itc2->item_style = "full";
-   itc2->func.text_get = NULL;
-   itc2->func.content_get = _example_content_get;
-   itc2->func.state_get = NULL;
-   itc2->func.del = NULL;
    EINA_LIST_FOREACH(_available_examples, l, example)
-     {
-        Elm_Widget_Item *item;
-
-        item = elm_genlist_item_append(list, itc2, example, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
-        elm_genlist_item_select_mode_set(item, ELM_OBJECT_SELECT_MODE_NONE);
-     }
+     elm_genlist_item_append(list, itc, example, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
    elm_genlist_realized_items_update(list);
 

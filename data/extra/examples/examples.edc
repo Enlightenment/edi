@@ -5,7 +5,7 @@ collections {
 
         data {
             item: "title" "C EFL Beta Hello World";
-            item: "directory" "tutorials/c/hellogui/";
+            item: "path" "tutorials/c/hellogui/";
             item: "description"
                   "Hello World using the EFL Beta APIs";
         }
@@ -27,7 +27,7 @@ collections {
 
         data {
             item: "title" "C EFL Beta Game of Life";
-            item: "directory" "apps/c/life/";
+            item: "path" "apps/c/life/";
             item: "description"
                   "Game of Life using the EFL Beta APIs";
         }
@@ -49,7 +49,7 @@ collections {
 
         data {
             item: "title" "C EFL Beta Basic Text Editor";
-            item: "directory" "apps/c/texteditor/";
+            item: "path" "apps/c/texteditor/";
             item: "description"
                   "A basic text editor app using the EFL Beta APIs";
         }
