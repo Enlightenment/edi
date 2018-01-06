@@ -33,6 +33,15 @@ edi_create_project(const char *template_name, const char *parentdir,
                    const char *email, Edi_Create_Cb func);
 
 /**
+ * Create a new project from an example.
+ *
+ * @ingroup Creation
+ */
+EAPI void
+edi_create_example(const char *example_name, const char *parentdir,
+                   const char *name, Edi_Create_Cb func);
+
+/**
  * @}
  */
 

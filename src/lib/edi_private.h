@@ -1,6 +1,9 @@
 #ifndef EDI_PRIVATE_H
 # define EDI_PRIVATE_H
 
+#include <Eina.h>
+#include <Efreet.h>
+
 extern int _edi_lib_log_dom;
 char *edi_create_escape_quotes(const char *in);
 

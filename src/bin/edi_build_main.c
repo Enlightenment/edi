@@ -41,7 +41,7 @@ _exe_del(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 
 static const Ecore_Getopt optdesc = {
   "edi_build",
-  "%prog [options] [build|clean|create|test]",
+  "%prog [options] [build|clean|test|create|example]",
   PACKAGE_VERSION,
   COPYRIGHT,
   "BSD with advertisement clause",
@@ -112,6 +112,14 @@ _edi_build_create_start(int argc, int arg0, char **argv)
                       _edi_build_create_done_cb);
 }
 
+static void
+_edi_build_example_start(int argc, int arg0, char **argv)
+{
+   elm_init(argc, argv);
+   edi_create_example(argv[arg0 + 1], argv[arg0 + 2], argv[arg0 + 3],
+                      _edi_build_create_done_cb);
+}
+
 EAPI_MAIN int
 main(int argc, char **argv)
 {
@@ -171,6 +179,20 @@ main(int argc, char **argv)
           }
 
         _edi_build_create_start(argc, args, argv);
+
+        ecore_main_loop_begin();
+        goto end;
+     }
+   if (!strncmp("example", build_type, 7))
+     {
+        if (argc - args != 4)
+          {
+             fprintf(stderr, _("example requires 3 additional parameters:\n"));
+             fprintf(stderr, "  example_name, parent_path, project_name\n");
+             goto end;
+          }
+
+        _edi_build_example_start(argc, args, argv);
 
         ecore_main_loop_begin();
         goto end;

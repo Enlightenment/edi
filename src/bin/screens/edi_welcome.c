@@ -201,7 +201,8 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(parent, label, 0, row, 1, 1);
-   evas_object_show(label);
+   if (show)
+     evas_object_show(label);
 
    input = elm_entry_add(parent);
    elm_entry_scrollable_set(input, EINA_TRUE);
@@ -209,13 +210,15 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(parent, input, 1, row, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 1, 1);
-   evas_object_show(input);
+   if (show)
+     evas_object_show(input);
 
    if (placeholder)
      {
         elm_object_text_set(input, placeholder);
      }
    _create_inputs[row] = input;
+   return input;
 }
 
 Edi_Template *
@@ -337,10 +340,14 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    user = elm_object_text_get(_create_inputs[3]);
    email = elm_object_text_get(_create_inputs[4]);
 
-   if (template && path && path[0] && name && name[0])
+   if (path && path[0] && name && name[0])
      {
+        if (!template->is_template)
           edi_create_example(template->path, path, name,
                              _edi_welcome_project_new_create_done_cb);
+        else
+          edi_create_project(template->path, path, name, url, user, email,
+                                 _edi_welcome_project_new_create_done_cb);
      }
    else
      {
@@ -385,7 +392,7 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 static void
 _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
 {
-   Evas_Object *content, *button;
+   Evas_Object *content, *button, *input;
    Elm_Object_Item *item;
    int row = 0;
    char fullname[1024];
@@ -400,13 +407,16 @@ _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
    if (!username)
      username = getenv("USERNAME");
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project URL"), NULL, row++, content);
+   input = _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, EINA_TRUE, row++, content);
+   if (!template->is_template)
+     elm_object_text_set(input, template->edje_id);
+
+   _edi_welcome_project_new_input_row_add(_("Project URL"), NULL, template->is_template, row++, content);
    if (_edi_welcome_user_fullname_get(username, fullname, sizeof(fullname)))
-      _edi_welcome_project_new_input_row_add(_("Creator Name"), fullname, row++, content);
+      _edi_welcome_project_new_input_row_add(_("Creator Name"), fullname, template->is_template, row++, content);
    else
-      _edi_welcome_project_new_input_row_add(_("Creator Name"), username, row++, content);
-   _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, row++, content);
+      _edi_welcome_project_new_input_row_add(_("Creator Name"), username, template->is_template, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, template->is_template, row++, content);
 
    button = elm_button_add(content);
    elm_object_text_set(button, _("Create"));
@@ -499,7 +509,6 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *content, *button, *naviframe;
    Evas_Object *table, *list, *rect, *hbox;
    Elm_Object_Item *item;
-   char path[PATH_MAX];
    Edi_Template *template, *example;
    Elm_Genlist_Item_Class *ith, *itc;
 
@@ -667,9 +676,9 @@ _edi_welcome_project_clone_cb(void *data, Evas_Object *obj EINA_UNUSED, void *ev
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(content);
 
-   _edi_welcome_project_new_input_row_add(_("Source Control URL"), NULL, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Source Control URL"), NULL, EINA_TRUE, row++, content);
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, EINA_TRUE, row++, content);
 
    pb = elm_progressbar_add(content);
    evas_object_size_hint_align_set(pb, EVAS_HINT_FILL, 0.5);

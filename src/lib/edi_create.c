@@ -10,6 +10,8 @@
 
 #include "edi_private.h"
 
+#define EXAMPLES_GIT_URL "https://git.enlightenment.org/tools/examples.git"
+
 typedef struct _Edi_Create
 {
    char *path, *temp, *name, *skelfile;
@@ -20,6 +22,15 @@ typedef struct _Edi_Create
 
    int filters;
 } Edi_Create;
+
+typedef struct _Edi_Create_Example
+{
+   char *path, *name;
+
+   Edi_Create_Cb callback;
+
+} Edi_Create_Example;
+
 
 static Edi_Create *_edi_create_data;
 
@@ -343,5 +354,63 @@ edi_create_project(const char *template_name, const char *parentdir,
 
    ecore_exe_run(cmd, data);
    free(cmd);
+}
+
+static void
+_edi_create_example_done_cb(void *data, Eio_File *file EINA_UNUSED)
+{
+   Edi_Create_Example *create = data;
+
+   if (create->callback)
+     create->callback(create->path, EINA_TRUE);
+}
+
+static void
+_edi_create_example_extract_dir(char *examples_path, Edi_Create_Example *create)
+{
+   char path[PATH_MAX];
+
+   eina_file_path_join(path, sizeof(path), examples_path, create->name);
+
+   eio_dir_copy(path, create->path, NULL, NULL, _edi_create_example_done_cb,
+                _edi_create_error_cb, create);
+
+   free(examples_path);
+}
+
+EAPI void
+edi_create_example(const char *example_name, const char *parentdir,
+                   const char *name, Edi_Create_Cb func)
+{
+   char dest[PATH_MAX], examplepath[PATH_MAX];
+   int status = 0;
+   Edi_Create_Example *data;
+
+   snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
+   snprintf(examplepath, sizeof(examplepath), "%s/%s/examples.git",
+            efreet_cache_home_get(), PACKAGE_NAME);
+
+   data = calloc(1, sizeof(Edi_Create_Example));
+   data->path = strdup(dest);
+   data->name = strdup(example_name);
+   data->callback = func;
+
+   INF("Extracting example project \"%s\" at path %s\n", example_name, dest);
+
+   if (ecore_file_exists(examplepath))
+     ERR("TODO: UPDATE NOT IMPLEMENTED");
+//     status = edi_scm_git_update(examplepath);
+   else
+     status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath);
+
+   if (status)
+     {
+        ERR("git error: [%d]\n", status);
+
+        if (func)
+          func(dest, EINA_FALSE);
+     }
+   else
+     _edi_create_example_extract_dir(strdup(examplepath), data);
 }
 
