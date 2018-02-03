@@ -54,6 +54,8 @@ _meson_configured_check(const char *dir)
 static Eina_Bool
 _meson_file_hidden_is(const char *file)
 {
+   size_t k;
+
    if (!file || strlen(file) == 0)
      return EINA_FALSE;
 
@@ -66,7 +68,7 @@ _meson_file_hidden_is(const char *file)
    if (ecore_file_is_dir(file) && _meson_configured_check(file))
      return EINA_TRUE;
 
-   for (size_t k = 0; k < EINA_C_ARRAY_LENGTH(hidden_exts); k++)
+   for (k = 0; k < EINA_C_ARRAY_LENGTH(hidden_exts); k++)
      if (eina_str_has_extension(file, hidden_exts[k]))
        return EINA_TRUE;
 
