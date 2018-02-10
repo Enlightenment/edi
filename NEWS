@@ -1,14 +1,23 @@
 =======
-Edi 0.7
+Edi 0.8
 =======
 
 Features:
 
   * Added theme support and new themes.
   * Added editor translucency option.
+
+
+=======
+Edi 0.7
+=======
+
+Features:
+
   * Added notification support.
   * Added split-view option for editors.
-  * Project wizard and new project templates.
+  * Updated project wizard and added new project templates.
+  * Include EFL examples in project wizard.
   * Improved debugging support.
   * Added edi_scm helper command.
   * Replace all in project.
