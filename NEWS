@@ -6,7 +6,8 @@ Features:
 
   * Added notification support.
   * Added split-view option for editors.
-  * Project wizard and new project templates.
+  * Updated project wizard and added new project templates.
+  * Include EFL examples in project wizard.
   * Improved debugging support.
   * Added edi_scm helper command.
   * Replace all in project.
