@@ -286,12 +286,14 @@ _edi_language_c_lookup(Edi_Editor *editor, unsigned int row, unsigned int col)
           }
 
         if (name)
-          suggest_it->summary = strdup(name);
-        suggest_it->detail = _edi_suggest_c_detail_get(editor, name, ret?ret:"", param?param:"");
+          {
+             suggest_it->summary = strdup(name);
+             suggest_it->detail = _edi_suggest_c_detail_get(editor, name, ret?ret:"", param?param:"");
+
+             list = eina_list_append(list, suggest_it);
+          }
         if (param)
           free(param);
-
-        list = eina_list_append(list, suggest_it);
      }
    clang_disposeCodeCompleteResults(res);
 #else
