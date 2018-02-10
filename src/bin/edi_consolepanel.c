@@ -16,7 +16,6 @@
 
 #include "edi_consolepanel.h"
 #include "mainview/edi_mainview.h"
-#include "edi_theme.h"
 #include "edi_config.h"
 
 #include "edi_private.h"
@@ -322,13 +321,11 @@ _edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, v
    EINA_LIST_FOREACH(_edi_console_code->widgets, item, widget)
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-        edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
      }
 
    EINA_LIST_FOREACH(_edi_test_code->widgets, item, widget)
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-        edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
      }
 
    return ECORE_CALLBACK_RENEW;
@@ -344,7 +341,6 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL);
    efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
@@ -370,7 +366,6 @@ void edi_testpanel_add(Evas_Object *parent)
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL);
    efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
