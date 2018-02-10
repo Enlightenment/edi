@@ -1,6 +1,6 @@
 project(
   'edi', 'c',
-  version : '0.6.99',
+  version : '0.7.0',
   default_options: [ 'c_std=gnu99', 'warning_level=2' ],
   meson_version : '>= 0.39.0')
 
@@ -22,7 +22,7 @@ config_h.set_quoted('PACKAGE_DOC_DIR', join_paths(get_option('prefix'), get_opti
 
 config_h.set_quoted('EFL_BETA_API_SUPPORT'     , '1')
 
-elm = dependency('elementary')
+elm = dependency('elementary', version : '>=1.20.6')
 top_inc = include_directories('.')
 
 cc = meson.get_compiler('c')
