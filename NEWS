@@ -8,6 +8,7 @@ Features:
   * Added split-view option for editors.
   * Updated project wizard and added new project templates.
   * Include EFL examples in project wizard.
+  * Add support for Go projects.
   * Improved debugging support.
   * Added edi_scm helper command.
   * Replace all in project.
