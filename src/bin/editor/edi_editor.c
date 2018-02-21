@@ -867,7 +867,7 @@ _edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
    widget = (Elm_Code_Widget *)obj;
    elm_code_widget_cursor_position_get(widget, &line, &col);
 
-   snprintf(buf, sizeof(buf), _("Line:%d, Column:%d"), line, col);
+   snprintf(buf, sizeof(buf), _("Line:%6d, Column:%4d"), line, col);
    elm_object_text_set((Evas_Object *)data, buf);
 }
 
@@ -909,50 +909,73 @@ static void
 _edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
    Edi_Language_Provider *provider;
-   Evas_Object *position, *mime, *lines;
+   Evas_Object *table, *rect, *tb, *position, *mime;
    Elm_Code *code;
+   char text[256];
+   const char *format, *spaces = "        ";
 
    elm_box_horizontal_set(panel, EINA_TRUE);
 
-   mime = elm_label_add(panel);
+   table = elm_table_add(panel);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(table);
+   elm_box_pack_end(panel, table);
+
+   code = elm_code_widget_code_get(editor->entry);
+   if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
+     format = "WIN";
+   else
+     format = "UNIX";
+
+   mime = elm_entry_add(panel);
+   elm_entry_editable_set(mime, EINA_FALSE);
+   elm_entry_scrollable_set(mime, EINA_FALSE);
+   elm_entry_single_line_set(mime, EINA_TRUE);
+
    if (item->mimetype)
      {
         provider = edi_language_provider_get(editor);
         if (provider && provider->mime_name(item->mimetype))
           {
-             char summary[1024];
-             sprintf(summary, "%s (%s)", provider->mime_name(item->mimetype), item->mimetype);
-             elm_object_text_set(mime, summary);
+             snprintf(text, sizeof(text), "%s (%s)%s%s", provider->mime_name(item->mimetype), item->mimetype, spaces, format);
           }
         else
-          elm_object_text_set(mime, item->mimetype);
+          {
+             snprintf(text, sizeof(text), "%s%s%s", item->mimetype, spaces, format);
+          }
      }
    else
-     elm_object_text_set(mime, item->editortype);
-   evas_object_size_hint_align_set(mime, 0.0, 0.5);
-   evas_object_size_hint_weight_set(mime, 0.1, 0.0);
-   elm_box_pack_end(panel, mime);
-   evas_object_show(mime);
-   elm_object_disabled_set(mime, EINA_TRUE);
+     {
+        snprintf(text, sizeof(text), "%s%s%s", item->editortype, spaces, format);
+     }
 
-   lines = elm_label_add(panel);
-   code = elm_code_widget_code_get(editor->entry);
-   if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
-     elm_object_text_set(lines, "WIN");
-   else
-     elm_object_text_set(lines, "UNIX");
-   evas_object_size_hint_align_set(lines, 0.0, 0.5);
-   evas_object_size_hint_weight_set(lines, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(panel, lines);
-   evas_object_show(lines);
-   elm_object_disabled_set(lines, EINA_TRUE);
+   elm_object_text_set(mime, text);
 
-   position = elm_label_add(panel);
+   rect = evas_object_rectangle_add(panel);
+   evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_move(rect, 0, 0);
+   evas_object_resize(rect, 220, 1);
+   evas_object_color_set(rect, 0, 0, 0, 0);
+   evas_object_show(rect);
+
+   tb = elm_entry_textblock_get(mime);
+   evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_resize(tb, 220, 1);
+   evas_object_show(tb);
+   elm_table_pack(table, tb, 0, 0, 1, 1);
+   elm_table_pack(table, rect, 0, 0, 1, 1);
+
+   position = elm_entry_add(panel);
+   elm_entry_single_line_set(position, EINA_TRUE);
+   elm_entry_text_style_user_push(position, "DEFAULT='font=Mono')");
+   elm_entry_editable_set(position, EINA_FALSE);
    evas_object_size_hint_align_set(position, 1.0, 0.5);
    evas_object_size_hint_weight_set(position, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(panel, position);
+   elm_table_pack(table, position, 1, 0, 1, 1);
    evas_object_show(position);
-   elm_object_disabled_set(position, EINA_TRUE);
 
    _edit_cursor_moved(position, editor->entry, NULL);
    evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
