@@ -152,6 +152,25 @@ void edi_consolepanel_clear()
    _edi_test_count = _edi_test_pass = _edi_test_fail = 0;
 }
 
+static void
+_edi_test_output_suite(int count, int pass, int fail)
+{
+   char *line;
+   const char *format = _("Total pass %d (%d%%), fail %d)");
+   int linemax, percent;
+
+   linemax = strlen(format) - 6 + 30;
+   line = malloc(sizeof(char) * linemax);
+
+   percent = 0;
+   if (count > 0)
+     percent = (int) ((pass / (double) count) * 100);
+
+   snprintf(line, linemax, format, pass, percent, fail);
+   elm_code_file_line_append(_edi_test_code->file, line, strlen(line), (fail > 0) ? _EDI_SUITE_FAILED : _EDI_SUITE_PASSED);
+   free(line);
+}
+
 static Eina_Bool
 _exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
@@ -178,23 +197,15 @@ _exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
    return ECORE_CALLBACK_RENEW;
 }
 
-static void
-_edi_test_output_suite(int count, int pass, int fail)
+static Eina_Bool
+_exe_done(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   char *line;
-   const char *format = _("Total pass %d (%d%%), fail %d)");
-   int linemax, percent;
+   if (_edi_test_count == 0)
+     return ECORE_CALLBACK_RENEW;
 
-   linemax = strlen(format) - 6 + 30;
-   line = malloc(sizeof(char) * linemax);
-
-   percent = 0;
-   if (count > 0)
-     percent = (int) ((pass / (double) count) * 100);
-
-   snprintf(line, linemax, format, pass, percent, fail);
-   elm_code_file_line_append(_edi_test_code->file, line, strlen(line), (fail > 0) ? _EDI_SUITE_FAILED : _EDI_SUITE_PASSED);
-   free(line);
+   _edi_test_output_suite(_edi_test_count, _edi_test_pass, _edi_test_fail);
+   _edi_test_count = 0;
+   return ECORE_CALLBACK_RENEW;
 }
 
 static Eina_Bool
@@ -309,6 +320,23 @@ static void _edi_test_line_callback(const char *content)
    else if (!strncmp(content, "FAIL:", 5))
      {
         _edi_test_line_parse_suite(content + 6);
+
+   else if (!strncmp(content, "=== RUN", 7))
+     {
+        edi_testpanel_show();
+        _edi_test_count++;
+     }
+   else if (!strncmp(content, "--- PASS:", 9))
+     {
+        _edi_test_pass++;
+
+        elm_code_file_line_append(_edi_test_code->file, content + 10, strlen(content) - 10, _EDI_SUITE_PASSED);
+     }
+   else if (!strncmp(content, "--- FAIL:", 9))
+     {
+        _edi_test_fail++;
+
+        elm_code_file_line_append(_edi_test_code->file, content + 10, strlen(content) - 10, _EDI_SUITE_FAILED);
      }
 }
 
@@ -353,6 +381,7 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_done, NULL);
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_consolepanel_config_changed, NULL);
 }
 
