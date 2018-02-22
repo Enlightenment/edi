@@ -17,24 +17,6 @@
 // TODO move out to edi_content.c or similar just like the editor type
 // (and the Evas include)
 
-static Evas_Object *
-_edi_content_provider_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
-{
-   Evas_Object *img, *scroll;
-
-   scroll = elm_scroller_add(parent);
-   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(scroll);
-   img = elm_image_add(scroll);
-   elm_image_file_set(img, item->path, NULL);
-   elm_image_no_scale_set(img, EINA_TRUE);
-   elm_object_content_set(scroll, img);
-   evas_object_show(img);
-
-   return scroll;
-}
-
 static Eina_Bool
 _edi_content_provider_diff_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
@@ -65,7 +47,7 @@ static Edi_Content_Provider _edi_content_provider_registry[] =
 {
    {"text", "text-x-generic", EINA_TRUE, EINA_TRUE, edi_editor_add},
    {"code", "text-x-csrc", EINA_TRUE, EINA_TRUE, edi_editor_add},
-   {"image", "image-x-generic", EINA_FALSE, EINA_FALSE, _edi_content_provider_image_add},
+   {"image", "image-x-generic", EINA_FALSE, EINA_FALSE, edi_editor_image_add},
    {"diff", "text-x-source", EINA_TRUE, EINA_FALSE, _edi_content_provider_diff_add},
 
    {NULL, NULL, EINA_FALSE, EINA_FALSE, NULL}

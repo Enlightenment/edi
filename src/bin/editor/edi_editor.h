@@ -90,6 +90,17 @@ struct _Edi_Editor
 Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
 
 /**
+ * Initialise a new image canvas and add it to the parent panel.
+ *
+ * @param parent The panel into which the image panel will be loaded.
+ * @param item The item describing the image file to be loaded in the canvas.
+ * @return the created evas object that contains the image.
+ *
+ * @ingroup Editor
+ */
+Evas_Object *edi_editor_image_add(Evas_Object *parent, Edi_Mainview_Item *item);
+
+/**
  * Reload existing editor's content from disk.
  *
  * @param editor the editor instance to reload content from.

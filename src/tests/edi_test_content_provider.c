@@ -14,6 +14,12 @@ edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNU
    return NULL;
 }
 
+EAPI Evas_Object *
+edi_editor_image_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
+{
+   return NULL;
+}
+
 Edi_Config *_edi_config = NULL;
 Edi_Project_Config *_edi_project_config = NULL;
 int EDI_EVENT_CONFIG_CHANGED;
