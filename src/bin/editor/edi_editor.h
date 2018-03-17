@@ -90,17 +90,6 @@ struct _Edi_Editor
 Evas_Object *edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item);
 
 /**
- * Initialise a new image canvas and add it to the parent panel.
- *
- * @param parent The panel into which the image panel will be loaded.
- * @param item The item describing the image file to be loaded in the canvas.
- * @return the created evas object that contains the image.
- *
- * @ingroup Editor
- */
-Evas_Object *edi_editor_image_add(Evas_Object *parent, Edi_Mainview_Item *item);
-
-/**
  * Reload existing editor's content from disk.
  *
  * @param editor the editor instance to reload content from.
@@ -165,17 +154,6 @@ void edi_editor_doc_open(Edi_Editor *editor);
  * @ingroup Widgets
  */
 void edi_editor_widget_config_get(Elm_Code_Widget *widget);
-
-/**
- * Add a statusbar to the panel for displaying statistics about loaded content.
- *
- * @param panel the panel in which the content resides and into which the statusbar is shown.
- * @param editor the editor object.
- * @param item the item containing information about the file's content.
- *
- * @ingroup Widgets
- */
-void edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item);
 
 /**
  * @}

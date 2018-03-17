@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "editor/edi_editor.h"
 #include "mainview/edi_mainview_item.h"
 
 /**
@@ -45,6 +46,17 @@ Evas_Object *edi_content_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
  * @ingroup Content
  */
 Evas_Object *edi_content_diff_add(Evas_Object *parent, Edi_Mainview_Item *item);
+
+/**
+ * Add a statusbar to the panel for displaying statistics about loaded content.
+ *
+ * @param panel the panel in which the content resides and into which the statusbar is shown.
+ * @param editor the editor object.
+ * @param item the item containing information about the file's content.
+ *
+ * @ingroup Content
+ */
+void edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item);
 
 /**
  * @}
