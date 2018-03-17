@@ -5,6 +5,8 @@ src = files([
   'edi_config.h',
   'edi_consolepanel.c',
   'edi_consolepanel.h',
+  'edi_content.c',
+  'edi_content.h',
   'edi_content_provider.c',
   'edi_content_provider.h',
   'edi_debug.c',

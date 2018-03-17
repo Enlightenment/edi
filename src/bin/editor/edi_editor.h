@@ -166,6 +166,16 @@ void edi_editor_doc_open(Edi_Editor *editor);
  */
 void edi_editor_widget_config_get(Elm_Code_Widget *widget);
 
+/**
+ * Add a statusbar to the panel for displaying statistics about loaded content.
+ *
+ * @param panel the panel in which the content resides and into which the statusbar is shown.
+ * @param editor the editor object.
+ * @param item the item containing information about the file's content.
+ *
+ * @ingroup Widgets
+ */
+void edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item);
 
 /**
  * @}

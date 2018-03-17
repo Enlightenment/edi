@@ -15,7 +15,13 @@ edi_editor_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNU
 }
 
 EAPI Evas_Object *
-edi_editor_image_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
+edi_content_image_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
+{
+   return NULL;
+}
+
+EAPI Evas_Object *
+edi_content_diff_add(Evas_Object *parent EINA_UNUSED, Edi_Mainview_Item *item EINA_UNUSED)
 {
    return NULL;
 }

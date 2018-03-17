@@ -913,8 +913,8 @@ _edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EI
    free(word);
 }
 
-static void
-_edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
+void
+edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
 {
    Edi_Language_Provider *provider;
    Evas_Object *table, *rect, *tb, *position, *mime;
@@ -1441,7 +1441,7 @@ edi_editor_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
    editor = calloc(1, sizeof(*editor));
    editor->mimetype = item->mimetype;
 
-   _edi_editor_statusbar_add(statusbar, editor, item);
+   edi_editor_statusbar_add(statusbar, editor, item);
 
    return vbox;
 }
@@ -1522,7 +1522,7 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_box_pack_end(box, widget);
 
    edi_editor_search_add(searchbar, editor);
-   _edi_editor_statusbar_add(statusbar, editor, item);
+   edi_editor_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(widget);
    ctrl = evas_key_modifier_mask_get(e, "Control");
