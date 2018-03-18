@@ -5,6 +5,7 @@
 #include "language/edi_language_provider.h"
 #include "editor/edi_editor.h"
 #include "edi_content.h"
+#include "mainview/edi_mainview.h"
 
 #include "edi_config.h"
 #include "edi_private.h"
@@ -40,7 +41,6 @@ Evas_Object *
 edi_content_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
    Evas_Object *vbox, *box, *searchbar, *statusbar, *scroll, *img;
-   Edi_Editor *editor;
 
    vbox = elm_box_add(parent);
    evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -76,45 +76,52 @@ edi_content_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_show(img);
 
    elm_box_pack_end(box, scroll);
-   editor = calloc(1, sizeof(*editor));
-   editor->mimetype = item->mimetype;
 
-   edi_content_statusbar_add(statusbar, editor, item);
+   edi_content_statusbar_add(statusbar, item);
+   edi_content_statusbar_position_set(item->pos, 0, 0);
 
    return vbox;
 }
 
-static void
-_edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
+void
+edi_content_statusbar_position_set(Evas_Object *position, unsigned int line, unsigned int col)
 {
-   Elm_Code_Widget *widget;
-   char buf[30];
-   unsigned int line;
-   unsigned int col;
+   char buf[64];
+   char text[128];
+   int i;
 
-   widget = (Elm_Code_Widget *)obj;
-   if (widget)
+   if (!position) return;
+
+   if (line && col)
      {
-        elm_code_widget_cursor_position_get(widget, &line, &col);
+        snprintf(buf, sizeof(buf), _("Line: %d, Column: %d"), line, col);
      }
    else
      {
-        line = 0; col = 0;
+        buf[0] = 0x00;
      }
 
-   snprintf(buf, sizeof(buf), _("Line:%6d, Column:%4d"), line, col);
+   text[0] = 0x00;
 
-   elm_object_text_set((Evas_Object *)data, buf);
+   for (i = strlen(buf); i < 24; i++)
+      {
+         strcat(text, " ");
+      }
+
+   strcat(text, buf);
+
+   elm_object_text_set(position, text);
 }
 
 void
-edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
+edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
 {
    Edi_Language_Provider *provider;
    Evas_Object *table, *rect, *tb, *position, *mime;
    Elm_Code *code;
    char text[256];
    const char *format, *spaces = "        ";
+   const char *mimename = NULL;
 
    elm_box_horizontal_set(panel, EINA_TRUE);
 
@@ -124,7 +131,8 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    evas_object_show(table);
    elm_box_pack_end(panel, table);
 
-   code = elm_code_widget_code_get(editor->entry);
+   code = elm_code_create();
+   code->file = elm_code_file_open(code, item->path);
    if (code)
      {
         if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
@@ -137,6 +145,8 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
         format = "";
      }
 
+   elm_code_free(code);
+
    mime = elm_entry_add(panel);
    elm_entry_editable_set(mime, EINA_FALSE);
    elm_entry_scrollable_set(mime, EINA_FALSE);
@@ -144,10 +154,12 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
 
    if (item->mimetype)
      {
-        provider = edi_language_provider_get(editor);
-        if (provider && provider->mime_name(item->mimetype))
+        provider = edi_language_provider_for_mime_get(item->mimetype);
+        if (provider)
+          mimename = provider->mime_name(item->mimetype);
+        if (provider && mimename)
           {
-             snprintf(text, sizeof(text), "%s (%s)%s%s", provider->mime_name(item->mimetype), item->mimetype, spaces, format);
+             snprintf(text, sizeof(text), "%s (%s)%s%s", mimename, item->mimetype, spaces, format);
           }
         else
           {
@@ -177,7 +189,7 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    elm_table_pack(table, tb, 0, 0, 1, 1);
    elm_table_pack(table, rect, 0, 0, 1, 1);
 
-   position = elm_entry_add(panel);
+   item->pos = position = elm_entry_add(panel);
    elm_entry_single_line_set(position, EINA_TRUE);
    elm_entry_text_style_user_push(position, "DEFAULT='font=Mono')");
    elm_entry_editable_set(position, EINA_FALSE);
@@ -185,8 +197,5 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_I
    evas_object_size_hint_weight_set(position, EVAS_HINT_EXPAND, 0.0);
    elm_table_pack(table, position, 1, 0, 1, 1);
    evas_object_show(position);
-
-   _edit_cursor_moved(position, editor->entry, NULL);
-   evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
 }
 

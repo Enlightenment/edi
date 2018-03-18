@@ -51,13 +51,22 @@ Evas_Object *edi_content_diff_add(Evas_Object *parent, Edi_Mainview_Item *item);
  * Add a statusbar to the panel for displaying statistics about loaded content.
  *
  * @param panel the panel in which the content resides and into which the statusbar is shown.
- * @param editor the editor object.
  * @param item the item containing information about the file's content.
  *
  * @ingroup Content
  */
-void edi_content_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item);
+void edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item);
 
+/**
+ * Set the statusbar line information.
+ *
+ * @param position the object to render the statistics within the statusbar.
+ * @param line the line number to displsy.
+ * @param col the column position to display.
+ *
+ * @ingroup Content
+ */
+void edi_content_statusbar_position_set(Evas_Object *position, unsigned int line, unsigned int col);
 /**
  * @}
  */

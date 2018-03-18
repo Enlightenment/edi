@@ -857,41 +857,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
      }
 }
 
-static void
-_edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   Edi_Editor *editor;
-   Edi_Language_Provider *provider;
-   char *word;
-   const char *snippet;
-
-   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
-
-   editor = (Edi_Editor *)data;
-
-   _suggest_hint_hide(editor);
-   if (evas_object_visible_get(editor->suggest_bg))
-     return;
-
-   provider = edi_language_provider_get(editor);
-   if (!provider)
-     return;
-
-   word = _edi_editor_current_word_get(editor);
-
-   if (word && strlen(word) > 1)
-     {
-        snippet = provider->snippet_get(word);
-        if (snippet)
-          _suggest_hint_show_snippet(editor, word);
-        else if (strlen(word) >= 3)
-          _suggest_hint_show_match(editor, word);
-     }
-
-   free(word);
-}
-
-
 #if HAVE_LIBCLANG
 static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type type)
@@ -1293,6 +1258,63 @@ edi_editor_reload(Edi_Editor *editor)
    ecore_thread_main_loop_end();
 }
 
+static void
+_edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+ {
+   Edi_Mainview_Item *item;
+   Elm_Code_Widget *widget;
+   unsigned int line;
+   unsigned int col;
+
+   widget = (Elm_Code_Widget *)obj;
+   if (widget)
+     {
+        elm_code_widget_cursor_position_get(widget, &line, &col);
+     }
+   else
+     {
+        line = 0; col = 0;
+     }
+
+   item = data;
+
+   edi_content_statusbar_position_set(item->pos, line, col);
+}
+
+static void
+_edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor;
+   Edi_Language_Provider *provider;
+   char *word;
+   const char *snippet;
+
+   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
+
+   editor = (Edi_Editor *)data;
+
+   _suggest_hint_hide(editor);
+   if (evas_object_visible_get(editor->suggest_bg))
+     return;
+
+   provider = edi_language_provider_get(editor);
+   if (!provider)
+     return;
+
+   word = _edi_editor_current_word_get(editor);
+
+   if (word && strlen(word) > 1)
+     {
+        snippet = provider->snippet_get(word);
+        if (snippet)
+          _suggest_hint_show_snippet(editor, word);
+        else if (strlen(word) >= 3)
+          _suggest_hint_show_match(editor, word);
+     }
+
+   free(word);
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -1368,8 +1390,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_show(widget);
    elm_box_pack_end(box, widget);
 
+   edi_content_statusbar_add(statusbar, item);
    edi_editor_search_add(searchbar, editor);
-   edi_content_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(widget);
    ctrl = evas_key_modifier_mask_get(e, "Control");
@@ -1387,7 +1409,9 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
    evas_object_event_callback_add(item->view, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
 
+   _edit_cursor_moved(item, editor->entry, NULL);
    evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, editor);
+   evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, item);
 
    if (edi_language_provider_has(editor))
      {
