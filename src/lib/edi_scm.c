@@ -434,8 +434,16 @@ _edi_scm_git_remote_name_get(void)
    if (!engine)
      return NULL;
 
-   if (!_remote_name)
-     _remote_name = _edi_scm_exec_response("git config --get user.name");
+   if (_remote_name)
+     free(_remote_name);
+
+   _remote_name = _edi_scm_exec_response("git config --get user.name");
+
+   if (_remote_name && !_remote_name[0])
+     {
+        free(_remote_name);
+        _remote_name = NULL;
+     }
 
    return _remote_name;
 }
@@ -449,8 +457,16 @@ _edi_scm_git_remote_email_get(void)
    if (!engine)
      return NULL;
 
-   if (!_remote_email)
-     _remote_email = _edi_scm_exec_response("git config --get user.email");
+   if (_remote_email)
+     free(_remote_email);
+
+   _remote_email = _edi_scm_exec_response("git config --get user.email");
+
+   if (_remote_email && !_remote_email[0])
+     {
+        free(_remote_email);
+        _remote_email = NULL;
+     }
 
    return _remote_email;
 }
@@ -464,8 +480,16 @@ _edi_scm_git_remote_url_get(void)
    if (!engine)
      return NULL;
 
-   if (!_remote_url)
-     _remote_url = _edi_scm_exec_response("git remote get-url origin");
+   if (_remote_url)
+     free(_remote_url);
+
+   _remote_url = _edi_scm_exec_response("git remote get-url origin");
+
+   if (_remote_url && !_remote_url[0])
+     {
+        free(_remote_url);
+        _remote_url = NULL;
+     }
 
    return _remote_url;
 }

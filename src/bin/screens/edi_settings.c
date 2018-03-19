@@ -614,6 +614,15 @@ _edi_settings_project_remote_cb(void *data EINA_UNUSED, Evas_Object *obj,
    elm_object_disabled_set(entry, EINA_TRUE);
 }
 
+static void _edi_settings_scm_credentials_set(const char *user_fullname, const char *user_email)
+{
+   if (!edi_scm_enabled())
+     return;
+
+   if (user_fullname && user_fullname[0] && user_email && user_email[0])
+     edi_scm_credentials_set(user_fullname, user_email);
+}
+
 static void
 _edi_settings_project_email_cb(void *data EINA_UNUSED, Evas_Object *obj,
                              void *event EINA_UNUSED)
@@ -627,6 +636,8 @@ _edi_settings_project_email_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
    _edi_project_config->user_email = eina_stringshare_add(elm_object_text_get(entry));
    _edi_project_config_save();
+
+   _edi_settings_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
 }
 
 static void
@@ -642,6 +653,8 @@ _edi_settings_project_name_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
    _edi_project_config->user_fullname = eina_stringshare_add(elm_object_text_get(entry));
    _edi_project_config_save();
+
+   _edi_settings_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
 }
 
 static Evas_Object *

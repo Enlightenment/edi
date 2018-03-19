@@ -1120,6 +1120,12 @@ static void
 _edi_menu_scm_stash_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                        void *event_info EINA_UNUSED)
 {
+   if (!_edi_project_credentials_check())
+     {
+        _edi_project_credentials_missing();
+        return;
+     }
+
    edi_screens_message_confirm(_edi_main_win, _("Are you sure you wish to stash these changes?"),
                                _edi_scm_stash_do_cb, NULL);
 }
