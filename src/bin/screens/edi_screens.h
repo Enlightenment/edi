@@ -83,6 +83,18 @@ void edi_screens_message_confirm(Evas_Object *parent, const char *message, void 
  */
 void edi_screens_message(Evas_Object *parent, const char *title, const char *message);
 
+
+/**
+ * Create an information dialogue with additional button to settings.
+ *
+ * @param parent The parent object to display the dialogue in.
+ * @param title The title for the popup.
+ * @param message The text to be displayed in the popup.
+ *
+ * @ingroup UI
+ */
+void edi_screens_settings_message(Evas_Object *parent, const char *title, const char *message);
+
 /**
  * Send a desktop notification message to the window manager.
  *

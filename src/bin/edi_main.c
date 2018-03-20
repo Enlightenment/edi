@@ -564,7 +564,7 @@ edi_launcher_config_missing()
    title = _("Unable to launch");
    message = _("No launch binary found, please configure in Settings.");
 
-   edi_screens_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, title, message);
 }
 
 void
@@ -575,7 +575,7 @@ edi_debug_exe_missing(void)
    title = _("Unable to launch debugger");
    message = _("No debug binary found, please check system configuration and Settings.");
 
-   edi_screens_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, title, message);
 }
 
 static void
@@ -587,7 +587,7 @@ _edi_project_credentials_missing()
    title = _("Missing user information");
    message = _("No user information found, please configure in Settings.");
 
-   edi_screens_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, title, message);
 }
 
 static Eina_Bool
