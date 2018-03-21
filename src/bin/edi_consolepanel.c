@@ -320,7 +320,7 @@ static void _edi_test_line_callback(const char *content)
    else if (!strncmp(content, "FAIL:", 5))
      {
         _edi_test_line_parse_suite(content + 6);
-
+     }
    else if (!strncmp(content, "=== RUN", 7))
      {
         edi_testpanel_show();
