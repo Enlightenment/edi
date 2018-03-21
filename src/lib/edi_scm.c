@@ -435,7 +435,7 @@ _edi_scm_git_remote_name_get(void)
      return NULL;
 
    if (_remote_name)
-     free(_remote_name);
+     return _remote_name;
 
    _remote_name = _edi_scm_exec_response("git config --get user.name");
 
@@ -458,7 +458,7 @@ _edi_scm_git_remote_email_get(void)
      return NULL;
 
    if (_remote_email)
-     free(_remote_email);
+     return _remote_email;
 
    _remote_email = _edi_scm_exec_response("git config --get user.email");
 
@@ -481,7 +481,7 @@ _edi_scm_git_remote_url_get(void)
      return NULL;
 
    if (_remote_url)
-     free(_remote_url);
+     return _remote_url;
 
    _remote_url = _edi_scm_exec_response("git remote get-url origin");
 
