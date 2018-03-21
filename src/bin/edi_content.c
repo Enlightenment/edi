@@ -133,16 +133,17 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
 
    code = elm_code_create();
    code->file = elm_code_file_open(code, item->path);
-   if (code)
+
+   if (item->editortype && !strcasecmp(item->editortype, "image"))
+     {
+        format = "";
+     }
+   else if (code)
      {
         if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
           format = "WIN";
         else
           format = "UNIX";
-     }
-   else
-     {
-        format = "";
      }
 
    elm_code_free(code);
@@ -156,8 +157,11 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
      {
         provider = edi_language_provider_for_mime_get(item->mimetype);
         if (provider)
-          mimename = provider->mime_name(item->mimetype);
-        if (provider && mimename)
+          {
+             mimename = provider->mime_name(item->mimetype);
+          }
+
+        if (mimename)
           {
              snprintf(text, sizeof(text), "%s (%s)%s%s", mimename, item->mimetype, spaces, format);
           }
