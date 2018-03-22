@@ -120,7 +120,7 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
    Evas_Object *table, *rect, *tb, *position, *mime;
    Elm_Code *code;
    char text[256];
-   const char *format, *spaces = "        ";
+   const char *format = "", *spaces = "        ";
    const char *mimename = NULL;
 
    elm_box_horizontal_set(panel, EINA_TRUE);
@@ -131,22 +131,18 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
    evas_object_show(table);
    elm_box_pack_end(panel, table);
 
-   code = elm_code_create();
-   code->file = elm_code_file_open(code, item->path);
+   if (!strcmp(item->editortype, "code"))
+     {
+        code = elm_code_create();
+        code->file = elm_code_file_open(code, item->path);
 
-   if (item->editortype && !strcasecmp(item->editortype, "image"))
-     {
-        format = "";
-     }
-   else if (code)
-     {
         if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
           format = "WIN";
         else
           format = "UNIX";
-     }
 
-   elm_code_free(code);
+        elm_code_free(code);
+     }
 
    mime = elm_entry_add(panel);
    elm_entry_editable_set(mime, EINA_FALSE);
@@ -157,18 +153,12 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
      {
         provider = edi_language_provider_for_mime_get(item->mimetype);
         if (provider)
-          {
-             mimename = provider->mime_name(item->mimetype);
-          }
+          mimename = provider->mime_name(item->mimetype);
 
         if (mimename)
-          {
-             snprintf(text, sizeof(text), "%s (%s)%s%s", mimename, item->mimetype, spaces, format);
-          }
+          snprintf(text, sizeof(text), "%s (%s)%s%s", mimename, item->mimetype, spaces, format);
         else
-          {
-             snprintf(text, sizeof(text), "%s%s%s", item->mimetype, spaces, format);
-          }
+          snprintf(text, sizeof(text), "%s%s%s", item->mimetype, spaces, format);
      }
    else
      {
