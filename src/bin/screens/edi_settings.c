@@ -664,8 +664,19 @@ _edi_settings_project_create(Evas_Object *parent)
    Evas_Object *box, *frames, *frame, *table, *label, *entry_name, *entry_email;
    Evas_Object *entry_remote;
    Eina_Strbuf *text;
+   const char *remote_name, *remote_email;
 
    engine = edi_scm_engine_get();
+   if (!engine)
+     {
+        remote_name = remote_email = "";
+     }
+   else
+     {
+        remote_name = engine->remote_name_get();
+        remote_email = engine->remote_email_get();
+     }
+
    frames = elm_box_add(parent);
    frame = _edi_settings_panel_create(frames, _("Project Settings"));
    elm_box_pack_end(frames, frame);
@@ -686,7 +697,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(label);
 
    entry_name = elm_entry_add(table);
-   elm_object_text_set(entry_name, _edi_project_config->user_fullname ?: engine->remote_name_get());
+   elm_object_text_set(entry_name, _edi_project_config->user_fullname ?: remote_name);
    elm_entry_single_line_set(entry_name, EINA_TRUE);
    elm_entry_scrollable_set(entry_name, EINA_TRUE);
    evas_object_size_hint_weight_set(entry_name, 0.75, 0.0);
@@ -704,7 +715,7 @@ _edi_settings_project_create(Evas_Object *parent)
    evas_object_show(label);
 
    entry_email = elm_entry_add(table);
-   elm_object_text_set(entry_email, _edi_project_config->user_email ?: engine->remote_email_get());
+   elm_object_text_set(entry_email, _edi_project_config->user_email ?: remote_email);
    elm_entry_single_line_set(entry_email, EINA_TRUE);
    elm_entry_scrollable_set(entry_email, EINA_TRUE);
    evas_object_size_hint_weight_set(entry_email, 0.75, 0.0);
