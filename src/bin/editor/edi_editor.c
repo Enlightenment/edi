@@ -856,15 +856,21 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 static void
 _edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   Elm_Code *code;
+   Elm_Code_Line *line;
    Elm_Code_Widget *widget;
    char buf[30];
-   unsigned int line;
+   unsigned int row;
    unsigned int col;
 
    widget = (Elm_Code_Widget *)obj;
-   elm_code_widget_cursor_position_get(widget, &line, &col);
+   elm_code_widget_cursor_position_get(widget, &row, &col);
 
-   snprintf(buf, sizeof(buf), _("Line:%d, Column:%d"), line, col);
+   code = elm_code_widget_code_get(widget);
+   line = elm_code_file_line_get(code->file, row);
+
+   snprintf(buf, sizeof(buf), _("Line:%d, Position:%d"), row,
+            elm_code_widget_line_text_position_for_column_get(widget, line, col) + 1);
    elm_object_text_set((Evas_Object *)data, buf);
 }
 
