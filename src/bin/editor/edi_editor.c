@@ -1260,23 +1260,29 @@ static void
 _edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
  {
    Edi_Mainview_Item *item;
+   Elm_Code *code;
+   Elm_Code_Line *line;
    Elm_Code_Widget *widget;
-   unsigned int line;
-   unsigned int col;
+   unsigned int row, col, pos;
 
    widget = (Elm_Code_Widget *)obj;
    if (widget)
      {
-        elm_code_widget_cursor_position_get(widget, &line, &col);
+        elm_code_widget_cursor_position_get(widget, &row, &col);
+
+        code = elm_code_widget_code_get(widget);
+        line = elm_code_file_line_get(code->file, row);
+
+        pos = elm_code_widget_line_text_position_for_column_get(widget, line, col) + 1;
      }
    else
      {
-        line = 0; col = 0;
+        row = 0; pos = 0;
      }
 
    item = data;
 
-   edi_content_statusbar_position_set(item->pos, line, col);
+   edi_content_statusbar_position_set(item->pos, row, pos);
 }
 
 static void

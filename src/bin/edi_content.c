@@ -84,7 +84,7 @@ edi_content_image_add(Evas_Object *parent, Edi_Mainview_Item *item)
 }
 
 void
-edi_content_statusbar_position_set(Evas_Object *position, unsigned int line, unsigned int col)
+edi_content_statusbar_position_set(Evas_Object *position, unsigned int line, unsigned int pos)
 {
    char buf[64];
    char text[128];
@@ -92,9 +92,9 @@ edi_content_statusbar_position_set(Evas_Object *position, unsigned int line, uns
 
    if (!position) return;
 
-   if (line && col)
+   if (line && pos)
      {
-        snprintf(buf, sizeof(buf), _("Line: %d, Column: %d"), line, col);
+        snprintf(buf, sizeof(buf), _("Line: %d, Position: %d"), line, pos);
      }
    else
      {
