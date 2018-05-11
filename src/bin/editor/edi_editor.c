@@ -640,8 +640,6 @@ _suggest_hint_popup_add(Edi_Editor *editor, const char *content, Evas_Smart_Cb f
    Evas_Coord cx, cy, cw, ch;
 
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
 
