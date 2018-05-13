@@ -56,7 +56,7 @@ edi_theme_elm_code_set(Evas_Object *obj, const char *name)
           continue;
 
         elm_layout_file_set(obj, theme->path, "elm/code/layout/default");
-        efl_ui_widget_theme_apply(obj);
+        elm_code_widget_theme_refresh(obj);
      }
 }
 
