@@ -597,12 +597,12 @@ _edi_project_credentials_check(void)
 
    eng = edi_scm_engine_get();
 
-   if ((!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0) &&
-        eng && !eng->remote_name_get())
+   if ((!_edi_project_config->user_fullname || !_edi_project_config->user_fullname[0]) &&
+       (!eng || !eng->remote_name_get()))
      return EINA_FALSE;
 
-   if ((!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0) &&
-        eng && !eng->remote_email_get())
+   if ((!_edi_project_config->user_email || !_edi_project_config->user_email[0]) &&
+       (!eng || !eng->remote_email_get()))
      return EINA_FALSE;
 
    return EINA_TRUE;

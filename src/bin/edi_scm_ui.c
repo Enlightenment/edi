@@ -651,7 +651,7 @@ edi_scm_ui_add(Evas_Object *parent)
    remote_name = engine->remote_name_get();
    remote_email = engine->remote_email_get();
 
-   if (remote_name[0] && remote_email[0])
+   if (remote_name && remote_name[0] && remote_email && remote_email[0])
      avatar = elm_photo_add(parent);
    else
      avatar = elm_icon_add(parent);
@@ -678,7 +678,7 @@ edi_scm_ui_add(Evas_Object *parent)
 
    string = eina_strbuf_new();
 
-   if (!remote_name[0] && !remote_email[0])
+   if ((!remote_name || !remote_name[0]) && (!remote_email || !remote_email[0]))
      {
         eina_strbuf_append(string, _("Unable to obtain user information."));
         elm_icon_standard_set(avatar, DEFAULT_USER_ICON);
