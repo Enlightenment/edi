@@ -106,7 +106,16 @@ _edi_scm_git_file_unstage(const char *path)
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git reset HEAD %s", path);
+   eina_strbuf_append_printf(command, "git remote get-url origin");
+
+   code = _edi_scm_exec(eina_strbuf_string_get(command));
+
+   eina_strbuf_reset(command);
+
+   if (code == 0)
+     eina_strbuf_append_printf(command, "git reset HEAD %s", path);
+   else
+     eina_strbuf_append_printf(command, "git rm --cached %s", path);
 
    code = _edi_scm_exec(eina_strbuf_string_get(command));
 
