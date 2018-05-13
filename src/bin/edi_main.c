@@ -596,12 +596,13 @@ _edi_project_credentials_check(void)
    Edi_Scm_Engine *eng;
 
    eng = edi_scm_engine_get();
+
    if ((!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0) &&
-        !eng->remote_name_get())
+        eng && !eng->remote_name_get())
      return EINA_FALSE;
 
    if ((!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0) &&
-        !eng->remote_email_get())
+        eng && !eng->remote_email_get())
      return EINA_FALSE;
 
    return EINA_TRUE;
