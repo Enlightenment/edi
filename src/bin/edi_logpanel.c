@@ -50,8 +50,11 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
 
+   ecore_thread_main_loop_begin();
+
    elm_code_file_line_append(_elm_code->file, buffer, strlen(buffer),
                              (level <= EINA_LOG_LEVEL_ERR) ? _EDI_LOG_ERROR : NULL);
+   ecore_thread_main_loop_end();
 }
 
 static void
