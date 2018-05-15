@@ -1,0 +1,67 @@
+collections {
+    group {
+        name: "hellogui";
+        max: 128 128;
+
+        data {
+            item: "title" "C EFL Beta Hello World";
+            item: "path" "tutorials/c/hellogui/";
+            item: "description"
+                  "Hello World using the EFL Beta APIs";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "hellogui.png" COMP;
+                    image.normal: "hellogui.png";
+                }
+            }
+        }
+    }
+
+    group {
+        name: "life";
+        max: 128 128;
+
+        data {
+            item: "title" "C EFL Beta Game of Life";
+            item: "path" "apps/c/life/";
+            item: "description"
+                  "Game of Life using the EFL Beta APIs";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "life.png" COMP;
+                    image.normal: "life.png";
+                }
+            }
+        }
+    }
+
+    group {
+        name: "texteditor";
+        max: 128 128;
+
+        data {
+            item: "title" "C EFL Beta Basic Text Editor";
+            item: "path" "apps/c/texteditor/";
+            item: "description"
+                  "A basic text editor app using the EFL Beta APIs";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "texteditor.png" COMP;
+                    image.normal: "texteditor.png";
+                }
+            }
+        }
+    }
+}

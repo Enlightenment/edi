@@ -50,6 +50,7 @@ struct _Edi_Editor
    Edi_Editor_Search *search;
    Eina_Bool modified;
    Ecore_Timer *save_timer;
+   Eina_List *split_views;
 
 #if HAVE_LIBCLANG
    /* Clang */

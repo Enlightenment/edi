@@ -16,10 +16,13 @@
 
 typedef struct _Edi_Template
 {
-   char *edje_path;
-   char *skeleton_path;
+   char *edje_id;
+   char *edje_path; // TODO fix
+   char *path; // file path for skeleton, directory for example
    char *title;
    char *desc;
+
+   Eina_Bool is_template;
 } Edi_Template;
 
 typedef struct _Edi_Welcome_Data {
@@ -31,6 +34,7 @@ typedef struct _Edi_Welcome_Data {
 } Edi_Welcome_Data;
 
 static Eina_List *_available_templates = NULL;
+static Eina_List *_available_examples = NULL;
 
 static Evas_Object *_welcome_window, *_welcome_naviframe;
 static Evas_Object *_edi_new_popup;
@@ -164,7 +168,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
 
 static void
 _edi_welcome_project_new_directory_row_add(const char *text, int row,
-   Evas_Object *parent)
+                                           Evas_Object *parent)
 {
    Evas_Object *label, *input;
 
@@ -186,9 +190,9 @@ _edi_welcome_project_new_directory_row_add(const char *text, int row,
    _create_inputs[row] = input;
 }
 
-static void
-_edi_welcome_project_new_input_row_add(const char *text, const char *placeholder, int row,
-   Evas_Object *parent)
+static Evas_Object *
+_edi_welcome_project_new_input_row_add(const char *text, const char *placeholder,
+                                       Eina_Bool show, int row, Evas_Object *parent)
 {
    Evas_Object *label, *input;
 
@@ -197,7 +201,8 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(parent, label, 0, row, 1, 1);
-   evas_object_show(label);
+   if (show)
+     evas_object_show(label);
 
    input = elm_entry_add(parent);
    elm_entry_scrollable_set(input, EINA_TRUE);
@@ -205,32 +210,106 @@ _edi_welcome_project_new_input_row_add(const char *text, const char *placeholder
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(parent, input, 1, row, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 1, 1);
-   evas_object_show(input);
+   if (show)
+     evas_object_show(input);
 
    if (placeholder)
      {
         elm_object_text_set(input, placeholder);
      }
    _create_inputs[row] = input;
+   return input;
+}
+
+Edi_Template *
+_edi_template_add(const char *templates, const char *groupname)
+{
+   Edi_Template *t;
+   Evas_Object *group;
+   Ecore_Evas *evas; // TODO find a way to not need this!
+
+   t = malloc(sizeof(Edi_Template));
+   evas = ecore_evas_buffer_new(0, 0);
+   group = edje_object_add(ecore_evas_get(evas));
+   edje_object_file_set(group, templates, groupname);
+
+   t->title = strdup(edje_object_data_get(group, "title"));
+   t->desc = strdup(edje_object_data_get(group, "description"));
+   t->path = strdup(edje_object_data_get(group, "path"));
+   t->edje_path = strdup(templates);
+   t->edje_id = strdup(groupname);
+
+   return t;
 }
 
 static void
 _edi_template_free(Edi_Template *t)
 {
-   if (t)
+   if (!t)
+     return;
+
+   free(t->title);
+   free(t->desc);
+   free(t->edje_path);
+   free(t->edje_id);
+   free(t->path);
+   free(t);
+}
+
+static void
+_edi_templates_discover(const char *directory)
+{
+   Eina_List *collection, *list;
+   char path[PATH_MAX];
+   const char *groupname;
+
+   eina_file_path_join(path, sizeof(path), directory, "templates.edj");
+   if (!ecore_file_exists(path))
+     return;
+
+   collection = edje_file_collection_list(path);
+   EINA_LIST_FOREACH(collection, list, groupname)
      {
-        free(t->title);
-        free(t->desc);
-        free(t->edje_path);
-        free(t->skeleton_path);
-        free(t);
+        Edi_Template *template = _edi_template_add(path, groupname);
+        if (!template)
+          continue;
+
+        template->is_template = EINA_TRUE;
+        _available_templates = eina_list_append(_available_templates, template);
      }
+
+   edje_mmap_collection_list_free(collection);
+}
+
+static void
+_edi_examples_discover(const char *directory)
+{
+   Eina_List *collection, *list;
+   char path[PATH_MAX];
+   const char *groupname;
+
+   eina_file_path_join(path, sizeof(path), directory, "examples.edj");
+   if (!ecore_file_exists(path))
+     return;
+
+   collection = edje_file_collection_list(path);
+   EINA_LIST_FOREACH(collection, list, groupname)
+     {
+        Edi_Template *example = _edi_template_add(path, groupname);
+        if (!example)
+          continue;
+
+        example->is_template = EINA_FALSE;
+        _available_examples = eina_list_append(_available_examples, example);
+     }
+
+   edje_mmap_collection_list_free(collection);
 }
 
 static void
 _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
 {
-   Edi_Template *template;
+   Edi_Template *template, *example;
 
    if (!success)
      {
@@ -241,49 +320,10 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
 
     EINA_LIST_FREE(_available_templates, template)
       _edi_template_free(template);
+    EINA_LIST_FREE(_available_examples, example)
+      _edi_template_free(example);
 
    _edi_welcome_project_open(path, EINA_TRUE);
-}
-
-Edi_Template *
-_edi_template_add(const char *directory, const char *file)
-{
-   Edi_Template *t;
-   char *path = edi_path_append(directory, file);
-
-   if (!ecore_file_exists(path))
-     return NULL;
-
-   t = malloc(sizeof(Edi_Template));
-   t->title = edje_file_data_get(path, "title");
-   t->desc = edje_file_data_get(path, "description");
-   t->skeleton_path = edi_path_append(directory, edje_file_data_get(path, "file"));
-   t->edje_path = path;
-
-   return t;
-}
-
-static void
-_edi_templates_discover(const char *directory)
-{
-   Eina_List *files;
-   char *file;
-
-   files = ecore_file_ls(directory);
-   EINA_LIST_FREE(files, file)
-     {
-        if (eina_str_has_extension(file, ".edj"))
-          {
-             Edi_Template *template = _edi_template_add(directory, file);
-             if (template)
-               _available_templates = eina_list_append(_available_templates, template);
-          }
-
-        free(file);
-     }
-
-   if (files)
-     eina_list_free(files);
 }
 
 static void
@@ -300,16 +340,20 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    user = elm_object_text_get(_create_inputs[3]);
    email = elm_object_text_get(_create_inputs[4]);
 
-   if (template && path && path[0] && name && name[0])
+   if (path && path[0] && name && name[0])
      {
-        edi_create_efl_project(template->skeleton_path, path, name, url, user, email,
-                               _edi_welcome_project_new_create_done_cb);
+        if (!template->is_template)
+          edi_create_example(template->path, path, name,
+                             _edi_welcome_project_new_create_done_cb);
+        else
+          edi_create_project(template->path, path, name, url, user, email,
+                                 _edi_welcome_project_new_create_done_cb);
      }
    else
      {
-        if (path && !path[0])
+        if (!path || !path[0])
           elm_object_focus_set(_create_inputs[0], EINA_TRUE);
-        else if (name && !name[0])
+        else if (!name || !name[0])
           elm_object_focus_set(_create_inputs[1], EINA_TRUE);
      }
 }
@@ -348,7 +392,7 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 static void
 _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
 {
-   Evas_Object *content, *button;
+   Evas_Object *content, *button, *input;
    Elm_Object_Item *item;
    int row = 0;
    char fullname[1024];
@@ -363,13 +407,16 @@ _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
    if (!username)
      username = getenv("USERNAME");
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project URL"), NULL, row++, content);
+   input = _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, EINA_TRUE, row++, content);
+   if (!template->is_template)
+     elm_object_text_set(input, template->edje_id);
+
+   _edi_welcome_project_new_input_row_add(_("Project URL"), NULL, template->is_template, row++, content);
    if (_edi_welcome_user_fullname_get(username, fullname, sizeof(fullname)))
-      _edi_welcome_project_new_input_row_add(_("Creator Name"), fullname, row++, content);
+      _edi_welcome_project_new_input_row_add(_("Creator Name"), fullname, template->is_template, row++, content);
    else
-      _edi_welcome_project_new_input_row_add(_("Creator Name"), username, row++, content);
-   _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, row++, content);
+      _edi_welcome_project_new_input_row_add(_("Creator Name"), username, template->is_template, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, template->is_template, row++, content);
 
    button = elm_button_add(content);
    elm_object_text_set(button, _("Create"));
@@ -429,7 +476,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
-   elm_image_file_set(image, template->edje_path, "logo");
+   elm_image_file_set(image, template->edje_path, template->edje_id);
    evas_object_show(image);
    elm_table_pack(table, image, 0, 0, 1, 1);
 
@@ -449,6 +496,12 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    return frame;
 }
 
+static char *
+_header_text_get(void *data, Evas_Object *obj EINA_UNUSED, const char *source EINA_UNUSED)
+{
+   return strdup((char *)data);
+}
+
 static void
 _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
@@ -456,19 +509,16 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *content, *button, *naviframe;
    Evas_Object *table, *list, *rect, *hbox;
    Elm_Object_Item *item;
-   Edi_Template *template;
-   Elm_Genlist_Item_Class *itc;
-   char path[PATH_MAX];
+   Edi_Template *template, *example;
+   Elm_Genlist_Item_Class *ith, *itc;
 
    naviframe = (Evas_Object *) data;
 
    EINA_LIST_FREE(_available_templates, template)
      _edi_template_free(template);
 
-   snprintf(path, sizeof(path), "%s/templates", _edi_config_dir_get());
-
    _edi_templates_discover(PACKAGE_DATA_DIR "/templates");
-   _edi_templates_discover(path);
+   _edi_examples_discover(PACKAGE_DATA_DIR "/examples");
 
    content = elm_box_add(naviframe);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -503,6 +553,12 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    elm_table_pack(table, list, 0, 0, 1, 1);
    elm_box_pack_end(hbox, table);
 
+   ith = elm_genlist_item_class_new();
+   ith->item_style = "group_index";
+   ith->func.text_get = _header_text_get;
+   ith->func.del = NULL;
+   elm_genlist_item_append(list, ith, _("Templates"), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+
    itc = elm_genlist_item_class_new();
    itc->item_style = "full";
    itc->func.text_get = NULL;
@@ -512,6 +568,11 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
 
    EINA_LIST_FOREACH(_available_templates, l, template)
      elm_genlist_item_append(list, itc, template, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+
+   elm_genlist_item_append(list, ith, _("Examples"), NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+
+   EINA_LIST_FOREACH(_available_examples, l, example)
+     elm_genlist_item_append(list, itc, example, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
 
    elm_genlist_realized_items_update(list);
 
@@ -543,7 +604,7 @@ _edi_welcome_clone_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    elm_object_disabled_set(wd->button, EINA_FALSE);
 
    if (wd->status)
-     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_TRUE);
+     _edi_message_open(_("Unable to clone project, please check URL or try again later"), EINA_FALSE);
    else
      _edi_welcome_project_open(wd->dir, EINA_FALSE);
 
@@ -566,15 +627,34 @@ static void
 _edi_welcome_project_clone_click_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *entry;
-   const char *parent, *name;
+   const char *parent, *name, *url;
    Edi_Welcome_Data *wd = data;
 
+   url = elm_object_text_get(_create_inputs[0]);
    entry = elm_layout_content_get(_create_inputs[1], "elm.swallow.entry");
    parent = elm_object_text_get(entry);
    name = elm_object_text_get(_create_inputs[2]);
 
+   if (!url || !url[0])
+     {
+        elm_object_focus_set(_create_inputs[0], EINA_TRUE);
+        return;
+     }
+
+   if (!parent || !parent[0])
+     {
+        elm_object_focus_set(_create_inputs[1], EINA_TRUE);
+        return;
+     }
+
+   if (!name || !name[0])
+     {
+        elm_object_focus_set(_create_inputs[2], EINA_TRUE);
+        return;
+     }
+
    wd->dir = edi_path_append(parent, name);
-   wd->url = strdup(elm_object_text_get(_create_inputs[0]));
+   wd->url = strdup(url);
 
    elm_object_disabled_set(wd->button, EINA_TRUE);
    elm_progressbar_pulse(wd->pb, EINA_TRUE);
@@ -596,9 +676,9 @@ _edi_welcome_project_clone_cb(void *data, Evas_Object *obj EINA_UNUSED, void *ev
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(content);
 
-   _edi_welcome_project_new_input_row_add(_("Source Control URL"), NULL, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Source Control URL"), NULL, EINA_TRUE, row++, content);
    _edi_welcome_project_new_directory_row_add(_("Parent Path"), row++, content);
-   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, row++, content);
+   _edi_welcome_project_new_input_row_add(_("Project Name"), NULL, EINA_TRUE, row++, content);
 
    pb = elm_progressbar_add(content);
    evas_object_size_hint_align_set(pb, EVAS_HINT_FILL, 0.5);

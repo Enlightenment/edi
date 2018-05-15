@@ -19,12 +19,64 @@
 #include "edi_private.h"
 #include "edi_config.h"
 
+typedef struct _Edi_Mainview_State {
+   Edi_Mainview_Panel *panel;
+   char *path;
+}  Edi_Mainview_State;
+
+static Edi_Mainview_State *_cached = NULL;
+
 static Evas_Object *_main_win;
 static Evas_Object *_edi_mainview_goto_popup;
 
 static void
 dummy()
 {}
+
+static void
+_edi_mainview_panel_cache_set(void)
+{
+   Edi_Mainview_Item *item;
+
+   if (!_cached)
+     _cached = calloc(1, sizeof(Edi_Mainview_State));
+
+   if (_cached->path)
+     {
+        free(_cached->path);
+        _cached->path = NULL;
+     }
+
+   _cached->panel = edi_mainview_panel_current_get();
+   item = edi_mainview_item_current_get();
+   if (item)
+     _cached->path = strdup(item->path);
+}
+
+static Edi_Mainview_State *
+_edi_mainview_panel_cache_get(void)
+{
+   if (!_cached || !_cached->panel || !_cached->path)
+     return NULL;
+
+   return _cached;
+}
+
+static Edi_Mainview_Item *
+_get_item_for_path(Edi_Mainview_Panel *panel, const char *path)
+{
+   Eina_List *item;
+   Edi_Mainview_Item *it;
+
+   if (!panel || !path) return NULL;
+
+   EINA_LIST_FOREACH(panel->items, item, it)
+     {
+        if (it && !strcmp(it->path, path))
+          return it;
+     }
+   return NULL;
+}
 
 unsigned int
 edi_mainview_panel_item_count(Edi_Mainview_Panel *panel)
@@ -63,6 +115,9 @@ _edi_mainview_panel_current_tab_hide(Edi_Mainview_Panel *panel)
    Edi_Editor *editor;
 
    edi_mainview_panel_focus(panel);
+
+   if (!panel || !panel->current)
+     return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (editor)
@@ -239,13 +294,14 @@ void
 edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item)
 {
    int item_index;
+   Eina_Bool current;
 
    if (!item)
      return;
 
+   current = (item == panel->current);
    item_index = eina_list_data_idx(panel->items, item);
 
-   edi_mainview_item_prev();
    if (item->view)
      evas_object_del(item->view);
    elm_box_unpack(panel->tabs, item->tab);
@@ -257,22 +313,22 @@ edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item
    eina_stringshare_del(item->path);
    free(item);
 
+   if (!current)
+     return;
+
    if (eina_list_count(panel->items) == 0)
-     _edi_mainview_panel_show(panel, panel->welcome);
-
-   if (panel == edi_mainview_panel_current_get())
      {
-        if (eina_list_count(panel->items))
-          {
-             if (item_index)
-               item = eina_list_nth(panel->items, item_index - 1);
-             else
-               item = eina_list_nth(panel->items, item_index);
-
-             edi_mainview_panel_item_select(panel, item);
-             _edi_mainview_panel_current_tab_show(panel);
-          }
+        _edi_mainview_panel_show(panel, panel->welcome);
+        return;
      }
+
+   if (item_index)
+     item = eina_list_nth(panel->items, item_index - 1);
+   else
+     item = eina_list_nth(panel->items, item_index);
+
+   edi_mainview_panel_item_select(panel, item);
+   _edi_mainview_panel_current_tab_show(panel);
 }
 
 void
@@ -303,7 +359,7 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
         elm_object_signal_emit(item->tab, "mouse,down,1", "base");
 
         evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
-        elm_scroller_region_bring_in(panel->tabs, region_x, 0, tabw, 0);
+        elm_scroller_region_bring_in(efl_parent_get(panel->tabs), region_x, 0, tabw, 0);
 
         _edi_project_config_tab_current_set(edi_mainview_panel_index_get(panel),
                                             edi_mainview_panel_item_current_tab_get(panel));
@@ -316,16 +372,22 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
 
 static void
 _promote(void *data, Evas_Object *obj EINA_UNUSED,
-         const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
+         const char *emission EINA_UNUSED, const char *source)
 {
    Edi_Mainview_Panel *panel;
    Edi_Mainview_Item *item = (Edi_Mainview_Item *) data;
 
+   // ignore if we clicked the delete part of the button
+   if (!strcmp(source, "del"))
+     return;
+
    panel = edi_mainview_panel_for_item_get(item);
+
+   _edi_mainview_panel_cache_set();
 
    _edi_mainview_panel_current_tab_hide(panel);
 
-   edi_mainview_panel_item_select(panel, (Edi_Mainview_Item *)data);
+   edi_mainview_panel_item_select(panel, item);
 
    _edi_mainview_panel_current_tab_show(panel);
 
@@ -337,10 +399,33 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
           const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
    Edi_Mainview_Panel *panel;
+   Edi_Mainview_Item *item;
+   Edi_Mainview_State *last;
+   Edi_Editor *editor;
    int index;
 
-   panel = edi_mainview_panel_for_item_get((Edi_Mainview_Item *)data);
-   edi_mainview_panel_item_close(panel, data);
+   item = (Edi_Mainview_Item *) data;
+   panel = edi_mainview_panel_for_item_get(item);
+
+   editor = (Edi_Editor *) evas_object_data_get(panel->current->view, "editor");
+   if (editor && eina_list_count(editor->split_views))
+     {
+        Elm_Code *code;
+        const char *path;
+        Elm_Code_Widget *widget = eina_list_nth(editor->split_views, 0);
+        elm_box_unpack(panel->current->container, widget);
+        code = elm_code_widget_code_get(editor->entry);
+        path = elm_code_file_path_get(code->file);
+
+        editor->split_views = eina_list_remove(editor->split_views, widget);
+         _edi_project_config_tab_split_view_count_set(path, edi_mainview_panel_id(panel), eina_list_count(editor->split_views));
+
+        evas_object_del(widget);
+
+        return;
+     }
+
+   edi_mainview_panel_item_close(panel, item);
    if (eina_list_count(panel->items)== 0 && edi_mainview_panel_count() > 1)
      {
         edi_mainview_panel_remove(panel);
@@ -349,6 +434,18 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
      }
 
    edi_mainview_panel_focus(panel);
+
+   /* When closing tabs keep current tab */
+   last = _edi_mainview_panel_cache_get();
+   if (last && last->panel == panel && last->path)
+     {
+        item  = _get_item_for_path(panel, last->path);
+        if (item)
+          {
+             _edi_mainview_panel_current_tab_hide(panel);
+             edi_mainview_panel_item_select(panel, item);
+          }
+     }
 
    if (eina_list_count(panel->items))
      _edi_mainview_panel_current_tab_show(panel);
@@ -399,7 +496,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    elm_object_focus_allow_set(tab, EINA_FALSE);
 
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
-   elm_object_part_text_set(tab, "elm.btn.text", basename((char*)options->path));
+   elm_object_part_text_set(tab, "elm.btn.text", ecore_file_file_get(options->path));
 /*
    icon = elm_icon_add(tab);
    elm_icon_standard_set(icon, provider->icon);
@@ -436,22 +533,6 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
      }
 
    _edi_project_config_tab_add(options->path, mime?mime:options->type, EINA_FALSE, id);
-}
-
-static Edi_Mainview_Item *
-_get_item_for_path(Edi_Mainview_Panel *panel, const char *path)
-{
-   Eina_List *item;
-   Edi_Mainview_Item *it;
-
-   if (!panel) return NULL;
-
-   EINA_LIST_FOREACH(panel->items, item, it)
-     {
-        if (it && !strcmp(it->path, path))
-          return it;
-     }
-   return NULL;
 }
 
 static void
@@ -504,6 +585,7 @@ _edi_mainview_panel_mime_content_safe_popup(void)
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked", _edi_popup_cancel_cb, popup);
 
+   _edi_mainview_panel_current_tab_show(edi_mainview_panel_current_get());
    evas_object_show(popup);
 }
 
@@ -824,7 +906,6 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
 
    current = panel;
 
-
    for (i = 0; i < edi_mainview_panel_count(); i++)
      {
         panel = edi_mainview_panel_by_index(i);
@@ -832,6 +913,7 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
         it = _get_item_for_path(panel, options->path);
         if (it)
           {
+             _edi_mainview_panel_current_tab_hide(panel);
              edi_mainview_panel_focus(panel);
 
              editor = evas_object_data_get(panel->current->view, "editor");
@@ -851,7 +933,6 @@ edi_mainview_panel_open(Edi_Mainview_Panel *panel, Edi_Path_Options *options)
                }
              return;
           }
-
    }
 
    panel = current;

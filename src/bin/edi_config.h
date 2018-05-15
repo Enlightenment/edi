@@ -55,7 +55,9 @@ struct _Edi_Project_Config_Panel
 struct _Edi_Project_Config_Tab
 {
    const char *path;
+   const char *fullpath;
    const char *type;
+   int split_views;
 };
 
 struct _Edi_Project_Config_Launch
@@ -77,6 +79,8 @@ struct _Edi_Project_Config
    struct
      {
         Eina_Bool translucent;
+        int alpha;
+        const char *theme;
         int width, height, bottomtab;
         double leftsize, bottomsize;
         Eina_Bool leftopen, bottomopen;
@@ -88,6 +92,7 @@ struct _Edi_Project_Config
      } gui;
 
    Edi_Project_Config_Launch launch;
+   Eina_Stringshare *debug_command;
    Eina_Stringshare *user_fullname;
    Eina_Stringshare *user_email;
 
@@ -103,6 +108,7 @@ extern Edi_Project_Config *_edi_project_config;
 Eina_Bool _edi_config_init(void);
 Eina_Bool _edi_config_shutdown(void);
 const char *_edi_config_dir_get(void);
+const char *_edi_project_config_debug_command_get(void);
 
 // Global configuration handling
 
@@ -125,6 +131,8 @@ void _edi_project_config_tab_add(const char *path, const char *type,
 void _edi_project_config_tab_remove(const char *path, Eina_Bool windowed, int panel_id);
 void _edi_project_config_tab_current_set(int panel_id, int tab_id);
 void _edi_project_config_panel_remove(int panel_id);
+void _edi_project_config_tab_split_view_count_set(const char *path, int panel_id, int count);
+
 
 #ifdef __cplusplus
 }

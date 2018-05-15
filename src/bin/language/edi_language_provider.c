@@ -11,6 +11,7 @@
 #include "edi_language_provider_c.c"
 #include "edi_language_provider_python.c"
 #include "edi_language_provider_rust.c"
+#include "edi_language_provider_go.c"
 
 static Edi_Language_Provider _edi_language_provider_registry[] =
 {
@@ -29,7 +30,11 @@ static Edi_Language_Provider _edi_language_provider_registry[] =
       _edi_language_rust_mime_name, _edi_language_rust_snippet_get,
       NULL, NULL
    },
-
+   {
+      "go", _edi_language_go_add, _edi_language_go_refresh, _edi_language_go_del,
+      _edi_language_go_mime_name, _edi_language_go_snippet_get,
+      NULL, NULL
+   },
 
    {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 };
@@ -55,6 +60,8 @@ Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime)
      id = "rust";
    if (!strcasecmp(mime, "text/x-python"))
      id = "python";
+   if (!strcasecmp(mime, "text/x-go"))
+     id = "go";
 
    if (!id)
      return NULL;

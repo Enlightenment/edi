@@ -34,9 +34,11 @@ void edi_debugpanel_add(Evas_Object *parent);
 /**
  * Start a new debugging session 
  *
+ * @param The toolname to do debugging with.
+ *
  * @ingroup UI
  */
-void edi_debugpanel_start();
+void edi_debugpanel_start(const char *toolname);
 
 /**
  * Stop existing debugging session

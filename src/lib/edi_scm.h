@@ -33,7 +33,8 @@ typedef struct _Edi_Scm_Status
    Eina_Bool staged;
 } Edi_Scm_Status;
 
-typedef int (scm_fn_add)(const char *path);
+typedef int (scm_fn_stage)(const char *path);
+typedef int (scm_fn_unstage)(const char *path);
 typedef int (scm_fn_mod)(const char *path);
 typedef int (scm_fn_del)(const char *path);
 typedef int (scm_fn_move)(const char *src, const char *dest);
@@ -57,10 +58,11 @@ typedef struct _Edi_Scm_Engine
    const char     *name;
    const char     *directory;
    const char     *path;
-   char           *workdir;
+   char           *root_directory;
    Eina_List      *statuses;
 
-   scm_fn_add         *file_add;
+   scm_fn_stage       *file_stage;
+   scm_fn_unstage     *file_unstage;
    scm_fn_mod         *file_mod;
    scm_fn_del         *file_del;
    scm_fn_move        *move;
@@ -99,11 +101,13 @@ typedef struct _Edi_Scm_Engine
 Edi_Scm_Engine *edi_scm_init();
 
 /**
- * Init the SCM system.
+ * Init the SCM system for the specified path.
+ *
+ * @param path The location to find the scm information.
  *
  * @ingroup Scm
  */
-EAPI Edi_Scm_Engine *edi_scm_generic_init(void);
+EAPI Edi_Scm_Engine *edi_scm_init_path(const char *path);
 
 /**
  * Shutdown and free memory in use by SCM system.
@@ -142,14 +146,24 @@ EAPI int edi_scm_git_clone(const char *url, const char *dir);
 Edi_Scm_Engine *edi_scm_engine_get(void);
 
 /**
- * Add file to be monitored by SCM.
+ * Stage file for commit with SCM.
  *
  * @param path The file path.
  * @return The status code of command executed.
  *
  * @ingroup Scm
  */
-int edi_scm_add(const char *path);
+int edi_scm_stage(const char *path);
+
+/**
+ * Unstage file from commit.
+ *
+ * @param path The file path.
+ * @return The status code of command executed.
+ *
+ * @ingroup Scm
+*/
+int edi_scm_unstage(const char *path);
 
 /**
  * Del file from those monitored by SCM.
@@ -284,6 +298,16 @@ Eina_Bool edi_scm_remote_enabled(void);
  * @ingroup Scm
  */
 const char *edi_scm_avatar_url_get(const char *email);
+
+
+/**
+ * Return the root directory of the SCM.
+ *
+ * @return The location of the SCM's root working directory.
+ *
+ * @ingroup Scm
+ */
+const char *edi_scm_root_directory_get(void);
 
 /**
  * @}

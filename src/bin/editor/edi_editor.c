@@ -640,8 +640,6 @@ _suggest_hint_popup_add(Edi_Editor *editor, const char *content, Evas_Smart_Cb f
    Evas_Coord cx, cy, cw, ch;
 
    elm_code_widget_cursor_position_get(editor->entry, &row, &col);
-
-   elm_code_widget_cursor_position_get(editor->entry, &row, &col);
    elm_code_widget_geometry_for_position_get(editor->entry, row, col,
                                              &cx, &cy, &cw, &ch);
 
@@ -858,15 +856,21 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
 static void
 _edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
 {
+   Elm_Code *code;
+   Elm_Code_Line *line;
    Elm_Code_Widget *widget;
    char buf[30];
-   unsigned int line;
+   unsigned int row;
    unsigned int col;
 
    widget = (Elm_Code_Widget *)obj;
-   elm_code_widget_cursor_position_get(widget, &line, &col);
+   elm_code_widget_cursor_position_get(widget, &row, &col);
 
-   snprintf(buf, sizeof(buf), _("Line:%d, Column:%d"), line, col);
+   code = elm_code_widget_code_get(widget);
+   line = elm_code_file_line_get(code->file, row);
+
+   snprintf(buf, sizeof(buf), _("Line:%d, Position:%d"), row,
+            elm_code_widget_line_text_position_for_column_get(widget, line, col) + 1);
    elm_object_text_set((Evas_Object *)data, buf);
 }
 
@@ -1203,16 +1207,13 @@ _focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
 
    code = elm_code_widget_code_get(editor->entry);
    filename = elm_code_file_path_get(code->file);
-
-   edi_filepanel_select_path(filename);
-
    mtime = ecore_file_mod_time(filename);
 
    if ((editor->save_time) && (editor->save_time < mtime))
      {
         ecore_timer_del(editor->save_timer);
         editor->save_timer = NULL;
-        _edi_editor_file_change_popup(evas_object_smart_parent_get(obj), editor);
+        _edi_editor_file_change_popup(obj, editor);
         editor->modified = EINA_FALSE;
         return;
      }

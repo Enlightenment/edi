@@ -10,6 +10,8 @@
 
 #include "edi_private.h"
 
+#define EXAMPLES_GIT_URL "https://git.enlightenment.org/tools/examples.git"
+
 typedef struct _Edi_Create
 {
    char *path, *temp, *name, *skelfile;
@@ -20,6 +22,15 @@ typedef struct _Edi_Create
 
    int filters;
 } Edi_Create;
+
+typedef struct _Edi_Create_Example
+{
+   char *path, *name;
+
+   Edi_Create_Cb callback;
+
+} Edi_Create_Example;
+
 
 static Edi_Create *_edi_create_data;
 
@@ -183,6 +194,7 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
    Edi_Create *create;
    Ecore_Event_Handler *handler;
    Eina_Strbuf *command;
+   char *escaped;
 
    create = (Edi_Create *)data;
 
@@ -199,15 +211,23 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
 
    command = eina_strbuf_new();
 
-   eina_strbuf_append(command, "sh -c 'git init && git add .");
+   eina_strbuf_append(command, "sh -c \"git init && git add .");
 
    if (create->user && strlen(create->user))
-     eina_strbuf_append_printf(command, " && git config user.name \"%s\"", create->user);
+     {
+        escaped = ecore_file_escape_name(create->user);
+        eina_strbuf_append_printf(command, " && git config user.name %s", escaped);
+        free(escaped);
+     }
 
    if (create->email && strlen(create->email))
-     eina_strbuf_append_printf(command, " && git config user.email \"%s\"", create->email);
+     {
+        escaped = ecore_file_escape_name(create->email);
+        eina_strbuf_append_printf(command, " && git config user.email %s", escaped);
+        free(escaped);
+     }
 
-   eina_strbuf_append(command, " ' ");
+   eina_strbuf_append(command, " \" ");
 
    ecore_exe_run(eina_strbuf_string_get(command), data);
 
@@ -298,18 +318,20 @@ _edi_create_extract_done(void *data, int type EINA_UNUSED, void *event EINA_UNUS
 }
 
 EAPI void
-edi_create_efl_project(const char *skelpath, const char *parentdir,
-                       const char *name, const char *url, const char *user,
-                       const char *email, Edi_Create_Cb func)
+edi_create_project(const char *template_name, const char *parentdir,
+                   const char *name, const char *url, const char *user,
+                   const char *email, Edi_Create_Cb func)
 {
    char *cmd, *extract;
-   char tmp[PATH_MAX], dest[PATH_MAX];
+   char tmp[PATH_MAX], dest[PATH_MAX], skelpath[PATH_MAX];
    Edi_Create *data;
    Ecore_Event_Handler *handler;
 
    extract = "tar zxf %s -C %s";
    snprintf(tmp, sizeof(tmp), "%s/edi_%s", eina_environment_tmp_get(), name);
    snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
+
+   snprintf(skelpath, sizeof(skelpath), PACKAGE_DATA_DIR "/templates/%s.tar.gz", template_name);
 
    INF("Creating project \"%s\" at path %s for %s<%s>\n", name, dest, user, email);
    DBG("Extracting project files from %s\n", skelpath);
@@ -341,5 +363,63 @@ edi_create_efl_project(const char *skelpath, const char *parentdir,
 
    ecore_exe_run(cmd, data);
    free(cmd);
+}
+
+static void
+_edi_create_example_done_cb(void *data, Eio_File *file EINA_UNUSED)
+{
+   Edi_Create_Example *create = data;
+
+   if (create->callback)
+     create->callback(create->path, EINA_TRUE);
+}
+
+static void
+_edi_create_example_extract_dir(char *examples_path, Edi_Create_Example *create)
+{
+   char path[PATH_MAX];
+
+   eina_file_path_join(path, sizeof(path), examples_path, create->name);
+
+   eio_dir_copy(path, create->path, NULL, NULL, _edi_create_example_done_cb,
+                _edi_create_error_cb, create);
+
+   free(examples_path);
+}
+
+EAPI void
+edi_create_example(const char *example_name, const char *parentdir,
+                   const char *name, Edi_Create_Cb func)
+{
+   char dest[PATH_MAX], examplepath[PATH_MAX];
+   int status = 0;
+   Edi_Create_Example *data;
+
+   snprintf(dest, sizeof(dest), "%s/%s", parentdir, name);
+   snprintf(examplepath, sizeof(examplepath), "%s/%s/examples.git",
+            efreet_cache_home_get(), PACKAGE_NAME);
+
+   data = calloc(1, sizeof(Edi_Create_Example));
+   data->path = strdup(dest);
+   data->name = strdup(example_name);
+   data->callback = func;
+
+   INF("Extracting example project \"%s\" at path %s\n", example_name, dest);
+
+   if (ecore_file_exists(examplepath))
+     ERR("TODO: UPDATE NOT IMPLEMENTED");
+//     status = edi_scm_git_update(examplepath);
+   else
+     status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath);
+
+   if (status)
+     {
+        ERR("git error: [%d]\n", status);
+
+        if (func)
+          func(dest, EINA_FALSE);
+     }
+   else
+     _edi_create_example_extract_dir(strdup(examplepath), data);
 }
 

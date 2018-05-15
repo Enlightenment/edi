@@ -1,0 +1,45 @@
+collections {
+    group {
+        name: "eflproject";
+        max: 128 128;
+
+        data {
+            item: "title" "C EFL Project";
+            item: "path"  "eflproject";
+            item: "description"
+                  "Begin your C programming EFL project. All content is freely modifiable and distributable and licensed in the public-domain.<br><br>Happy hacking!";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "c.png" COMP;
+                    image.normal: "c.png";
+                }
+            }
+        }
+    }
+
+    group {
+        name: "eflproject_python";
+        max: 128 128;
+
+        data {
+            item: "title" "Python EFL Project";
+            item: "path"  "eflproject_python";
+            item: "description"
+                  "Start your new EFL Python programming project. All code is in the public-domain, you are free to modify and distribute as you wish.";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "python.png" COMP;
+                    image.normal: "python.png";
+                }
+            }
+        }
+    }
+}

@@ -17,13 +17,18 @@ static Evas_Object *_info_widget;
 static Elm_Code *_elm_code;
 
 static Eina_Bool
-_edi_logpanel_ignore(Eina_Log_Level level, const char *fnc)
+_edi_logpanel_ignore(Eina_Log_Level level, const char *domain, const char *fnc)
 {
    if (level <= EINA_LOG_LEVEL_DBG)
-     return !strncmp(fnc, "_eo_", 4) || !strncmp(fnc, "_evas_", 6) ||
+     {
+        if (!strncmp(domain, "eo", 2))
+          return EINA_TRUE;
+        if (!strncmp(fnc, "_eo_", 4) || !strncmp(fnc, "_evas_", 6) ||
             !strncmp(fnc, "_ecore_", 7) || !strncmp(fnc, "_edje_", 6) ||
             !strncmp(fnc, "_elm_", 5) || !strncmp(fnc, "_drm_", 5) ||
-            !strncmp(fnc, "_eina_", 6);
+            !strncmp(fnc, "_eina_", 6))
+          return EINA_TRUE;
+     }
 
    return !strncmp(fnc, "_evas_object_smart_need_recalculate_set", strlen(fnc));
 }
@@ -36,17 +41,20 @@ _edi_logpanel_print_cb(const Eina_Log_Domain *domain, Eina_Log_Level level,
    unsigned int printed, buffer_len = 512;
    char buffer [buffer_len];
 
-   if (_edi_log_dom == -1) return; 
+   if (_edi_log_dom == -1) return;
 
-   if (_edi_logpanel_ignore(level, fnc))
+   if (_edi_logpanel_ignore(level, domain->domain_str, fnc))
      return;
 
    printed = snprintf(buffer, buffer_len, "%s:%s:%s (%d): ",
            domain->domain_str, file, fnc, line);
    vsnprintf(buffer + printed, buffer_len - printed, fmt, args);
 
+   ecore_thread_main_loop_begin();
+
    elm_code_file_line_append(_elm_code->file, buffer, strlen(buffer),
                              (level <= EINA_LOG_LEVEL_ERR) ? _EDI_LOG_ERROR : NULL);
+   ecore_thread_main_loop_end();
 }
 
 static void

@@ -23,14 +23,23 @@ typedef void (*Edi_Create_Cb)(const char *path, Eina_Bool success);
  */
 
 /**
- * Create a new standard EFL project.
+ * Create a new project from an Edi template.
  *
  * @ingroup Creation
  */
 EAPI void
-edi_create_efl_project(const char *skelpath, const char *parentdir,
-                       const char *name, const char *url, const char *user,
-                       const char *email, Edi_Create_Cb func);
+edi_create_project(const char *template_name, const char *parentdir,
+                   const char *name, const char *url, const char *user,
+                   const char *email, Edi_Create_Cb func);
+
+/**
+ * Create a new project from an example.
+ *
+ * @ingroup Creation
+ */
+EAPI void
+edi_create_example(const char *example_name, const char *parentdir,
+                   const char *name, Edi_Create_Cb func);
 
 /**
  * @}

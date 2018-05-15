@@ -1,8 +1,10 @@
 #include <Edi.h>
-#include "edi_scm_ui.h"
 
-#define DEFAULT_WIDTH  480
-#define DEFAULT_HEIGHT 240
+#include "edi_scm_ui.h"
+#include "edi_private.h"
+
+#define DEFAULT_WIDTH  560
+#define DEFAULT_HEIGHT 480
 
 static void
 _win_del_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
@@ -12,25 +14,20 @@ _win_del_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUS
 }
 
 static void
-_win_title_set(Evas_Object *win)
+_win_title_set(Evas_Object *win, Edi_Scm_Engine *engine)
 {
    Eina_Strbuf *title;
-   char *workdir;
-
-   workdir = _edi_scm_ui_workdir_get();
-   if (!workdir)
-     workdir = getcwd(NULL, PATH_MAX);
 
    title = eina_strbuf_new();
-   eina_strbuf_append_printf(title, "Edi Source Control :: %s", workdir);
+   eina_strbuf_append_printf(title, _("Edi Source Control :: %s (%s)"),
+                             ecore_file_file_get((char *)engine->root_directory),
+                             engine->name ?: _("unknown"));
    elm_win_title_set(win, eina_strbuf_string_get(title));
    eina_strbuf_free(title);
-
-   free(workdir);
 }
 
 static Evas_Object *
-_win_add(void)
+_win_add(Edi_Scm_Engine *engine)
 {
    Evas_Object *win, *icon;
 
@@ -44,7 +41,7 @@ _win_add(void)
    evas_object_resize(win, DEFAULT_WIDTH * elm_config_scale_get(), DEFAULT_HEIGHT * elm_config_scale_get());
    evas_object_smart_callback_add(win, "delete,request", _win_del_cb, NULL);
 
-   _win_title_set(win);
+   _win_title_set(win, engine);
 
    return win;
 }
@@ -52,14 +49,56 @@ _win_add(void)
 int main(int argc, char **argv)
 {
    Evas_Object *win;
+   Edi_Scm_Engine *engine;
+   const char *arg, *root;
 
    ecore_init();
    elm_init(argc, argv);
+   root = NULL;
 
-   if (!edi_scm_generic_init())
-     exit(1 << 0);
+   if (argc >= 2)
+     {
+        arg = argv[1];
+        if (!strcmp("-h", arg) || !strcmp("--help", arg))
+          {
+             printf("Usage: edi_scm [directory]\n\n");
+             printf("The Enlightened IDE Source Control\n\n");
 
-   win = _win_add();
+             printf("Options:\n");
+             printf("  -c, --commit\t\topen with the commit screen.\n");
+             printf("  -h, --help\t\tshow this message.\n");
+             return 0;
+          }
+
+        if (!strcmp("-c", arg) || !strcmp("--commit", arg))
+          {
+             if (argc >= 3)
+               root = argv[2];
+          }
+        else
+          {
+             root = arg;
+          }
+     }
+
+   if (root)
+     {
+        if (!ecore_file_is_dir(root))
+          {
+             fprintf(stderr, _("Root path must be a directory\n"));
+             exit(1 << 0);
+          }
+        engine = edi_scm_init_path(realpath(root, NULL));
+     }
+   else
+     {
+        engine = edi_scm_init();
+     }
+
+   if (!engine)
+     exit(1 << 2);
+
+   win = _win_add(engine);
    edi_scm_ui_add(win);
    elm_win_center(win, EINA_TRUE, EINA_TRUE);
    evas_object_show(win);

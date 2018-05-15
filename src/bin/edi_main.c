@@ -26,6 +26,8 @@
 
 #include "edi_private.h"
 
+#define MENU_ELLIPSIS(S) eina_slstr_printf("%s...", S)
+
 int EDI_EVENT_TAB_CHANGED;
 int EDI_EVENT_FILE_CHANGED;
 int EDI_EVENT_FILE_SAVED;
@@ -560,7 +562,18 @@ edi_launcher_config_missing()
    title = _("Unable to launch");
    message = _("No launch binary found, please configure in Settings.");
 
-   edi_screens_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, title, message);
+}
+
+void
+edi_debug_exe_missing(void)
+{
+   const char *title, *message;
+
+   title = _("Unable to launch debugger");
+   message = _("No debug binary found, please check system configuration and Settings.");
+
+   edi_screens_settings_message(_edi_main_win, title, message);
 }
 
 static void
@@ -572,16 +585,22 @@ _edi_project_credentials_missing()
    title = _("Missing user information");
    message = _("No user information found, please configure in Settings.");
 
-   edi_screens_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, title, message);
 }
 
 static Eina_Bool
 _edi_project_credentials_check(void)
 {
-   if (!_edi_project_config->user_fullname || strlen(_edi_project_config->user_fullname) == 0)
+   Edi_Scm_Engine *eng;
+
+   eng = edi_scm_engine_get();
+
+   if ((!_edi_project_config->user_fullname || !_edi_project_config->user_fullname[0]) &&
+       (!eng || !eng->remote_name_get()))
      return EINA_FALSE;
 
-   if (!_edi_project_config->user_email || strlen(_edi_project_config->user_email) == 0)
+   if ((!_edi_project_config->user_email || !_edi_project_config->user_email[0]) &&
+       (!eng || !eng->remote_email_get()))
      return EINA_FALSE;
 
    return EINA_TRUE;
@@ -730,6 +749,12 @@ _edi_build_display_status_cb(int status, void *data)
 }
 
 static void
+_edi_debug_project(void)
+{
+   edi_debugpanel_start(_edi_project_config_debug_command_get());
+}
+
+static void
 _edi_build_project(void)
 {
    if (!edi_build_provider_for_project_get())
@@ -796,7 +821,7 @@ static void
 _tb_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    edi_debugpanel_show();
-   edi_debugpanel_start();
+   _edi_debug_project();
 }
 
 static void
@@ -1013,11 +1038,20 @@ _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_memcheck_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   edi_debugpanel_show();
+   edi_debugpanel_stop();
+   edi_debugpanel_start("memcheck");
+}
+
+static void
 _edi_menu_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
    edi_debugpanel_show();
-   edi_debugpanel_start();
+   _edi_debug_project();
 }
 
 static void
@@ -1063,13 +1097,11 @@ _edi_menu_scm_commit_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
         return;
      }
 
-   edi_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
-
    chdir(edi_project_get());
 
    /* when program terminates update the filepanel */
    if (edi_exe_notify_handle("edi_scm_status", _edi_scm_program_exited_cb, NULL))
-     edi_exe_notify("edi_scm_status", "edi_scm");
+     edi_exe_notify("edi_scm_status", "edi_scm --commit");
 
    chdir(workdir);
 
@@ -1151,10 +1183,10 @@ _edi_menu_setup(Evas_Object *win)
    menu = elm_win_main_menu_get(win);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("File"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", _("New Project ..."), _edi_menu_project_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Project")), _edi_menu_project_new_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "document-new", _("New ..."), _edi_menu_new_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", _("New Directory ..."), _edi_menu_new_dir_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "document-new", MENU_ELLIPSIS(_("New")), _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Directory")), _edi_menu_new_dir_cb, NULL);
    _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", _("Save"), _edi_menu_save_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-close", _("Close"), _edi_menu_close_cb, NULL);
    elm_menu_item_add(menu, menu_it, "window-close", _("Close all"), _edi_menu_closeall_cb, NULL);
@@ -1173,10 +1205,10 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Find & Replace"), _edi_menu_find_cb, NULL);
    elm_menu_item_add(menu, menu_it, "edit-find", _("Find file"), _edi_menu_findfile_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "go-jump", _("Goto Line ..."), _edi_menu_goto_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "go-jump", MENU_ELLIPSIS(_("Goto Line")), _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", _("Find in project ..."), _edi_menu_find_project_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Replace in project ..."), _edi_menu_find_replace_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find", MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "edit-find-replace", MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
    elm_menu_item_add(menu, menu_it, "window-new", _("New Window"), _edi_menu_view_open_window_cb, NULL);
@@ -1189,8 +1221,10 @@ _edi_menu_setup(Evas_Object *win)
    _edi_menu_build = elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
    _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
    elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debug"), _edi_menu_debug_cb, NULL);
    _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debugger"), _edi_menu_debug_cb, NULL);
+   elm_menu_item_add(menu, menu_it, "applications-electronics", _("Memcheck"), _edi_menu_memcheck_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
    _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Init"), _edi_menu_scm_init_cb, NULL);
@@ -1255,7 +1289,7 @@ edi_toolbar_setup(Evas_Object *parent)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_item_add(tb, "edit-find-replace", _("Find..."), _tb_search_cb);
+   _edi_toolbar_item_add(tb, "edit-find-replace", MENU_ELLIPSIS(_("Find")), _tb_search_cb);
    _edi_toolbar_item_add(tb, "go-jump", _("Goto Line"), _tb_goto_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
@@ -1288,12 +1322,12 @@ _edi_win_title_get()
    if (provider)
      type = provider->id;
    else
-     type = "unknown";
+     type = _("unknown");
 
    name = edi_project_name_get();
    len = 8 + 3 + strlen(name) + strlen(type);
    winname = malloc(len * sizeof(char));
-   snprintf(winname, len, "Edi :: %s (%s)", name, type);
+   snprintf(winname, len, _("Edi :: %s (%s)"), name, type);
 
    return winname;
 }
@@ -1336,6 +1370,7 @@ static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+
    return ECORE_CALLBACK_RENEW;
 }
 
@@ -1370,6 +1405,7 @@ _edi_open_tabs()
    Eina_List *tabs, *panels, *list, *sublist;
    Edi_Mainview_Panel *panel_obj;
    char *path;
+   int i;
    unsigned int tab_id = 0, panel_id = 0;
 
    panels = _edi_project_config->panels;
@@ -1380,7 +1416,7 @@ _edi_open_tabs()
           /* Make sure we have enough panels */
           edi_mainview_panel_append();
         panel_obj = edi_mainview_panel_by_index(panel_id);
-
+        edi_mainview_panel_focus(panel_obj);
         tabs = panel->tabs;
         panel->tabs = NULL;
         tab_id = 0;
@@ -1395,9 +1431,13 @@ _edi_open_tabs()
              options->type = eina_stringshare_add(tab->type);
              options->background = tab_id != panel->current_tab;
 
-             edi_mainview_panel_open(panel_obj, options);
-
              tab_id++;
+             edi_mainview_panel_open(panel_obj, options);
+             for (i = 0; i < tab->split_views; i++)
+                {
+                   edi_mainview_panel_tab_select(panel_obj, tab_id);
+                   edi_mainview_split_current();
+                }
              free(path);
           }
 
@@ -1435,6 +1475,11 @@ static void
 _win_delete_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event EINA_UNUSED)
 {
    edi_close();
+}
+
+Evas_Object *edi_main_win_get(void)
+{
+   return _edi_main_win;
 }
 
 Eina_Bool

@@ -29,8 +29,6 @@ extern "C" {
  * @ingroup SCM
  */
 void edi_scm_ui_add(Evas_Object *parent);
-
-char *_edi_scm_ui_workdir_get(void);
 /**
  * @}
  */
