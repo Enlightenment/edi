@@ -23,8 +23,6 @@ src = files([
   'edi_private.h',
   'edi_searchpanel.c',
   'edi_searchpanel.h',
-  'edi_theme.c',
-  'edi_theme.h',
 ])
 
 bin_dir = include_directories('.')

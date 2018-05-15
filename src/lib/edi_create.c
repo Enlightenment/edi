@@ -194,6 +194,7 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
    Edi_Create *create;
    Ecore_Event_Handler *handler;
    Eina_Strbuf *command;
+   char *escaped;
 
    create = (Edi_Create *)data;
 
@@ -210,15 +211,23 @@ _edi_create_filter_file_done(void *data, int type EINA_UNUSED, void *event EINA_
 
    command = eina_strbuf_new();
 
-   eina_strbuf_append(command, "sh -c 'git init && git add .");
+   eina_strbuf_append(command, "sh -c \"git init && git add .");
 
    if (create->user && strlen(create->user))
-     eina_strbuf_append_printf(command, " && git config user.name \"%s\"", create->user);
+     {
+        escaped = ecore_file_escape_name(create->user);
+        eina_strbuf_append_printf(command, " && git config user.name %s", escaped);
+        free(escaped);
+     }
 
    if (create->email && strlen(create->email))
-     eina_strbuf_append_printf(command, " && git config user.email \"%s\"", create->email);
+     {
+        escaped = ecore_file_escape_name(create->email);
+        eina_strbuf_append_printf(command, " && git config user.email %s", escaped);
+        free(escaped);
+     }
 
-   eina_strbuf_append(command, " ' ");
+   eina_strbuf_append(command, " \" ");
 
    ecore_exe_run(eina_strbuf_string_get(command), data);
 

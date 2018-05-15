@@ -150,9 +150,9 @@ _make_run(const char *path, const char *args)
         return;
      }
 
-   full_len = strlen(path) + strlen(path);
+   full_len = strlen(path) + strlen(args) + 1;
    full_cmd = malloc(sizeof(char) * (full_len + 1));
-   snprintf(full_cmd, full_len + 2, "%s %s", path, args);
+   snprintf(full_cmd, full_len + 1, "%s %s", path, args);
 
    ecore_exe_pipe_run(full_cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                                 ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |

@@ -16,7 +16,6 @@
 
 #include "edi_consolepanel.h"
 #include "mainview/edi_mainview.h"
-#include "edi_theme.h"
 #include "edi_config.h"
 
 #include "edi_private.h"
@@ -153,6 +152,25 @@ void edi_consolepanel_clear()
    _edi_test_count = _edi_test_pass = _edi_test_fail = 0;
 }
 
+static void
+_edi_test_output_suite(int count, int pass, int fail)
+{
+   char *line;
+   const char *format = _("Total pass %d (%d%%), fail %d)");
+   int linemax, percent;
+
+   linemax = strlen(format) - 6 + 30;
+   line = malloc(sizeof(char) * linemax);
+
+   percent = 0;
+   if (count > 0)
+     percent = (int) ((pass / (double) count) * 100);
+
+   snprintf(line, linemax, format, pass, percent, fail);
+   elm_code_file_line_append(_edi_test_code->file, line, strlen(line), (fail > 0) ? _EDI_SUITE_FAILED : _EDI_SUITE_PASSED);
+   free(line);
+}
+
 static Eina_Bool
 _exe_data(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
 {
@@ -179,23 +197,15 @@ _exe_error(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info)
    return ECORE_CALLBACK_RENEW;
 }
 
-static void
-_edi_test_output_suite(int count, int pass, int fail)
+static Eina_Bool
+_exe_done(void *d EINA_UNUSED, int t EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   char *line;
-   const char *format = _("Total pass %d (%d%%), fail %d)");
-   int linemax, percent;
+   if (_edi_test_count == 0)
+     return ECORE_CALLBACK_RENEW;
 
-   linemax = strlen(format) - 6 + 30;
-   line = malloc(sizeof(char) * linemax);
-
-   percent = 0;
-   if (count > 0)
-     percent = (int) ((pass / (double) count) * 100);
-
-   snprintf(line, linemax, format, pass, percent, fail);
-   elm_code_file_line_append(_edi_test_code->file, line, strlen(line), (fail > 0) ? _EDI_SUITE_FAILED : _EDI_SUITE_PASSED);
-   free(line);
+   _edi_test_output_suite(_edi_test_count, _edi_test_pass, _edi_test_fail);
+   _edi_test_count = 0;
+   return ECORE_CALLBACK_RENEW;
 }
 
 static Eina_Bool
@@ -311,6 +321,23 @@ static void _edi_test_line_callback(const char *content)
      {
         _edi_test_line_parse_suite(content + 6);
      }
+   else if (!strncmp(content, "=== RUN", 7))
+     {
+        edi_testpanel_show();
+        _edi_test_count++;
+     }
+   else if (!strncmp(content, "--- PASS:", 9))
+     {
+        _edi_test_pass++;
+
+        elm_code_file_line_append(_edi_test_code->file, content + 10, strlen(content) - 10, _EDI_SUITE_PASSED);
+     }
+   else if (!strncmp(content, "--- FAIL:", 9))
+     {
+        _edi_test_fail++;
+
+        elm_code_file_line_append(_edi_test_code->file, content + 10, strlen(content) - 10, _EDI_SUITE_FAILED);
+     }
 }
 
 static Eina_Bool
@@ -322,13 +349,11 @@ _edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, v
    EINA_LIST_FOREACH(_edi_console_code->widgets, item, widget)
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-        edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
      }
 
    EINA_LIST_FOREACH(_edi_test_code->widgets, item, widget)
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-        edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
      }
 
    return ECORE_CALLBACK_RENEW;
@@ -351,7 +376,6 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_consolepanel_line_cb, NULL);
    efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);
@@ -365,6 +389,7 @@ void edi_consolepanel_add(Evas_Object *parent)
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
+   ecore_event_handler_add(ECORE_EXE_EVENT_DEL, _exe_done, NULL);
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_consolepanel_config_changed, NULL);
 }
 
@@ -385,7 +410,6 @@ void edi_testpanel_add(Evas_Object *parent)
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_testpanel_line_cb, NULL);
    efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_consolepanel_clicked_cb, code);

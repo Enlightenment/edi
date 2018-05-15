@@ -1,5 +1,5 @@
 =======
-Edi 0.8
+Edi 0.7
 =======
 
 Features:
@@ -7,10 +7,13 @@ Features:
   * Added theme support and new themes.
   * Added editor translucency option.
 
+Bug fixes:
 
-=======
-Edi 0.7
-=======
+  *
+
+---------
+Edi 0.6.1
+---------
 
 Features:
 
@@ -18,9 +21,14 @@ Features:
   * Added split-view option for editors.
   * Updated project wizard and added new project templates.
   * Include EFL examples in project wizard.
+  * Add support for Go projects.
   * Improved debugging support.
   * Added edi_scm helper command.
   * Replace all in project.
+
+Bug fixes:
+
+  * overall stability of the SCM git integration
 
 =======
 Edi 0.6

@@ -8,6 +8,7 @@ src = files([
   'edi_build_provider_make.c',
   'edi_build_provider_meson.c',
   'edi_build_provider_python.c',
+  'edi_build_provider_go.c',
   'edi_builder.c',
   'edi_builder.h',
   'edi_create.c',

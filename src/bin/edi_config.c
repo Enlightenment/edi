@@ -473,6 +473,7 @@ void
 _edi_project_config_load()
 {
    Eina_Bool save = EINA_FALSE;
+   Edi_Build_Provider *provider;
 
    _edi_project_config = _edi_config_domain_load(_edi_project_config_dir_get(), EDI_PROJECT_CONFIG_NAME, _edi_proj_cfg_edd);
    if (_edi_project_config)
@@ -526,7 +527,11 @@ _edi_project_config_load()
    IFPCFGEND;
 
    IFPCFG(0x0003);
-   _edi_project_config->gui.tab_inserts_spaces = EINA_TRUE;
+   provider = edi_build_provider_for_project_get();
+   if (provider && !strcmp("go", provider->id))
+     _edi_project_config->gui.tab_inserts_spaces = EINA_FALSE;
+   else
+     _edi_project_config->gui.tab_inserts_spaces = EINA_TRUE;
    IFPCFGEND;
 
    IFPCFG(0x0004);

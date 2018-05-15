@@ -11,7 +11,7 @@ and in creating apps based on the EFL suite.
 
 meson
 ninja
-EFL from git master (>= 1.20.99)
+EFL latest release (>= 1.20.7)
 libclang-dev (or llvm-clang-devel)
 
 ## Installation
