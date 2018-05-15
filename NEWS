@@ -1,6 +1,6 @@
-=======
-Edi 0.7
-=======
+---------
+Edi 0.6.1
+---------
 
 Features:
 
@@ -12,6 +12,10 @@ Features:
   * Improved debugging support.
   * Added edi_scm helper command.
   * Replace all in project.
+
+Bug fixes:
+
+  * overall stability of the SCM git integration
 
 =======
 Edi 0.6
