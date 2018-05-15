@@ -75,8 +75,15 @@ _edi_logpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void 
 
 void edi_logpanel_add(Evas_Object *parent)
 {
+   Evas_Object *frame;
    Elm_Code_Widget *widget;
    Elm_Code *code;
+
+   frame = elm_frame_add(parent);
+   elm_object_text_set(frame, _("Logs"));
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(frame);
 
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
@@ -94,6 +101,7 @@ void edi_logpanel_add(Evas_Object *parent)
    eina_log_print_cb_set(_edi_logpanel_print_cb, NULL);
    eina_log_color_disable_set(EINA_TRUE);
 
-   elm_box_pack_end(parent, widget);
+   elm_object_content_set(frame, widget);
+   elm_box_pack_end(parent, frame);
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_logpanel_config_changed, NULL);
 }

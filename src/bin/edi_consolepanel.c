@@ -336,11 +336,18 @@ _edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, v
 
 void edi_consolepanel_add(Evas_Object *parent)
 {
+   Evas_Object *frame;
    Elm_Code *code;
    Elm_Code_Widget *widget;
 
    code = elm_code_create();
    _edi_console_code = code;
+
+   frame = elm_frame_add(parent);
+   elm_object_text_set(frame, _("Console"));
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(frame);
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
@@ -353,7 +360,8 @@ void edi_consolepanel_add(Evas_Object *parent)
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
 
-   elm_box_pack_end(parent, widget);
+   elm_object_content_set(frame, widget);
+   elm_box_pack_end(parent, frame);
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _exe_data, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _exe_error, NULL);
@@ -362,11 +370,18 @@ void edi_consolepanel_add(Evas_Object *parent)
 
 void edi_testpanel_add(Evas_Object *parent)
 {
+   Evas_Object *frame;
    Elm_Code *code;
    Elm_Code_Widget *widget;
 
    code = elm_code_create();
    _edi_test_code = code;
+
+   frame = elm_frame_add(parent);
+   elm_object_text_set(frame, _("Tests"));
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(frame);
 
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
@@ -379,6 +394,7 @@ void edi_testpanel_add(Evas_Object *parent)
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
 
-   elm_box_pack_end(parent, widget);
+   elm_object_content_set(frame, widget);
+   elm_box_pack_end(parent, frame);
 }
 
