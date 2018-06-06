@@ -1084,6 +1084,35 @@ _edi_filepanel_select_check(void *data EINA_UNUSED)
    return ECORE_CALLBACK_RENEW;
 }
 
+static void
+_edi_filepanel_select_next_best_path(const char *path)
+{
+   Elm_Object_Item *item;
+   char *end, *try = strdup(path);
+
+   while (1)
+     {
+        if (!strcmp(try, edi_project_get()))
+          break;
+
+        end = strrchr(try, '/');
+        if (!end)
+          break;
+        else
+          *end = '\0';
+
+        item = _file_listing_item_find(try);
+        if (item)
+          {
+             elm_genlist_item_selected_set(item, EINA_TRUE);
+             elm_genlist_item_bring_in(item, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
+             break;
+          }
+     }
+
+   free(try);
+}
+
 void
 edi_filepanel_select_path(const char *path)
 {
@@ -1091,12 +1120,16 @@ edi_filepanel_select_path(const char *path)
 
    item = _file_listing_item_find(path);
    if (!item)
-     return;
+     {
+        _edi_filepanel_select_next_best_path(path);
+        return;
+     }
 
    if (elm_genlist_item_selected_get(item))
      return;
 
    elm_genlist_item_selected_set(item, EINA_TRUE);
+   elm_genlist_item_bring_in(item, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
 }
 
 void
