@@ -395,6 +395,47 @@ _promote(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_tab_info_menu_dismissed_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                            void *ev EINA_UNUSED)
+{
+   evas_object_del(obj);
+}
+
+static void
+_tab_info_menu_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                  void *event_info)
+
+{
+   Evas_Event_Mouse_Down *ev;
+   Elm_Object_Item *menu_it;
+   Edi_Mainview_Item *item;
+   Evas_Object *menu;
+   const char *path;
+
+   ev = event_info;
+
+   /* right-click for tab information */
+   if (ev->button != 3)
+     return;
+
+   item = data;
+
+   path = strstr(item->path, edi_project_get());
+   if (path)
+     path += 1 + strlen(edi_project_get());
+   else
+     path = item->path;
+
+   menu = elm_menu_add(_main_win);
+   evas_object_smart_callback_add(menu, "dismissed", _tab_info_menu_dismissed_cb, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, "document-properties", path, NULL, NULL);
+
+   elm_menu_move(menu, ev->canvas.x, ev->canvas.y);
+
+   evas_object_show(menu);
+}
+
+static void
 _closetab(void *data, Evas_Object *obj EINA_UNUSED,
           const char *emission EINA_UNUSED, const char *source EINA_UNUSED)
 {
@@ -504,6 +545,8 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
 */
    elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
    elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
+   evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_DOWN, _tab_info_menu_cb, item);
+
 
    elm_box_pack_end(panel->tabs, tab);
    evas_object_show(tab);
