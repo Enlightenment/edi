@@ -211,6 +211,7 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
         elm_object_disabled_set(_button_start, EINA_FALSE);
         elm_object_disabled_set(_button_int, EINA_TRUE);
         elm_object_disabled_set(_button_term, EINA_TRUE);
+        return ECORE_CALLBACK_RENEW;
      }
 
    if (!debug)
