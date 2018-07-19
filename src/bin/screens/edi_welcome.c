@@ -473,8 +473,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_object_content_set(frame, table);
 
    image = elm_image_add(table);
-   evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_image_file_set(image, template->edje_path, template->edje_id);
    evas_object_show(image);
