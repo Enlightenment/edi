@@ -647,18 +647,16 @@ edi_mainview_project_search_popup_show(void)
    elm_box_pack_end(box, input);
    evas_object_show(box);
 
-   frame = elm_frame_add(box);
+   frame = elm_frame_add(popup);
    evas_object_show(frame);
    elm_object_content_set(frame, box);
    elm_object_content_set(popup, frame);
-
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_project_search_popup_cancel_cb, NULL);
-
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Search"));
    elm_object_part_content_set(popup, "button2", button);
