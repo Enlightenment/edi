@@ -841,7 +841,7 @@ _edi_mainview_panel_goto_popup_key_up_cb(void *data, Evas *e EINA_UNUSED,
    str = elm_object_text_get(obj);
 
    if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
-     _edi_mainview_panel_goto_popup_go_cb(panel, obj, NULL);
+     _edi_mainview_panel_goto_popup_go_cb(obj, NULL, NULL);
 }
 
 void
