@@ -11,24 +11,30 @@
 #include "edi_private.h"
 
 static Eina_List *_edi_themes = NULL;
-
 // we are hooking into Efl for now...
 Efl_Ui_Theme_Apply efl_ui_widget_theme_apply(Eo *obj);
 
 void
 edi_theme_window_alpha_set(void)
 {
-   Evas_Object *win;
+   Evas_Object *win, *bg, *mainbox;
    Eina_Bool enabled = _edi_project_config->gui.translucent;
 
    win = edi_main_win_get();
 
    elm_win_alpha_set(win, enabled);
 
+   bg = evas_object_data_get(win, "background");
    if (enabled)
-     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, _edi_project_config->gui.alpha);
+     efl_gfx_color_set(bg, 95, 95, 95, _edi_project_config->gui.alpha);
    else
-     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, 255);
+     efl_gfx_color_set(bg, 95, 95, 95, 255);
+
+   mainbox = evas_object_data_get(win, "mainbox");
+   if (enabled)
+     efl_gfx_color_set(mainbox, 255, 255, 255, _edi_project_config->gui.alpha);
+   else
+     efl_gfx_color_set(mainbox, 255, 255, 255, 255);
 }
 
 void edi_theme_elm_code_alpha_set(Evas_Object *obj)
