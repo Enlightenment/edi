@@ -1521,7 +1521,6 @@ edi_open(const char *inputpath)
    elm_win_resize_object_add(win, hbx);
    evas_object_show(hbx);
 
-   edi_theme_main_box_set(hbx);
    edi_theme_window_alpha_set();
 
    tb = edi_toolbar_setup(hbx);
