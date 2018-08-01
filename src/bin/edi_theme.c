@@ -11,51 +11,29 @@
 #include "edi_private.h"
 
 static Eina_List *_edi_themes = NULL;
-static Evas_Object *_main_box = NULL;
 
 // we are hooking into Efl for now...
 Efl_Ui_Theme_Apply efl_ui_widget_theme_apply(Eo *obj);
 
 void
-edi_theme_main_box_set(Evas_Object *box)
-{
-   _main_box = box;
-}
-
-Evas_Object *
-edi_theme_main_box_get(void)
-{
-   return _main_box;
-}
-
-void
 edi_theme_window_alpha_set(void)
 {
    Evas_Object *win;
-   Evas_Object *background;
-   static int r, g, b, a;
    Eina_Bool enabled = _edi_project_config->gui.translucent;
 
    win = edi_main_win_get();
 
    elm_win_alpha_set(win, enabled);
 
-   background = edi_theme_main_box_get();
-   if (!background)
-     return;
-
-   if (!r && !g && !b && !a)
-     evas_object_color_get(background, &r, &g, &b, &a);
-
    if (enabled)
-     evas_object_color_set(background, r, g, b, _edi_project_config->gui.alpha);
+     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, _edi_project_config->gui.alpha);
    else
-     evas_object_color_set(background, r, g, b, 255);
+     efl_gfx_color_set(efl_part(win, "background"), 64, 64, 64, 255);
 }
 
 void edi_theme_elm_code_alpha_set(Evas_Object *obj)
 {
-  if (_edi_project_config->gui.translucent)
+   if (_edi_project_config->gui.translucent)
      elm_code_widget_alpha_set(obj, _edi_project_config->gui.alpha);
    else
      elm_code_widget_alpha_set(obj, 255);

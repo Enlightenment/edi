@@ -59,9 +59,6 @@ Edi_Theme *edi_theme_theme_by_name(const char *name);
 
 void edi_theme_window_alpha_set(void);
 void edi_theme_elm_code_alpha_set(Evas_Object *obj);
-void edi_theme_main_box_set(Evas_Object *box);
-Evas_Object *edi_theme_main_box_get(void);
-
 /**
  * @}
  */
