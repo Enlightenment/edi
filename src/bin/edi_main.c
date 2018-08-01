@@ -1488,7 +1488,7 @@ Evas_Object *edi_main_win_get(void)
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *win, *hbx, *vbx, *tb, *content;
+   Evas_Object *table, *win, *bg, *hbx, *vbx, *tb, *content;
    char *winname;
    char *path;
 
@@ -1513,13 +1513,28 @@ edi_open(const char *inputpath)
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
 
+   table = elm_table_add(win);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(table);
+
    hbx = elm_box_add(win);
    _edi_main_box = hbx;
    elm_box_horizontal_set(hbx, EINA_TRUE);
    evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_win_resize_object_add(win, hbx);
    evas_object_show(hbx);
+
+   bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(bg);
+   elm_win_resize_object_add(win, table);
+   elm_table_pack(table, bg, 0, 0, 1, 1);
+   elm_table_pack(table, hbx, 0, 0, 1, 1);
+
+   evas_object_data_set(win, "background", bg);
+   evas_object_data_set(win, "mainbox", hbx);
 
    edi_theme_window_alpha_set();
 
