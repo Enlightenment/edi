@@ -466,6 +466,29 @@ _edi_mainview_panel_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
    return container;
 }
 
+static int
+_font_width_get(Evas_Object *parent, const char *text)
+{
+   int w = 0;
+
+   Evas_Object *textblock = evas_object_text_add(parent);
+   evas_object_size_hint_weight_set(textblock, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(textblock, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(textblock);
+
+   evas_object_text_font_set(textblock, "sans", 12);
+   evas_object_text_text_set(textblock, text);
+
+   evas_object_geometry_get(textblock, NULL, NULL, &w, NULL);
+
+   evas_object_del(textblock);
+
+   if (w < 120)
+     w = 120;
+
+   return w;
+}
+
 static void
 _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *options, const char *mime)
 {
@@ -473,7 +496,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
    Elm_Code *code;
-   int h;
+   int h, width;
    const char *path;
 
    if (!panel) return;
@@ -515,9 +538,11 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    elm_icon_standard_set(icon, provider->icon);
    elm_object_part_content_set(tab, "icon", icon);
 */
+   width = _font_width_get(tab, ecore_file_file_get(options->path));
+
    elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
    elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
-   evas_object_size_hint_min_set(tab, 120 * elm_config_scale_get(), h);
+   evas_object_size_hint_min_set(tab, width * elm_config_scale_get(), h);
 
    elm_box_pack_end(panel->tabs, tab);
    evas_object_show(tab);
