@@ -827,10 +827,9 @@ _edi_mainview_panel_goto_popup_go_cb(void *data,
 }
 
 static void
-_edi_mainview_panel_goto_popup_key_up_cb(void *data, Evas *e EINA_UNUSED,
+_edi_mainview_panel_goto_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
                                    Evas_Object *obj, void *event_info)
 {
-   Edi_Mainview_Panel *panel = data;
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *)event_info;
    const char *str;
 
