@@ -473,6 +473,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
    Elm_Code *code;
+   int h;
    const char *path;
 
    if (!panel) return;
@@ -491,6 +492,8 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    panel->items = eina_list_append(panel->items, item);
    _edi_mainview_panel_show(panel, content);
 
+   evas_object_geometry_get(panel->tabs, NULL, NULL, NULL, &h);
+
    tab = elm_button_add(panel->tabs);
    evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
@@ -503,9 +506,10 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
      path = item->path;
 
    elm_object_tooltip_text_set(tab, path);
+   elm_object_tooltip_window_mode_set(tab, EINA_TRUE);
 
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
-   elm_object_part_text_set(tab, "elm.btn.text", ecore_file_file_get(options->path));
+   elm_object_part_text_set(tab, "elm.btn.text", eina_slstr_printf("<style align=left> %s</>", ecore_file_file_get(options->path)));
 /*
    icon = elm_icon_add(tab);
    elm_icon_standard_set(icon, provider->icon);
@@ -513,6 +517,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
 */
    elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
    elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
+   evas_object_size_hint_min_set(tab, 120 * elm_config_scale_get(), h);
 
    elm_box_pack_end(panel->tabs, tab);
    evas_object_show(tab);
