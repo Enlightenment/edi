@@ -28,6 +28,7 @@ _edi_searchpanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED,
 {
    elm_code_widget_font_set(_info_widget, _edi_project_config->font.name, _edi_project_config->font.size);
    edi_theme_elm_code_set(_info_widget, _edi_project_config->gui.theme);
+   edi_theme_elm_code_alpha_set(_info_widget);
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -610,6 +611,7 @@ _edi_taskspanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, 
 {
    elm_code_widget_font_set(_tasks_widget, _edi_project_config->font.name, _edi_project_config->font.size);
    edi_theme_elm_code_set(_tasks_widget, _edi_project_config->gui.theme);
+   edi_theme_elm_code_alpha_set(_tasks_widget);
 
    return ECORE_CALLBACK_RENEW;
 }

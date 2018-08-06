@@ -351,12 +351,14 @@ _edi_consolepanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, v
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
         edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
+	edi_theme_elm_code_alpha_set(widget);
      }
 
    EINA_LIST_FOREACH(_edi_test_code->widgets, item, widget)
      {
         elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
         edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
+	edi_theme_elm_code_alpha_set(widget);
      }
 
    return ECORE_CALLBACK_RENEW;
