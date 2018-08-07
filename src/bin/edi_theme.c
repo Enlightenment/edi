@@ -20,6 +20,8 @@ void
 edi_theme_window_alpha_set(void)
 {
    Evas_Object *win, *bg, *mainbox;
+   int r, g, b, a;
+   double fade;
    Eina_Bool enabled = _edi_project_config->gui.translucent;
 
    win = edi_main_win_get();
@@ -34,12 +36,14 @@ edi_theme_window_alpha_set(void)
 
    bg = evas_object_data_get(win, "background");
 
-   double fade = (100.0 / 255 *_edi_project_config->gui.alpha) / 100.0;
+   fade = _edi_project_config->gui.alpha / 255.0;
+
+   efl_gfx_color_get(efl_part(win, "background"), &r, &g, &b, &a);
 
    if (enabled)
-     efl_gfx_color_set(bg, 100 * fade, 100 * fade, 100 * fade, fade * _edi_project_config->gui.alpha);
+     efl_gfx_color_set(bg, r * fade, g * fade, b * fade, fade * _edi_project_config->gui.alpha);
    else
-     efl_gfx_color_set(bg, 100, 100, 100, 128);
+     efl_gfx_color_set(bg, r, g, b, 128);
 }
 
 void edi_theme_elm_code_alpha_set(Evas_Object *obj)
