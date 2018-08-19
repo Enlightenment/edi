@@ -1341,6 +1341,14 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
 }
 
 static void
+_edi_focused_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Evas_Object *win = edi_settings_win_get();
+   if (win)
+     elm_win_raise(win);
+}
+
+static void
 _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
                            void *event_info EINA_UNUSED)
 {
@@ -1512,6 +1520,7 @@ edi_open(const char *inputpath)
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
+   evas_object_smart_callback_add(win, "focused", _edi_focused_cb, NULL);
 
    table = elm_table_add(win);
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);

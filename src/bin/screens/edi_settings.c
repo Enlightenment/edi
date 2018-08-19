@@ -13,6 +13,7 @@
 
 #include "edi_private.h"
 
+static Evas_Object *_edi_settings_win;
 static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
                        *_edi_settings_behaviour, *_edi_settings_project;
 
@@ -21,6 +22,8 @@ static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
 static void
 _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
+   _edi_settings_win = NULL;
+
    evas_object_del(data);
 }
 
@@ -820,12 +823,18 @@ _edi_settings_behaviour_create(Evas_Object *parent)
 }
 
 Evas_Object *
+edi_settings_win_get(void)
+{
+   return _edi_settings_win;
+}
+
+Evas_Object *
 edi_settings_show(Evas_Object *mainwin)
 {
    Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it, *default_it;
 
-   win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
+   _edi_settings_win = win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
    if (!win) return NULL;
 
    elm_win_title_set(win, _("Edi Settings"));

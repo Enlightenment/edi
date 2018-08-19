@@ -58,6 +58,22 @@ Evas_Object *edi_about_show(Evas_Object *mainwin);
  */
 Evas_Object *edi_settings_show(Evas_Object *mainwin);
 
+/**
+ * Return a pointer to the settings window.
+ *
+ * @return The object if it exists or NULL if not.
+ *
+ * @ingroup UI
+ */
+Evas_Object *edi_settings_win_get(void);
+
+/**
+ * Create the font selection settings widget.
+ *
+ * @param parent The parent object for the font selection widget.
+ *
+ * @ingroup UI
+ */
 void edi_settings_font_add(Evas_Object *parent);
 
 /**
