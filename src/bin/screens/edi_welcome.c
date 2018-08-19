@@ -533,7 +533,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(table);
-   rect = evas_object_rectangle_add(table);
+   rect = evas_object_rectangle_add(evas_object_evas_get(table));
    evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(rect, 500 * elm_config_scale_get(), 300 * elm_config_scale_get());
