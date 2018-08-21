@@ -1067,23 +1067,6 @@ _filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
      elm_genlist_filter_set(tree, (void *)strdup(match));
 }
 
-Eina_Bool
-_edi_filepanel_select_check(void *data EINA_UNUSED)
-{
-   Edi_Mainview_Panel *current;
-   Edi_Mainview_Item *item;
-
-   current = edi_mainview_panel_current_get();
-   if (!current) return ECORE_CALLBACK_RENEW;
-
-   item = edi_mainview_item_current_get(current);
-   if (!item) return ECORE_CALLBACK_RENEW;
-
-   edi_filepanel_select_path(item->path);
-
-   return ECORE_CALLBACK_RENEW;
-}
-
 static void
 _edi_filepanel_select_next_best_path(const char *path)
 {
@@ -1241,8 +1224,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    eina_hash_free_cb_set(_list_statuses, _list_status_free_cb);
 
    edi_filepanel_scm_status_update();
-
-   ecore_timer_add(0.1, _edi_filepanel_select_check, NULL);
 
    _root_dir = calloc(1, sizeof(Edi_Dir_Data));
    _root_dir->path = path;
