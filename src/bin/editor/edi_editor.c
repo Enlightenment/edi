@@ -1369,6 +1369,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "selection,cut", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "selection,paste" _changed_cb, editor);
    evas_object_event_callback_add(widget, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, editor);
    evas_object_smart_callback_add(widget, "focused", _focused_cb, item);
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
