@@ -153,6 +153,9 @@ _edi_create_free_data()
    create = _edi_create_data;
    _edi_create_data = NULL;
 
+   if (!create)
+     return;
+
    if (create->temp && ecore_file_exists(create->temp))
      ecore_file_recursive_rm(create->temp);
 
@@ -288,8 +291,6 @@ _edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 
    create = (Edi_Create *) data;
    ERR("copy error: [%s]\n", strerror(error));
-   if (create->callback)
-     create->callback(create->path, EINA_FALSE);
 
    _edi_create_free_data();
 }
