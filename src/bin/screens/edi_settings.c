@@ -841,7 +841,7 @@ edi_settings_show(Evas_Object *mainwin)
    if (!win) return NULL;
 
    elm_win_title_set(win, _("Edi Settings"));
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
+   elm_win_focus_highlight_enabled_set(win, EINA_FALSE);
    evas_object_smart_callback_add(win, "delete,request", _edi_settings_exit, win);
 
    bg = elm_bg_add(win);
