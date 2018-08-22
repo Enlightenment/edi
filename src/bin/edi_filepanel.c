@@ -983,7 +983,7 @@ _file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
                                _ls_done_cb, _ls_error_cb, lreq);
 }
 
-static void
+static Eina_Bool
 _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
                       void *event EINA_UNUSED)
 {
@@ -995,7 +995,7 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    if (strncmp(edi_project_get(), dir, strlen(edi_project_get())) ||
        ev->filename[strlen(edi_project_get()) + 1] == '.' ||
        _file_path_hidden(ev->filename, EINA_FALSE))
-     return;
+     return EINA_TRUE;
 
    parent_it = _file_listing_item_find(dir);
 
@@ -1010,10 +1010,12 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    else
     DBG("Ignoring file update event for %s", ev->filename);
 
-   if (ecore_file_file_get(ev->filename)[0] == '.') return;
+   if (ecore_file_file_get(ev->filename)[0] == '.') return EINA_TRUE;
 
    edi_filepanel_scm_status_update();
    edi_filepanel_item_update(ev->filename);
+
+   return EINA_TRUE;
 }
 
 /* Panel filtering */
