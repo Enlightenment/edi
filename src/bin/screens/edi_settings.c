@@ -834,6 +834,9 @@ edi_settings_show(Evas_Object *mainwin)
    Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it, *default_it;
 
+   if (edi_settings_win_get())
+     return NULL;
+
    _edi_settings_win = win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
    if (!win) return NULL;
 

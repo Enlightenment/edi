@@ -835,9 +835,6 @@ _tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
 static void
 _tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   if (edi_settings_win_get())
-     return;
-
    edi_settings_show(_edi_main_win);
 }
 
@@ -905,9 +902,6 @@ static void
 _edi_menu_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   if (edi_settings_win_get())
-     return;
-
    edi_settings_show(_edi_main_win);
 }
 
