@@ -290,6 +290,7 @@ _edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
    Edi_Create *create;
 
    create = (Edi_Create *) data;
+   (void) create;
    ERR("copy error: [%s]\n", strerror(error));
 
    _edi_create_free_data();
