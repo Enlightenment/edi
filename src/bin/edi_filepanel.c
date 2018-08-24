@@ -14,6 +14,7 @@
 
 #include "edi_filepanel.h"
 #include "edi_file.h"
+#include "edi_config.h"
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
 #include "screens/edi_file_screens.h"
@@ -46,6 +47,9 @@ static Eina_Bool
 _file_path_hidden(const char *path, Eina_Bool filter)
 {
    const char *relative;
+
+   if (_edi_config->show_hidden)
+     return EINA_FALSE;
 
    if (edi_file_path_hidden(path))
      return EINA_TRUE;
@@ -783,6 +787,9 @@ static Eina_Bool
 _ls_filter_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED,
               const Eina_File_Direct_Info *info)
 {
+   if (_edi_config->show_hidden)
+     return EINA_TRUE;
+
    return info->path[info->name_start] != '.';
 }
 
@@ -1096,6 +1103,23 @@ _edi_filepanel_select_next_best_path(const char *path)
      }
 
    free(try);
+}
+
+void
+edi_filepanel_refresh_all(void)
+{
+   elm_genlist_clear(_list);
+   eina_hash_free_buckets(_list_items);
+   eina_hash_free_buckets(_list_statuses);
+   _file_listing_empty(_root_dir, NULL);
+
+   free(_root_dir);
+
+   _root_dir = calloc(1, sizeof(Edi_Dir_Data));
+   _root_dir->path = edi_project_get();
+
+   _file_listing_fill(_root_dir, NULL);
+   elm_genlist_realized_items_update(_list);
 }
 
 void

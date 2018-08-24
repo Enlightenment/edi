@@ -242,6 +242,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, version, EET_T_INT);
    EDI_CONFIG_VAL(D, T, autosave, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, trim_whitespace, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, show_hidden, EET_T_UCHAR);
 
    EDI_CONFIG_LIST(D, T, projects, _edi_cfg_proj_edd);
    EDI_CONFIG_LIST(D, T, mime_assocs, _edi_cfg_mime_edd);
@@ -361,6 +362,7 @@ _edi_config_load(void)
 
    _edi_config->autosave = EINA_TRUE;
    _edi_config->trim_whitespace = EINA_TRUE;
+   _edi_config->show_hidden = EINA_FALSE;
    _edi_config->projects = NULL;
    _edi_config->mime_assocs = NULL;
    IFCFGEND;
