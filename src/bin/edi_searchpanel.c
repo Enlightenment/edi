@@ -204,14 +204,13 @@ edi_search_term(const char *start, const char *end, int boundary,
              lookup = memchr(search, *term, cchunk);
 
              // Did we found the right word or not ?
-             if (lookup && !memcmp(lookup, term, eina_stringshare_strlen(term)))
-               break ;
-
              if (!lookup)
-               break ;
+               break;
+             else if (!memcmp(lookup, term, eina_stringshare_strlen(term)))
+               break;
 
              // We didn't, start looking from where we are at
-             cchunk -= lookup + 1 - search;
+             cchunk -= lookup - search;
              search = lookup + 1;
           }
         while (cchunk > 0);
