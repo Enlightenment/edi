@@ -650,6 +650,8 @@ figure {
 
 figcaption {
   text-align: center;
+  font-size: 85%;
+  font-weight: bold;
 }
 /* GENERAL ELEMENT TYPE STYLES */
 
