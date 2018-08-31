@@ -300,6 +300,7 @@ edi_search_file(Eina_File *file, const char *term)
 {
    Eina_Iterator_Search *it;
    size_t length;
+   const char elf_header[4] = {0x7f, 'E', 'L', 'F'};
 
    if (!file || !term || strlen(term) == 0) return NULL;
 
@@ -314,6 +315,12 @@ edi_search_file(Eina_File *file, const char *term)
 
    it->map = eina_file_map_all(file, EINA_FILE_SEQUENTIAL);
    if (!it->map)
+     {
+        free(it);
+        return NULL;
+     }
+
+   if (length >= 4 && !memcmp(it->map, elf_header, sizeof(elf_header)))
      {
         free(it);
         return NULL;
