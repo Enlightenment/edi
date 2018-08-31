@@ -644,7 +644,13 @@ form {
 
 }
 
+figure {
+  display: inline-block;
+}
 
+figcaption {
+  text-align: center;
+}
 /* GENERAL ELEMENT TYPE STYLES */
 
 #main-content h1 {
