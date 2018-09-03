@@ -85,6 +85,23 @@ edi_scm_git_clone(const char *url, const char *dir)
    return code;
 }
 
+EAPI int
+edi_scm_git_update(const char *dir)
+{
+   char *oldpwd;
+   int code;
+
+   oldpwd = getcwd(NULL, PATH_MAX);
+
+   chdir(dir);
+   code = edi_exe_wait("git fetch origin && git reset --hard origin/master");
+   chdir(oldpwd);
+
+   free(oldpwd);
+
+   return code;
+}
+
 static int
 _edi_scm_git_file_stage(const char *path)
 {

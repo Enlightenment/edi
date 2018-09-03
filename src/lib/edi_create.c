@@ -410,8 +410,7 @@ edi_create_example(const char *example_name, const char *parentdir,
    INF("Extracting example project \"%s\" at path %s\n", example_name, dest);
 
    if (ecore_file_exists(examplepath))
-     ERR("TODO: UPDATE NOT IMPLEMENTED");
-//     status = edi_scm_git_update(examplepath);
+     status = edi_scm_git_update(examplepath);
    else
      status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath);
 

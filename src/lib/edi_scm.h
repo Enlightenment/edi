@@ -128,13 +128,24 @@ EAPI int edi_scm_git_new(void);
 /**
  * Clone an existing git repository from the provided url.
  *
- * @param url the URL to clone from.
- * @param dir the new directory that will be created to clone into
+ * @param url The URL to clone from.
+ * @param dir The new directory that will be created to clone into.
  * @return The status code of the clone command.
  *
  * @ingroup Scm
  */
 EAPI int edi_scm_git_clone(const char *url, const char *dir);
+
+/**
+ * Update a local git repository from remote source.
+ *
+ * @param dir The directory to update.
+ *
+ * @return The status code of the update process.
+ *
+ * @ingroup Scm
+ */
+EAPI int edi_scm_git_update(const char *dir);
 
 /**
  * Get a pointer to the SCM engine in use.
