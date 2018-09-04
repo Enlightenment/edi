@@ -327,7 +327,7 @@ _edi_toolbar_separator_add(Evas_Object *tb)
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
-   Evas_Object *filepane, *logpane, *logpanels, *content_out, *content_in, *tb;
+   Evas_Object *filepane, *logpane, *logpanels, *scroller, *content_out, *content_in, *tb;
    Evas_Object *icon, *button, *mainview;
 
    filepane = elm_panes_add(win);
@@ -382,11 +382,16 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_mainview_add(mainview, win);
 
    elm_object_part_content_set(filepane, "right", content_in);
-   elm_box_pack_end(content_out, filepane);
-
-   elm_object_part_content_set(logpane, "top", content_out);
    evas_object_show(filepane);
    _edi_leftpanes = filepane;
+   elm_box_pack_end(content_out, filepane);
+
+   scroller = elm_scroller_add(win);
+   evas_object_size_hint_weight_set(scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(scroller);
+   elm_object_content_set(scroller, content_out);
+   elm_object_part_content_set(logpane, "top", scroller);
 
    // add file list
    evas_object_size_hint_weight_set(_edi_filepanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
