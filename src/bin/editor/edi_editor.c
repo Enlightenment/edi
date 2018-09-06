@@ -176,10 +176,6 @@ _changed_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
      ecore_timer_reset(editor->save_timer);
    else if (_edi_config->autosave)
      editor->save_timer = ecore_timer_add(EDI_CONTENT_SAVE_TIMEOUT, _edi_editor_autosave_cb, editor);
-
-   // TODO: add method to elm_code to refresh syntax.
-   if (!_edi_config->autosave)
-     elm_code_widget_syntax_enabled_set(editor->entry, EINA_TRUE);
 }
 
 static char *
