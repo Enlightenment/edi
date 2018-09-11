@@ -592,7 +592,7 @@ _edi_mainview_project_search_cb(void *data,
    text_markup = elm_object_text_get((Evas_Object *) data);
    if (!text_markup || !text_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid search term."));
+        elm_object_focus_set((Evas_Object *)data, EINA_TRUE);
         return;
      }
 
@@ -672,20 +672,23 @@ _edi_mainview_project_replace_cb(void *data,
                              Evas_Object *obj,
                              void *event_info EINA_UNUSED)
 {
+   Evas_Object *search_obj, *replace_obj;
    const char *search_markup, *replace_markup;
    char *search, *replace;
 
-   search_markup = elm_object_text_get(evas_object_data_get(obj, "search"));
+   search_obj = evas_object_data_get(obj, "search");
+   search_markup = elm_object_text_get(search_obj);
    if (!search_markup || !search_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid search string."));
+        elm_object_focus_set(search_obj, EINA_TRUE);
         return;
      }
 
-   replace_markup = elm_object_text_get(data);
+   replace_obj = (Evas_Object *) data;
+   replace_markup = elm_object_text_get(replace_obj);
    if (!replace_markup || !replace_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid replace string."));
+        elm_object_focus_set(replace_obj, EINA_TRUE);
         return;
      }
 
