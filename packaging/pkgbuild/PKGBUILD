@@ -1,13 +1,13 @@
 # Maintainer: Enlightenment Developers <enlightenment-devel@enlightenment.org>
 pkgname='edi-git'
-pkgver=0.6.99.0001
+pkgver=0.7.0.0001
 pkgrel=1
 pkgdesc="Efl based IDE - GIT development snapshot"
 arch=('i686' 'x86_64' 'arm')
 url="https://www.enlightenment.org/about-edi"
 license=('GPLv2')
 makedepends=('git' 'meson')
-depends=('efl-git' 'clang' 'check')
+depends=('efl' 'clang' 'check')
 options=('!libtool' 'debug' '!strip')
 provides=('edi')
 source=("edi-git::git+https://github.com/Enlightenment/edi.git#branch=develop")
