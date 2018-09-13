@@ -5,6 +5,8 @@ src = files([
   'edi_config.h',
   'edi_consolepanel.c',
   'edi_consolepanel.h',
+  'edi_content.c',
+  'edi_content.h',
   'edi_content_provider.c',
   'edi_content_provider.h',
   'edi_debug.c',
@@ -21,6 +23,8 @@ src = files([
   'edi_private.h',
   'edi_searchpanel.c',
   'edi_searchpanel.h',
+  'edi_theme.c',
+  'edi_theme.h',
 ])
 
 bin_dir = include_directories('.')

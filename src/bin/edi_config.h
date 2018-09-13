@@ -41,6 +41,7 @@ struct _Edi_Config
 
    Eina_Bool autosave;
    Eina_Bool trim_whitespace;
+   Eina_Bool show_hidden;
 
    Eina_List *projects;
    Eina_List *mime_assocs;

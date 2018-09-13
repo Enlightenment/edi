@@ -96,6 +96,12 @@ void edi_filepanel_item_update(const char *path);
 void edi_filepanel_item_update_all(void);
 
 /**
+ * Clear all filepanel items and do a full refresh.
+ *
+ * @ingroup UI
+ */
+void edi_filepanel_refresh_all(void);
+/**
  * @}
  */
 

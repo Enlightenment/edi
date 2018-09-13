@@ -138,12 +138,13 @@ _edi_screens_settings_display_cb(void *data, Evas_Object *obj,
 
 void edi_screens_settings_message(Evas_Object *parent, const char *title, const char *message)
 {
-   Evas_Object *popup, *table, *box, *icon, *sep, *label, *button;
+   Evas_Object *popup, *frame, *table, *box, *icon, *sep, *label, *button;
 
    popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text", title);
 
    table = elm_table_add(popup);
+   elm_table_padding_set(table, 10, 10);
    icon = elm_icon_add(table);
    elm_icon_standard_set(icon, "dialog-information");
    evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
@@ -152,24 +153,25 @@ void edi_screens_settings_message(Evas_Object *parent, const char *title, const 
    evas_object_show(icon);
    elm_table_pack(table, icon, 0, 0, 1, 1);
 
+   frame = elm_frame_add(popup);
+   elm_object_content_set(frame, table);
+   evas_object_show(frame);
+
+   box = elm_box_add(popup);
    label = elm_label_add(popup);
    elm_object_text_set(label, message);
    evas_object_show(label);
-   elm_table_pack(table, label, 1, 0, 1, 1);
+   elm_box_pack_end(box, label);
    evas_object_show(table);
 
-   box = elm_box_add(popup);
    sep = elm_separator_add(box);
    elm_separator_horizontal_set(sep, EINA_TRUE);
    evas_object_show(sep);
    elm_box_pack_end(box, sep);
-   elm_box_pack_end(box, table);
-   sep = elm_separator_add(box);
-   elm_separator_horizontal_set(sep, EINA_TRUE);
-   evas_object_show(sep);
-   elm_box_pack_end(box, sep);
-
-   elm_object_content_set(popup, box);
+   evas_object_show(box);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+   elm_object_content_set(popup, frame);
+   evas_object_show(table);
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("OK"));

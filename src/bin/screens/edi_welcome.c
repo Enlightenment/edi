@@ -473,8 +473,6 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    elm_object_content_set(frame, table);
 
    image = elm_image_add(table);
-   evas_object_size_hint_weight_set(image, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(image, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_image_file_set(image, template->edje_path, template->edje_id);
    evas_object_show(image);
@@ -535,7 +533,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(table);
-   rect = evas_object_rectangle_add(table);
+   rect = evas_object_rectangle_add(evas_object_evas_get(table));
    evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_min_set(rect, 500 * elm_config_scale_get(), 300 * elm_config_scale_get());

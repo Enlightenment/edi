@@ -155,7 +155,6 @@ void edi_editor_doc_open(Edi_Editor *editor);
  */
 void edi_editor_widget_config_get(Elm_Code_Widget *widget);
 
-
 /**
  * @}
  */

@@ -7,6 +7,7 @@
 #include <Elementary.h>
 
 #include "edi_debug.h"
+#include "edi_theme.h"
 #include "edi_debugpanel.h"
 #include "edi_config.h"
 
@@ -36,6 +37,8 @@ static Eina_Bool
 _edi_debugpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    elm_code_widget_font_set(_info_widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_set(_info_widget, _edi_project_config->gui.theme);
+   edi_theme_elm_code_alpha_set(_info_widget);
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -209,6 +212,7 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
         elm_object_disabled_set(_button_start, EINA_FALSE);
         elm_object_disabled_set(_button_int, EINA_TRUE);
         elm_object_disabled_set(_button_term, EINA_TRUE);
+        return ECORE_CALLBACK_RENEW;
      }
 
    if (!debug)
@@ -313,16 +317,26 @@ void edi_debugpanel_start(const char *name)
 
 void edi_debugpanel_add(Evas_Object *parent)
 {
-   Evas_Object *table, *entry, *bt_term, *bt_int, *bt_start, *bt_quit;
+   Evas_Object *table, *frame, *box, *entry, *bt_term, *bt_int, *bt_start, *bt_quit;
    Evas_Object *separator;
    Evas_Object *ico_start, *ico_quit, *ico_int, *ico_term;
    Elm_Code_Widget *widget;
    Elm_Code *code;
    Ecore_Timer *timer;
 
+   frame = elm_frame_add(parent);
+   elm_object_text_set(frame, _("Debug"));
+   evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
+   box = elm_box_add(parent);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_set(_info_widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_debugpanel_line_cb, NULL);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -398,8 +412,13 @@ void edi_debugpanel_add(Evas_Object *parent)
    timer = ecore_timer_add(1.0, _edi_debug_active_check_cb, NULL);
    (void) timer;
 
-   elm_box_pack_end(parent, widget);
-   elm_box_pack_end(parent, table);
+   elm_box_pack_end(box, widget);
+   elm_box_pack_end(box, table);
+   evas_object_show(box);
+
+   elm_object_content_set(frame, box);
+   evas_object_show(frame);
+   elm_box_pack_end(parent, frame);
 
    ecore_event_handler_add(ECORE_EXE_EVENT_DATA, _debugpanel_stdout_handler, NULL);
    ecore_event_handler_add(ECORE_EXE_EVENT_ERROR, _debugpanel_stdout_handler, NULL);

@@ -67,6 +67,7 @@ _font_monospaced_check(const char *name, Evas_Object *parent)
 
    evas_object_text_text_set(textblock, "m");
    evas_object_geometry_get(textblock, NULL, NULL, &w2, NULL);
+   evas_object_del(textblock);
 
    // check width difference is small or zero.
    diff = (w2 >= w1) ? w2 - w1 : w1 - w2;

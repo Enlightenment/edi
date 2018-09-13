@@ -17,7 +17,7 @@ START_TEST (edi_test_language_provider_lookup)
 }
 END_TEST
 */
-void edi_test_language_provider(TCase *tc)
+void edi_test_language_provider(EINA_UNUSED TCase *tc)
 {
 //   tcase_add_test(tc, edi_test_language_provider_lookup);
 }

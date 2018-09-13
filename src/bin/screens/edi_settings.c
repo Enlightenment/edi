@@ -9,9 +9,12 @@
 #include "edi_screens.h"
 #include "edi_config.h"
 #include "edi_debug.h"
+#include "edi_filepanel.h"
+#include "edi_theme.h"
 
 #include "edi_private.h"
 
+static Evas_Object *_edi_settings_win;
 static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
                        *_edi_settings_behaviour, *_edi_settings_project;
 
@@ -20,6 +23,8 @@ static Elm_Object_Item *_edi_settings_display, *_edi_settings_builds,
 static void
 _edi_settings_exit(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
+   _edi_settings_win = NULL;
+
    evas_object_del(data);
 }
 
@@ -145,11 +150,74 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    return widget;
 }
 
+static void
+_edi_settings_display_theme_pressed_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info)
+{
+   Edi_Theme *theme;
+   const char *text = elm_object_item_text_get(event_info);
+
+   theme = elm_object_item_data_get(event_info);
+
+   if (_edi_project_config->gui.theme)
+     eina_stringshare_del(_edi_project_config->gui.theme);
+
+   _edi_project_config->gui.theme = eina_stringshare_add(theme->name);
+   _edi_project_config_save();
+
+   elm_object_text_set(obj, text);
+   elm_combobox_hover_end(obj);
+}
+
+static char *
+_edi_settings_display_theme_text_get_cb(void *data, Evas_Object *obj EINA_UNUSED, const char *part EINA_UNUSED)
+{
+   Edi_Theme *current;
+
+   current = data;
+
+   return strdup(current->title);
+}
+
+static void
+_edi_settings_display_translucent_state_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                    void *event EINA_UNUSED)
+{
+   Evas_Object *slider, *check;
+   int state;
+
+   check = obj;
+   slider = data;
+
+   state = elm_check_state_get(check);
+
+   _edi_project_config->gui.translucent = state;
+   _edi_project_config_save();
+
+   elm_object_disabled_set(slider, !state);
+}
+
+static void
+_edi_settings_display_alpha_changed_cb(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+{
+
+   _edi_project_config->gui.alpha = elm_slider_value_get(obj);
+   _edi_project_config_save();
+}
+
+static char *
+_edi_settings_display_alpha_format(double value)
+{
+   return (char*)eina_stringshare_printf("%1.0f%%", (value/255)*100);
+}
+
 static Evas_Object *
 _edi_settings_display_create(Evas_Object *parent)
 {
    Evas_Object *container, *box, *frame, *label, *spinner, *check, *button, *preview;
-   Evas_Object *table;
+   Evas_Object *table, *combobox, *slider;
+   Elm_Genlist_Item_Class *itc;
+   Edi_Theme *theme;
+   Eina_List *themes, *l;
 
    container = elm_box_add(parent);
    evas_object_size_hint_weight_set(container, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -184,6 +252,82 @@ _edi_settings_display_create(Evas_Object *parent)
                                   _edi_settings_font_choose_cb, parent);
 
    elm_object_focus_set(button, EINA_TRUE);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Color theme"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 1, 1, 1);
+   evas_object_show(label);
+
+   // START OF THEME SELECTOR
+
+   combobox = elm_combobox_add(table);
+   evas_object_size_hint_weight_set(combobox, 0.75, 0.0);
+   evas_object_size_hint_align_set(combobox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(combobox);
+   evas_object_smart_callback_add(combobox, "item,pressed",
+                                 _edi_settings_display_theme_pressed_cb, NULL);
+
+   if (!_edi_project_config->gui.theme)
+     elm_object_text_set(combobox, edi_theme_theme_by_name("default")->title);
+   else
+     elm_object_text_set(combobox, edi_theme_theme_by_name(_edi_project_config->gui.theme)->title);
+
+   elm_table_pack(table, combobox, 1, 1, 1, 1);
+   itc = elm_genlist_item_class_new();
+   itc->item_style = "default";
+   itc->func.text_get = _edi_settings_display_theme_text_get_cb;
+
+   themes = edi_theme_themes_get();
+
+   EINA_LIST_FOREACH(themes, l, theme)
+     {
+        elm_genlist_item_append(combobox, itc, theme, NULL, ELM_GENLIST_ITEM_NONE, NULL, NULL);
+     }
+
+   elm_genlist_realized_items_update(combobox);
+   elm_genlist_item_class_free(itc);
+
+   // END OF THEME SELECTOR
+
+   // START OF ALPHA SELECTOR
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Translucent"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 2, 1, 1);
+   evas_object_show(label);
+
+   slider = elm_slider_add(table);
+   check = elm_check_add(box);
+   elm_check_state_set(check, _edi_project_config->gui.translucent);
+   evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_pack(table, check, 1, 2, 1, 1);
+   evas_object_show(check);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_display_translucent_state_cb, slider);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Alpha"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 3, 1, 1);
+   evas_object_show(label);
+
+   elm_object_disabled_set(slider, !_edi_project_config->gui.translucent);
+   evas_object_size_hint_align_set(slider, EVAS_HINT_FILL, 0.5);
+   evas_object_size_hint_weight_set(slider, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_slider_min_max_set(slider, 0, 255);
+   elm_slider_value_set(slider, _edi_project_config->gui.alpha);
+   elm_slider_span_size_set(slider, 255);
+   elm_slider_step_set(slider, 0.01);
+   elm_slider_units_format_function_set(slider, _edi_settings_display_alpha_format,
+                                        (void(*)(char*))eina_stringshare_del);
+   elm_slider_indicator_format_function_set(slider, _edi_settings_display_alpha_format,
+                                            (void(*)(char*))eina_stringshare_del);
+   elm_table_pack(table, slider, 1, 3, 1, 1);
+   evas_object_show(slider);
+   evas_object_smart_callback_add(slider, "slider,drag,stop", _edi_settings_display_alpha_changed_cb, NULL);
+   evas_object_smart_callback_add(slider, "delay,changed", _edi_settings_display_alpha_changed_cb, NULL);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Hide Toolbar"));
@@ -474,6 +618,15 @@ _edi_settings_project_remote_cb(void *data EINA_UNUSED, Evas_Object *obj,
    elm_object_disabled_set(entry, EINA_TRUE);
 }
 
+static void _edi_settings_scm_credentials_set(const char *user_fullname, const char *user_email)
+{
+   if (!edi_scm_enabled())
+     return;
+
+   if (user_fullname && user_fullname[0] && user_email && user_email[0])
+     edi_scm_credentials_set(user_fullname, user_email);
+}
+
 static void
 _edi_settings_project_email_cb(void *data EINA_UNUSED, Evas_Object *obj,
                              void *event EINA_UNUSED)
@@ -487,6 +640,8 @@ _edi_settings_project_email_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
    _edi_project_config->user_email = eina_stringshare_add(elm_object_text_get(entry));
    _edi_project_config_save();
+
+   _edi_settings_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
 }
 
 static void
@@ -502,6 +657,8 @@ _edi_settings_project_name_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
    _edi_project_config->user_fullname = eina_stringshare_add(elm_object_text_get(entry));
    _edi_project_config_save();
+
+   _edi_settings_scm_credentials_set(_edi_project_config->user_fullname, _edi_project_config->user_email);
 }
 
 static Evas_Object *
@@ -614,6 +771,19 @@ _edi_settings_project_create(Evas_Object *parent)
 }
 
 static void
+_edi_settings_behaviour_show_hidden_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                       void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *) obj;
+   _edi_config->show_hidden = elm_check_state_get(check);
+   _edi_config_save();
+   edi_filepanel_refresh_all();
+}
+
+
+static void
 _edi_settings_behaviour_autosave_cb(void *data EINA_UNUSED, Evas_Object *obj,
                                     void *event EINA_UNUSED)
 {
@@ -663,7 +833,22 @@ _edi_settings_behaviour_create(Evas_Object *parent)
                                   _edi_settings_behaviour_trim_whitespace_cb, NULL);
    evas_object_show(check);
 
+   check = elm_check_add(box);
+   elm_object_text_set(check, _("Show hidden files"));
+   elm_check_state_set(check, _edi_config->show_hidden);
+   elm_box_pack_end(box, check);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.5);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_behaviour_show_hidden_cb, NULL);
+   evas_object_show(check);
+
    return frame;
+}
+
+Evas_Object *
+edi_settings_win_get(void)
+{
+   return _edi_settings_win;
 }
 
 Evas_Object *
@@ -672,11 +857,14 @@ edi_settings_show(Evas_Object *mainwin)
    Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it, *default_it;
 
-   win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
+   if (edi_settings_win_get())
+     return NULL;
+
+   _edi_settings_win = win = elm_win_add(mainwin, "settings", ELM_WIN_BASIC);
    if (!win) return NULL;
 
    elm_win_title_set(win, _("Edi Settings"));
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
+   elm_win_focus_highlight_enabled_set(win, EINA_FALSE);
    evas_object_smart_callback_add(win, "delete,request", _edi_settings_exit, win);
 
    bg = elm_bg_add(win);

@@ -14,6 +14,7 @@
 
 #include "edi_filepanel.h"
 #include "edi_file.h"
+#include "edi_config.h"
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
 #include "screens/edi_file_screens.h"
@@ -46,6 +47,9 @@ static Eina_Bool
 _file_path_hidden(const char *path, Eina_Bool filter)
 {
    const char *relative;
+
+   if (_edi_config->show_hidden)
+     return EINA_FALSE;
 
    if (edi_file_path_hidden(path))
      return EINA_TRUE;
@@ -783,6 +787,9 @@ static Eina_Bool
 _ls_filter_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED,
               const Eina_File_Direct_Info *info)
 {
+   if (_edi_config->show_hidden)
+     return EINA_TRUE;
+
    return info->path[info->name_start] != '.';
 }
 
@@ -983,7 +990,7 @@ _file_listing_fill(Edi_Dir_Data *dir, Elm_Object_Item *parent_it)
                                _ls_done_cb, _ls_error_cb, lreq);
 }
 
-static void
+static Eina_Bool
 _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
                       void *event EINA_UNUSED)
 {
@@ -995,7 +1002,7 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    if (strncmp(edi_project_get(), dir, strlen(edi_project_get())) ||
        ev->filename[strlen(edi_project_get()) + 1] == '.' ||
        _file_path_hidden(ev->filename, EINA_FALSE))
-     return;
+     return EINA_TRUE;
 
    parent_it = _file_listing_item_find(dir);
 
@@ -1010,10 +1017,12 @@ _file_listing_updated(void *data EINA_UNUSED, int type EINA_UNUSED,
    else
     DBG("Ignoring file update event for %s", ev->filename);
 
-   if (ecore_file_file_get(ev->filename)[0] == '.') return;
+   if (ecore_file_file_get(ev->filename)[0] == '.') return EINA_TRUE;
 
    edi_filepanel_scm_status_update();
    edi_filepanel_item_update(ev->filename);
+
+   return EINA_TRUE;
 }
 
 /* Panel filtering */
@@ -1067,21 +1076,50 @@ _filter_key_down_cb(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
      elm_genlist_filter_set(tree, (void *)strdup(match));
 }
 
-Eina_Bool
-_edi_filepanel_select_check(void *data EINA_UNUSED)
+static void
+_edi_filepanel_select_next_best_path(const char *path)
 {
-   Edi_Mainview_Panel *current;
-   Edi_Mainview_Item *item;
+   Elm_Object_Item *item;
+   char *end, *try = strdup(path);
 
-   current = edi_mainview_panel_current_get();
-   if (!current) return ECORE_CALLBACK_RENEW;
+   while (1)
+     {
+        if (!strcmp(try, edi_project_get()))
+          break;
 
-   item = edi_mainview_item_current_get(current);
-   if (!item) return ECORE_CALLBACK_RENEW;
+        end = strrchr(try, '/');
+        if (!end)
+          break;
+        else
+          *end = '\0';
 
-   edi_filepanel_select_path(item->path);
+        item = _file_listing_item_find(try);
+        if (item)
+          {
+             elm_genlist_item_selected_set(item, EINA_TRUE);
+             elm_genlist_item_bring_in(item, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
+             break;
+          }
+     }
 
-   return ECORE_CALLBACK_RENEW;
+   free(try);
+}
+
+void
+edi_filepanel_refresh_all(void)
+{
+   elm_genlist_clear(_list);
+   eina_hash_free_buckets(_list_items);
+   eina_hash_free_buckets(_list_statuses);
+   _file_listing_empty(_root_dir, NULL);
+
+   free(_root_dir);
+
+   _root_dir = calloc(1, sizeof(Edi_Dir_Data));
+   _root_dir->path = edi_project_get();
+
+   _file_listing_fill(_root_dir, NULL);
+   elm_genlist_realized_items_update(_list);
 }
 
 void
@@ -1091,12 +1129,16 @@ edi_filepanel_select_path(const char *path)
 
    item = _file_listing_item_find(path);
    if (!item)
-     return;
+     {
+        _edi_filepanel_select_next_best_path(path);
+        return;
+     }
 
    if (elm_genlist_item_selected_get(item))
      return;
 
    elm_genlist_item_selected_set(item, EINA_TRUE);
+   elm_genlist_item_bring_in(item, ELM_GENLIST_ITEM_SCROLLTO_MIDDLE);
 }
 
 void
@@ -1168,7 +1210,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    elm_genlist_homogeneous_set(list, EINA_TRUE);
    elm_genlist_select_mode_set(list, ELM_OBJECT_SELECT_MODE_ALWAYS);
    elm_genlist_filter_set(list, "");
-   evas_object_size_hint_min_set(list, 100, -1);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(list, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(list);
@@ -1209,8 +1250,6 @@ edi_filepanel_add(Evas_Object *parent, Evas_Object *win,
    eina_hash_free_cb_set(_list_statuses, _list_status_free_cb);
 
    edi_filepanel_scm_status_update();
-
-   ecore_timer_add(0.1, _edi_filepanel_select_check, NULL);
 
    _root_dir = calloc(1, sizeof(Edi_Dir_Data));
    _root_dir->path = path;

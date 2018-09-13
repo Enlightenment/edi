@@ -16,6 +16,7 @@
 #include "edi_content_provider.h"
 #include "edi_searchpanel.h"
 #include "edi_file.h"
+#include "edi_theme.h"
 
 #include "edi_private.h"
 #include "edi_config.h"
@@ -290,6 +291,8 @@ _edi_mainview_split_config_changed_cb(void *data, int type EINA_UNUSED, void *ev
    Elm_Code_Widget *widget = data;
 
    elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_alpha_set(widget);
+   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -589,7 +592,7 @@ _edi_mainview_project_search_cb(void *data,
    text_markup = elm_object_text_get((Evas_Object *) data);
    if (!text_markup || !text_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid search term."));
+        elm_object_focus_set((Evas_Object *)data, EINA_TRUE);
         return;
      }
 
@@ -644,18 +647,16 @@ edi_mainview_project_search_popup_show(void)
    elm_box_pack_end(box, input);
    evas_object_show(box);
 
-   frame = elm_frame_add(box);
+   frame = elm_frame_add(popup);
    evas_object_show(frame);
    elm_object_content_set(frame, box);
    elm_object_content_set(popup, frame);
-
 
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Cancel"));
    elm_object_part_content_set(popup, "button1", button);
    evas_object_smart_callback_add(button, "clicked",
                                        _edi_mainview_project_search_popup_cancel_cb, NULL);
-
    button = elm_button_add(popup);
    elm_object_text_set(button, _("Search"));
    elm_object_part_content_set(popup, "button2", button);
@@ -671,20 +672,23 @@ _edi_mainview_project_replace_cb(void *data,
                              Evas_Object *obj,
                              void *event_info EINA_UNUSED)
 {
+   Evas_Object *search_obj, *replace_obj;
    const char *search_markup, *replace_markup;
    char *search, *replace;
 
-   search_markup = elm_object_text_get(evas_object_data_get(obj, "search"));
+   search_obj = evas_object_data_get(obj, "search");
+   search_markup = elm_object_text_get(search_obj);
    if (!search_markup || !search_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid search string."));
+        elm_object_focus_set(search_obj, EINA_TRUE);
         return;
      }
 
-   replace_markup = elm_object_text_get(data);
+   replace_obj = (Evas_Object *) data;
+   replace_markup = elm_object_text_get(replace_obj);
    if (!replace_markup || !replace_markup[0])
      {
-        _edi_mainview_popup_message_open(_("Please enter a valid replace string."));
+        elm_object_focus_set(replace_obj, EINA_TRUE);
         return;
      }
 

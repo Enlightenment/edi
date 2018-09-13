@@ -466,6 +466,29 @@ _edi_mainview_panel_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
    return container;
 }
 
+static int
+_font_width_get(Evas_Object *parent, const char *text)
+{
+   int w = 0;
+
+   Evas_Object *textblock = evas_object_text_add(parent);
+   evas_object_size_hint_weight_set(textblock, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(textblock, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(textblock);
+
+   evas_object_text_font_set(textblock, "sans", 12);
+   evas_object_text_text_set(textblock, text);
+
+   evas_object_geometry_get(textblock, NULL, NULL, &w, NULL);
+
+   evas_object_del(textblock);
+
+   if (w < 120)
+     w = 120;
+
+   return w;
+}
+
 static void
 _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *options, const char *mime)
 {
@@ -473,6 +496,8 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
    Elm_Code *code;
+   int h, width;
+   const char *path;
 
    if (!panel) return;
 
@@ -490,20 +515,34 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    panel->items = eina_list_append(panel->items, item);
    _edi_mainview_panel_show(panel, content);
 
+   evas_object_geometry_get(panel->tabs, NULL, NULL, NULL, &h);
+
    tab = elm_button_add(panel->tabs);
    evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
    elm_object_focus_allow_set(tab, EINA_FALSE);
 
+   path = strstr(item->path, edi_project_get());
+   if (path)
+     path += 1 + strlen(edi_project_get());
+   else
+     path = item->path;
+
+   elm_object_tooltip_text_set(tab, path);
+   elm_object_tooltip_window_mode_set(tab, EINA_TRUE);
+
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
-   elm_object_part_text_set(tab, "elm.btn.text", ecore_file_file_get(options->path));
+   elm_object_part_text_set(tab, "elm.btn.text", eina_slstr_printf("<style align=left> %s</>", ecore_file_file_get(options->path)));
 /*
    icon = elm_icon_add(tab);
    elm_icon_standard_set(icon, provider->icon);
    elm_object_part_content_set(tab, "icon", icon);
 */
+   width = _font_width_get(tab, ecore_file_file_get(options->path));
+
    elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
    elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
+   evas_object_size_hint_min_set(tab, width * elm_config_scale_get(), h);
 
    elm_box_pack_end(panel->tabs, tab);
    evas_object_show(tab);
@@ -788,17 +827,16 @@ _edi_mainview_panel_goto_popup_go_cb(void *data,
 }
 
 static void
-_edi_mainview_panel_goto_popup_key_up_cb(void *data, Evas *e EINA_UNUSED,
+_edi_mainview_panel_goto_popup_key_up_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
                                    Evas_Object *obj, void *event_info)
 {
-   Edi_Mainview_Panel *panel = data;
    Evas_Event_Key_Up *ev = (Evas_Event_Key_Up *)event_info;
    const char *str;
 
    str = elm_object_text_get(obj);
 
    if (strlen(str) && (!strcmp(ev->key, "KP_Enter") || !strcmp(ev->key, "Return")))
-     _edi_mainview_panel_goto_popup_go_cb(panel, obj, NULL);
+     _edi_mainview_panel_goto_popup_go_cb(obj, NULL, NULL);
 }
 
 void

@@ -1,3 +1,19 @@
+=======
+Edi 0.7
+=======
+
+Features:
+
+  * Added theme support and new themes.
+  * Added editor translucency option.
+  * Added option to show hidden files
+
+Bug fixes:
+
+  * Fix issues where panels would change size or not fully shrink
+  * Improvements to the UI and flow
+  * General stability fixes with Edi and Edi SCM
+
 ---------
 Edi 0.6.1
 ---------

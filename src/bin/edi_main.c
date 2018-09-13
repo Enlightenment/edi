@@ -8,10 +8,12 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
+#include <Efl_Ui.h>
 #include <Eio.h>
 
 #include "Edi.h"
 #include "edi_config.h"
+#include "edi_theme.h"
 #include "edi_filepanel.h"
 #include "edi_file.h"
 #include "edi_logpanel.h"
@@ -325,7 +327,7 @@ _edi_toolbar_separator_add(Evas_Object *tb)
 static Evas_Object *
 edi_content_setup(Evas_Object *win, const char *path)
 {
-   Evas_Object *filepane, *logpane, *logpanels, *content_out, *content_in, *tb;
+   Evas_Object *filepane, *logpane, *logpanels, *scroller, *content_out, *content_in, *tb;
    Evas_Object *icon, *button, *mainview;
 
    filepane = elm_panes_add(win);
@@ -380,11 +382,16 @@ edi_content_setup(Evas_Object *win, const char *path)
    edi_mainview_add(mainview, win);
 
    elm_object_part_content_set(filepane, "right", content_in);
-   elm_box_pack_end(content_out, filepane);
-
-   elm_object_part_content_set(logpane, "top", content_out);
    evas_object_show(filepane);
    _edi_leftpanes = filepane;
+   elm_box_pack_end(content_out, filepane);
+
+   scroller = elm_scroller_add(win);
+   evas_object_size_hint_weight_set(scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(scroller);
+   elm_object_content_set(scroller, content_out);
+   elm_object_part_content_set(logpane, "top", scroller);
 
    // add file list
    evas_object_size_hint_weight_set(_edi_filepanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -405,7 +412,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 1.0);
-   elm_toolbar_icon_size_set(tb, 16);
+   elm_toolbar_icon_size_set(tb, 24);
    elm_object_style_set(tb, "item_horizontal");
    elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
@@ -1339,6 +1346,14 @@ _edi_exit(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info
 }
 
 static void
+_edi_focused_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Evas_Object *win = edi_settings_win_get();
+   if (win)
+     elm_win_raise(win);
+}
+
+static void
 _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
                            void *event_info EINA_UNUSED)
 {
@@ -1370,6 +1385,7 @@ static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   edi_theme_window_alpha_set();
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -1485,7 +1501,7 @@ Evas_Object *edi_main_win_get(void)
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *win, *hbx, *vbx, *tb, *content;
+   Evas_Object *table, *win, *bg, *hbx, *vbx, *tb, *content;
    char *winname;
    char *path;
 
@@ -1509,14 +1525,32 @@ edi_open(const char *inputpath)
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
+   evas_object_smart_callback_add(win, "focused", _edi_focused_cb, NULL);
+
+   table = elm_table_add(win);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(table);
 
    hbx = elm_box_add(win);
    _edi_main_box = hbx;
    elm_box_horizontal_set(hbx, EINA_TRUE);
    evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_win_resize_object_add(win, hbx);
    evas_object_show(hbx);
+
+   bg = elm_bg_add(win);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(bg);
+   elm_win_resize_object_add(win, table);
+   elm_table_pack(table, bg, 0, 0, 1, 1);
+   elm_table_pack(table, hbx, 0, 0, 1, 1);
+
+   evas_object_data_set(win, "background", bg);
+   evas_object_data_set(win, "mainbox", hbx);
+
+   edi_theme_window_alpha_set();
 
    tb = edi_toolbar_setup(hbx);
    elm_box_pack_start(hbx, tb);

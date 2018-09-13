@@ -99,7 +99,7 @@ START_TEST (edi_test_language_provider_c_summary)
 END_TEST
 */
 
-void edi_test_language_provider_c(TCase *tc)
+void edi_test_language_provider_c(EINA_UNUSED TCase *tc)
 {
 #if HAVE_LIBCLANG
 	// TODO fix issues caused in elm by this test

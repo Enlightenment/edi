@@ -10,8 +10,10 @@
 #include "edi_editor.h"
 
 #include "mainview/edi_mainview.h"
+#include "edi_content.h"
 #include "edi_filepanel.h"
 #include "edi_config.h"
+#include "edi_theme.h"
 
 #include "language/edi_language_provider.h"
 
@@ -853,115 +855,6 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
      }
 }
 
-static void
-_edit_cursor_moved(void *data, Evas_Object *obj, void *event_info EINA_UNUSED)
-{
-   Elm_Code *code;
-   Elm_Code_Line *line;
-   Elm_Code_Widget *widget;
-   char buf[30];
-   unsigned int row;
-   unsigned int col;
-
-   widget = (Elm_Code_Widget *)obj;
-   elm_code_widget_cursor_position_get(widget, &row, &col);
-
-   code = elm_code_widget_code_get(widget);
-   line = elm_code_file_line_get(code->file, row);
-
-   snprintf(buf, sizeof(buf), _("Line:%d, Position:%d"), row,
-            elm_code_widget_line_text_position_for_column_get(widget, line, col) + 1);
-   elm_object_text_set((Evas_Object *)data, buf);
-}
-
-static void
-_edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
-{
-   Edi_Editor *editor;
-   Edi_Language_Provider *provider;
-   char *word;
-   const char *snippet;
-
-   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
-
-   editor = (Edi_Editor *)data;
-
-   _suggest_hint_hide(editor);
-   if (evas_object_visible_get(editor->suggest_bg))
-     return;
-
-   provider = edi_language_provider_get(editor);
-   if (!provider)
-     return;
-
-   word = _edi_editor_current_word_get(editor);
-
-   if (word && strlen(word) > 1)
-     {
-        snippet = provider->snippet_get(word);
-        if (snippet)
-          _suggest_hint_show_snippet(editor, word);
-        else if (strlen(word) >= 3)
-          _suggest_hint_show_match(editor, word);
-     }
-
-   free(word);
-}
-
-static void
-_edi_editor_statusbar_add(Evas_Object *panel, Edi_Editor *editor, Edi_Mainview_Item *item)
-{
-   Edi_Language_Provider *provider;
-   Evas_Object *position, *mime, *lines;
-   Elm_Code *code;
-
-   elm_box_horizontal_set(panel, EINA_TRUE);
-
-   mime = elm_label_add(panel);
-   if (item->mimetype)
-     {
-        provider = edi_language_provider_get(editor);
-        if (provider && provider->mime_name(item->mimetype))
-          {
-             char summary[1024];
-             sprintf(summary, "%s (%s)", provider->mime_name(item->mimetype), item->mimetype);
-             elm_object_text_set(mime, summary);
-          }
-        else
-          elm_object_text_set(mime, item->mimetype);
-     }
-   else
-     elm_object_text_set(mime, item->editortype);
-   evas_object_size_hint_align_set(mime, 0.0, 0.5);
-   evas_object_size_hint_weight_set(mime, 0.1, 0.0);
-   elm_box_pack_end(panel, mime);
-   evas_object_show(mime);
-   elm_object_disabled_set(mime, EINA_TRUE);
-
-   lines = elm_label_add(panel);
-   code = elm_code_widget_code_get(editor->entry);
-   if (elm_code_file_line_ending_get(code->file) == ELM_CODE_FILE_LINE_ENDING_WINDOWS)
-     elm_object_text_set(lines, "WIN");
-   else
-     elm_object_text_set(lines, "UNIX");
-   evas_object_size_hint_align_set(lines, 0.0, 0.5);
-   evas_object_size_hint_weight_set(lines, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(panel, lines);
-   evas_object_show(lines);
-   elm_object_disabled_set(lines, EINA_TRUE);
-
-   position = elm_label_add(panel);
-   evas_object_size_hint_align_set(position, 1.0, 0.5);
-   evas_object_size_hint_weight_set(position, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(panel, position);
-   evas_object_show(position);
-   elm_object_disabled_set(position, EINA_TRUE);
-
-   _edit_cursor_moved(position, editor->entry, NULL);
-   evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, position);
-   evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, editor);
-}
-
 #if HAVE_LIBCLANG
 static void
 _edi_range_color_set(Edi_Editor *editor, Edi_Range range, Elm_Code_Token_Type type)
@@ -1310,6 +1203,8 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    code->config.trim_whitespace = _edi_config->trim_whitespace;
 
    elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   edi_theme_elm_code_alpha_set(widget);
+   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_obj_code_widget_show_whitespace_set(widget, _edi_project_config->gui.show_whitespace);
    elm_obj_code_widget_tab_inserts_spaces_set(widget, _edi_project_config->gui.tab_inserts_spaces);
    elm_obj_code_widget_line_width_marker_set(widget, _edi_project_config->gui.width_marker);
@@ -1361,6 +1256,69 @@ edi_editor_reload(Edi_Editor *editor)
    ecore_thread_main_loop_end();
 }
 
+static void
+_edit_cursor_moved(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
+ {
+   Edi_Mainview_Item *item;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   Elm_Code_Widget *widget;
+   unsigned int row, col, pos;
+
+   widget = (Elm_Code_Widget *)obj;
+   if (widget)
+     {
+        elm_code_widget_cursor_position_get(widget, &row, &col);
+
+        code = elm_code_widget_code_get(widget);
+        line = elm_code_file_line_get(code->file, row);
+
+        pos = elm_code_widget_line_text_position_for_column_get(widget, line, col) + 1;
+     }
+   else
+     {
+        row = 0; pos = 0;
+     }
+
+   item = data;
+
+   edi_content_statusbar_position_set(item->pos, row, pos);
+}
+
+static void
+_edit_file_changed(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   Edi_Editor *editor;
+   Edi_Language_Provider *provider;
+   char *word;
+   const char *snippet;
+
+   ecore_event_add(EDI_EVENT_FILE_CHANGED, NULL, NULL, NULL);
+
+   editor = (Edi_Editor *)data;
+
+   _suggest_hint_hide(editor);
+   if (evas_object_visible_get(editor->suggest_bg))
+     return;
+
+   provider = edi_language_provider_get(editor);
+   if (!provider)
+     return;
+
+   word = _edi_editor_current_word_get(editor);
+
+   if (word && strlen(word) > 1)
+     {
+        snippet = provider->snippet_get(word);
+        if (snippet)
+          _suggest_hint_show_snippet(editor, word);
+        else if (strlen(word) >= 3)
+          _suggest_hint_show_match(editor, word);
+     }
+
+   free(word);
+}
+
 Evas_Object *
 edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
 {
@@ -1402,6 +1360,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    elm_code_widget_line_numbers_set(widget, EINA_TRUE);
    _edi_editor_config_changed(widget, 0, NULL);
 
+   edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
+
    editor = calloc(1, sizeof(*editor));
    editor->entry = widget;
    editor->mimetype = item->mimetype;
@@ -1409,6 +1369,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_event_callback_add(widget, EVAS_CALLBACK_KEY_DOWN,
                                   _smart_cb_key_down, editor);
    evas_object_smart_callback_add(widget, "changed,user", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "selection,cut", _changed_cb, editor);
+   evas_object_smart_callback_add(widget, "selection,paste", _changed_cb, editor);
    evas_object_event_callback_add(widget, EVAS_CALLBACK_MOUSE_UP, _mouse_up_cb, editor);
    evas_object_smart_callback_add(widget, "focused", _focused_cb, item);
    evas_object_smart_callback_add(widget, "unfocused", _unfocused_cb, editor);
@@ -1434,8 +1396,8 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_show(widget);
    elm_box_pack_end(box, widget);
 
+   edi_content_statusbar_add(statusbar, item);
    edi_editor_search_add(searchbar, editor);
-   _edi_editor_statusbar_add(statusbar, editor, item);
 
    e = evas_object_evas_get(widget);
    ctrl = evas_key_modifier_mask_get(e, "Control");
@@ -1452,6 +1414,10 @@ edi_editor_add(Evas_Object *parent, Edi_Mainview_Item *item)
    evas_object_data_set(item->view, "editor", editor);
    ev_handler = ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_editor_config_changed, widget);
    evas_object_event_callback_add(item->view, EVAS_CALLBACK_DEL, _editor_del_cb, ev_handler);
+
+   _edit_cursor_moved(item, editor->entry, NULL);
+   evas_object_smart_callback_add(editor->entry, "changed,user", _edit_file_changed, editor);
+   evas_object_smart_callback_add(editor->entry, "cursor,changed", _edit_cursor_moved, item);
 
    if (edi_language_provider_has(editor))
      {

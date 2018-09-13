@@ -5,7 +5,7 @@ collections {
 
         data {
             item: "title" "C EFL Beta Hello World";
-            item: "path" "tutorials/c/hellogui/";
+            item: "path" "tutorial/c/hello-gui/";
             item: "description"
                   "Hello World using the EFL Beta APIs";
         }

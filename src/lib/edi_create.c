@@ -153,6 +153,9 @@ _edi_create_free_data()
    create = _edi_create_data;
    _edi_create_data = NULL;
 
+   if (!create)
+     return;
+
    if (create->temp && ecore_file_exists(create->temp))
      ecore_file_recursive_rm(create->temp);
 
@@ -288,7 +291,7 @@ _edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
 
    create = (Edi_Create *) data;
    ERR("copy error: [%s]\n", strerror(error));
-   if (create->callback)
+   if (create && create->callback)
      create->callback(create->path, EINA_FALSE);
 
    _edi_create_free_data();
@@ -407,8 +410,7 @@ edi_create_example(const char *example_name, const char *parentdir,
    INF("Extracting example project \"%s\" at path %s\n", example_name, dest);
 
    if (ecore_file_exists(examplepath))
-     ERR("TODO: UPDATE NOT IMPLEMENTED");
-//     status = edi_scm_git_update(examplepath);
+     status = edi_scm_git_update(examplepath);
    else
      status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath);
 

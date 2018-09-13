@@ -33,6 +33,7 @@ typedef struct _Edi_Mainview_Item
    /* Private */
 
    Evas_Object *container; /**< The visual container that the item will display within */
+   Evas_Object *pos; /**< The object pointing to the item's statusbar in the editor */
    Eina_Bool loaded;
 } Edi_Mainview_Item;
 
