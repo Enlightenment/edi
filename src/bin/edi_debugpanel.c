@@ -197,11 +197,14 @@ _edi_debugpanel_button_start_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UN
    edi_debugpanel_start(_edi_project_config_debug_command_get());
 }
 
-static Eina_Bool
-_edi_debug_active_check_cb(void *data EINA_UNUSED)
+void
+edi_debugpanel_active_check(void)
 {
+   Edi_Debug *debug;
    int pid;
-   Edi_Debug *debug = edi_debug_get();
+
+   debug = edi_debug_get();
+   if (!debug) return;
 
    pid = ecore_exe_pid_get(debug->exe);
    if (pid == -1)
@@ -212,16 +215,11 @@ _edi_debug_active_check_cb(void *data EINA_UNUSED)
         elm_object_disabled_set(_button_start, EINA_FALSE);
         elm_object_disabled_set(_button_int, EINA_TRUE);
         elm_object_disabled_set(_button_term, EINA_TRUE);
-        return ECORE_CALLBACK_RENEW;
+        return;
      }
-
-   if (!debug)
-     return ECORE_CALLBACK_RENEW;
 
    pid = edi_debug_process_id(debug);
    _edi_debugpanel_icons_update(pid > 0 ? debug->state : 0);
-
-   return ECORE_CALLBACK_RENEW;
 }
 
 void edi_debugpanel_stop(void)
@@ -322,7 +320,6 @@ void edi_debugpanel_add(Evas_Object *parent)
    Evas_Object *ico_start, *ico_quit, *ico_int, *ico_term;
    Elm_Code_Widget *widget;
    Elm_Code *code;
-   Ecore_Timer *timer;
 
    frame = elm_frame_add(parent);
    elm_object_text_set(frame, _("Debug"));
@@ -408,9 +405,6 @@ void edi_debugpanel_add(Evas_Object *parent)
    _entry_widget = entry;
 
    edi_debug_new();
-
-   timer = ecore_timer_add(1.0, _edi_debug_active_check_cb, NULL);
-   (void) timer;
 
    elm_box_pack_end(box, widget);
    elm_box_pack_end(box, table);

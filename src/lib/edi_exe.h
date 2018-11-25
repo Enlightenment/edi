@@ -63,6 +63,31 @@ EAPI void edi_exe_notify(const char *name, const char *command);
 EAPI Eina_Bool edi_exe_notify_handle(const char *name, void ((*func)(int, void *)), void *data);
 
 /**
+ * This function launches the project application binary. Used for monitoring a running
+ * process state. It's a wrapper for ecore_exe_run but is necessary to keep track of any
+ * instance of program being ran.
+ *
+ * @param command The command to execute.
+ * @param flags The ECORE_EXE flags to execute with.
+ * @param data  Data to be passed to ecore_exe_run.
+ *
+ * @return PID of the process after executing.
+ */
+EAPI pid_t edi_exe_project_run(const char *command, int flags, void *data);
+
+/**
+ * Returns the PID of the project executable if running.
+ *
+ * @return PID if the process exists else -1.
+ */
+EAPI pid_t edi_exe_project_pid_get(void);
+
+/**
+ * Reset the project PID to inactive state.
+ */
+EAPI void edi_exe_project_pid_reset(void);
+
+/**
  * @}
  */
 

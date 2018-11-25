@@ -26,7 +26,7 @@ _relative_path_exists(const char *base, const char *relative)
 static void
 _exec_cmd(const char *cmd)
 {
-   ecore_exe_pipe_run(cmd,
+   edi_exe_project_run(cmd,
                       ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                       ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                       ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);

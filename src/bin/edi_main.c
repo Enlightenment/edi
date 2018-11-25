@@ -16,6 +16,7 @@
 #include "edi_theme.h"
 #include "edi_filepanel.h"
 #include "edi_file.h"
+#include "edi_process.h"
 #include "edi_logpanel.h"
 #include "edi_consolepanel.h"
 #include "edi_searchpanel.h"
@@ -52,12 +53,64 @@ static Elm_Object_Item *_edi_selected_bottompanel;
 static Evas_Object *_edi_filepanel, *_edi_filepanel_icon;
 
 static Evas_Object *_edi_menu_undo, *_edi_menu_redo, *_edi_toolbar_undo, *_edi_toolbar_redo, *_edi_toolbar_build, *_edi_toolbar_test;
-static Evas_Object *_edi_menu_build, *_edi_menu_clean, *_edi_menu_test;
+static Evas_Object *_edi_menu_build, *_edi_menu_clean, *_edi_menu_test, *_edi_menu_run, *_edi_menu_terminate;
 static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
+static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate;
 int _edi_log_dom = -1;
 
+static void
+_edi_active_process_icons_set(Eina_Bool active)
+{
+   if (active)
+     {
+        elm_object_disabled_set(_edi_toolbar_run, EINA_TRUE);
+        elm_object_disabled_set(_edi_toolbar_terminate, EINA_FALSE);
+        elm_object_item_disabled_set(_edi_menu_run, EINA_TRUE);
+        elm_object_item_disabled_set(_edi_menu_terminate, EINA_FALSE);
+     }
+   else
+     {
+        elm_object_disabled_set(_edi_toolbar_run, EINA_FALSE);
+        elm_object_disabled_set(_edi_toolbar_terminate, EINA_TRUE);
+        elm_object_item_disabled_set(_edi_menu_run, EINA_FALSE);
+        elm_object_item_disabled_set(_edi_menu_terminate, EINA_TRUE);
+     }
+}
+
+static Eina_Bool
+_edi_active_process_check_cb(EINA_UNUSED void *data)
+{
+   Edi_Proc_Stats *stats;
+   pid_t pid;
+
+   // Check debugpanel state.
+   edi_debugpanel_active_check();
+
+   pid = edi_exe_project_pid_get();
+   if (pid == -1)
+     {
+        _edi_active_process_icons_set(EINA_FALSE);
+        return ECORE_CALLBACK_RENEW;
+     }
+
+   stats = edi_process_stats_by_pid(pid);
+   if (!stats)
+     {
+        // Our process is not running, reset PID we
+        // track.
+        edi_exe_project_pid_reset();
+        _edi_active_process_icons_set(EINA_FALSE);
+        return ECORE_CALLBACK_RENEW;
+     }
+
+   free(stats);
+
+   _edi_active_process_icons_set(EINA_TRUE);
+
+   return ECORE_CALLBACK_RENEW;
+}
 
 static void
 _edi_file_open_cb(const char *path, const char *type, Eina_Bool newwin)
@@ -723,6 +776,15 @@ _edi_launcher_run(Edi_Project_Config_Launch *launch)
 }
 
 static void
+_edi_launcher_terminate(void)
+{
+   pid_t pid = edi_exe_project_pid_get();
+   if (pid == -1) return;
+
+   kill(pid, SIGKILL);
+}
+
+static void
 _edi_build_menu_items_disabled_set(Eina_Bool state)
 {
    elm_object_disabled_set(_edi_toolbar_build, state);
@@ -829,6 +891,12 @@ _tb_debug_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
 {
    edi_debugpanel_show();
    _edi_debug_project();
+}
+
+static void
+_tb_terminate_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
+{
+   _edi_launcher_terminate();
 }
 
 static void
@@ -1038,6 +1106,13 @@ _edi_menu_run_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_terminate_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                 void *event_info EINA_UNUSED)
+{
+   _edi_launcher_terminate();
+}
+
+static void
 _edi_menu_clean_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                    void *event_info EINA_UNUSED)
 {
@@ -1227,8 +1302,10 @@ _edi_menu_setup(Evas_Object *win)
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
    _edi_menu_build = elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
    _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
    _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
+   _edi_menu_run = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
+   _edi_menu_terminate = elm_menu_item_add(menu, menu_it, "media-playback-stop", _("Terminate"), _edi_menu_terminate_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debugger"), _edi_menu_debug_cb, NULL);
    elm_menu_item_add(menu, menu_it, "applications-electronics", _("Memcheck"), _edi_menu_memcheck_cb, NULL);
@@ -1304,7 +1381,10 @@ edi_toolbar_setup(Evas_Object *parent)
 
    _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
    _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
-   _edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+   _edi_toolbar_run =_edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
+   _edi_toolbar_terminate = _edi_toolbar_item_add(tb, "media-playback-stop", _("Terminate"), _tb_terminate_cb);
    _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
 
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
@@ -1581,6 +1661,7 @@ edi_open(const char *inputpath)
    ecore_event_handler_add(EDI_EVENT_TAB_CHANGED, _edi_tab_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_CHANGED, _edi_file_changed, NULL);
    ecore_event_handler_add(EDI_EVENT_FILE_SAVED, _edi_file_saved, NULL);
+   ecore_timer_add(1.0, _edi_active_process_check_cb, NULL);
 
    ERR("Loaded project at %s", path);
    evas_object_resize(win, _edi_project_config->gui.width * elm_config_scale_get(),

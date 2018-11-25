@@ -17,6 +17,8 @@ src = files([
   'edi_exe.h',
   'edi_path.c',
   'edi_path.h',
+  'edi_process.c',
+  'edi_process.h',
   'edi_private.h',
   'edi_scm.c',
   'edi_scm.h',

@@ -2,14 +2,11 @@
 # include "config.h"
 #endif
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
  #include <unistd.h>
  #include <sys/types.h>
  #include <sys/sysctl.h>
  #include <sys/user.h>
-#endif
-#if defined(__OpenBSD__)
- #include <sys/proc.h>
 #endif
 
 #include <Eo.h>
@@ -17,6 +14,7 @@
 #include <Elementary.h>
 
 #include "edi_debug.h"
+#include "edi_process.h"
 #include "edi_config.h"
 #include "edi_private.h"
 
@@ -67,160 +65,77 @@ Edi_Debug_Tool *edi_debug_tool_get(const char *name)
     return &_debugger_tools[0];
 }
 
-#if defined(__FreeBSD__) || defined(__DragonFly__)
-static long int
-_sysctlfromname(const char *name, void *mib, int depth, size_t *len)
+static int
+_system_pid_max_get(void)
 {
-   long int result;
+   static int pid_max = 0;
 
-   if (sysctlnametomib(name, mib, len) < 0) return -1;
-   *len = sizeof(result);
-   if (sysctl(mib, depth, &result, len, NULL, 0) < 0) return -1;
+   if (pid_max > 0)
+    return pid_max;
 
-   return result;
-}
+#if defined(__linux__)
+   FILE *f;
+   char buf[128];
+   size_t n;
+
+   f = fopen("/proc/sys/kernel/pid_max", "r");
+   if (f)
+     {
+        n = fread(buf, 1, sizeof(buf) - 1, f);
+        buf[n] = 0x00;
+        fclose(f);
+        pid_max = atoi(buf);
+     }
+#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
+   int mib[2] = { CTL_KERN, KERN_MAXPROC };
+   size_t len = sizeof(pid_max);
+   sysctl(mib, 2, &pid_max, &len, NULL, 0);
+#elif defined(PID_MAX)
+   pid_max = PID_MAX;
 #endif
+   if (pid_max <= 0)
+     pid_max = 99999;
+
+   return pid_max;
+}
 
 /* Get the process ID of the child process being debugged in *our* session */
 int edi_debug_process_id(Edi_Debug *debugger)
 {
-   int my_pid, child_pid = -1;
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined (__APPLE__) || defined(__OpenBSD__)
-   struct kinfo_proc kp;
-   int mib[6];
-   size_t len;
-   int max_pid, i;
+   Edi_Proc_Stats *p;
+   int pid_max, debugger_pid, child_pid = -1;
 
+   if (!debugger) return -1;
    if (!debugger->program_name) return -1;
    if (!debugger->exe) return -1;
 
-#if defined(__FreeBSD__) || defined(__DragonFly__)
-   len = sizeof(max_pid);
-   max_pid = _sysctlfromname("kern.lastpid", mib, 2, &len);
-#elif defined(PID_MAX)
-   max_pid = PID_MAX;
-#else
-   max_pid = 99999;
-#endif
-   my_pid = ecore_exe_pid_get(debugger->exe);
+   debugger_pid = ecore_exe_pid_get(debugger->exe);
 
-#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-   if (sysctlnametomib("kern.proc.pid", mib, &len) < 0) return -1;
-#elif defined(__OpenBSD__)
-   mib[0] = CTL_KERN;
-   mib[1] = KERN_PROC;
-   mib[2] = KERN_PROC_PID;
-   mib[4] = sizeof(struct kinfo_proc);
-   mib[5] = 1;
-#endif
+   pid_max = _system_pid_max_get();
 
-   for (i = my_pid; i <= max_pid; i++)
+   for (int i = 1; i <= pid_max; i++)
      {
-        mib[3] = i;
-        len = sizeof(kp);
-#if defined(__OpenBSD__)
-        if (sysctl(mib, 6, &kp, &len, NULL, 0) == -1) continue;
-#else
-        if (sysctl(mib, 4, &kp, &len, NULL, 0) == -1) continue;
-#endif
-
-#if defined(__FreeBSD__) || defined(__DragonFly__)
-        if (kp.ki_ppid != my_pid) continue;
-        if (strcmp(debugger->program_name, kp.ki_comm)) continue;
-        child_pid = kp.ki_pid;
-        if (kp.ki_stat == SRUN || kp.ki_stat == SSLEEP)
-          debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
-        else
-          debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
-#elif defined(__OpenBSD__)
-        if (kp.p_ppid != my_pid) continue;
-        if (strcmp(debugger->program_name, kp.p_comm)) continue;
-        child_pid = kp.p_pid;
-
-        if (kp.p_stat == SRUN || kp.p_stat == SSLEEP)
-          debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
-        else
-          debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
-#else /* APPLE */
-        if (kp.kp_proc.p_oppid != my_pid) continue;
-        if (strcmp(debugger->program_name, kp.kp_proc.p_comm)) continue;
-        child_pid = kp.kp_proc.p_pid;
-        if (kp.kp_proc.p_stat == SRUN || kp.kp_proc.p_stat == SSLEEP)
-          debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
-        else
-          debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
-#endif
-        break;
-     }
-#else
-   Eina_List *files, *l;
-   const char *temp_name;
-   char path[PATH_MAX];
-   char buf[4096];
-   char  *p, *name, *end;
-   FILE *f;
-   int count, parent_pid, pid;
-
-   if (!debugger->program_name)
-     return -1;
-
-   if (!debugger->exe) return -1;
-
-   my_pid = ecore_exe_pid_get(debugger->exe);
-
-   files = ecore_file_ls("/proc");
-
-   EINA_LIST_FOREACH(files, l, name)
-     {
-        pid = atoi(name);
-        if (!pid) continue;
-        snprintf(path, sizeof(path), "/proc/%d/cmdline", pid);
-        f = fopen(path, "r");
-        if (!f) continue;
-        p = fgets(buf, sizeof(buf), f);
-        fclose(f);
+        p = edi_process_stats_by_pid(i);
         if (!p) continue;
-        temp_name = ecore_file_file_get(buf);
-        if (!strcmp(temp_name, debugger->program_name))
+
+        if (p->ppid == debugger_pid)
           {
-             parent_pid = 0;
-             // Match success - program name with pid.
-             child_pid = pid;
-             snprintf(path, sizeof(path), "/proc/%d/stat", pid);
-             f = fopen(path, "r");
-             if (f)
+             if (!strcmp(debugger->program_name, p->command))
                {
-                  count = 0;
-                  p = fgets(buf, sizeof(buf), f);
-                  while (*p++ != '\0')
-                    {
-                       if (p[0] == ' ') { count++; p++; }
-                       if (count == 2)
-                         {
-                            if (p[0] == 'S' || p[0] == 'R')
-                              debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
-                            else
-                              debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
-                         }
-                       if (count == 3) break;
-                    }
-                  end = strchr(p, ' ');
-                  if (end)
-                    {
-                       *end = '\0';
-                       // parent pid matches - right process.
-                       parent_pid = atoi(p);
-                    }
-                  fclose(f);
+                  child_pid = p->pid;
+                  if (!strcmp(p->state, "RUN") ||!strcmp(p->state, "SLEEP"))
+                    debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
+                  else
+                    debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
                }
-             if (parent_pid == my_pid)
-               break;
           }
+
+        free(p);
+
+        if (child_pid != -1)
+          break;
      }
 
-   if (files)
-     eina_list_free(files);
-#endif
    return child_pid;
 }
 
