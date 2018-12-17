@@ -14,6 +14,12 @@ static void
 _edi_screens_popup_cancel_cb(void *data, Evas_Object *obj EINA_UNUSED,
                              void *event_info EINA_UNUSED)
 {
+   Edi_Settings_Tab *default_tab;
+
+   default_tab = evas_object_data_get((Evas_Object *) data, "default_tab");
+   if (default_tab)
+     free(default_tab);
+
    evas_object_del((Evas_Object *) data);
 }
 
@@ -129,16 +135,20 @@ static void
 _edi_screens_settings_display_cb(void *data, Evas_Object *obj,
                              void *event_info EINA_UNUSED)
 {
-   Evas_Object *parent = evas_object_data_get(obj, "parent");
+   Evas_Object *parent;
+   Edi_Settings_Tab type;
 
+   parent = evas_object_data_get(obj, "parent");
+   type = *((Edi_Settings_Tab *) evas_object_data_get((Evas_Object *) data, "default_tab"));
    evas_object_del((Evas_Object *) data);
 
-   edi_settings_show(parent);
+   edi_settings_show(parent, type);
 }
 
-void edi_screens_settings_message(Evas_Object *parent, const char *title, const char *message)
+void edi_screens_settings_message(Evas_Object *parent, Edi_Settings_Tab type, const char *title, const char *message)
 {
    Evas_Object *popup, *frame, *table, *box, *icon, *sep, *label, *button;
+   Edi_Settings_Tab *default_tab;
 
    popup = elm_popup_add(parent);
    elm_object_part_text_set(popup, "title,text", title);
@@ -182,6 +192,14 @@ void edi_screens_settings_message(Evas_Object *parent, const char *title, const 
    elm_object_text_set(button, _("Settings"));
    elm_object_part_content_set(popup, "button2", button);
    evas_object_data_set(button, "parent", parent);
+
+   default_tab = malloc(sizeof(Edi_Settings_Tab));
+   if (default_tab)
+     {
+        *default_tab = type;
+        evas_object_data_set(popup, "default_tab", default_tab);
+     }
+
    evas_object_smart_callback_add(button, "clicked", _edi_screens_settings_display_cb, popup);
 
    evas_object_show(popup);

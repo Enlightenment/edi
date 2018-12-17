@@ -852,10 +852,11 @@ edi_settings_win_get(void)
 }
 
 Evas_Object *
-edi_settings_show(Evas_Object *mainwin)
+edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
 {
    Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it, *default_it;
+   Elm_Object_Item *it_project, *it_display, *it_behaviour, *it_builds;
 
    if (edi_settings_win_get())
      return NULL;
@@ -908,18 +909,34 @@ edi_settings_show(Evas_Object *mainwin)
                                                    _edi_settings_behaviour_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
 
-
-   elm_toolbar_item_append(tb, "applications-development", _("Project"),_edi_settings_category_cb, _edi_settings_project);
-   default_it = elm_toolbar_item_append(tb, "preferences-desktop", _("Display"),
-                                        _edi_settings_category_cb, _edi_settings_display);
-   elm_toolbar_item_append(tb, "system-run", "Builds",
-                           _edi_settings_category_cb, _edi_settings_builds);
+   it_project = elm_toolbar_item_append(tb, "applications-development", _("Project"),_edi_settings_category_cb, _edi_settings_project);
+   it_display = elm_toolbar_item_append(tb, "preferences-desktop", _("Display"), _edi_settings_category_cb, _edi_settings_display);
+   it_builds = elm_toolbar_item_append(tb, "system-run", _("Builds"), _edi_settings_category_cb, _edi_settings_builds);
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
    elm_toolbar_item_append(tb, "application-internet", _("Global"), NULL, NULL);
-   elm_toolbar_item_append(tb, "preferences-other", _("Behaviour"),
-                           _edi_settings_category_cb, _edi_settings_behaviour);
+   elm_object_item_disabled_set(tb, EINA_TRUE);
+
+   it_behaviour = elm_toolbar_item_append(tb, "preferences-other", _("Behaviour"),
+                                         _edi_settings_category_cb, _edi_settings_behaviour);
+
+   switch (type)
+     {
+        case EDI_SETTINGS_TAB_DISPLAY:
+          default_it = it_display;
+          break;
+        case EDI_SETTINGS_TAB_PROJECT:
+          default_it = it_project;
+          break;
+        case EDI_SETTINGS_TAB_BEHAVIOUR:
+          default_it = it_behaviour;
+          break;
+        case EDI_SETTINGS_TAB_BUILDS:
+          default_it = it_builds;
+          break;
+     }
+
    elm_toolbar_item_selected_set(default_it, EINA_TRUE);
 
    evas_object_show(naviframe);

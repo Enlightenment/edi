@@ -622,7 +622,7 @@ edi_launcher_config_missing()
    title = _("Unable to launch");
    message = _("No launch binary found, please configure in Settings.");
 
-   edi_screens_settings_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, EDI_SETTINGS_TAB_BUILDS, title, message);
 }
 
 void
@@ -633,7 +633,7 @@ edi_debug_exe_missing(void)
    title = _("Unable to launch debugger");
    message = _("No debug binary found, please check system configuration and Settings.");
 
-   edi_screens_settings_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, EDI_SETTINGS_TAB_BUILDS, title, message);
 }
 
 static void
@@ -645,7 +645,7 @@ _edi_project_credentials_missing()
    title = _("Missing user information");
    message = _("No user information found, please configure in Settings.");
 
-   edi_screens_settings_message(_edi_main_win, title, message);
+   edi_screens_settings_message(_edi_main_win, EDI_SETTINGS_TAB_PROJECT, title, message);
 }
 
 static Eina_Bool
@@ -908,7 +908,7 @@ _tb_about_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_i
 static void
 _tb_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
-   edi_settings_show(_edi_main_win);
+   edi_settings_show(_edi_main_win, EDI_SETTINGS_TAB_DISPLAY);
 }
 
 static void
@@ -975,7 +975,7 @@ static void
 _edi_menu_settings_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   edi_settings_show(_edi_main_win);
+   edi_settings_show(_edi_main_win, EDI_SETTINGS_TAB_DISPLAY);
 }
 
 static void
