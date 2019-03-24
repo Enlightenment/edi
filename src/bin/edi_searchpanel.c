@@ -585,9 +585,9 @@ edi_searchpanel_add(Evas_Object *parent)
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
    edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
-   elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
-   efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_searchpanel_line_clicked_cb, NULL);
+   elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   elm_code_widget_gravity_set(widget, 0.0, 1.0);
+   efl_event_callback_add(widget, EFL_UI_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_searchpanel_line_clicked_cb, NULL);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
@@ -672,10 +672,10 @@ edi_taskspanel_add(Evas_Object *parent)
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
    edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
-   elm_obj_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   elm_obj_code_widget_gravity_set(widget, 0.0, 1.0);
+   elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
+   elm_code_widget_gravity_set(widget, 0.0, 1.0);
    efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_taskspanel_line_cb, NULL);
-   efl_event_callback_add(widget, ELM_OBJ_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_taskspanel_line_clicked_cb, NULL);
+   efl_event_callback_add(widget, EFL_UI_CODE_WIDGET_EVENT_LINE_CLICKED, _edi_taskspanel_line_clicked_cb, NULL);
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
