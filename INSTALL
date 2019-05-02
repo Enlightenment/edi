@@ -37,7 +37,7 @@ The above will only work after at least the following is done:
 ** QUICK AND DIRTY HELP **
 --------------------------
 
-How clean out the build and config and start fresh:
+How to clean out the build and config and start fresh:
 
     rm -rf build
 
