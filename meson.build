@@ -22,7 +22,7 @@ config_h.set_quoted('PACKAGE_DOC_DIR', join_paths(get_option('prefix'), get_opti
 
 config_h.set_quoted('EFL_BETA_API_SUPPORT'     , '1')
 
-elm = dependency('elementary', version : '>=1.21.1')
+elm = dependency('elementary', version : '>=1.22.0')
 top_inc = include_directories('.')
 
 cc = meson.get_compiler('c')
