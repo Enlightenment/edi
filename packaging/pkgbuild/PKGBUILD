@@ -1,6 +1,6 @@
 # Maintainer: Enlightenment Developers <enlightenment-devel@enlightenment.org>
 pkgname='edi-git'
-pkgver=0.7.0.0001
+pkgver=0.7.1.0001
 pkgrel=1
 pkgdesc="Efl based IDE - GIT development snapshot"
 arch=('i686' 'x86_64' 'arm')
