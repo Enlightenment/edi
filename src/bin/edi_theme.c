@@ -14,7 +14,7 @@
 static Eina_List *_edi_themes = NULL;
 
 // we are hooking into Efl for now...
-Efl_Ui_Theme_Apply efl_ui_widget_theme_apply(Eo *obj);
+Eina_Error efl_ui_widget_theme_apply(Eo *obj);
 
 void
 edi_theme_window_alpha_set(void)

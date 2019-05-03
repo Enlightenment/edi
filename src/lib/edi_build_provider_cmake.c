@@ -76,7 +76,7 @@ _cmake_run(const char *path, const char *args)
 
    if (!args)
      {
-        ecore_exe_pipe_run(path, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+        edi_exe_project_run(path, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                                  ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                                  ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 
@@ -87,7 +87,7 @@ _cmake_run(const char *path, const char *args)
    full_cmd = malloc(sizeof(char) * (full_len + 1));
    snprintf(full_cmd, full_len + 2, "%s %s", path, args);
 
-   ecore_exe_pipe_run(full_cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
+   edi_exe_project_run(full_cmd, ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                                 ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                                 ECORE_EXE_PIPE_WRITE | ECORE_EXE_USE_SH, NULL);
 

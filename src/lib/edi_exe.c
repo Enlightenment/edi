@@ -184,3 +184,29 @@ edi_exe_response(const char *command)
 
    return out;
 }
+
+static pid_t _project_pid = -1;
+
+void
+edi_exe_project_pid_reset()
+{
+   _project_pid = -1;
+}
+
+pid_t
+edi_exe_project_pid_get(void)
+{
+   return _project_pid;
+}
+
+pid_t
+edi_exe_project_run(const char *command, int flags, void *data)
+{
+   Ecore_Exe *exe;
+
+   exe = ecore_exe_pipe_run(command, flags, data);
+
+   _project_pid = ecore_exe_pid_get(exe);
+
+   return _project_pid;
+}

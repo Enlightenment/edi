@@ -48,6 +48,14 @@ void edi_debugpanel_start(const char *toolname);
 void edi_debugpanel_stop();
 
 /**
+ * Perform a poll to check the state of any debug session
+ *
+ * @ingroup UI
+ */
+void edi_debugpanel_active_check(void);
+
+
+/**
  * @}
  */
 

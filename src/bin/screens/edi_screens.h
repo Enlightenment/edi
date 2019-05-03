@@ -22,6 +22,14 @@ extern "C" {
  *
  */
 
+typedef enum _Edi_Settings_Tab
+{
+   EDI_SETTINGS_TAB_DISPLAY = 0,
+   EDI_SETTINGS_TAB_PROJECT = 1,
+   EDI_SETTINGS_TAB_BUILDS = 2,
+   EDI_SETTINGS_TAB_BEHAVIOUR = 3,
+} Edi_Settings_Tab;
+
 /**
  * Initialise a new Edi welcome window and display it.
  *
@@ -56,7 +64,7 @@ Evas_Object *edi_about_show(Evas_Object *mainwin);
  *
  * @ingroup UI
  */
-Evas_Object *edi_settings_show(Evas_Object *mainwin);
+Evas_Object *edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type);
 
 /**
  * Return a pointer to the settings window.
@@ -104,12 +112,13 @@ void edi_screens_message(Evas_Object *parent, const char *title, const char *mes
  * Create an information dialogue with additional button to settings.
  *
  * @param parent The parent object to display the dialogue in.
+ * @param type The type of tab to be opened in the settings window.
  * @param title The title for the popup.
  * @param message The text to be displayed in the popup.
  *
  * @ingroup UI
  */
-void edi_screens_settings_message(Evas_Object *parent, const char *title, const char *message);
+void edi_screens_settings_message(Evas_Object *parent, Edi_Settings_Tab type, const char *title, const char *message);
 
 /**
  * Send a desktop notification message to the window manager.

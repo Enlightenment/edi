@@ -147,7 +147,8 @@ _meson_run(const char *path, const char *args)
 
    if (args) cmd = eina_slstr_printf("%s %s", path, args);
    else cmd = path;
-   ecore_exe_pipe_run(cmd,
+
+   edi_exe_project_run(cmd,
                       ECORE_EXE_PIPE_READ_LINE_BUFFERED | ECORE_EXE_PIPE_READ |
                       ECORE_EXE_PIPE_ERROR_LINE_BUFFERED | ECORE_EXE_PIPE_ERROR |
                       ECORE_EXE_PIPE_WRITE /*| ECORE_EXE_USE_SH*/, md);
