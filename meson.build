@@ -27,8 +27,6 @@ top_inc = include_directories('.')
 
 cc = meson.get_compiler('c')
 
-
-
 config_h.set_quoted('EFL_CFLAGS', run_command(find_program('pkg-config'), '--libs', '--cflags', 'elementary').stdout().strip())
 
 intl = cc.find_library('intl', required : false)

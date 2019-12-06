@@ -185,7 +185,6 @@ edi_content_statusbar_add(Evas_Object *panel, Edi_Mainview_Item *item)
 
    item->pos = position = elm_entry_add(panel);
    elm_entry_single_line_set(position, EINA_TRUE);
-   elm_entry_text_style_user_push(position, "DEFAULT='font=Mono')");
    elm_entry_editable_set(position, EINA_FALSE);
    evas_object_size_hint_align_set(position, 1.0, 0.5);
    evas_object_size_hint_weight_set(position, EVAS_HINT_EXPAND, 0.0);
