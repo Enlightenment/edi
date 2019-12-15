@@ -29,7 +29,7 @@ src = files([
 lib_dir = include_directories('.')
 
 edi_lib_lib = shared_library('edi', src,
-  dependencies : [elm],
+  dependencies : [elm, deps_os],
   include_directories : top_inc,
   version : meson.project_version(),
   install : true

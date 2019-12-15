@@ -86,10 +86,6 @@ _system_pid_max_get(void)
         fclose(f);
         pid_max = atoi(buf);
      }
-#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
-   int mib[2] = { CTL_KERN, KERN_MAXPROC };
-   size_t len = sizeof(pid_max);
-   sysctl(mib, 2, &pid_max, &len, NULL, 0);
 #elif defined(PID_MAX)
    pid_max = PID_MAX;
 #endif

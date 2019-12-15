@@ -25,6 +25,13 @@ config_h.set_quoted('EFL_BETA_API_SUPPORT'     , '1')
 elm = dependency('elementary', version : '>=1.22.0')
 top_inc = include_directories('.')
 
+host_os = host_machine.system()
+
+deps_os = declare_dependency(link_args : [] )
+if host_os == 'openbsd'
+   deps_os = declare_dependency(link_args : [ '-lkvm' ])
+endif
+
 cc = meson.get_compiler('c')
 
 config_h.set_quoted('EFL_CFLAGS', run_command(find_program('pkg-config'), '--libs', '--cflags', 'elementary').stdout().strip())
@@ -49,6 +56,7 @@ if build_machine.system() == 'darwin'
      opt_clang_link_dir = '/usr/local/opt/llvm/lib'
    endif
 endif
+
 
 if get_option('libclang') == true
 
