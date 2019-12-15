@@ -1346,6 +1346,7 @@ edi_toolbar_setup(Evas_Object *parent)
 
    tb = elm_toolbar_add(parent);
    elm_toolbar_horizontal_set(tb, EINA_TRUE);
+   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
