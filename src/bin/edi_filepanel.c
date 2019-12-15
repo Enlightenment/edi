@@ -710,7 +710,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    ic = elm_icon_add(lbox);
    elm_icon_standard_set(ic, icon_name);
-   evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
+   evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(24), ELM_SCALE_SIZE(24));
    evas_object_show(ic);
    elm_box_pack_end(lbox, ic);
 
@@ -796,7 +796,7 @@ _content_dir_get(void *data EINA_UNUSED, Evas_Object *obj, const char *source)
 
    ic = elm_icon_add(obj);
    elm_icon_standard_set(ic, "folder");
-   evas_object_size_hint_aspect_set(ic, EVAS_ASPECT_CONTROL_VERTICAL, 1, 1);
+   evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(24), ELM_SCALE_SIZE(24));
    evas_object_show(ic);
    return ic;
 }
