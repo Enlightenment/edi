@@ -814,6 +814,12 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           }
      }
 
+   if (shift && !strcmp(ev->key, "Insert"))
+     {
+        elm_code_widget_selection_paste(editor->entry);
+        return;
+     }
+
    if (alt || ctrl)
      return;
 
