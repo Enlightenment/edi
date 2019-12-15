@@ -390,6 +390,18 @@ _item_menu_scm_stage_cb(void *data, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_item_menu_scm_undo_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                       void *event_info EINA_UNUSED)
+{
+   Edi_Dir_Data *sd = data;
+
+   edi_scm_undo(sd->path);
+   edi_filepanel_scm_status_update();
+   edi_filepanel_item_update(sd->path);
+}
+
+
+static void
 _item_menu_scm_unstage_cb(void *data, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
@@ -483,6 +495,12 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
         status = _edi_filepanel_file_scm_status(sd->path);
 
         menu_it = elm_menu_item_add(menu, NULL, NULL, eina_slstr_printf("%s...", _("Source Control")), NULL, NULL);
+
+        menu_it2 = elm_menu_item_add(menu, menu_it, "edit-undo", _("Undo Changes"), _item_menu_scm_undo_cb, sd);
+        if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_STAGED)
+          elm_object_item_disabled_set(menu_it2, EINA_TRUE);
+
+        elm_menu_item_separator_add(menu, menu_it);
 
         menu_it2 = elm_menu_item_add(menu, menu_it, "document-save-as", _("Stage Changes"), _item_menu_scm_stage_cb, sd);
         if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_STAGED)

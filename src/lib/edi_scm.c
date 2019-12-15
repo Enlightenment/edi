@@ -142,6 +142,21 @@ _edi_scm_git_file_unstage(const char *path)
 }
 
 static int
+_edi_scm_git_file_undo(const char *path)
+{
+   int code;
+   Eina_Strbuf *command = eina_strbuf_new();
+
+   eina_strbuf_append_printf(command, "git checkout %s", path);
+
+   code = _edi_scm_exec(eina_strbuf_string_get(command));
+
+   eina_strbuf_free(command);
+
+   return code;
+}
+
+static int
 _edi_scm_git_file_mod(const char *path)
 {
    int code;
@@ -646,6 +661,22 @@ edi_scm_unstage(const char *path)
 }
 
 EAPI int
+edi_scm_undo(const char *path)
+{
+   char *escaped;
+   int result;
+   Edi_Scm_Engine *e = edi_scm_engine_get();
+
+   escaped = ecore_file_escape_name(path);
+
+   result = e->file_undo(escaped);
+
+   free(escaped);
+
+   return result;
+}
+
+EAPI int
 edi_scm_move(const char *src, const char *dest)
 {
    char *esc_src, *esc_dst;
@@ -809,6 +840,7 @@ _edi_scm_git_init(const char *rootdir)
    engine->file_mod = _edi_scm_git_file_mod;
    engine->file_del = _edi_scm_git_file_del;
    engine->file_unstage = _edi_scm_git_file_unstage;
+   engine->file_undo = _edi_scm_git_file_undo;
    engine->move = _edi_scm_git_file_move;
    engine->status = _edi_scm_git_status;
    engine->diff = _edi_scm_git_diff;

@@ -35,6 +35,7 @@ typedef struct _Edi_Scm_Status
 
 typedef int (scm_fn_stage)(const char *path);
 typedef int (scm_fn_unstage)(const char *path);
+typedef int (scm_fn_undo)(const char *path);
 typedef int (scm_fn_mod)(const char *path);
 typedef int (scm_fn_del)(const char *path);
 typedef int (scm_fn_move)(const char *src, const char *dest);
@@ -63,6 +64,7 @@ typedef struct _Edi_Scm_Engine
 
    scm_fn_stage       *file_stage;
    scm_fn_unstage     *file_unstage;
+   scm_fn_undo        *file_undo;
    scm_fn_mod         *file_mod;
    scm_fn_del         *file_del;
    scm_fn_move        *move;
@@ -175,6 +177,16 @@ int edi_scm_stage(const char *path);
  * @ingroup Scm
 */
 int edi_scm_unstage(const char *path);
+
+/**
+ * Reset file changes to last commit state.
+ *
+ * @param path The file path.
+ * @return The status code of command executed.
+ *
+ * @ingroup Scm
+*/
+int edi_scm_undo(const char *path);
 
 /**
  * Del file from those monitored by SCM.
