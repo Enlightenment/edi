@@ -4,7 +4,6 @@
 
 #include <Elementary.h>
 #include <Evas.h>
-#include <Efl_Ui.h>
 
 #include "Edi.h"
 #include "edi_theme.h"
@@ -12,9 +11,6 @@
 #include "edi_private.h"
 
 static Eina_List *_edi_themes = NULL;
-
-// we are hooking into Efl for now...
-Eina_Error efl_ui_widget_theme_apply(Eo *obj);
 
 void
 edi_theme_window_alpha_set(void)

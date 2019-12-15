@@ -1,4 +1,5 @@
 #ifdef HAVE_CONFIG_H
+
 # include "config.h"
 #endif
 
@@ -8,7 +9,6 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
-#include <Efl_Ui.h>
 #include <Eio.h>
 
 #include "Edi.h"
@@ -1331,7 +1331,7 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
    Evas_Object *content;
    Elm_Object_Item *tb_it;
 
-   tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
+   tb_it = elm_toolbar_item_append(tb, icon, name, func, NULL);
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
 
@@ -1345,44 +1345,32 @@ edi_toolbar_setup(Evas_Object *parent)
    Elm_Object_Item *tb_it;
 
    tb = elm_toolbar_add(parent);
-   elm_toolbar_horizontal_set(tb, EINA_FALSE);
+   elm_toolbar_horizontal_set(tb, EINA_TRUE);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
+   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(tb, 0.5, 0.0);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
    _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", _("Save"), _tb_save_cb);
    _edi_toolbar_item_add(tb, "window-close", _("Close"), _tb_close_cb);
 
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
    _edi_toolbar_undo = _edi_toolbar_item_add(tb, "edit-undo", _("Undo"), _tb_undo_cb);
    _edi_toolbar_redo = _edi_toolbar_item_add(tb, "edit-redo", _("Redo"), _tb_redo_cb);
-
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    _edi_toolbar_item_add(tb, "edit-cut", _("Cut"), _tb_cut_cb);
    _edi_toolbar_item_add(tb, "edit-copy", _("Copy"), _tb_copy_cb);
    _edi_toolbar_item_add(tb, "edit-paste", _("Paste"), _tb_paste_cb);
 
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
    _edi_toolbar_item_add(tb, "edit-find-replace", MENU_ELLIPSIS(_("Find")), _tb_search_cb);
    _edi_toolbar_item_add(tb, "go-jump", _("Goto Line"), _tb_goto_cb);
 
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-
    _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
    _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
    _edi_toolbar_run =_edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
    _edi_toolbar_terminate = _edi_toolbar_item_add(tb, "media-playback-stop", _("Terminate"), _tb_terminate_cb);
    _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
@@ -1449,7 +1437,7 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 }
 
 static void
-_edi_toolbar_set_visible(Eina_Bool visible)
+_edi_toolbar_visible_set(Eina_Bool visible)
 {
    elm_box_unpack(_edi_main_box, _edi_toolbar);
    if (visible)
@@ -1464,7 +1452,7 @@ _edi_toolbar_set_visible(Eina_Bool visible)
 static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
-   _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
+   _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
    edi_theme_window_alpha_set();
 
    return ECORE_CALLBACK_RENEW;
@@ -1581,7 +1569,7 @@ Evas_Object *edi_main_win_get(void)
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *table, *win, *bg, *hbx, *vbx, *tb, *content;
+   Evas_Object *table, *win, *bg, *hbx, *tb, *content;
    char *winname;
    char *path;
 
@@ -1614,7 +1602,7 @@ edi_open(const char *inputpath)
 
    hbx = elm_box_add(win);
    _edi_main_box = hbx;
-   elm_box_horizontal_set(hbx, EINA_TRUE);
+   elm_box_horizontal_set(hbx, EINA_FALSE);
    evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(hbx);
@@ -1633,22 +1621,17 @@ edi_open(const char *inputpath)
    edi_theme_window_alpha_set();
 
    tb = edi_toolbar_setup(hbx);
-   elm_box_pack_start(hbx, tb);
-   _edi_toolbar = tb;
-   _edi_toolbar_set_visible(!_edi_project_config->gui.toolbar_hidden);
 
-   vbx = elm_box_add(hbx);
-   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(vbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbx, vbx);
-   evas_object_show(vbx);
+   _edi_toolbar = tb;
+   _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
 
    _edi_menu_setup(win);
 
-   content = edi_content_setup(vbx, path);
+   content = edi_content_setup(hbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(vbx, content);
+   elm_box_pack_end(hbx, tb);
+   elm_box_pack_end(hbx, content);
 
    _edi_config_project_add(path);
    _edi_open_tabs();
