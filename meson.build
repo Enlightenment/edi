@@ -48,7 +48,7 @@ endif
 opt_clang_header_dir = get_option('libclang-headerdir')
 opt_clang_link_dir = get_option('libclang-libdir')
 
-if build_machine.system() == 'darwin'
+if host_os == 'darwin'
    if opt_clang_header_dir == ''
      opt_clang_header_dir = '/usr/local/opt/llvm/include'
    endif
