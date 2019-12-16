@@ -239,7 +239,7 @@ edi_process_stats_by_pid(int pid)
 
    for (int i = 0; i < pid_count; i++)
      {
-        if (kp[i].p_pid == p->pid)
+        if (kp && kp[i].p_pid == p->pid)
           p->numthreads++;
      }
 
