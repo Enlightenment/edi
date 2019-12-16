@@ -451,7 +451,7 @@ _edi_welcome_button_clicked_cb(void *data, Evas_Object *obj EINA_UNUSED, void *e
 static Evas_Object *
 _content_get(void *data, Evas_Object *obj, const char *source)
 {
-   Evas_Object *frame, *table, *image, *entry;
+   Evas_Object *frame, *box,  *lbox, *rbox, *image, *entry;
    Edi_Template *template = (Edi_Template *) data;
    Eina_Slstr *content;
 
@@ -464,32 +464,43 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(frame);
 
-   table = elm_table_add(obj);
-   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_table_padding_set(table, 5, 5);
-   elm_table_homogeneous_set(table, EINA_TRUE);
-   evas_object_show(table);
-   elm_object_content_set(frame, table);
+   box = elm_box_add(obj);
+   elm_box_horizontal_set(box, EINA_TRUE);
+   elm_box_align_set(box, 0, 0);
 
-   image = elm_image_add(table);
+   lbox = elm_box_add(box);
+   elm_box_horizontal_set(lbox, EINA_TRUE);
+   evas_object_show(lbox);
+
+   elm_object_content_set(frame, box);
+
+   image = elm_image_add(box);
    evas_object_size_hint_min_set(image, 96 * elm_config_scale_get(), 96 * elm_config_scale_get());
    elm_image_file_set(image, template->edje_path, template->edje_id);
    evas_object_show(image);
-   elm_table_pack(table, image, 0, 0, 1, 1);
+   elm_box_pack_end(lbox, image);
 
-   entry = elm_entry_add(table);
+   rbox = elm_box_add(box);
+   elm_box_horizontal_set(box, EINA_TRUE);
+   evas_object_size_hint_weight_set(rbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(rbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(rbox);
+
+   entry = elm_entry_add(box);
    evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_entry_editable_set(entry, EINA_FALSE);
    elm_entry_scrollable_set(entry, EINA_FALSE);
    elm_entry_single_line_set(entry, EINA_FALSE);
    elm_entry_line_wrap_set(entry, ELM_WRAP_WORD);
-   elm_table_pack(table, entry, 1, 0, 3, 1);
    evas_object_show(entry);
 
    content = eina_slstr_printf("<b>%s</b><br><br>%s", template->title, template->desc);
    elm_object_text_set(entry, content);
+   elm_box_pack_end(rbox, entry);
+
+   elm_box_pack_end(box, lbox);
+   elm_box_pack_end(box, rbox);
 
    return frame;
 }
@@ -505,7 +516,7 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
 {
    Eina_List *l;
    Evas_Object *content, *button, *naviframe;
-   Evas_Object *table, *list, *rect, *hbox;
+   Evas_Object *table, *list, *hbox;
    Elm_Object_Item *item;
    Edi_Template *template, *example;
    Elm_Genlist_Item_Class *ith, *itc;
@@ -533,11 +544,6 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(table);
-   rect = evas_object_rectangle_add(evas_object_evas_get(table));
-   evas_object_size_hint_weight_set(rect, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(rect, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(rect, 500 * elm_config_scale_get(), 300 * elm_config_scale_get());
-   elm_table_pack(table, rect, 0, 0, 1, 1);
 
    list = elm_genlist_add(content);
    evas_object_size_hint_weight_set(list, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -578,11 +584,12 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
 
    button = elm_button_add(content);
    elm_object_text_set(button, _("Choose"));
-   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, 0.1);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_data_set(button, "selected", list);
    evas_object_smart_callback_add(button, "clicked", _edi_welcome_button_clicked_cb, naviframe);
    evas_object_show(button);
+
    elm_box_pack_end(content, hbox);
    elm_box_pack_end(content, button);
 
