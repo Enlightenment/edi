@@ -107,8 +107,8 @@ _edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
      }
    else
      {
-	ecore_exe_run(eina_slstr_printf("edi %s", path), NULL);
-	exit(0);
+        ecore_exe_run(eina_slstr_printf("edi %s", path), NULL);
+        exit(0);
      }
 }
 
