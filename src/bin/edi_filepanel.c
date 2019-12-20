@@ -68,7 +68,7 @@ _get_provider_from_hashset(const char *filename)
    const char *mime = eina_hash_find(mime_entries, filename);
    if ( !mime )
      {
-       mime = efreet_mime_type_get(filename);
+       mime = edi_mime_type_get(filename);
 
        if (mime)
          eina_hash_add(mime_entries, filename, strdup(mime));

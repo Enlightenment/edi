@@ -39,6 +39,7 @@ extern "C" {
 #include <edi_path.h>
 #include <edi_exe.h>
 #include <edi_scm.h>
+#include <edi_mime.h>
 
 /**
  * @file

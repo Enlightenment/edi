@@ -257,7 +257,7 @@ _edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Ein
    if (!S_ISREG(stat->mode))
      return;
 
-   mime = efreet_mime_type_get(options->path);
+   mime = edi_mime_type_get(options->path);
    provider = edi_content_provider_for_mime_get(mime);
    if (!provider)
      {

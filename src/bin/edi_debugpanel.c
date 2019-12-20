@@ -295,7 +295,7 @@ void edi_debugpanel_start(const char *name)
         return;
      }
 
-   mime = efreet_mime_type_get(_edi_project_config->launch.path);
+   mime = edi_mime_type_get(_edi_project_config->launch.path);
    if (mime && !strcmp(mime, "application/x-shellscript"))
      snprintf(debug->cmd, sizeof(debug->cmd), LIBTOOL_COMMAND " --mode execute %s %s", debug->tool->exec, _edi_project_config->launch.path);
    else if (debug->tool->arguments)

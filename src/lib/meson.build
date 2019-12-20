@@ -15,6 +15,8 @@ src = files([
   'edi_create.h',
   'edi_exe.c',
   'edi_exe.h',
+  'edi_mime.c',
+  'edi_mime.h',
   'edi_path.c',
   'edi_path.h',
   'edi_process.c',

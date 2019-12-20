@@ -235,7 +235,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    status = (Edi_Scm_Status *) data;
 
-   mime = efreet_mime_type_get(status->fullpath);
+   mime = edi_mime_type_get(status->fullpath);
    if (mime)
      icon_file = efreet_mime_type_icon_get(mime, elm_config_icon_theme_get(), 32);
 

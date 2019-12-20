@@ -1801,7 +1801,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      {
         const char *mime;
 
-        mime = efreet_mime_type_get(project_path);
+        mime = edi_mime_type_get(project_path);
         if (!edi_content_provider_for_mime_get(mime))
           {
              fprintf(stderr, _("Could not open file of unsupported mime type (%s)\n"), mime);

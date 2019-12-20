@@ -407,7 +407,7 @@ _edi_searchpanel_search_project_file(const char *path, const char *search_term, 
 
    // If the file looks big, check if it is a text file first.
    if (eina_file_size_get(f) > 1 * 1024 * 1024 &&
-       strncmp(efreet_mime_type_get(path), "text/", 5))
+       strncmp(edi_mime_type_get(path), "text/", 5))
      {
         eina_file_close(f);
         return ;
