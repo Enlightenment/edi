@@ -100,13 +100,16 @@ _edi_message_open(const char *message, Eina_Bool deletable)
 static void
 _edi_welcome_project_open(const char *path, const unsigned int _edi_creating)
 {
-   if (!edi_open(path) && !_edi_creating)
+   if (!ecore_file_exists(path) && !_edi_creating)
      {
        _edi_message_path = path;
        _edi_message_open(_("That project directory no longer exists"), EINA_TRUE);
      }
    else
-     evas_object_del(_welcome_window);
+     {
+	ecore_exe_run(eina_slstr_printf("edi %s", path), NULL);
+	exit(0);
+     }
 }
 
 static void
