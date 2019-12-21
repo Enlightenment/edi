@@ -1339,20 +1339,24 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 }
 
 static Evas_Object *
-edi_toolbar_setup(Evas_Object *parent)
+edi_toolbar_setup(void)
 {
-   Evas_Object *tb;
+   Evas_Object *win, *tb;
    Elm_Object_Item *tb_it;
 
-   tb = elm_toolbar_add(parent);
-   elm_toolbar_horizontal_set(tb, EINA_TRUE);
+   win = elm_win_add(edi_main_win_get(), "bar", ELM_WIN_BASIC);
+   elm_win_focus_highlight_enabled_set(win, EINA_FALSE);
+   evas_object_show(win);
+
+   tb = elm_toolbar_add(win);
+   elm_toolbar_horizontal_set(tb, EINA_FALSE);
    elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_object_focus_allow_set(tb, EINA_FALSE);
-   evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_align_set(tb, 0, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(tb, 0.5, 0.0);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
@@ -1383,6 +1387,7 @@ edi_toolbar_setup(Evas_Object *parent)
    _edi_toolbar_item_add(tb, "help-about", _("About"), _tb_about_cb);
 
    evas_object_show(tb);
+   elm_object_content_set(win, tb);
    return tb;
 }
 
@@ -1603,7 +1608,7 @@ edi_open(const char *inputpath)
 
    hbx = elm_box_add(win);
    _edi_main_box = hbx;
-   elm_box_horizontal_set(hbx, EINA_FALSE);
+   elm_box_horizontal_set(hbx, EINA_TRUE);
    evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(hbx);
@@ -1621,9 +1626,9 @@ edi_open(const char *inputpath)
 
    edi_theme_window_alpha_set();
 
-   tb = edi_toolbar_setup(hbx);
+   tb = edi_toolbar_setup();
 
-   _edi_toolbar = tb;
+   //_edi_toolbar = tb;
    _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
 
    _edi_menu_setup(win);
@@ -1631,7 +1636,6 @@ edi_open(const char *inputpath)
    content = edi_content_setup(hbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbx, tb);
    elm_box_pack_end(hbx, content);
 
    _edi_config_project_add(path);
