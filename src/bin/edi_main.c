@@ -44,7 +44,7 @@ typedef struct _Edi_Panel_Slide_Effect
    Eina_Bool left;
 } Edi_Panel_Slide_Effect;
 
-static Evas_Object *_edi_toolbar = NULL, *_edi_leftpanes, *_edi_bottompanes;
+static Evas_Object *_edi_toolbar_win = NULL, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel, *_edi_debugpanel;
 static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item, *_edi_debugpanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
@@ -58,7 +58,7 @@ static Evas_Object *_edi_main_win, *_edi_main_box;
 static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate;
 int _edi_log_dom = -1;
 
-static Eina_Bool _edi_toolbar_horizontal;
+static Eina_Bool _edi_toolbar_win_is_horizontal;
 
 static void
 _edi_active_process_icons_set(Eina_Bool active)
@@ -1324,13 +1324,20 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, "help-about", _("About"), _edi_menu_about_cb, NULL);
 }
 
-static void
-edi_toolbar_delete(void)
+static Evas_Object *
+edi_toolbar_win_get(void)
 {
-   if (_edi_toolbar)
+   return _edi_toolbar_win;
+}
+
+static void
+edi_toolbar_win_del(void)
+{
+   Evas_Object *win = edi_toolbar_win_get();
+   if (win)
      {
-        evas_object_del(_edi_toolbar);
-        _edi_toolbar = NULL;
+        evas_object_del(win);
+        _edi_toolbar_win = NULL;
      }
 }
 
@@ -1348,7 +1355,7 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 }
 
 static void
-edi_toolbar_setup(void)
+edi_toolbar_win_add(void)
 {
    Evas_Object *win, *tb, *box, *notify;
    Elm_Object_Item *tb_it;
@@ -1356,21 +1363,21 @@ edi_toolbar_setup(void)
 
    if (_edi_project_config->gui.toolbar_hidden)
      {
-        edi_toolbar_delete();
+        edi_toolbar_win_del();
         return;
      }
 
-   if ((_edi_toolbar) &&
-       (_edi_toolbar_horizontal == _edi_project_config->gui.toolbar_horizontal))
+   if ((edi_toolbar_win_get()) &&
+       (_edi_toolbar_win_is_horizontal == _edi_project_config->gui.toolbar_horizontal))
      {
         return;
      }
 
-   edi_toolbar_delete();
+   edi_toolbar_win_del();
 
-   _edi_toolbar_horizontal = _edi_project_config->gui.toolbar_horizontal;
+   _edi_toolbar_win_is_horizontal = _edi_project_config->gui.toolbar_horizontal;
 
-   _edi_toolbar = win = elm_win_add(edi_main_win_get(), "toolbar", ELM_WIN_BASIC);
+   _edi_toolbar_win = win = elm_win_add(edi_main_win_get(), "toolbar", ELM_WIN_BASIC);
 
    elm_object_focus_allow_set(win, EINA_FALSE);
 
@@ -1384,14 +1391,14 @@ edi_toolbar_setup(void)
 
    tb = elm_toolbar_add(box);
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
-   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
+   elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 0.0);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
    elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_toolbar_icon_size_set(tb, 48 * elm_config_scale_get());
-   elm_object_focus_allow_set(tb, EINA_FALSE);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
+   elm_object_focus_allow_set(tb, EINA_FALSE);
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
@@ -1469,6 +1476,10 @@ _edi_focused_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *win = edi_settings_win_get();
    if (win)
      elm_win_raise(win);
+
+   win = edi_toolbar_win_get();
+   if (win)
+     elm_win_raise(win);
 }
 
 static void
@@ -1491,7 +1502,7 @@ _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EI
 {
    edi_theme_window_alpha_set();
 
-   edi_toolbar_setup();
+   edi_toolbar_win_add();
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -1659,9 +1670,9 @@ edi_open(const char *inputpath)
    evas_object_data_set(win, "background", bg);
    evas_object_data_set(win, "mainbox", hbx);
 
-   _edi_toolbar_horizontal = _edi_project_config->gui.toolbar_horizontal;
+   _edi_toolbar_win_is_horizontal = _edi_project_config->gui.toolbar_horizontal;
 
-   edi_toolbar_setup();
+   edi_toolbar_win_add();
 
    _edi_menu_setup(win);
 
