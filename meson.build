@@ -9,7 +9,7 @@ add_global_arguments('-DHAVE_CONFIG_H=1', '-DHAVE_CONFIG=1', language: 'c')
 config_h = configuration_data()
 config_h.set_quoted('PACKAGE'          , meson.project_name())
 config_h.set_quoted('PACKAGE_VERSION'  , meson.project_version())
-config_h.set_quoted('PACKAGE_COPYRIGHT', 'Copyright (c) 2014-2019. EDI Authors (see AUTHORS).'
+config_h.set_quoted('PACKAGE_COPYRIGHT', 'Copyright (c) 2014-2019. EDI Authors (see AUTHORS).')
 config_h.set_quoted('PACKAGE_URL'      , 'https://www.enlightenment.org')
 config_h.set_quoted('PACKAGE_TARNAME'  , meson.project_name())
 config_h.set_quoted('PACKAGE_BUGREPORT', 'enlightenment-devel@lists.sourceforge.net')
