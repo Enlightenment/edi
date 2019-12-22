@@ -114,6 +114,17 @@ _edi_settings_toolbar_hidden_cb(void *data EINA_UNUSED, Evas_Object *obj,
 }
 
 static void
+_edi_settings_toolbar_horizontal_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *)obj;
+   _edi_project_config->gui.toolbar_horizontal = elm_check_state_get(check);
+   _edi_project_config_save();
+}
+
+static void
 _edi_settings_font_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
    Evas_Object *naviframe, *box;
@@ -344,6 +355,23 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_table_pack(table, check, 1, 4, 1, 1);
    evas_object_show(check);
    elm_box_pack_end(box, table);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Horizontal Toolbar"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 5, 1, 1);
+   evas_object_show(label);
+
+   check = elm_check_add(box);
+   elm_check_state_set(check, _edi_project_config->gui.toolbar_horizontal);
+   evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_toolbar_horizontal_cb, NULL);
+   elm_table_pack(table, check, 1, 5, 1, 1);
+   evas_object_show(check);
+   elm_box_pack_end(box, table);
+
 
    // END OF ALPHA SELECTOR
 
