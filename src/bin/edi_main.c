@@ -44,7 +44,7 @@ typedef struct _Edi_Panel_Slide_Effect
    Eina_Bool left;
 } Edi_Panel_Slide_Effect;
 
-static Evas_Object *_edi_toolbar_win = NULL, *_edi_leftpanes, *_edi_bottompanes;
+static Evas_Object *_edi_toolbar_win, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel, *_edi_debugpanel;
 static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item, *_edi_debugpanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
@@ -57,8 +57,6 @@ static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
 static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate;
 int _edi_log_dom = -1;
-
-static Eina_Bool _edi_toolbar_win_is_horizontal;
 
 static void
 _edi_active_process_icons_set(Eina_Bool active)
@@ -1360,26 +1358,33 @@ edi_toolbar_win_add(void)
    Evas_Object *win, *tb, *box, *notify;
    Elm_Object_Item *tb_it;
    Evas_Coord w, h;
+   static Eina_Bool is_horizontal = EINA_TRUE, is_init = EINA_TRUE;
+
+   if (is_init)
+     {
+        is_horizontal = _edi_project_config->gui.toolbar_horizontal;
+        is_init = EINA_FALSE;
+	_edi_toolbar_win = NULL;
+     }
 
    if (_edi_project_config->gui.toolbar_hidden)
      {
         edi_toolbar_win_del();
+
         return;
      }
 
    if ((edi_toolbar_win_get()) &&
-       (_edi_toolbar_win_is_horizontal == _edi_project_config->gui.toolbar_horizontal))
+       (is_horizontal == _edi_project_config->gui.toolbar_horizontal))
      {
         return;
      }
 
+   is_horizontal = _edi_project_config->gui.toolbar_horizontal;
+
    edi_toolbar_win_del();
 
-   _edi_toolbar_win_is_horizontal = _edi_project_config->gui.toolbar_horizontal;
-
    _edi_toolbar_win = win = elm_win_add(edi_main_win_get(), "toolbar", ELM_WIN_BASIC);
-
-   elm_object_focus_allow_set(win, EINA_FALSE);
 
    box = elm_box_add(win);
    elm_box_horizontal_set(box, _edi_project_config->gui.toolbar_horizontal);
@@ -1669,8 +1674,6 @@ edi_open(const char *inputpath)
 
    evas_object_data_set(win, "background", bg);
    evas_object_data_set(win, "mainbox", hbx);
-
-   _edi_toolbar_win_is_horizontal = _edi_project_config->gui.toolbar_horizontal;
 
    edi_toolbar_win_add();
 
