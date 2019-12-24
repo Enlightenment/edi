@@ -1364,7 +1364,7 @@ edi_toolbar_win_add(void)
      {
         is_horizontal = _edi_project_config->gui.toolbar_horizontal;
         is_init = EINA_FALSE;
-	_edi_toolbar_win = NULL;
+        _edi_toolbar_win = NULL;
      }
 
    if (_edi_project_config->gui.toolbar_hidden)
