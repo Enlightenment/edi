@@ -1261,64 +1261,64 @@ _edi_menu_setup(Evas_Object *win)
 
    menu = elm_win_main_menu_get(win);
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("File"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Project")), _edi_menu_project_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("folder-new"), MENU_ELLIPSIS(_("New Project")), _edi_menu_project_new_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "document-new", MENU_ELLIPSIS(_("New")), _edi_menu_new_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "folder-new", MENU_ELLIPSIS(_("New Directory")), _edi_menu_new_dir_cb, NULL);
-   _edi_menu_save = elm_menu_item_add(menu, menu_it, "document-save", _("Save"), _edi_menu_save_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "window-close", _("Close"), _edi_menu_close_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "window-close", _("Close all"), _edi_menu_closeall_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("document-new"), MENU_ELLIPSIS(_("New")), _edi_menu_new_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("folder-new"), MENU_ELLIPSIS(_("New Directory")), _edi_menu_new_dir_cb, NULL);
+   _edi_menu_save = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("document-save"), _("Save"), _edi_menu_save_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("window-close"), _("Close"), _edi_menu_close_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("window-close"), _("Close all"), _edi_menu_closeall_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "preferences-desktop", _("Settings"), _edi_menu_settings_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("preferences-desktop"), _("Settings"), _edi_menu_settings_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "application-exit", _("Quit"), _edi_menu_quit_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("application-exit"), _("Quit"), _edi_menu_quit_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Edit"), NULL, NULL);
-   _edi_menu_undo = elm_menu_item_add(menu, menu_it, "edit-undo", _("Undo"), _edi_menu_undo_cb, NULL);
-   _edi_menu_redo = elm_menu_item_add(menu, menu_it, "edit-redo", _("Redo"), _edi_menu_redo_cb, NULL);
+   _edi_menu_undo = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-undo"), _("Undo"), _edi_menu_undo_cb, NULL);
+   _edi_menu_redo = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-redo"), _("Redo"), _edi_menu_redo_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-cut", _("Cut"), _edi_menu_cut_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-copy", _("Copy"), _edi_menu_copy_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-paste", _("Paste"), _edi_menu_paste_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-cut"), _("Cut"), _edi_menu_cut_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-copy"), _("Copy"), _edi_menu_copy_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-paste"), _("Paste"), _edi_menu_paste_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find-replace", _("Find & Replace"), _edi_menu_find_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find", _("Find file"), _edi_menu_findfile_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "go-jump", MENU_ELLIPSIS(_("Goto Line")), _edi_menu_goto_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find-replace"), _("Find & Replace"), _edi_menu_find_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), _("Find file"), _edi_menu_findfile_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-jump"), MENU_ELLIPSIS(_("Goto Line")), _edi_menu_goto_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "edit-find-replace", MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find-replace"), MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "window-new", _("New Window"), _edi_menu_view_open_window_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "object-flip-horizontal", _("New Panel"), _edi_menu_view_new_panel_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "object-flip-vertical", _("Split View"), _edi_menu_view_split_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("window-new"), _("New Window"), _edi_menu_view_open_window_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("object-flip-horizontal"), _("New Panel"), _edi_menu_view_new_panel_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("object-flip-vertical"), _("Split View"), _edi_menu_view_split_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "edit-find", _("Open Tasks"), _edi_menu_view_tasks_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), _("Open Tasks"), _edi_menu_view_tasks_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
-   _edi_menu_build = elm_menu_item_add(menu, menu_it, "system-run", _("Build"), _edi_menu_build_cb, NULL);
-   _edi_menu_test = elm_menu_item_add(menu, menu_it, "media-record", _("Test"), _edi_menu_test_cb, NULL);
-   _edi_menu_clean = elm_menu_item_add(menu, menu_it, "edit-clear", _("Clean"), _edi_menu_clean_cb, NULL);
+   _edi_menu_build = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("system-run"), _("Build"), _edi_menu_build_cb, NULL);
+   _edi_menu_test = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-record"), _("Test"), _edi_menu_test_cb, NULL);
+   _edi_menu_clean = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-clear"), _("Clean"), _edi_menu_clean_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   _edi_menu_run = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Run"), _edi_menu_run_cb, NULL);
-   _edi_menu_terminate = elm_menu_item_add(menu, menu_it, "media-playback-stop", _("Terminate"), _edi_menu_terminate_cb, NULL);
+   _edi_menu_run = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Run"), _edi_menu_run_cb, NULL);
+   _edi_menu_terminate = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-stop"), _("Terminate"), _edi_menu_terminate_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Debugger"), _edi_menu_debug_cb, NULL);
-   elm_menu_item_add(menu, menu_it, "applications-electronics", _("Memcheck"), _edi_menu_memcheck_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("utilities-terminal"), _("Debugger"), _edi_menu_debug_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("applications-electronics"), _("Memcheck"), _edi_menu_memcheck_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
-   _edi_menu_init = elm_menu_item_add(menu, menu_it, "media-playback-start", _("Init"), _edi_menu_scm_init_cb, NULL);
-   _edi_menu_commit = elm_menu_item_add(menu, menu_it, "mail-send", _("Commit"), _edi_menu_scm_commit_cb, NULL);
-   _edi_menu_stash = elm_menu_item_add(menu, menu_it, "edit-undo", _("Stash"), _edi_menu_scm_stash_cb, NULL);
-   _edi_menu_status = elm_menu_item_add(menu, menu_it, "dialog-error", _("Status"), _edi_menu_scm_status_cb, NULL);
-   _edi_menu_push = elm_menu_item_add(menu, menu_it, "go-up", _("Push"), _edi_menu_scm_push_cb, NULL);
-   _edi_menu_pull = elm_menu_item_add(menu, menu_it, "go-down", _("Pull"), _edi_menu_scm_pull_cb, NULL);
+   _edi_menu_init = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Init"), _edi_menu_scm_init_cb, NULL);
+   _edi_menu_commit = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("mail-send"), _("Commit"), _edi_menu_scm_commit_cb, NULL);
+   _edi_menu_stash = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-undo"), _("Stash"), _edi_menu_scm_stash_cb, NULL);
+   _edi_menu_status = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("dialog-error"), _("Status"), _edi_menu_scm_status_cb, NULL);
+   _edi_menu_push = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-up"), _("Push"), _edi_menu_scm_push_cb, NULL);
+   _edi_menu_pull = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-down"), _("Pull"), _edi_menu_scm_pull_cb, NULL);
 
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Help"), NULL, NULL);
-   elm_menu_item_add(menu, menu_it, "go-home", _("Visit Website"), _edi_menu_website_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-home"), _("Visit Website"), _edi_menu_website_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, "help-about", _("About"), _edi_menu_about_cb, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("help-about"), _("About"), _edi_menu_about_cb, NULL);
 }
 
 static Evas_Object *

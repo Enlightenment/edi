@@ -587,6 +587,7 @@ _avatar_effect(Evas_Object *avatar)
    Evas_Map *map;
    int w, h;
 
+   return;
    evas_object_move(avatar, 8 * elm_config_scale_get(), 15 * elm_config_scale_get());
    evas_object_resize(avatar, 72 * elm_config_scale_get(), 72 * elm_config_scale_get());
    evas_object_geometry_get(avatar, NULL, NULL, &w, &h);
