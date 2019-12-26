@@ -9,7 +9,7 @@ install_data(['document-new.png', 'window-close.png', 'window-close.png',
               'application-exit.png', 'edit-find.png', 'window-new.png',
               'object-flip-horizontal.png', 'object-flip-vertical.png',
               'edit-clear.png','applications-electronics.png', 'mail-send.png',
-              'dialog-error.png', 'go-home.png'
+              'dialog-error.png', 'go-home.png', 'network-server.png'
              ],
              install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'icons')
 )

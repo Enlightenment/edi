@@ -987,7 +987,7 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
    elm_toolbar_item_selected_set(default_it, EINA_TRUE);
 
    evas_object_show(naviframe);
-   evas_object_resize(win, 480 * elm_config_scale_get(), 320 * elm_config_scale_get());
+   evas_object_resize(win, 480 * elm_config_scale_get(), 360 * elm_config_scale_get());
    evas_object_show(win);
 
    return win;

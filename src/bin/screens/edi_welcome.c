@@ -9,6 +9,7 @@
 
 #include "edi_screens.h"
 #include "edi_config.h"
+#include "edi_theme.h"
 
 #include "edi_private.h"
 
@@ -846,7 +847,7 @@ Evas_Object *edi_welcome_show()
    _edi_project_box = frame;
    _edi_welcome_add_recent_projects(frame);
 
-   button = _edi_welcome_button_create(_("Open Existing Project"), "folder",
+   button = _edi_welcome_button_create(_("Open Existing Project"), edi_theme_icon_path_get("folder"),
                                        box, _edi_welcome_project_choose_cb, NULL);
    elm_box_pack_end(box, button);
 
@@ -866,11 +867,11 @@ Evas_Object *edi_welcome_show()
    elm_box_pack_end(box, image);
    evas_object_show(image);
 
-   button = _edi_welcome_button_create(_("Create New Project"), "folder-new",
+   button = _edi_welcome_button_create(_("Create New Project"), edi_theme_icon_path_get("folder-new"),
                                        box, _edi_welcome_project_new_cb, naviframe);
    elm_box_pack_end(box, button);
 
-   button = _edi_welcome_button_create(_("Checkout Existing Project"), "network-server",
+   button = _edi_welcome_button_create(_("Checkout Existing Project"), edi_theme_icon_path_get("network-server"),
                                        box, _edi_welcome_project_clone_cb, naviframe);
    elm_box_pack_end(box, button);
 
