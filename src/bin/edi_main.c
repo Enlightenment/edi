@@ -302,7 +302,7 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
 
    if (item == _edi_selected_bottompanel)
      {
-        elm_toolbar_item_icon_set(item, "go-up");
+        elm_toolbar_item_icon_set(item, edi_theme_icon_path_get("go-up"));
 
         _edi_slide_panel_new(_edi_bottompanes, panel, _edi_project_config->gui.bottomsize, EINA_FALSE, EINA_FALSE);
         _edi_selected_bottompanel = NULL;
@@ -1403,6 +1403,8 @@ edi_toolbar_win_add(void)
    evas_object_show(notify);
 
    tb = elm_toolbar_add(box);
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_DEFAULT);
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 0.0);
@@ -1411,8 +1413,6 @@ edi_toolbar_win_add(void)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
    elm_object_focus_allow_set(tb, EINA_FALSE);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
-   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
    _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", _("Save"), _tb_save_cb);

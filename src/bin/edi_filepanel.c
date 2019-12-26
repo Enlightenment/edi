@@ -14,6 +14,7 @@
 
 #include "edi_filepanel.h"
 #include "edi_file.h"
+#include "edi_theme.h"
 #include "edi_config.h"
 #include "edi_content_provider.h"
 #include "mainview/edi_mainview.h"
@@ -472,29 +473,26 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "document-properties", ecore_file_file_get(sd->path), NULL, NULL);
-   elm_object_item_disabled_set(menu_it, EINA_TRUE);
-   elm_menu_item_separator_add(menu, NULL);
+   menu_it2 = menu_it = elm_menu_item_add(menu, NULL, "document-properties", ecore_file_file_get(sd->path), NULL, NULL);
 
-   elm_menu_item_add(menu, NULL, "fileopen", _("Open"), _item_menu_open_cb, sd);
-   elm_menu_item_add(menu, NULL, "window-new", _("Open in New Window"), _item_menu_open_window_cb, sd);
+   elm_menu_item_add(menu, menu_it, "fileopen", _("Open"), _item_menu_open_cb, sd);
+   elm_menu_item_add(menu, menu_it, "window-new", _("Open in New Window"), _item_menu_open_window_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "object-flip-horizontal", _("Open in New Panel"), _item_menu_open_panel_cb, sd);
+   menu_it = elm_menu_item_add(menu, menu_it, "object-flip-horizontal", _("Open in New Panel"), _item_menu_open_panel_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, eina_slstr_printf("%s...", _("Open as")), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, menu_it2, NULL, eina_slstr_printf("%s...", _("Open as")), NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
 
-   menu_it = elm_menu_item_add(menu, NULL, "gtk-execute", _("Open External"),
+   menu_it = elm_menu_item_add(menu, menu_it, "gtk-execute", _("Open External"),
                                _item_menu_xdgopen_cb, sd);
-   elm_menu_item_separator_add(menu, NULL);
-
    if (edi_scm_enabled())
      {
         status = _edi_filepanel_file_scm_status(sd->path);
+        elm_menu_item_separator_add(menu, menu_it2);
 
-        menu_it = elm_menu_item_add(menu, NULL, NULL, eina_slstr_printf("%s...", _("Source Control")), NULL, NULL);
+        menu_it = elm_menu_item_add(menu, menu_it2, NULL, eina_slstr_printf("%s...", _("Source Control")), NULL, NULL);
 
         menu_it2 = elm_menu_item_add(menu, menu_it, "edit-undo", _("Undo Changes"), _item_menu_scm_undo_cb, sd);
         if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_STAGED)
@@ -607,19 +605,17 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
    menu_it = elm_menu_item_add(menu, NULL, "folder", ecore_file_file_get(sd->path), NULL, NULL);
-   elm_object_item_disabled_set(menu_it, EINA_TRUE);
-   elm_menu_item_separator_add(menu, NULL);
 
-   elm_menu_item_add(menu, NULL, "document-new", _("Create File here"), _item_menu_create_file_cb, sd);
-   elm_menu_item_add(menu, NULL, "folder-new", _("Create Directory here"), _item_menu_create_dir_cb, sd);
+   elm_menu_item_add(menu, menu_it, "document-new", _("Create File here"), _item_menu_create_file_cb, sd);
+   elm_menu_item_add(menu, menu_it, "folder-new", _("Create Directory here"), _item_menu_create_dir_cb, sd);
    if (ecore_file_app_installed("terminology"))
-     elm_menu_item_add(menu, NULL, "utilities-terminal", _("Open Terminal here"), _item_menu_open_terminal_cb, sd);
+     elm_menu_item_add(menu, menu_it, "utilities-terminal", _("Open Terminal here"), _item_menu_open_terminal_cb, sd);
 
    if (strcmp(sd->path, edi_project_get()))
      {
-        elm_menu_item_add(menu, NULL, "document-save-as", _("Rename Directory"), _item_menu_rename_cb, sd);
+        elm_menu_item_add(menu, menu_it, "document-save-as", _("Rename Directory"), _item_menu_rename_cb, sd);
         if (ecore_file_dir_is_empty(sd->path))
-          elm_menu_item_add(menu, NULL, "edit-delete", _("Remove Directory"), _item_menu_rmdir_cb, sd);
+          elm_menu_item_add(menu, menu_it, "edit-delete", _("Remove Directory"), _item_menu_rmdir_cb, sd);
      }
 }
 
@@ -709,7 +705,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
    evas_object_show(lbox);
 
    ic = elm_icon_add(lbox);
-   elm_icon_standard_set(ic, icon_name);
+   elm_icon_standard_set(ic, edi_theme_icon_path_get(icon_name));
    evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(24), ELM_SCALE_SIZE(24));
    evas_object_show(ic);
    elm_box_pack_end(lbox, ic);
@@ -795,7 +791,7 @@ _content_dir_get(void *data EINA_UNUSED, Evas_Object *obj, const char *source)
      return NULL;
 
    ic = elm_icon_add(obj);
-   elm_icon_standard_set(ic, "folder");
+   elm_icon_standard_set(ic, edi_theme_icon_path_get("folder"));
    evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(24), ELM_SCALE_SIZE(24));
    evas_object_show(ic);
    return ic;
