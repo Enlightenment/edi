@@ -1,5 +1,4 @@
 #ifdef HAVE_CONFIG_H
-
 # include "config.h"
 #endif
 
@@ -96,8 +95,7 @@ _edi_active_process_check_cb(EINA_UNUSED void *data)
    stats = edi_process_stats_by_pid(pid);
    if (!stats)
      {
-        // Our process is not running, reset PID we
-        // track.
+        // Our process is not running, reset PID.
         edi_exe_project_pid_reset();
         _edi_active_process_icons_set(EINA_FALSE);
         return ECORE_CALLBACK_RENEW;
@@ -166,6 +164,7 @@ _edi_panel_size_save(Eina_Bool left)
      size = elm_panes_content_left_size_get(_edi_leftpanes);
    else
      size = elm_panes_content_right_size_get(_edi_bottompanes);
+
    open = (size != 0.0);
 
    if (left)
@@ -463,7 +462,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 1.0);
-   elm_toolbar_icon_size_set(tb, 24);
+   elm_toolbar_icon_size_set(tb, 24 * elm_config_scale_get());
    elm_object_style_set(tb, "item_horizontal");
    elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
@@ -1367,16 +1366,15 @@ edi_toolbar_win_add(void)
 
    if (is_init)
      {
-        is_horizontal = _edi_project_config->gui.toolbar_horizontal;
-	internal_icons = _edi_project_config->gui.internal_icons;
-        is_init = EINA_FALSE;
         _edi_toolbar_win = NULL;
+        is_horizontal = _edi_project_config->gui.toolbar_horizontal;
+        internal_icons = _edi_project_config->gui.internal_icons;
+        is_init = EINA_FALSE;
      }
 
    if (_edi_project_config->gui.toolbar_hidden)
      {
         edi_toolbar_win_del();
-
         return;
      }
 
@@ -1387,15 +1385,16 @@ edi_toolbar_win_add(void)
         return;
      }
 
+   edi_toolbar_win_del();
+
    is_horizontal = _edi_project_config->gui.toolbar_horizontal;
    internal_icons = _edi_project_config->gui.internal_icons;
-
-   edi_toolbar_win_del();
 
    _edi_toolbar_win = win = elm_win_add(edi_main_win_get(), "toolbar", ELM_WIN_BASIC);
 
    box = elm_box_add(win);
    elm_box_horizontal_set(box, _edi_project_config->gui.toolbar_horizontal);
+   elm_object_focus_allow_set(box, EINA_FALSE);
    evas_object_show(box);
 
    notify = elm_notify_add(win);
@@ -1404,29 +1403,41 @@ edi_toolbar_win_add(void)
 
    tb = elm_toolbar_add(box);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
-   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_DEFAULT);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 0.0);
-   elm_toolbar_homogeneous_set(tb, EINA_TRUE);
    elm_toolbar_icon_size_set(tb, 48 * elm_config_scale_get());
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
    elm_object_focus_allow_set(tb, EINA_FALSE);
+   evas_object_show(tb);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
    _edi_toolbar_save =_edi_toolbar_item_add(tb, "document-save", _("Save"), _tb_save_cb);
    _edi_toolbar_item_add(tb, "window-close", _("Close"), _tb_close_cb);
 
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
    _edi_toolbar_undo = _edi_toolbar_item_add(tb, "edit-undo", _("Undo"), _tb_undo_cb);
    _edi_toolbar_redo = _edi_toolbar_item_add(tb, "edit-redo", _("Redo"), _tb_redo_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    _edi_toolbar_item_add(tb, "edit-cut", _("Cut"), _tb_cut_cb);
    _edi_toolbar_item_add(tb, "edit-copy", _("Copy"), _tb_copy_cb);
    _edi_toolbar_item_add(tb, "edit-paste", _("Paste"), _tb_paste_cb);
 
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+
    _edi_toolbar_item_add(tb, "edit-find-replace", MENU_ELLIPSIS(_("Find")), _tb_search_cb);
    _edi_toolbar_item_add(tb, "go-jump", _("Goto Line"), _tb_goto_cb);
+
+   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
    _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
    _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
@@ -1441,7 +1452,6 @@ edi_toolbar_win_add(void)
    _edi_toolbar_item_add(tb, "preferences-desktop", _("Settings"), _tb_settings_cb);
    _edi_toolbar_item_add(tb, "help-about", _("About"), _tb_about_cb);
 
-   evas_object_show(tb);
    elm_object_content_set(notify, tb);
    elm_box_pack_end(box, notify);
    elm_object_content_set(win, box);
