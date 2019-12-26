@@ -480,10 +480,13 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
 
    menu_it = elm_menu_item_add(menu, menu_it, "object-flip-horizontal", _("Open in New Panel"), _item_menu_open_panel_cb, sd);
 
+   elm_menu_item_separator_add(menu, menu_it2);
+
    menu_it = elm_menu_item_add(menu, menu_it2, NULL, eina_slstr_printf("%s...", _("Open as")), NULL, NULL);
    _item_menu_filetype_create(menu, menu_it, "text", _item_menu_open_as_text_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "code", _item_menu_open_as_code_cb, sd);
    _item_menu_filetype_create(menu, menu_it, "image", _item_menu_open_as_image_cb, sd);
+   elm_menu_item_separator_add(menu, menu_it);
 
    menu_it = elm_menu_item_add(menu, menu_it, "gtk-execute", _("Open External"),
                                _item_menu_xdgopen_cb, sd);
@@ -604,7 +607,7 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
    menu = elm_menu_add(win);
    evas_object_smart_callback_add(menu, "dismissed", _item_menu_dismissed_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, "folder", ecore_file_file_get(sd->path), NULL, NULL);
+   menu_it = elm_menu_item_add(menu, NULL, edi_theme_icon_path_get("folder"), ecore_file_file_get(sd->path), NULL, NULL);
 
    elm_menu_item_add(menu, menu_it, "document-new", _("Create File here"), _item_menu_create_file_cb, sd);
    elm_menu_item_add(menu, menu_it, "folder-new", _("Create Directory here"), _item_menu_create_dir_cb, sd);
