@@ -151,4 +151,23 @@ edi_theme_themes_get(void)
    return _edi_themes;
 }
 
+const char *
+edi_theme_icon_path_get(const char *name)
+{
+   char *path;
+   const char *icon_path, *directory = PACKAGE_DATA_DIR "/icons";
+   icon_path = name;
+
+   path = edi_path_append(directory, eina_slstr_printf("%s.png", name));
+   if (path)
+     {
+        if (ecore_file_exists(path))
+          {
+             icon_path = eina_slstr_printf("%s", path);
+          }
+        free(path);
+     }
+
+   return icon_path;
+}
 

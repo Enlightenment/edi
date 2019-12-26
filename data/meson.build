@@ -1,5 +1,6 @@
 subdir('desktop')
 subdir('images')
+subdir('icons')
 subdir('extra/templates')
 subdir('extra/examples')
 subdir('themes')

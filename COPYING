@@ -11,7 +11,7 @@ data/extra/templates/	No license - public domain
 Icons by <matthieu.james@gmail.com> from "Faenza" icon theme (GPLv2):
         data/extra/templates/images/c.png
         data/extra/templates/images/python.png
-
+        data/icons/*.png
 
 edi:			COPYING.GPLv2
 

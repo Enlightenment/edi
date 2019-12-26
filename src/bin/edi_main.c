@@ -310,8 +310,8 @@ _edi_toggle_panel(void *data, Evas_Object *obj, void *event_info)
    else
      {
         if (_edi_selected_bottompanel)
-          elm_toolbar_item_icon_set(_edi_selected_bottompanel, "go-up");
-        elm_toolbar_item_icon_set(item, "go-down");
+          elm_toolbar_item_icon_set(_edi_selected_bottompanel, edi_theme_icon_path_get("go-up"));
+        elm_toolbar_item_icon_set(item, edi_theme_icon_path_get("go-down"));
 
         size = elm_panes_content_right_size_get(_edi_bottompanes);
         if (size == 0.0)
@@ -463,7 +463,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_toolbar_align_set(tb, 1.0);
-   elm_toolbar_icon_size_set(tb, 32);
+   elm_toolbar_icon_size_set(tb, 24);
    elm_object_style_set(tb, "item_horizontal");
    elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
@@ -473,27 +473,27 @@ edi_content_setup(Evas_Object *win, const char *path)
 
    _edi_toolbar_separator_add(tb);
 
-   _edi_logpanel_item = elm_toolbar_item_append(tb, "go-up", _("Logs"),
+   _edi_logpanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Logs"),
                                                 _edi_toggle_panel, "0");
    _edi_toolbar_separator_add(tb);
 
-   _edi_consolepanel_item = elm_toolbar_item_append(tb, "go-up", _("Console"),
+   _edi_consolepanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Console"),
                                                     _edi_toggle_panel, "1");
    _edi_toolbar_separator_add(tb);
 
-   _edi_testpanel_item = elm_toolbar_item_append(tb, "go-up", _("Tests"),
+   _edi_testpanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Tests"),
                                                  _edi_toggle_panel, "2");
    _edi_toolbar_separator_add(tb);
 
-   _edi_searchpanel_item = elm_toolbar_item_append(tb, "go-up", _("Search"),
+   _edi_searchpanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Search"),
                                                  _edi_toggle_panel, "3");
    _edi_toolbar_separator_add(tb);
 
-   _edi_taskspanel_item = elm_toolbar_item_append(tb, "go-up", _("Tasks"),
+   _edi_taskspanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Tasks"),
                                                   _edi_toggle_panel, "4");
    _edi_toolbar_separator_add(tb);
 
-   _edi_debugpanel_item = elm_toolbar_item_append(tb, "go-up", _("Debug"),
+   _edi_debugpanel_item = elm_toolbar_item_append(tb, edi_theme_icon_path_get("go-up"), _("Debug"),
                                                   _edi_toggle_panel, "5");
    _edi_toolbar_separator_add(tb);
 
@@ -542,32 +542,32 @@ edi_content_setup(Evas_Object *win, const char *path)
         elm_panes_content_right_size_set(logpane, _edi_project_config->gui.bottomsize);
         if (_edi_project_config->gui.bottomtab == 1)
           {
-             elm_toolbar_item_icon_set(_edi_consolepanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_consolepanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_consolepanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 2)
           {
-             elm_toolbar_item_icon_set(_edi_testpanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_testpanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_testpanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 3)
           {
-             elm_toolbar_item_icon_set(_edi_searchpanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_searchpanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_searchpanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 4)
           {
-             elm_toolbar_item_icon_set(_edi_taskspanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_taskspanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_taskspanel_item;
           }
         else if (_edi_project_config->gui.bottomtab == 5)
           {
-             elm_toolbar_item_icon_set(_edi_debugpanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_debugpanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_debugpanel_item;
           }
         else
           {
-             elm_toolbar_item_icon_set(_edi_logpanel_item, "go-down");
+             elm_toolbar_item_icon_set(_edi_logpanel_item, edi_theme_icon_path_get("go-down"));
              _edi_selected_bottompanel = _edi_logpanel_item;
           }
      }
@@ -1345,7 +1345,11 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
    Evas_Object *content;
    Elm_Object_Item *tb_it;
 
-   tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
+   if (!_edi_project_config->gui.internal_icons)
+     tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
+   else
+     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), NULL, func, NULL);
+
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
 
@@ -1359,10 +1363,12 @@ edi_toolbar_win_add(void)
    Elm_Object_Item *tb_it;
    Evas_Coord w, h;
    static Eina_Bool is_horizontal = EINA_TRUE, is_init = EINA_TRUE;
+   static Eina_Bool internal_icons = EINA_TRUE;
 
    if (is_init)
      {
         is_horizontal = _edi_project_config->gui.toolbar_horizontal;
+	internal_icons = _edi_project_config->gui.internal_icons;
         is_init = EINA_FALSE;
         _edi_toolbar_win = NULL;
      }
@@ -1375,12 +1381,14 @@ edi_toolbar_win_add(void)
      }
 
    if ((edi_toolbar_win_get()) &&
-       (is_horizontal == _edi_project_config->gui.toolbar_horizontal))
+       (is_horizontal == _edi_project_config->gui.toolbar_horizontal) &&
+       (internal_icons == _edi_project_config->gui.internal_icons))
      {
         return;
      }
 
    is_horizontal = _edi_project_config->gui.toolbar_horizontal;
+   internal_icons = _edi_project_config->gui.internal_icons;
 
    edi_toolbar_win_del();
 

@@ -88,6 +88,8 @@ struct _Edi_Project_Config
         Eina_Bool show_whitespace;
         unsigned int width_marker, tabstop;
 
+        Eina_Bool internal_icons;
+
         Eina_Bool toolbar_hidden;
         Eina_Bool toolbar_horizontal;
         Eina_Bool tab_inserts_spaces;
