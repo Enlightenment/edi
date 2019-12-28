@@ -1618,12 +1618,14 @@ edi_open(const char *inputpath)
    Evas_Object *vbx_tb, *hbx_tb;
    char *winname;
    char *path;
+   Eina_Bool is_project = EINA_TRUE;
 
    if (!edi_project_set(inputpath))
      {
-        fprintf(stderr, _("Project path must be a directory\n"));
-        return EINA_FALSE;
+        edi_project_set(eina_environment_home_get());
+        is_project = EINA_FALSE;
      }
+
    path = realpath(inputpath, NULL);
    _edi_project_config_load();
 
@@ -1682,12 +1684,18 @@ edi_open(const char *inputpath)
 
    _edi_menu_setup(win);
 
-   content = edi_content_setup(vbx, path);
+   if (is_project)
+     content = edi_content_setup(vbx, path);
+   else
+     content = edi_content_setup(vbx, ecore_file_dir_get(path));
+
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbx, content);
 
-   _edi_config_project_add(path);
+   if (is_project)
+     _edi_config_project_add(path);
+
    _edi_open_tabs();
    edi_scm_init();
    _edi_icon_update();
@@ -1704,6 +1712,9 @@ edi_open(const char *inputpath)
    evas_object_resize(win, _edi_project_config->gui.width * elm_config_scale_get(),
                       _edi_project_config->gui.height * elm_config_scale_get());
    evas_object_show(win);
+
+   if (!is_project)
+     edi_mainview_open_path(path);
 
    free(path);
    return EINA_TRUE;
@@ -1860,7 +1871,7 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
              fprintf(stderr, _("Could not open file of unsupported mime type (%s)\n"), mime);
              goto end;
           }
-        edi_open_file(project_path);
+        edi_open(project_path);
      }
    else if (!(edi_open(project_path)))
      goto end;
