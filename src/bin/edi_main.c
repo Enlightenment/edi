@@ -1356,6 +1356,7 @@ edi_toolbar_setup(void)
    elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_icon_size_set(tb, 48 * elm_config_scale_get());
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+
    if (is_horizontal)
      evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
    else
@@ -1404,10 +1405,9 @@ edi_toolbar_setup(void)
 
    if (is_horizontal)
      {
+        elm_box_horizontal_set(_edi_main_box, EINA_FALSE);
         elm_box_pack_start(_edi_toolbar_hbx, tb);
         elm_box_pack_start(_edi_main_box, _edi_toolbar_hbx);
-        elm_box_horizontal_set(_edi_main_box, EINA_FALSE);
-        elm_box_recalculate(_edi_toolbar_hbx);
         _edi_toolbar_main_box = _edi_toolbar_hbx;
      }
    else
