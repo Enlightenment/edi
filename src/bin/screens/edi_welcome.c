@@ -327,7 +327,7 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
     EINA_LIST_FREE(_available_examples, example)
       _edi_template_free(example);
 
-   _edi_welcome_project_open(path, EINA_TRUE);
+   _edi_welcome_project_open(path, EINA_FALSE);
 }
 
 static void
