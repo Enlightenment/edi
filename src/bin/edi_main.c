@@ -43,7 +43,7 @@ typedef struct _Edi_Panel_Slide_Effect
    Eina_Bool left;
 } Edi_Panel_Slide_Effect;
 
-static Evas_Object *_edi_toolbar_win, *_edi_leftpanes, *_edi_bottompanes;
+static Evas_Object *_edi_toolbar, *_edi_leftpanes, *_edi_bottompanes;
 static Evas_Object *_edi_logpanel, *_edi_consolepanel, *_edi_testpanel, *_edi_searchpanel, *_edi_taskspanel, *_edi_debugpanel;
 static Elm_Object_Item *_edi_logpanel_item, *_edi_consolepanel_item, *_edi_testpanel_item, *_edi_searchpanel_item, *_edi_taskspanel_item, *_edi_debugpanel_item;
 static Elm_Object_Item *_edi_selected_bottompanel;
@@ -54,7 +54,7 @@ static Evas_Object *_edi_menu_build, *_edi_menu_clean, *_edi_menu_test, *_edi_me
 static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_menu_pull, *_edi_menu_status, *_edi_menu_stash;
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
-static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate;
+static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate, *_edi_toolbar_hbx, *_edi_toolbar_vbx, *_edi_toolbar_main_box;
 int _edi_log_dom = -1;
 
 static void
@@ -1322,23 +1322,6 @@ _edi_menu_setup(Evas_Object *win)
 }
 
 static Evas_Object *
-edi_toolbar_win_get(void)
-{
-   return _edi_toolbar_win;
-}
-
-static void
-edi_toolbar_win_del(void)
-{
-   Evas_Object *win = edi_toolbar_win_get();
-   if (win)
-     {
-        evas_object_del(win);
-        _edi_toolbar_win = NULL;
-     }
-}
-
-static Evas_Object *
 _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_Smart_Cb func)
 {
    Evas_Object *content;
@@ -1356,61 +1339,28 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 }
 
 static void
-edi_toolbar_win_add(void)
+edi_toolbar_setup(void)
 {
-   Evas_Object *win, *tb, *box, *notify;
+   Evas_Object *win, *tb;
    Elm_Object_Item *tb_it;
-   Evas_Coord w, h;
-   static Eina_Bool is_horizontal = EINA_TRUE, is_init = EINA_TRUE;
-   static Eina_Bool internal_icons = EINA_TRUE;
+   Eina_Bool is_horizontal = _edi_project_config->gui.toolbar_horizontal;
 
-   if (is_init)
-     {
-        _edi_toolbar_win = NULL;
-        is_horizontal = _edi_project_config->gui.toolbar_horizontal;
-        internal_icons = _edi_project_config->gui.internal_icons;
-        is_init = EINA_FALSE;
-     }
+   win = edi_main_win_get();
 
-   if (_edi_project_config->gui.toolbar_hidden)
-     {
-        edi_toolbar_win_del();
-        return;
-     }
-
-   if ((edi_toolbar_win_get()) &&
-       (is_horizontal == _edi_project_config->gui.toolbar_horizontal) &&
-       (internal_icons == _edi_project_config->gui.internal_icons))
-     {
-        return;
-     }
-
-   edi_toolbar_win_del();
-
-   is_horizontal = _edi_project_config->gui.toolbar_horizontal;
-   internal_icons = _edi_project_config->gui.internal_icons;
-
-   _edi_toolbar_win = win = elm_win_add(edi_main_win_get(), "toolbar", ELM_WIN_BASIC);
-
-   box = elm_box_add(win);
-   elm_box_horizontal_set(box, _edi_project_config->gui.toolbar_horizontal);
-   elm_object_focus_allow_set(box, EINA_FALSE);
-   evas_object_show(box);
-
-   notify = elm_notify_add(win);
-   elm_object_style_set(notify, "transparent");
-   evas_object_show(notify);
-
-   tb = elm_toolbar_add(box);
-   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_NONE);
+   _edi_toolbar = tb = elm_toolbar_add(win);
+   elm_toolbar_align_set(tb, 0.0);
+   elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
    elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_toolbar_align_set(tb, 0.0);
+   elm_object_focus_allow_set(tb, EINA_FALSE);
    elm_toolbar_icon_size_set(tb, 48 * elm_config_scale_get());
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
-   elm_object_focus_allow_set(tb, EINA_FALSE);
+   if (is_horizontal)
+     evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
+   else
+     evas_object_size_hint_weight_set(tb, 0.0, EVAS_HINT_EXPAND);
+
    evas_object_show(tb);
 
    _edi_toolbar_item_add(tb, "document-new", _("New File"), _tb_new_cb);
@@ -1452,17 +1402,21 @@ edi_toolbar_win_add(void)
    _edi_toolbar_item_add(tb, "preferences-desktop", _("Settings"), _tb_settings_cb);
    _edi_toolbar_item_add(tb, "help-about", _("About"), _tb_about_cb);
 
-   elm_object_content_set(notify, tb);
-   elm_box_pack_end(box, notify);
-   elm_object_content_set(win, box);
-   elm_win_resize_object_add(win, box);
-   evas_object_show(win);
-
-   evas_object_geometry_get(tb, NULL, NULL, &w, &h);
-   evas_object_resize(win, w + 40, h + 40);
-
-   elm_win_alpha_set(win, EINA_TRUE);
-   elm_win_borderless_set(win, EINA_TRUE);
+   if (is_horizontal)
+     {
+        elm_box_pack_start(_edi_toolbar_hbx, tb);
+        elm_box_pack_start(_edi_main_box, _edi_toolbar_hbx);
+        elm_box_horizontal_set(_edi_main_box, EINA_FALSE);
+        elm_box_recalculate(_edi_toolbar_hbx);
+        _edi_toolbar_main_box = _edi_toolbar_hbx;
+     }
+   else
+     {
+        elm_box_horizontal_set(_edi_main_box, EINA_TRUE);
+        elm_box_pack_start(_edi_toolbar_vbx, tb);
+        elm_box_pack_start(_edi_main_box, _edi_toolbar_vbx);
+        _edi_toolbar_main_box = _edi_toolbar_vbx;
+     }
 }
 
 static char *
@@ -1499,10 +1453,6 @@ _edi_focused_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *even
    Evas_Object *win = edi_settings_win_get();
    if (win)
      elm_win_raise(win);
-
-   win = edi_toolbar_win_get();
-   if (win)
-     elm_win_raise(win);
 }
 
 static void
@@ -1520,12 +1470,34 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
+static void
+_edi_toolbar_visible_set(Eina_Bool visible)
+{
+   elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
+
+   if (visible)
+     {
+        evas_object_show(_edi_toolbar_main_box);
+        evas_object_show(_edi_toolbar);
+     }
+   else
+     {
+        evas_object_hide(_edi_toolbar_main_box);
+        evas_object_hide(_edi_toolbar);
+     }
+
+   if (visible)
+     {
+        elm_box_pack_start(_edi_main_box, _edi_toolbar_main_box);
+     }
+}
+
 static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    edi_theme_window_alpha_set();
 
-   edi_toolbar_win_add();
+   _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -1642,7 +1614,8 @@ Evas_Object *edi_main_win_get(void)
 Eina_Bool
 edi_open(const char *inputpath)
 {
-   Evas_Object *table, *win, *bg, *hbx, *content;
+   Evas_Object *table, *win, *bg, *vbx, *content;
+   Evas_Object *vbx_tb, *hbx_tb;
    char *winname;
    char *path;
 
@@ -1673,12 +1646,12 @@ edi_open(const char *inputpath)
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(table);
 
-   hbx = elm_box_add(win);
-   _edi_main_box = hbx;
-   elm_box_horizontal_set(hbx, EINA_FALSE);
-   evas_object_size_hint_weight_set(hbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(hbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(hbx);
+   vbx = elm_box_add(win);
+   _edi_main_box = vbx;
+   elm_box_horizontal_set(vbx, EINA_FALSE);
+   evas_object_size_hint_weight_set(vbx, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbx, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(vbx);
 
    bg = elm_bg_add(win);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
@@ -1686,21 +1659,33 @@ edi_open(const char *inputpath)
    evas_object_show(bg);
    elm_win_resize_object_add(win, table);
    elm_table_pack(table, bg, 0, 0, 1, 1);
-   elm_table_pack(table, hbx, 0, 0, 1, 1);
+   elm_table_pack(table, vbx, 0, 0, 1, 1);
+
+   _edi_toolbar_vbx = vbx_tb = elm_box_add(win);
+   elm_box_horizontal_set(vbx_tb, EINA_FALSE);
+   evas_object_size_hint_weight_set(vbx_tb, 0.0, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbx_tb, 0.0, EVAS_HINT_FILL);
+   evas_object_show(vbx_tb);
+
+   _edi_toolbar_hbx = hbx_tb = elm_box_add(win);
+   elm_box_horizontal_set(hbx_tb, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbx_tb, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(hbx_tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(hbx_tb);
 
    edi_theme_window_alpha_set();
 
    evas_object_data_set(win, "background", bg);
-   evas_object_data_set(win, "mainbox", hbx);
+   evas_object_data_set(win, "mainbox", vbx);
 
-   edi_toolbar_win_add();
+   edi_toolbar_setup();
 
    _edi_menu_setup(win);
 
-   content = edi_content_setup(hbx, path);
+   content = edi_content_setup(vbx, path);
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(hbx, content);
+   elm_box_pack_end(vbx, content);
 
    _edi_config_project_add(path);
    _edi_open_tabs();
