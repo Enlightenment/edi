@@ -10,3 +10,4 @@ Icon=@PACKAGE_NAME@
 TryExec=@PACKAGE_NAME@
 Exec=@PACKAGE_NAME@
 Categories=Development;Utility;
+MimeType=text/plain;
