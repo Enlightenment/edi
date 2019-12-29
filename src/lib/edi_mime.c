@@ -23,19 +23,18 @@ edi_mime_type_get(const char *path)
    f = eina_file_open(path, EINA_FALSE);
    if (!f) return efreet_mime_type_get(path);
 
+   len = eina_file_size_get(f);
+   if (!len)
+     {
+        eina_file_close(f);
+        return "text/plain";
+     }
+
    map = eina_file_map_all(f, EINA_FILE_POPULATE);
    if (!map)
      {
         eina_file_close(f);
         return efreet_mime_type_get(path);
-     }
-
-   len = eina_file_size_get(f);
-   if (!len)
-     {
-        eina_file_map_free(f, map);
-        eina_file_close(f);
-        return "text/plain";
      }
 
    if (len > 2048) len = 2048;
