@@ -517,8 +517,8 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
      }
    else
      {
-        menu_it = elm_menu_item_add(menu, NULL, "document-save-as", _("Rename File"), _item_menu_rename_cb, sd);
-        menu_it = elm_menu_item_add(menu, NULL, "edit-delete", _("Delete File"), _item_menu_del_cb, sd);
+        menu_it = elm_menu_item_add(menu, menu_it2, "document-save-as", _("Rename File"), _item_menu_rename_cb, sd);
+        menu_it = elm_menu_item_add(menu, menu_it2, "edit-delete", _("Delete File"), _item_menu_del_cb, sd);
      }
 }
 
