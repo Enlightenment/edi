@@ -1354,7 +1354,7 @@ edi_toolbar_setup(void)
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
    elm_object_focus_allow_set(tb, EINA_FALSE);
-   elm_toolbar_icon_size_set(tb, 48 * elm_config_scale_get());
+   elm_toolbar_icon_size_set(tb, 32 * elm_config_scale_get());
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
    if (is_horizontal)
