@@ -575,9 +575,10 @@ _edi_settings_builds_create(Evas_Object *parent)
    evas_object_show(ic);
 
    selector = elm_fileselector_button_add(box);
+   elm_fileselector_path_set(selector, edi_project_get());
+   elm_fileselector_expandable_set(selector, EINA_FALSE);
    elm_object_text_set(selector, _("Select"));
    elm_object_part_content_set(selector, "icon", ic);
-   elm_fileselector_path_set(selector, edi_project_get());
    evas_object_size_hint_align_set(selector, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(table, selector, 1, 0, 1, 1);
    evas_object_show(selector);
