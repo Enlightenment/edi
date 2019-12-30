@@ -1350,10 +1350,10 @@ edi_toolbar_setup(void)
    _edi_toolbar = tb = elm_toolbar_add(win);
    elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_shrink_mode_set(tb, ELM_TOOLBAR_SHRINK_SCROLL);
-   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_NONE);
+   elm_toolbar_select_mode_set(tb, ELM_OBJECT_SELECT_MODE_DISPLAY_ONLY);
    elm_toolbar_horizontal_set(tb, _edi_project_config->gui.toolbar_horizontal);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_object_focus_allow_set(tb, EINA_FALSE);
+   elm_object_focus_allow_set(tb, EINA_TRUE);
    elm_toolbar_icon_size_set(tb, 32 * elm_config_scale_get());
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
@@ -1639,6 +1639,8 @@ edi_open(const char *inputpath)
 
    _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
+   elm_win_focus_highlight_animate_set(win, EINA_TRUE);
+   elm_config_focus_move_policy_set(ELM_FOCUS_MOVE_POLICY_IN);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
    evas_object_smart_callback_add(win, "focused", _edi_focused_cb, NULL);
