@@ -766,7 +766,7 @@ _edi_welcome_add_recent_projects(Evas_Object *box)
         // Add an 'edit-delete' icon that can be clicked to remove a project directory
         icon_button = elm_button_add(box);
         ic = elm_icon_add(icon_button);
-        elm_icon_standard_set(ic, "edit-delete");
+        elm_icon_standard_set(ic, edi_theme_icon_path_get("edit-delete"));
         elm_image_resizable_set(ic, EINA_FALSE, EINA_TRUE);
 
         label = elm_label_add(box);
