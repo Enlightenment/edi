@@ -24,6 +24,7 @@ typedef struct _Edi_Debug_Tool {
    const char *command_start;
    const char *command_continue;
    const char *command_arguments;
+   const char *command_settings;
 } Edi_Debug_Tool;
 
 typedef struct _Edi_Debug {

@@ -9,6 +9,12 @@
  #include <sys/user.h>
 #endif
 
+#if defined(__linux__)
+# include <sys/types.h>
+# include <dirent.h>
+# include <ctype.h>
+#endif
+
 #include <Eo.h>
 #include <Eina.h>
 #include <Elementary.h>
@@ -19,13 +25,13 @@
 #include "edi_private.h"
 
 Edi_Debug_Tool _debugger_tools[] = {
-    { "gdb", "gdb", NULL, "run\n", "c\n", "set args %s" },
-    { "lldb", "lldb", NULL, "run\n", "c\n", "settings set target.run-args %s" },
-    { "pdb", "pdb", NULL, NULL, "c\n", "run %s" },
-    { "memcheck", "valgrind", "--tool=memcheck", NULL, NULL, NULL },
-    { "massif", "valgrind", "--tool=massif", NULL, NULL, NULL },
-    { "callgrind", "valgrind", "--tool=callgrind", NULL, NULL, NULL },
-    { NULL, NULL, NULL, NULL, NULL, NULL },
+    { "gdb", "gdb", NULL, "run\n", "c\n", "set args %s\n", "set follow-fork-mode child\n"},
+    { "lldb", "lldb", NULL, "run\n", "c\n", "settings set target.run-args %s", NULL },
+    { "pdb", "pdb", NULL, NULL, "c\n", "run %s", NULL },
+    { "memcheck", "valgrind", "--tool=memcheck", NULL, NULL, NULL, NULL },
+    { "massif", "valgrind", "--tool=massif", NULL, NULL, NULL, NULL },
+    { "callgrind", "valgrind", "--tool=callgrind", NULL, NULL, NULL, NULL },
+    { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
 };
 
 Edi_Debug *_debugger = NULL;
@@ -106,6 +112,46 @@ int edi_debug_process_id(Edi_Debug *debugger)
    if (!debugger->exe) return -1;
 
    debugger_pid = ecore_exe_pid_get(debugger->exe);
+#if defined(__linux__)
+   DIR *dir;
+   struct dirent *dh;
+
+   dir = opendir("/proc");
+   if (!dir) return -1;
+
+   while ((dh = readdir(dir)))
+     {
+        const char *c = dh->d_name;
+        while (*c)
+          {
+             if (!isdigit(*c)) break;
+             ++c;
+          }
+
+        if (*c) continue;
+
+        p = edi_process_stats_by_pid(atoi(dh->d_name));
+        if (!p) continue;
+
+        if (p->ppid == debugger_pid)
+          {
+             if (!strcmp(debugger->program_name, p->command))
+               {
+                  child_pid = p->pid;
+                  if (!strcmp(p->state, "RUN") ||!strcmp(p->state, "SLEEP"))
+                    debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
+                  else
+                    debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
+               }
+          }
+
+        free(p);
+     }
+
+   closedir(dir);
+
+   return child_pid;
+#endif
 
    pid_max = _system_pid_max_get();
 
