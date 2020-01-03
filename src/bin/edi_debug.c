@@ -154,6 +154,9 @@ int edi_debug_process_id(Edi_Debug *debugger)
           }
 
         free(p);
+
+        if (child_pid != -1)
+          break;
      }
 
    closedir(dir);
@@ -189,6 +192,9 @@ int edi_debug_process_id(Edi_Debug *debugger)
           }
 
         free(p);
+
+        if (child_pid != -1)
+          break;
      }
 
    kvm_close(kern);
