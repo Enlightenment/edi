@@ -42,7 +42,7 @@ if get_option('libclang') == true
 endif
 
 executable('edi', src,
-  dependencies : deps,
+  dependencies : [deps, deps_os],
   include_directories : incls,
   install : true
 )

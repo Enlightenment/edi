@@ -9,6 +9,14 @@
  #include <sys/user.h>
 #endif
 
+#if defined(__OpenBSD__)
+# include <kvm.h>
+# include <limits.h>
+# include <sys/proc.h>
+# include <sys/param.h>
+# include <sys/resource.h>
+#endif
+
 #if defined(__linux__)
 # include <sys/types.h>
 # include <dirent.h>
@@ -149,6 +157,41 @@ int edi_debug_process_id(Edi_Debug *debugger)
      }
 
    closedir(dir);
+
+   return child_pid;
+#elif defined(__OpenBSD__)
+   kvm_t *kern;
+   struct kinfo_proc *kp;
+   char errbuf[4096];
+   int pid_count;
+
+   kern = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, errbuf);
+   if (!kern) return -1;
+
+   kp = kvm_getprocs(kern, KERN_PROC_ALL, 0, sizeof(*kp), &pid_count);
+   if (!kp) return -1;
+
+   for (int i = 0; i < pid_count; i++)
+     {
+        p = edi_process_stats_by_pid(kp[i].p_pid);
+        if (!p) continue;
+
+        if (p->ppid == debugger_pid)
+          {
+             if (!strcmp(debugger->program_name, p->command))
+               {
+                  child_pid = p->pid;
+                  if (!strcmp(p->state, "RUN") ||!strcmp(p->state, "SLEEP"))
+                    debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
+                  else
+                    debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
+               }
+          }
+
+        free(p);
+     }
+
+   kvm_close(kern);
 
    return child_pid;
 #endif
