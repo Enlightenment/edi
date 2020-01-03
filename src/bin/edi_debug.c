@@ -165,7 +165,7 @@ int edi_debug_process_id(Edi_Debug *debugger)
 #elif defined(__OpenBSD__)
    kvm_t *kern;
    struct kinfo_proc *kp;
-   char errbuf[4096];
+   char errbuf[_POSIX2_LINE_MAX];
    int pid_count;
 
    kern = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, errbuf);
