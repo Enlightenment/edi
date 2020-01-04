@@ -55,7 +55,12 @@ static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_me
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
 static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate, *_edi_toolbar_hbx, *_edi_toolbar_vbx, *_edi_toolbar_main_box;
+static Eina_Bool _edi_toolbar_is_horizontal;
+
 int _edi_log_dom = -1;
+
+static void
+edi_toolbar_setup(void);
 
 static void
 _edi_active_process_icons_set(Eina_Bool active)
@@ -1339,6 +1344,61 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 }
 
 static void
+_edi_toolbar_horizontal_set(Eina_Bool is_horizontal)
+{
+   _edi_toolbar_is_horizontal = is_horizontal;
+}
+
+static Eina_Bool
+_edi_toolbar_horizontal_get()
+{
+   return _edi_toolbar_is_horizontal;
+}
+
+static void
+_edi_toolbar_visible_set(Eina_Bool visible)
+{
+   elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
+
+   if (visible)
+     {
+        evas_object_show(_edi_toolbar_main_box);
+        evas_object_show(_edi_toolbar);
+     }
+   else
+     {
+        evas_object_hide(_edi_toolbar_main_box);
+        evas_object_hide(_edi_toolbar);
+     }
+
+   if (visible)
+     {
+        elm_box_pack_start(_edi_main_box, _edi_toolbar_main_box);
+     }
+}
+
+static void
+_edi_toolbar_config_changed()
+{
+   _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
+
+   // No change.
+   if (_edi_project_config->gui.toolbar_horizontal == _edi_toolbar_horizontal_get())
+     return;
+
+   // Remove the existing toolbar.
+   elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
+   evas_object_del(_edi_toolbar);
+
+   // Create our toolbar.
+   edi_toolbar_setup();
+   elm_box_recalculate(_edi_main_box);
+
+  // Toolbar has changed, update current state.
+  _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
+}
+
+static void
 edi_toolbar_setup(void)
 {
    Evas_Object *win, *tb;
@@ -1470,34 +1530,12 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config_save();
 }
 
-static void
-_edi_toolbar_visible_set(Eina_Bool visible)
-{
-   elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
-
-   if (visible)
-     {
-        evas_object_show(_edi_toolbar_main_box);
-        evas_object_show(_edi_toolbar);
-     }
-   else
-     {
-        evas_object_hide(_edi_toolbar_main_box);
-        evas_object_hide(_edi_toolbar);
-     }
-
-   if (visible)
-     {
-        elm_box_pack_start(_edi_main_box, _edi_toolbar_main_box);
-     }
-}
-
 static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    edi_theme_window_alpha_set();
 
-   _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
+   _edi_toolbar_config_changed();
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -1681,6 +1719,8 @@ edi_open(const char *inputpath)
 
    evas_object_data_set(win, "background", bg);
    evas_object_data_set(win, "mainbox", vbx);
+
+   _edi_toolbar_horizontal_set( _edi_project_config->gui.toolbar_horizontal);
 
    edi_toolbar_setup();
 

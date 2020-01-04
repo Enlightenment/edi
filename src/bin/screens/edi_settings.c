@@ -373,13 +373,6 @@ _edi_settings_display_create(Evas_Object *parent)
                                   _edi_settings_toolbar_horizontal_cb, NULL);
    elm_table_pack(table, check, 1, 5, 1, 1);
    evas_object_show(check);
-
-   label = elm_label_add(table);
-   elm_object_text_set(label, _("(Requires Restart)"));
-   evas_object_size_hint_align_set(label, 0.2, EVAS_HINT_EXPAND);
-   elm_table_pack(table, label, 1, 5, 1, 1);
-   evas_object_show(label);
-
    elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
