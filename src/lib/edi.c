@@ -18,6 +18,7 @@
 static int _edi_init = 0;
 int _edi_lib_log_dom = -1;
 static const char *_edi_project_path;
+static Eina_Bool _edi_project_mode;
 
 EAPI int
 edi_init(void)
@@ -133,4 +134,16 @@ edi_project_file_exists(const char *file)
 
    free(path);
    return exists;
+}
+
+EAPI Eina_Bool
+edi_project_mode_get(void)
+{
+   return _edi_project_mode;
+}
+
+EAPI void
+edi_project_mode_set(Eina_Bool enabled)
+{
+   _edi_project_mode = enabled;
 }

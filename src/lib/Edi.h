@@ -153,8 +153,12 @@ EAPI char *edi_project_file_path_get(const char *file);
  */
 EAPI Eina_Bool edi_project_file_exists(const char *file);
 
-/**
- * @}
+EAPI Eina_Bool edi_project_mode_get(void);
+
+EAPI void edi_project_mode_set(Eina_Bool enabled);
+
+
+/* @}
  */
 
 #ifdef __cplusplus

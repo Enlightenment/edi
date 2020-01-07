@@ -65,6 +65,8 @@ edi_toolbar_setup(void);
 static void
 _edi_active_process_icons_set(Eina_Bool active)
 {
+   if (!edi_project_mode_get()) return;
+
    if (active)
      {
         elm_object_disabled_set(_edi_toolbar_run, EINA_TRUE);
@@ -607,13 +609,15 @@ _edi_icon_update()
    elm_object_disabled_set(_edi_toolbar_undo, !can_undo);
    elm_object_disabled_set(_edi_toolbar_redo, !can_redo);
 
-   elm_object_item_disabled_set(_edi_menu_init, can_scm);
-   elm_object_item_disabled_set(_edi_menu_push, !can_remote);
-   elm_object_item_disabled_set(_edi_menu_pull, !can_remote);
-   elm_object_item_disabled_set(_edi_menu_status, !can_scm);
-   elm_object_item_disabled_set(_edi_menu_commit, !can_scm);
-   elm_object_item_disabled_set(_edi_menu_stash, !can_scm);
-
+   if (edi_project_mode_get())
+     {
+        elm_object_item_disabled_set(_edi_menu_init, can_scm);
+        elm_object_item_disabled_set(_edi_menu_push, !can_remote);
+        elm_object_item_disabled_set(_edi_menu_pull, !can_remote);
+        elm_object_item_disabled_set(_edi_menu_status, !can_scm);
+        elm_object_item_disabled_set(_edi_menu_commit, !can_scm);
+        elm_object_item_disabled_set(_edi_menu_stash, !can_scm);
+     }
 }
 
 void
@@ -789,6 +793,7 @@ _edi_launcher_terminate(void)
 static void
 _edi_build_menu_items_disabled_set(Eina_Bool state)
 {
+   if (!edi_project_mode_get()) return;
    elm_object_disabled_set(_edi_toolbar_build, state);
    elm_object_disabled_set(_edi_toolbar_test, state);
    elm_object_item_disabled_set(_edi_menu_build, state);
@@ -1300,25 +1305,27 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), _("Open Tasks"), _edi_menu_view_tasks_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
-   _edi_menu_build = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("system-run"), _("Build"), _edi_menu_build_cb, NULL);
-   _edi_menu_test = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-record"), _("Test"), _edi_menu_test_cb, NULL);
-   _edi_menu_clean = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-clear"), _("Clean"), _edi_menu_clean_cb, NULL);
-   elm_menu_item_separator_add(menu, menu_it);
-   _edi_menu_run = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Run"), _edi_menu_run_cb, NULL);
-   _edi_menu_terminate = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-stop"), _("Terminate"), _edi_menu_terminate_cb, NULL);
-   elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("utilities-terminal"), _("Debugger"), _edi_menu_debug_cb, NULL);
-   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("applications-electronics"), _("Memcheck"), _edi_menu_memcheck_cb, NULL);
+   if (edi_project_mode_get())
+     {
+        menu_it = elm_menu_item_add(menu, NULL, NULL, _("Build"), NULL, NULL);
+        _edi_menu_build = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("system-run"), _("Build"), _edi_menu_build_cb, NULL);
+        _edi_menu_test = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-record"), _("Test"), _edi_menu_test_cb, NULL);
+        _edi_menu_clean = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-clear"), _("Clean"), _edi_menu_clean_cb, NULL);
+        elm_menu_item_separator_add(menu, menu_it);
+        _edi_menu_run = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Run"), _edi_menu_run_cb, NULL);
+        _edi_menu_terminate = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-stop"), _("Terminate"), _edi_menu_terminate_cb, NULL);
+        elm_menu_item_separator_add(menu, menu_it);
+        elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("utilities-terminal"), _("Debugger"), _edi_menu_debug_cb, NULL);
+        elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("applications-electronics"), _("Memcheck"), _edi_menu_memcheck_cb, NULL);
 
-   menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
-   _edi_menu_init = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Init"), _edi_menu_scm_init_cb, NULL);
-   _edi_menu_commit = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("mail-send"), _("Commit"), _edi_menu_scm_commit_cb, NULL);
-   _edi_menu_stash = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-undo"), _("Stash"), _edi_menu_scm_stash_cb, NULL);
-   _edi_menu_status = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("dialog-error"), _("Status"), _edi_menu_scm_status_cb, NULL);
-   _edi_menu_push = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-up"), _("Push"), _edi_menu_scm_push_cb, NULL);
-   _edi_menu_pull = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-down"), _("Pull"), _edi_menu_scm_pull_cb, NULL);
-
+        menu_it = elm_menu_item_add(menu, NULL, NULL, _("Project"), NULL, NULL);
+        _edi_menu_init = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("media-playback-start"), _("Init"), _edi_menu_scm_init_cb, NULL);
+        _edi_menu_commit = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("mail-send"), _("Commit"), _edi_menu_scm_commit_cb, NULL);
+        _edi_menu_stash = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-undo"), _("Stash"), _edi_menu_scm_stash_cb, NULL);
+        _edi_menu_status = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("dialog-error"), _("Status"), _edi_menu_scm_status_cb, NULL);
+        _edi_menu_push = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-up"), _("Push"), _edi_menu_scm_push_cb, NULL);
+        _edi_menu_pull = elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-down"), _("Pull"), _edi_menu_scm_pull_cb, NULL);
+     }
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Help"), NULL, NULL);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-home"), _("Visit Website"), _edi_menu_website_cb, NULL);
@@ -1450,15 +1457,18 @@ edi_toolbar_setup(void)
    tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
 
-   _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
-   _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
+   if (edi_project_mode_get())
+     {
+        _edi_toolbar_build = _edi_toolbar_item_add(tb, "system-run", _("Build"), _tb_build_cb);
+        _edi_toolbar_test = _edi_toolbar_item_add(tb, "media-record", _("Test"), _tb_test_cb);
 
-   _edi_toolbar_run =_edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
-   _edi_toolbar_terminate = _edi_toolbar_item_add(tb, "media-playback-stop", _("Terminate"), _tb_terminate_cb);
-   _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
+        _edi_toolbar_run =_edi_toolbar_item_add(tb, "media-playback-start", _("Run"), _tb_run_cb);
+        _edi_toolbar_terminate = _edi_toolbar_item_add(tb, "media-playback-stop", _("Terminate"), _tb_terminate_cb);
+        _edi_toolbar_item_add(tb, "utilities-terminal", _("Debug"), _tb_debug_cb);
 
-   tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
-   elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+        tb_it = elm_toolbar_item_append(tb, "separator", "", NULL, NULL);
+        elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
+     }
 
    _edi_toolbar_item_add(tb, "preferences-desktop", _("Settings"), _tb_settings_cb);
    _edi_toolbar_item_add(tb, "help-about", _("About"), _tb_about_cb);
@@ -1528,6 +1538,7 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
    _edi_project_config->gui.width = w + 1;
    _edi_project_config->gui.height = h + 1;
    _edi_project_config_save();
+   elm_box_recalculate(_edi_main_box);
 }
 
 static Eina_Bool
@@ -1656,12 +1667,13 @@ edi_open(const char *inputpath)
    Evas_Object *vbx_tb, *hbx_tb;
    char *winname;
    char *path;
-   Eina_Bool is_project = EINA_TRUE;
+
+   edi_project_mode_set(EINA_TRUE);
 
    if (!edi_project_set(inputpath))
      {
         edi_project_set(eina_environment_home_get());
-        is_project = EINA_FALSE;
+        edi_project_mode_set(EINA_FALSE);
      }
 
    path = realpath(inputpath, NULL);
@@ -1726,7 +1738,7 @@ edi_open(const char *inputpath)
 
    _edi_menu_setup(win);
 
-   if (is_project)
+   if (edi_project_mode_get())
      content = edi_content_setup(vbx, path);
    else
      content = edi_content_setup(vbx, ecore_file_dir_get(path));
@@ -1735,7 +1747,7 @@ edi_open(const char *inputpath)
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_end(vbx, content);
 
-   if (is_project)
+   if (edi_project_mode_get())
      _edi_config_project_add(path);
 
    _edi_open_tabs();
@@ -1755,7 +1767,7 @@ edi_open(const char *inputpath)
                       _edi_project_config->gui.height * elm_config_scale_get());
    evas_object_show(win);
 
-   if (!is_project)
+   if (!edi_project_mode_get())
      edi_mainview_open_path(path);
 
    free(path);
