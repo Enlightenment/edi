@@ -1679,6 +1679,8 @@ edi_open(const char *inputpath)
      }
 
    path = realpath(inputpath, NULL);
+   if (!path) return EINA_FALSE;
+
    _edi_project_config_load();
 
    elm_need_ethumb();
@@ -1921,13 +1923,20 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      {
         const char *mime;
 
+        if (!ecore_file_exists(project_path))
+          {
+             fprintf(stderr, _("Could not open file (%s)\n"), project_path);
+             goto end;
+          }
+
         mime = edi_mime_type_get(project_path);
         if (!edi_content_provider_for_mime_get(mime))
           {
              fprintf(stderr, _("Could not open file of unsupported mime type (%s)\n"), mime);
              goto end;
           }
-        edi_open(project_path);
+        if (!edi_open(project_path))
+          goto end;
      }
    else if (!(edi_open(project_path)))
      goto end;
