@@ -300,7 +300,6 @@ edi_search_file(Eina_File *file, const char *term)
 {
    Eina_Iterator_Search *it;
    size_t length;
-   const char elf_header[4] = {0x7f, 'E', 'L', 'F'};
 
    if (!file || !term || strlen(term) == 0) return NULL;
 
@@ -315,12 +314,6 @@ edi_search_file(Eina_File *file, const char *term)
 
    it->map = eina_file_map_all(file, EINA_FILE_SEQUENTIAL);
    if (!it->map)
-     {
-        free(it);
-        return NULL;
-     }
-
-   if (length >= 4 && !memcmp(it->map, elf_header, sizeof(elf_header)))
      {
         free(it);
         return NULL;
@@ -405,9 +398,8 @@ _edi_searchpanel_search_project_file(const char *path, const char *search_term, 
    f = eina_file_open(path, EINA_FALSE);
    if (!f) return ;
 
-   // If the file looks big, check if it is a text file first.
-   if (eina_file_size_get(f) > 1 * 1024 * 1024 &&
-       strncmp(edi_mime_type_get(path), "text/", 5))
+   // If the file looks big.
+   if (eina_file_size_get(f) > 2 * 1024 * 1024)
      {
         eina_file_close(f);
         return ;
@@ -502,6 +494,9 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
                {
                 case EINA_FILE_REG:
                   {
+                     if (strncmp(edi_mime_type_get(info->path), "text/", 5))
+                       break;
+
                      _edi_searchpanel_search_project_file(info->path, search_term, logger);
                      break;
                   }
@@ -531,6 +526,15 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
 static void
 _search_end_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED)
 {
+   const char *text;
+   size_t len;
+
+   text = _("done!");
+
+   len = strlen(text);
+
+   elm_code_file_line_append(_elm_code->file, text, len, NULL);
+
    _search_thread = NULL;
    _searching = EINA_FALSE;
 }
@@ -612,6 +616,13 @@ _edi_taskspanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
    line->status = ELM_CODE_STATUS_TYPE_TODO;
 }
 
+static void
+_tasks_end_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED)
+{
+   _search_thread = NULL;
+   _searching = EINA_FALSE;
+}
+
 static Eina_Bool
 _edi_taskspanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
@@ -652,8 +663,8 @@ edi_taskspanel_find(void)
      }
 
    _search_thread = ecore_thread_feedback_run(_tasks_begin_cb, NULL,
-                                             _search_end_cb, _search_end_cb,
-                                             path, EINA_FALSE);
+                                              _tasks_end_cb, _tasks_end_cb,
+                                              path, EINA_FALSE);
 }
 
 void
