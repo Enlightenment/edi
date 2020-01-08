@@ -596,8 +596,6 @@ _edi_icon_update()
 
    can_undo = edi_mainview_can_undo();
    can_redo = edi_mainview_can_redo();
-   can_scm = edi_scm_enabled();
-   can_remote = can_scm && edi_scm_remote_enabled();
    modified = edi_mainview_modified();
 
    elm_object_item_disabled_set(_edi_menu_save, !modified);
@@ -611,6 +609,9 @@ _edi_icon_update()
 
    if (edi_project_mode_get())
      {
+        can_scm = edi_scm_enabled();
+        can_remote = can_scm && edi_scm_remote_enabled();
+
         elm_object_item_disabled_set(_edi_menu_init, can_scm);
         elm_object_item_disabled_set(_edi_menu_push, !can_remote);
         elm_object_item_disabled_set(_edi_menu_pull, !can_remote);
@@ -794,6 +795,7 @@ static void
 _edi_build_menu_items_disabled_set(Eina_Bool state)
 {
    if (!edi_project_mode_get()) return;
+
    elm_object_disabled_set(_edi_toolbar_build, state);
    elm_object_disabled_set(_edi_toolbar_test, state);
    elm_object_item_disabled_set(_edi_menu_build, state);

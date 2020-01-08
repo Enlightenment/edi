@@ -905,6 +905,9 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
    Evas_Object *win, *bg, *table, *naviframe, *tb;
    Elm_Object_Item *tb_it, *default_it;
    Elm_Object_Item *it_project, *it_display, *it_behaviour, *it_builds;
+   Eina_Bool project_mode;
+
+   it_project = it_display = it_behaviour = it_builds = NULL;
 
    if (edi_settings_win_get())
      return NULL;
@@ -957,9 +960,13 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
                                                    _edi_settings_behaviour_create(naviframe), NULL);
    elm_naviframe_item_title_enabled_set(_edi_settings_behaviour, EINA_FALSE, EINA_FALSE);
 
-   it_project = elm_toolbar_item_append(tb, "applications-development", _("Project"),_edi_settings_category_cb, _edi_settings_project);
+   project_mode = edi_project_mode_get();
+
+   if (project_mode)
+     it_project = elm_toolbar_item_append(tb, "applications-development", _("Project"),_edi_settings_category_cb, _edi_settings_project);
    it_display = elm_toolbar_item_append(tb, "preferences-desktop", _("Display"), _edi_settings_category_cb, _edi_settings_display);
-   it_builds = elm_toolbar_item_append(tb, "system-run", _("Builds"), _edi_settings_category_cb, _edi_settings_builds);
+   if (project_mode)
+     it_builds = elm_toolbar_item_append(tb, "system-run", _("Builds"), _edi_settings_category_cb, _edi_settings_builds);
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
@@ -985,7 +992,8 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
           break;
      }
 
-   elm_toolbar_item_selected_set(default_it, EINA_TRUE);
+   if (default_it)
+     elm_toolbar_item_selected_set(default_it, EINA_TRUE);
 
    evas_object_show(naviframe);
    evas_object_resize(win, 480 * elm_config_scale_get(), 360 * elm_config_scale_get());
