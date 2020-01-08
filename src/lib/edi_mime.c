@@ -20,6 +20,8 @@ edi_mime_type_get(const char *path)
    unsigned long long len;
    Eina_Bool likely_text = EINA_TRUE;
 
+   if (!path) return NULL;
+
    f = eina_file_open(path, EINA_FALSE);
    if (!f) return efreet_mime_type_get(path);
 
@@ -30,14 +32,14 @@ edi_mime_type_get(const char *path)
         return "text/plain";
      }
 
-   map = eina_file_map_all(f, EINA_FILE_POPULATE);
+   if (len > 2048) len = 2048;
+
+   map = eina_file_map_new(f, EINA_FILE_POPULATE, 0, len);
    if (!map)
      {
         eina_file_close(f);
         return efreet_mime_type_get(path);
      }
-
-   if (len > 2048) len = 2048;
 
    for (int i = 0; i < (int) len; i++)
      {
