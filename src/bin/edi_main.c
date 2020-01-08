@@ -1779,17 +1779,6 @@ edi_open(const char *inputpath)
 }
 
 void
-edi_open_file(const char *filepath)
-{
-   // TODO we should make this window more functional (i.e. toolbar etc)
-
-   edi_project_set(eina_environment_home_get());
-
-   _edi_project_config_load();
-   edi_mainview_open_window_path(filepath);
-}
-
-void
 edi_close()
 {
    edi_debugpanel_stop();
