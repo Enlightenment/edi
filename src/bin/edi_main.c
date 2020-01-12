@@ -1745,7 +1745,7 @@ edi_open(const char *inputpath)
    if (edi_project_mode_get())
      content = edi_content_setup(vbx, path);
    else
-     content = edi_content_setup(vbx, ecore_file_dir_get(path));
+     content = edi_content_setup(vbx, edi_project_get());
 
    evas_object_size_hint_weight_set(content, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(content, EVAS_HINT_FILL, EVAS_HINT_FILL);
