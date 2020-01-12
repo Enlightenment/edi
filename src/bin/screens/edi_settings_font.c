@@ -2,12 +2,18 @@
 # include "config.h"
 #endif
 
+#if defined(__linux__)
+# define _GNU_SOURCE
+#endif
+
 #include <Elementary.h>
 #include <Ecore.h>
 
 #include "edi_config.h"
 
 #include "edi_private.h"
+
+#include <string.h>
 
 #define FONT_STEP (1.0 / (EDI_FONT_MAX - EDI_FONT_MIN))
 
@@ -48,6 +54,7 @@ _edi_settings_font_preview_add(Evas_Object *parent, const char *font_name, int f
    return widget;
 }
 
+#if 0
 static Eina_Bool
 _font_monospaced_check(const char *name, Evas_Object *parent)
 {
@@ -77,6 +84,8 @@ _font_monospaced_check(const char *name, Evas_Object *parent)
 
    return EINA_TRUE;
 }
+
+#endif
 
 static void
 _parse_font_name(const char *full_name,
@@ -329,7 +338,7 @@ edi_settings_font_add(Evas_Object *opbox)
           {
              f = calloc(1, sizeof(Font));
              _parse_font_name(fname, &f->full_name, &f->pretty_name);
-             if (!_font_monospaced_check(f->full_name, opbox))
+             if (!strcasestr(f->full_name, "mono"))
                {
                   free(f);
                   continue;
