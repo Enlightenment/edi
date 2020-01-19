@@ -1077,6 +1077,28 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
      }
 }
 
+
+static void
+_edi_mainview_panel_next_mouse_wheel_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
+                                        Evas_Object *obj, void *event_info)
+{
+   Evas_Event_Mouse_Wheel *ev;
+   Evas_Object *scroller;
+   int x, y, w, h;
+
+   scroller = obj;
+   ev = event_info;
+
+   elm_scroller_region_get(scroller, &x, &y, &w, &h);
+
+   if (ev->z > 0)
+     x += w * 0.4;
+   else if (ev->z < 0)
+     x -= w * 0.4;
+
+   elm_scroller_region_bring_in(scroller, x, y, w, h);
+}
+
 static void
 _edi_mainview_panel_next_clicked_cb(void *data,
                                     Evas_Object *obj EINA_UNUSED,
@@ -1169,6 +1191,8 @@ edi_mainview_panel_add(Evas_Object *parent)
    elm_scroller_bounce_set(scr, EINA_FALSE, EINA_FALSE);
    elm_scroller_policy_set(scr, ELM_SCROLLER_POLICY_OFF, ELM_SCROLLER_POLICY_OFF);
    elm_table_pack(tabs, scr, 0, 0, 1, 1);
+   evas_object_event_callback_add(scr, EVAS_CALLBACK_MOUSE_WHEEL,
+                                  _edi_mainview_panel_next_mouse_wheel_cb, NULL);
    evas_object_show(scr);
 
    prev = elm_button_add(tabs);
