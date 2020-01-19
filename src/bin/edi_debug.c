@@ -4,16 +4,17 @@
 
 #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
  #include <unistd.h>
+ #include <fcntl.h>
+ #include <kvm.h>
+ #include <sys/param.h>
  #include <sys/types.h>
  #include <sys/sysctl.h>
  #include <sys/user.h>
 #endif
 
 #if defined(__OpenBSD__)
-# include <kvm.h>
 # include <limits.h>
 # include <sys/proc.h>
-# include <sys/param.h>
 # include <sys/resource.h>
 #endif
 
@@ -109,11 +110,45 @@ _system_pid_max_get(void)
    return pid_max;
 }
 
+int _edi_debug_process_id_fallback(Edi_Debug *debugger)
+{
+   Edi_Proc_Stats *p;
+   int pid_max, debugger_pid, child_pid = -1;
+
+   debugger_pid = ecore_exe_pid_get(debugger->exe);
+   pid_max = _system_pid_max_get();
+
+   for (int i = 1; i <= pid_max; i++)
+     {
+        p = edi_process_stats_by_pid(i);
+        if (!p) continue;
+
+        if (p->ppid == debugger_pid)
+          {
+             if (!strcmp(debugger->program_name, p->command))
+               {
+                  child_pid = p->pid;
+                  if (!strcmp(p->state, "RUN") ||!strcmp(p->state, "SLEEP"))
+                    debugger->state = EDI_DEBUG_PROCESS_ACTIVE;
+                  else
+                    debugger->state = EDI_DEBUG_PROCESS_SLEEPING;
+               }
+          }
+
+        free(p);
+
+        if (child_pid != -1)
+          break;
+     }
+
+   return child_pid;
+}
+
 /* Get the process ID of the child process being debugged in *our* session */
 int edi_debug_process_id(Edi_Debug *debugger)
 {
    Edi_Proc_Stats *p;
-   int pid_max, debugger_pid, child_pid = -1;
+   int debugger_pid, child_pid = -1;
 
    if (!debugger) return -1;
    if (!debugger->program_name) return -1;
@@ -200,13 +235,25 @@ int edi_debug_process_id(Edi_Debug *debugger)
    kvm_close(kern);
 
    return child_pid;
-#endif
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
+   kvm_t *kern;
+   struct kinfo_proc *kp;
+   char errbuf[_POSIX2_LINE_MAX];
+   int pid_count;
 
-   pid_max = _system_pid_max_get();
-
-   for (int i = 1; i <= pid_max; i++)
+   kern = kvm_openfiles(NULL, NULL, NULL, O_RDONLY, errbuf);
+   if (!kern)
      {
-        p = edi_process_stats_by_pid(i);
+        // Most likely we don't have READ access to /dev/mem.
+        return _edi_debug_process_id_fallback(debugger);
+     }
+
+   kp = kvm_getprocs(kern, KERN_PROC_PROC, 0, &pid_count);
+   if (!kp) return -1;
+
+   for (int i = 0; i < pid_count; i++)
+     {
+        p = edi_process_stats_by_pid(kp[i].ki_pid);
         if (!p) continue;
 
         if (p->ppid == debugger_pid)
@@ -227,6 +274,11 @@ int edi_debug_process_id(Edi_Debug *debugger)
           break;
      }
 
+   kvm_close(kern);
+
    return child_pid;
+#endif
+
+   return _edi_debug_process_id_fallback(debugger);
 }
 

@@ -29,7 +29,7 @@ top_inc = include_directories('.')
 host_os = host_machine.system()
 
 deps_os = declare_dependency(link_args : [] )
-if host_os == 'openbsd'
+if host_os == 'openbsd' or host_os == 'freebsd' or host_os == 'dragonfly'
    deps_os = declare_dependency(link_args : [ '-lkvm' ])
 endif
 
