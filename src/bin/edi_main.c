@@ -468,7 +468,7 @@ edi_content_setup(Evas_Object *win, const char *path)
    evas_object_size_hint_weight_set(tb, EVAS_HINT_EXPAND, 0.0);
    evas_object_size_hint_align_set(tb, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_toolbar_homogeneous_set(tb, EINA_FALSE);
-   elm_toolbar_align_set(tb, 1.0);
+   elm_toolbar_align_set(tb, 0.0);
    elm_toolbar_icon_size_set(tb, 24 * elm_config_scale_get());
    elm_object_style_set(tb, "item_horizontal");
    elm_object_focus_allow_set(tb, EINA_FALSE);
