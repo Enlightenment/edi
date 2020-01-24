@@ -285,15 +285,9 @@ _edi_create_notify_cb(void *d, Eio_File *handler EINA_UNUSED, const Eio_Progress
 }
 
 static void
-_edi_create_error_cb(void *data, Eio_File *handler EINA_UNUSED, int error)
+_edi_create_error_cb(void *data EINA_UNUSED, Eio_File *handler EINA_UNUSED, int error)
 {
-   Edi_Create *create;
-
-   create = (Edi_Create *) data;
    ERR("copy error: [%s]\n", strerror(error));
-   if (create && create->callback)
-     create->callback(create->path, EINA_FALSE);
-
    _edi_create_free_data();
 }
 

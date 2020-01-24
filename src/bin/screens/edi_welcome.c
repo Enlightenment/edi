@@ -347,11 +347,15 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
    if (path && path[0] && name && name[0])
      {
         if (!template->is_template)
-          edi_create_example(template->path, path, name,
-                             _edi_welcome_project_new_create_done_cb);
+          {
+             edi_create_example(template->path, path, name,
+                                _edi_welcome_project_new_create_done_cb);
+          }
         else
-          edi_create_project(template->path, path, name, url, user, email,
-                                 _edi_welcome_project_new_create_done_cb);
+          {
+             edi_create_project(template->path, path, name, url, user, email,
+                                _edi_welcome_project_new_create_done_cb);
+          }
      }
    else
      {
