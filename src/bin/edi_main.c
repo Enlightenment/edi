@@ -1342,9 +1342,9 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
    Elm_Object_Item *tb_it;
 
    if (!_edi_project_config->gui.internal_icons)
-     tb_it = elm_toolbar_item_append(tb, icon, NULL, func, NULL);
+     tb_it = elm_toolbar_item_append(tb, icon, name, func, NULL);
    else
-     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), NULL, func, NULL);
+     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), name, func, NULL);
 
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
