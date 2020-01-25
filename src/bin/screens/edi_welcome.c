@@ -160,7 +160,7 @@ _edi_welcome_project_choose_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNU
    elm_win_resize_object_add(win, fs);
    evas_object_show(fs);
 
-   elm_fileselector_expandable_set(fs, EINA_TRUE);
+   elm_fileselector_expandable_set(fs, EINA_FALSE);
    elm_fileselector_folder_only_set(fs, EINA_TRUE);
    elm_fileselector_path_set(fs, eina_environment_home_get());
    elm_fileselector_sort_method_set(fs, ELM_FILESELECTOR_SORT_BY_FILENAME_ASC);
@@ -186,6 +186,7 @@ _edi_welcome_project_new_directory_row_add(const char *text, int row,
    input = elm_fileselector_entry_add(parent);
    elm_object_text_set(input, _("Select folder"));
    elm_fileselector_folder_only_set(input, EINA_TRUE);
+   elm_fileselector_expandable_set(input, EINA_FALSE);
    evas_object_size_hint_weight_set(input, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(input, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_pack(parent, input, 1, row, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 1, 1);
