@@ -33,6 +33,13 @@ _edi_searchpanel_config_changed_cb(void *data EINA_UNUSED, int type EINA_UNUSED,
    return ECORE_CALLBACK_RENEW;
 }
 
+void
+edi_searchpanel_stop(void)
+{
+   if (_search_thread)
+     ecore_thread_cancel(_search_thread);
+}
+
 static void
 _edi_searchpanel_line_clicked_cb(void *data EINA_UNUSED, const Efl_Event *event)
 {
@@ -498,13 +505,10 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
                {
                 case EINA_FILE_REG:
                   {
+	             if (ecore_thread_check(_search_thread)) return;
+
                      const char *mime = edi_mime_type_get(info->path);
-                     if (!mime)
-                       {
-                          // If we're in a search and EDI is shutting down we
-                          // need to return here.
-                          return;
-                       }
+
                      if (strncmp(mime, "text/", 5))
                        break;
 

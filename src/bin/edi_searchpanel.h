@@ -33,6 +33,13 @@ extern "C" {
 void edi_searchpanel_add(Evas_Object *parent);
 
 /**
+ * Cancel a search that is in progress.
+ *
+ * @ingroup UI
+ */
+void edi_searchpanel_stop(void);
+
+/**
  * Show the Edi searchpanel - animating on to screen if required.
  *
  * @ingroup UI

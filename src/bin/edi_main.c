@@ -1783,6 +1783,7 @@ edi_open(const char *inputpath)
 void
 edi_close()
 {
+   edi_searchpanel_stop();
    edi_debugpanel_stop();
    elm_exit();
 }
