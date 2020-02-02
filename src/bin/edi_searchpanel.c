@@ -70,15 +70,13 @@ _edi_searchpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_O
 }
 
 static void
-_edi_searchpanel_button_clicked_cb(void *data EINA_UNUSED,
-                                   Evas_Object *obj EINA_UNUSED,
+_edi_searchpanel_button_clicked_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                                    void *event_info EINA_UNUSED)
 {
    const char *text_markup;
    char *text;
-   Evas_Object *button, *entry;
+   Evas_Object *entry;
 
-   button = obj;
    entry = data;
 
    if (_search_thread)
