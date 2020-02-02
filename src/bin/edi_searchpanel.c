@@ -16,7 +16,7 @@
 
 #include "edi_private.h"
 
-static Evas_Object *_info_widget, *_tasks_widget;
+static Evas_Object *_info_widget, *_tasks_widget, *_button_search;
 static Elm_Code *_elm_code, *_tasks_code;
 
 static Ecore_Thread *_search_thread = NULL;
@@ -38,6 +38,64 @@ edi_searchpanel_stop(void)
 {
    if (_search_thread)
      ecore_thread_cancel(_search_thread);
+}
+
+static void
+_edi_searchpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj, void *event_info)
+{
+   Evas_Object *entry;
+   Evas_Event_Key_Down *event;
+   const char *text_markup;
+   char *text;
+
+   event = event_info;
+   entry = obj;
+
+   if (!event) return;
+
+   if (!event->key) return;
+
+   if (!strcmp(event->key, "Return"))
+     {
+        edi_searchpanel_stop();
+        text_markup = elm_object_part_text_get(entry, NULL);
+        text = elm_entry_markup_to_utf8(text_markup);
+        if (text)
+          {
+             edi_searchpanel_find(text);
+             free(text);
+          }
+        elm_object_part_text_set(entry, NULL, "");
+     }
+}
+
+static void
+_edi_searchpanel_button_clicked_cb(void *data EINA_UNUSED,
+                                   Evas_Object *obj EINA_UNUSED,
+                                   void *event_info EINA_UNUSED)
+{
+   const char *text_markup;
+   char *text;
+   Evas_Object *button, *entry;
+
+   button = obj;
+   entry = data;
+
+   if (_search_thread)
+     {
+        edi_searchpanel_stop();
+     }
+   else
+     {
+        text_markup = elm_object_part_text_get(entry, NULL);
+        text = elm_entry_markup_to_utf8(text_markup);
+        if (text)
+          {
+             edi_searchpanel_find(text);
+             free(text);
+          }
+        elm_object_part_text_set(entry, NULL, "");
+     }
 }
 
 static void
@@ -505,7 +563,7 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
                {
                 case EINA_FILE_REG:
                   {
-	             if (ecore_thread_check(_search_thread)) return;
+                     if (ecore_thread_check(_search_thread)) return;
 
                      const char *mime = edi_mime_type_get(info->path);
 
@@ -548,6 +606,8 @@ _search_end_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED)
 
    len = strlen(text);
 
+   elm_object_text_set(_button_search, _("Search"));
+
    elm_code_file_line_append(_elm_code->file, text, len, NULL);
 
    _search_thread = NULL;
@@ -581,6 +641,7 @@ edi_searchpanel_find(const char *text)
    path = edi_project_get();
 
    elm_code_file_clear(_elm_code->file);
+   elm_object_text_set(_button_search, _("Cancel"));
 
    _searching = EINA_TRUE;
    _search_thread = ecore_thread_feedback_run(_search_begin_cb, NULL,
@@ -591,7 +652,7 @@ edi_searchpanel_find(const char *text)
 void
 edi_searchpanel_add(Evas_Object *parent)
 {
-   Evas_Object *frame;
+   Evas_Object *frame, *entry, *box, *hbox, *button;
    Elm_Code_Widget *widget;
    Elm_Code *code;
 
@@ -600,6 +661,34 @@ edi_searchpanel_add(Evas_Object *parent)
    evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(frame);
+
+   box = elm_box_add(parent);
+   evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(box);
+
+   hbox = elm_box_add(parent);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_show(hbox);
+
+   entry = elm_entry_add(parent);
+   elm_entry_single_line_set(entry, EINA_TRUE);
+   elm_entry_scrollable_set(entry, EINA_TRUE);
+   elm_entry_editable_set(entry, EINA_TRUE);
+   evas_object_size_hint_weight_set(entry, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(entry, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_DOWN, _edi_searchpanel_keypress_cb, NULL);
+   evas_object_show(entry);
+
+   _button_search = button = elm_button_add(parent);
+   evas_object_size_hint_weight_set(button, 0.05, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(button, _("Search"));
+   elm_box_horizontal_set(button, EINA_TRUE);
+   evas_object_smart_callback_add(button, "clicked", _edi_searchpanel_button_clicked_cb, entry);
+   evas_object_show(button);
 
    code = elm_code_create();
    widget = elm_code_widget_add(parent, code);
@@ -615,7 +704,13 @@ edi_searchpanel_add(Evas_Object *parent)
    _info_widget = widget;
    eina_spinlock_new(&logs_lock);
 
-   elm_object_content_set(frame, widget);
+   elm_box_pack_end(hbox, entry);
+   elm_box_pack_end(hbox, button);
+
+   elm_box_pack_end(box, widget);
+   elm_box_pack_end(box, hbox);
+
+   elm_object_content_set(frame, box);
    elm_box_pack_end(parent, frame);
 
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_searchpanel_config_changed_cb, NULL);

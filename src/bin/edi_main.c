@@ -1040,7 +1040,7 @@ static void
 _edi_menu_find_project_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                       void *event_info EINA_UNUSED)
 {
-   edi_mainview_project_search_popup_show();
+   edi_searchpanel_show();
 }
 
 static void
