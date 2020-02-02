@@ -55,7 +55,7 @@ static Evas_Object *_edi_menu_init, *_edi_menu_commit, *_edi_menu_push, *_edi_me
 static Evas_Object *_edi_menu_save, *_edi_toolbar_save;
 static Evas_Object *_edi_main_win, *_edi_main_box;
 static Evas_Object *_edi_toolbar_run, *_edi_toolbar_terminate, *_edi_toolbar_hbx, *_edi_toolbar_vbx, *_edi_toolbar_main_box;
-static Eina_Bool _edi_toolbar_is_horizontal;
+static Eina_Bool _edi_toolbar_is_horizontal, _edi_toolbar_text_visible;
 
 int _edi_log_dom = -1;
 
@@ -1340,16 +1340,32 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
 {
    Evas_Object *content;
    Elm_Object_Item *tb_it;
+   const char *item_name = NULL;
+
+   if (_edi_project_config->gui.toolbar_text_visible)
+     item_name = name;
 
    if (!_edi_project_config->gui.internal_icons)
-     tb_it = elm_toolbar_item_append(tb, icon, name, func, NULL);
+     tb_it = elm_toolbar_item_append(tb, icon, item_name, func, NULL);
    else
-     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), name, func, NULL);
+     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), item_name, func, NULL);
 
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
 
    return content;
+}
+
+static void
+_edi_toolbar_text_visible_set(Eina_Bool visible)
+{
+   _edi_toolbar_text_visible = visible;
+}
+
+static Eina_Bool
+_edi_toolbar_text_visible_get(void)
+{
+   return _edi_toolbar_text_visible;
 }
 
 static void
@@ -1392,8 +1408,11 @@ _edi_toolbar_config_changed()
    _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
 
    // No change.
-   if (_edi_project_config->gui.toolbar_horizontal == _edi_toolbar_horizontal_get())
-     return;
+   if ((_edi_project_config->gui.toolbar_horizontal == _edi_toolbar_horizontal_get()) &&
+       (_edi_project_config->gui.toolbar_text_visible == _edi_toolbar_text_visible_get()))
+     {
+        return;
+     }
 
    // Remove the existing toolbar.
    elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
@@ -1405,6 +1424,7 @@ _edi_toolbar_config_changed()
 
   // Toolbar has changed, update current state.
   _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
+  _edi_toolbar_text_visible_set(_edi_project_config->gui.toolbar_text_visible);
 }
 
 static void
@@ -1737,6 +1757,7 @@ edi_open(const char *inputpath)
    evas_object_data_set(win, "mainbox", vbx);
 
    _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
+   _edi_toolbar_text_visible_set(_edi_project_config->gui.toolbar_text_visible);
 
    edi_toolbar_setup();
 

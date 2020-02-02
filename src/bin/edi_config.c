@@ -287,6 +287,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.toolbar_horizontal, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.toolbar_text_visible, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.internal_icons, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.tab_inserts_spaces, EET_T_UCHAR);
 
@@ -524,6 +525,7 @@ _edi_project_config_load()
    _edi_project_config->gui.internal_icons = EINA_TRUE;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
    _edi_project_config->gui.toolbar_horizontal = EINA_FALSE;
+   _edi_project_config->gui.toolbar_text_visible = EINA_TRUE;
    IFPCFGEND;
 
    IFPCFG(0x0002);
@@ -688,7 +690,7 @@ _edi_project_config_panel_remove_all(void)
    count = eina_list_count(_edi_project_config->panels);
    for (i = 0; i < count; i++)
      {
-	_edi_project_config_panel_remove(0);
+        _edi_project_config_panel_remove(0);
      }
 }
 

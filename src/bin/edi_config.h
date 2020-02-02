@@ -92,6 +92,8 @@ struct _Edi_Project_Config
 
         Eina_Bool toolbar_hidden;
         Eina_Bool toolbar_horizontal;
+        Eina_Bool toolbar_text_visible;
+
         Eina_Bool tab_inserts_spaces;
      } gui;
 

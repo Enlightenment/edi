@@ -115,12 +115,23 @@ _edi_settings_toolbar_hidden_cb(void *data EINA_UNUSED, Evas_Object *obj,
 
 static void
 _edi_settings_toolbar_horizontal_cb(void *data EINA_UNUSED, Evas_Object *obj,
-                                void *event EINA_UNUSED)
+                                    void *event EINA_UNUSED)
 {
    Evas_Object *check;
 
    check = (Evas_Object *)obj;
    _edi_project_config->gui.toolbar_horizontal = elm_check_state_get(check);
+   _edi_project_config_save();
+}
+
+static void
+_edi_settings_toolbar_text_visible_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                              void *event EINA_UNUSED)
+{
+   Evas_Object *check;
+
+   check = (Evas_Object *)obj;
+   _edi_project_config->gui.toolbar_text_visible = elm_check_state_get(check);
    _edi_project_config_save();
 }
 
@@ -260,7 +271,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(label);
 
    button = elm_button_add(table);
-   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, 0); // EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, 0);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(button);
    preview = _edi_settings_font_preview_add(table, _edi_project_config->font.name,
@@ -376,7 +387,7 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
-   elm_object_text_set(label, _("Internal Icons"));
+   elm_object_text_set(label, _("Show Toolbar Text"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    elm_table_pack(table, label, 0, 6, 1, 1);
    evas_object_show(label);
@@ -386,13 +397,25 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
-                                  _edi_settings_internal_icons_changed_cb, NULL);
+                                  _edi_settings_toolbar_text_visible_cb, NULL);
+   evas_object_show(check);
    elm_table_pack(table, check, 1, 6, 1, 1);
+
+   label = elm_label_add(table);
+   elm_object_text_set(label, _("Internal Icons"));
+   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   elm_table_pack(table, label, 0, 7, 1, 1);
+   evas_object_show(label);
+
+   check = elm_check_add(box);
+   elm_check_state_set(check, _edi_project_config->gui.internal_icons);
+   evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_internal_icons_changed_cb, NULL);
+   elm_table_pack(table, check, 1, 7, 1, 1);
    evas_object_show(check);
    elm_box_pack_end(box, table);
-
-
-   // END OF ALPHA SELECTOR
 
    frame = _edi_settings_panel_create(parent, _("Editor"));
    box = elm_object_part_content_get(frame, "default");
