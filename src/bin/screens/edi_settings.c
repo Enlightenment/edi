@@ -393,7 +393,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(label);
 
    check = elm_check_add(box);
-   elm_check_state_set(check, _edi_project_config->gui.internal_icons);
+   elm_check_state_set(check, _edi_project_config->gui.toolbar_text_visible);
    evas_object_size_hint_weight_set(check, EVAS_HINT_EXPAND, 0.5);
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
