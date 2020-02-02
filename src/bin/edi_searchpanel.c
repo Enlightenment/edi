@@ -201,6 +201,10 @@ edi_search_term(const char *start, const char *end, int boundary,
         cchunk = chunk = start + boundary < end ? boundary : end - start;
         do
           {
+             if ((search + cchunk) > end)
+               {
+                  cchunk = end - search;
+               }
              lookup = memchr(search, *term, cchunk);
 
              // Did we found the right word or not ?
@@ -494,7 +498,14 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
                {
                 case EINA_FILE_REG:
                   {
-                     if (strncmp(edi_mime_type_get(info->path), "text/", 5))
+                     const char *mime = edi_mime_type_get(info->path);
+                     if (!mime)
+                       {
+                          // If we're in a search and EDI is shutting down we
+                          // need to return here.
+                          return;
+                       }
+                     if (strncmp(mime, "text/", 5))
                        break;
 
                      _edi_searchpanel_search_project_file(info->path, search_term, logger);
