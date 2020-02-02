@@ -1736,7 +1736,7 @@ edi_open(const char *inputpath)
    evas_object_data_set(win, "background", bg);
    evas_object_data_set(win, "mainbox", vbx);
 
-   _edi_toolbar_horizontal_set( _edi_project_config->gui.toolbar_horizontal);
+   _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
 
    edi_toolbar_setup();
 
@@ -1772,7 +1772,9 @@ edi_open(const char *inputpath)
    evas_object_show(win);
 
    if (!edi_project_mode_get())
-     edi_mainview_open_path(path);
+     {
+        edi_mainview_open_path(path);
+     }
 
    free(path);
    return EINA_TRUE;

@@ -9,7 +9,6 @@
 #include <Elementary.h>
 
 #include "edi_config.h"
-
 #include "edi_private.h"
 
 #define EDI_CONFIG_NAME PACKAGE_NAME
@@ -562,6 +561,12 @@ _edi_project_config_load()
    _edi_project_config->version = EDI_PROJECT_CONFIG_FILE_VERSION;
 
    if (save) _edi_project_config_save_no_notify();
+
+   /* opening as an editor */
+   if (!edi_project_mode_get())
+     {
+        _edi_project_config_panel_remove_all();
+     }
 }
 
 Eina_List **
@@ -673,6 +678,18 @@ _edi_project_config_panel_remove(int panel_id)
    free(panel);
 
    _edi_project_config_save_no_notify();
+}
+
+void
+_edi_project_config_panel_remove_all(void)
+{
+   unsigned int i, count;
+
+   count = eina_list_count(_edi_project_config->panels);
+   for (i = 0; i < count; i++)
+     {
+	_edi_project_config_panel_remove(0);
+     }
 }
 
 void
