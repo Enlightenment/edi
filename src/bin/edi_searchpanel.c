@@ -60,12 +60,12 @@ _edi_searchpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_O
         edi_searchpanel_stop();
         text_markup = elm_object_part_text_get(entry, NULL);
         text = elm_entry_markup_to_utf8(text_markup);
-        if (text)
+        if (text && text[0] && text[1])
           {
              edi_searchpanel_find(text);
              free(text);
+             elm_object_part_text_set(entry, NULL, "");
           }
-        elm_object_part_text_set(entry, NULL, "");
      }
 }
 
