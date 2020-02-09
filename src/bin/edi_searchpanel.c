@@ -41,12 +41,29 @@ edi_searchpanel_stop(void)
 }
 
 static void
+_edi_searchpanel_find(Evas_Object *entry)
+{
+   const char *text_markup;
+   char *text;
+
+   text_markup = elm_object_part_text_get(entry, NULL);
+   text = elm_entry_markup_to_utf8(text_markup);
+   if (text)
+     {
+        if (text[0] && text[1])
+          {
+             edi_searchpanel_find(text);
+             elm_object_part_text_set(entry, NULL, "");
+          }
+        free(text);
+     }
+}
+
+static void
 _edi_searchpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj, void *event_info)
 {
    Evas_Object *entry;
    Evas_Event_Key_Down *event;
-   const char *text_markup;
-   char *text;
 
    event = event_info;
    entry = obj;
@@ -58,14 +75,7 @@ _edi_searchpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_O
    if (!strcmp(event->key, "Return"))
      {
         edi_searchpanel_stop();
-        text_markup = elm_object_part_text_get(entry, NULL);
-        text = elm_entry_markup_to_utf8(text_markup);
-        if (text && text[0] && text[1])
-          {
-             edi_searchpanel_find(text);
-             free(text);
-             elm_object_part_text_set(entry, NULL, "");
-          }
+        _edi_searchpanel_find(entry);
      }
 }
 
@@ -73,8 +83,6 @@ static void
 _edi_searchpanel_button_clicked_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                                    void *event_info EINA_UNUSED)
 {
-   const char *text_markup;
-   char *text;
    Evas_Object *entry;
 
    entry = data;
@@ -85,14 +93,7 @@ _edi_searchpanel_button_clicked_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
      }
    else
      {
-        text_markup = elm_object_part_text_get(entry, NULL);
-        text = elm_entry_markup_to_utf8(text_markup);
-        if (text)
-          {
-             edi_searchpanel_find(text);
-             free(text);
-          }
-        elm_object_part_text_set(entry, NULL, "");
+        _edi_searchpanel_find(entry);
      }
 }
 
