@@ -146,7 +146,7 @@ edi_searchpanel_line_render(const Eina_File_Line *line, const char *path, size_t
 
    while (text < end)
      {
-        if (*text != ' ' && *text != '\t')
+        if (*text != ' ' && *text != '\t' && *text != '\n')
           break;
         text++;
      }
@@ -413,7 +413,6 @@ typedef struct {
 
    Eina_Inarray texts;
 } Async_Log;
-
 
 static Eina_Spinlock logs_lock;
 static unsigned int logs_count = 0;
