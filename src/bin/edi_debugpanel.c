@@ -43,13 +43,28 @@ _edi_debugpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, voi
    return ECORE_CALLBACK_RENEW;
 }
 
+static void
+chomp(char *line)
+{
+   char *s = line;
+
+   while (*s)
+     {
+        if (*s == '\r' || *s == '\n')
+          {
+             *s = '\0';
+             break;
+          }
+        s++;
+     }
+}
+
 static Eina_Bool
 _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *event)
 {
    Ecore_Exe_Event_Data *ev;
    Edi_Debug *debug;
-   int idx;
-   char *start, *end = NULL;
+   char *buf, *start, *end;
 
    ev = event;
 
@@ -62,30 +77,27 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
       {
          if (!ev->data) return ECORE_CALLBACK_DONE;
 
-         char buf[ev->size + 1];
-         memcpy(buf, ev->data, ev->size);
-         buf[ev->size] = '\0';
+         buf = start = ev->data;
 
-         idx = 0;
-
-         if (buf[idx] == '\n')
-           idx++;
-
-         start = &buf[idx];
-         while (idx < ev->size)
+         while (start < (buf + ev->size))
            {
-              if (buf[idx] == '\n')
-                end = &buf[idx];
+              while (*start == '\n') start++;
+              if (!start) break;
 
-              if (start && end)
+              end = strchr(start, '\n');
+              if (!end) end = &buf[ev->size - 1];
+
+              size_t len = end - start + 1;
+              char *line = malloc(len);
+              if (line)
                 {
-                   elm_code_file_line_append(_debug_output->file, start, end - start, NULL);
-                   start = end + 1;
-                   end = NULL;
+                   snprintf(line, len, "%s", start);
+                   chomp(line);
+                   elm_code_file_line_append(_debug_output->file, line, len, NULL);
+                   free(line);
                 }
-              idx++;
+              start = end + 1;
            }
-        /* We can forget the last line here as it's the prompt string */
     }
 
     return ECORE_CALLBACK_DONE;
@@ -114,8 +126,10 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
         text = elm_entry_markup_to_utf8(text_markup);
         if (text)
           {
-             command = malloc(strlen(text) + 2);
-             snprintf(command, strlen(text) + 2, "%s\n", text);
+             size_t len = strlen(text);
+             if (!len) return;
+             command = malloc(len + 2);
+             snprintf(command, len + 2, "%s\n", text);
              res = ecore_exe_send(debug->exe, command, strlen(command));
              if (res)
                elm_code_file_line_append(_debug_output->file, command, strlen(command) - 1, NULL);
@@ -135,9 +149,13 @@ _edi_debugpanel_icons_update(Edi_Debug_Process_State state)
    ico_int = elm_icon_add(_button_int);
 
    if (state == EDI_DEBUG_PROCESS_ACTIVE)
-     elm_icon_standard_set(ico_int, "media-playback-pause");
+     {
+        elm_icon_standard_set(ico_int, "media-playback-pause");
+     }
    else
-     elm_icon_standard_set(ico_int, "media-playback-start");
+     {
+        elm_icon_standard_set(ico_int, "media-playback-start");
+     }
 
    elm_object_part_content_set(_button_int, "icon", ico_int);
 }
@@ -315,9 +333,9 @@ void edi_debugpanel_start(const char *name)
 
 void edi_debugpanel_add(Evas_Object *parent)
 {
-   Evas_Object *table, *frame, *box, *entry, *bt_term, *bt_int, *bt_start, *bt_quit;
+   Evas_Object *hbox, *frame, *box, *entry, *bt_term, *bt_int, *bt_start, *bt_quit;
    Evas_Object *separator;
-   Evas_Object *ico_start, *ico_quit, *ico_int, *ico_term;
+   Evas_Object *ico_int, *ico_term;
    Elm_Code_Widget *widget;
    Elm_Code *code;
 
@@ -340,9 +358,11 @@ void edi_debugpanel_add(Evas_Object *parent)
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
 
-   table = elm_table_add(parent);
-   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, 0);
-   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, 0);
+   hbox = elm_box_add(parent);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_show(hbox);
 
    separator = elm_separator_add(parent);
    elm_separator_horizontal_set(separator, EINA_FALSE);
@@ -367,19 +387,19 @@ void edi_debugpanel_add(Evas_Object *parent)
    evas_object_show(bt_int);
 
    _button_start = bt_start = elm_button_add(parent);
-   ico_start = elm_icon_add(parent);
-   elm_icon_standard_set(ico_start, "media-playback-start");
    elm_object_tooltip_text_set(bt_start, "Start Debugging");
-   elm_object_part_content_set(bt_start, "icon", ico_start);
+   evas_object_size_hint_weight_set(bt_start, 0.05, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bt_start, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(bt_start, _("Start"));
    evas_object_smart_callback_add(bt_start, "clicked", _edi_debugpanel_button_start_cb, NULL);
    evas_object_show(bt_start);
 
    _button_quit = bt_quit = elm_button_add(parent);
-   ico_quit = elm_icon_add(parent);
-   elm_icon_standard_set(ico_quit, "application-exit");
-   elm_object_part_content_set(bt_quit, "icon", ico_quit);
-   elm_object_tooltip_text_set(bt_quit, "Stop Debugging");
+   elm_object_tooltip_text_set(bt_quit, "Quit Debugging");
    elm_object_disabled_set(bt_quit, EINA_TRUE);
+   evas_object_size_hint_weight_set(bt_quit, 0.05, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(bt_quit, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(bt_quit, _("Quit"));
    evas_object_smart_callback_add(bt_quit, "clicked", _edi_debugpanel_button_quit_cb, NULL);
    evas_object_show(bt_quit);
 
@@ -392,13 +412,11 @@ void edi_debugpanel_add(Evas_Object *parent)
    evas_object_event_callback_add(entry, EVAS_CALLBACK_KEY_DOWN, _edi_debugpanel_keypress_cb, NULL);
    evas_object_show(entry);
 
-   elm_table_pack(table, entry, 0, 0, 1, 1);
-   elm_table_pack(table, bt_term, 1, 0, 1, 1);
-   elm_table_pack(table, bt_int, 2, 0, 1, 1);
-   elm_table_pack(table, separator, 3, 0, 1, 1);
-   elm_table_pack(table, bt_start, 4, 0, 1, 1);
-   elm_table_pack(table, bt_quit, 5, 0, 1, 1);
-   evas_object_show(table);
+   elm_box_pack_end(hbox, bt_term);
+   elm_box_pack_end(hbox, bt_int);
+   elm_box_pack_end(hbox, entry);
+   elm_box_pack_end(hbox, bt_start);
+   elm_box_pack_end(hbox, bt_quit);
 
    _debug_output = code;
    _info_widget = widget;
@@ -407,7 +425,7 @@ void edi_debugpanel_add(Evas_Object *parent)
    edi_debug_new();
 
    elm_box_pack_end(box, widget);
-   elm_box_pack_end(box, table);
+   elm_box_pack_end(box, hbox);
    evas_object_show(box);
 
    elm_object_content_set(frame, box);
