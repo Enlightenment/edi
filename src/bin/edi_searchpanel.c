@@ -596,16 +596,7 @@ _edi_searchpanel_search_project(const char *directory, const char *search_term, 
 static void
 _search_end_cb(void *data EINA_UNUSED, Ecore_Thread *thread EINA_UNUSED)
 {
-   const char *text;
-   size_t len;
-
-   text = _("done!");
-
-   len = strlen(text);
-
    elm_object_text_set(_button_search, _("Search"));
-
-   elm_code_file_line_append(_elm_code->file, text, len, NULL);
 
    _search_thread = NULL;
    _searching = EINA_FALSE;
