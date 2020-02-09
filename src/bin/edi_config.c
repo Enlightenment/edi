@@ -524,7 +524,7 @@ _edi_project_config_load()
    _edi_project_config->gui.tabstop = 8;
    _edi_project_config->gui.internal_icons = EINA_TRUE;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
-   _edi_project_config->gui.toolbar_horizontal = EINA_FALSE;
+   _edi_project_config->gui.toolbar_horizontal = EINA_TRUE;
    _edi_project_config->gui.toolbar_text_visible = EINA_TRUE;
    IFPCFGEND;
 
