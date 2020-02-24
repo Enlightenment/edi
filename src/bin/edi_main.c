@@ -453,10 +453,17 @@ edi_content_setup(Evas_Object *win, const char *path)
    // add file list
    evas_object_size_hint_weight_set(_edi_filepanel, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(_edi_filepanel, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   if (_edi_project_config->gui.leftopen)
-     elm_panes_content_left_size_set(filepane, _edi_project_config->gui.leftsize);
+
+   if (edi_project_mode_get())
+     {
+        if (_edi_project_config->gui.leftopen)
+          elm_panes_content_left_size_set(filepane, _edi_project_config->gui.leftsize);
+        else
+          elm_panes_content_left_size_set(filepane, 0.0);
+     }
    else
      elm_panes_content_left_size_set(filepane, 0.0);
+
    evas_object_smart_callback_add(filepane, "unpress", _edi_panel_dragged_cb, _edi_filepanel);
 
    edi_filepanel_add(_edi_filepanel, win, path, _edi_file_open_cb);
