@@ -44,6 +44,7 @@ static Evas_Object *_edi_project_box;
 static Evas_Object *_create_inputs[6];
 
 static Evas_Object *_edi_create_button, *_edi_open_button;
+static Evas_Object *_edi_create_progress;
 
 static const char *_edi_message_path;
 
@@ -331,6 +332,56 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
    _edi_welcome_project_open(path, EINA_FALSE);
 }
 
+typedef struct {
+   const char *template_path;
+   const char *path;
+   const char *name;
+} Edi_Create_Example;
+
+static void
+_edi_create_example_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Create_Example *ex = data;
+
+   edi_create_example(ex->template_path, ex->path, ex->name,
+                      _edi_welcome_project_new_create_done_cb);
+}
+
+static void
+_edi_create_example_thread_done_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Create_Example *ex = data;
+
+   evas_object_hide(_edi_create_progress);
+   elm_object_disabled_set(_edi_create_button, EINA_FALSE);
+
+   free(ex);
+}
+
+static void
+_edi_create_example_started(void)
+{
+   evas_object_show(_edi_create_progress);
+   elm_progressbar_pulse(_edi_create_progress, EINA_TRUE);
+   elm_object_disabled_set(_edi_create_button, EINA_TRUE);
+}
+
+static void
+_edi_create_example(const char *template_path, const char *path, const char *name)
+{
+   Edi_Create_Example *ex;
+
+   _edi_create_example_started();
+
+   ex = calloc(1, sizeof(Edi_Create_Example));
+   ex->template_path = template_path;
+   ex->path = path;
+   ex->name = name;
+
+   ecore_thread_run(_edi_create_example_thread_run_cb, _edi_create_example_thread_done_cb,
+                    _edi_create_example_thread_done_cb, ex);
+}
+
 static void
 _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUSED)
 {
@@ -349,8 +400,8 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
      {
         if (!template->is_template)
           {
-             edi_create_example(template->path, path, name,
-                                _edi_welcome_project_new_create_done_cb);
+             /* Examples are remote and this can block. */
+             _edi_create_example(template->path, path, name);
           }
         else
           {
@@ -401,7 +452,7 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 static void
 _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
 {
-   Evas_Object *content, *button, *input;
+   Evas_Object *content, *button, *input, *pb;
    Elm_Object_Item *item;
    int row = 0;
    char fullname[1024];
@@ -427,7 +478,12 @@ _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
       _edi_welcome_project_new_input_row_add(_("Creator Name"), username, template->is_template, row++, content);
    _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, template->is_template, row++, content);
 
-   button = elm_button_add(content);
+
+   _edi_create_progress = pb = elm_progressbar_add(content);
+   elm_progressbar_pulse_set(pb, EINA_TRUE);
+   elm_table_pack(content, pb, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 4, row, 2, 1);
+
+   _edi_create_button = button = elm_button_add(content);
    elm_object_text_set(button, _("Create"));
    evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(button, EVAS_HINT_FILL, EVAS_HINT_FILL);
