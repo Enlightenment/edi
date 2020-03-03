@@ -44,7 +44,7 @@ static Evas_Object *_edi_project_box;
 static Evas_Object *_create_inputs[6];
 
 static Evas_Object *_edi_create_button, *_edi_open_button;
-static Evas_Object *_edi_create_progress;
+static Evas_Object *_edi_create_progress, *_edi_create_label;
 
 static const char *_edi_message_path;
 
@@ -320,7 +320,6 @@ _edi_welcome_project_new_create_done_cb(const char *path, Eina_Bool success)
    if (!success)
      {
         ERR("Unable to create project at path %s", path);
-
         return;
      }
 
@@ -353,6 +352,7 @@ _edi_create_example_thread_done_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    Edi_Create_Example *ex = data;
 
    evas_object_hide(_edi_create_progress);
+   evas_object_hide(_edi_create_label);
    elm_object_disabled_set(_edi_create_button, EINA_FALSE);
 
    free(ex);
@@ -398,6 +398,15 @@ _edi_welcome_project_new_create_cb(void *data EINA_UNUSED, Evas_Object *obj EINA
 
    if (path && path[0] && name && name[0])
      {
+        const char *tmp = eina_slstr_printf("%s/%s", path, name);
+        if (ecore_file_exists(tmp))
+          {
+             elm_object_focus_set(_create_inputs[1], EINA_TRUE);
+             elm_object_text_set(_edi_create_label, eina_slstr_printf(_("%s already exists"), tmp));
+             evas_object_show(_edi_create_label);
+             return;
+          }
+
         if (!template->is_template)
           {
              /* Examples are remote and this can block. */
@@ -452,7 +461,7 @@ _edi_welcome_user_fullname_get(const char *username, char *fullname, size_t max)
 static void
 _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
 {
-   Evas_Object *content, *button, *input, *pb;
+   Evas_Object *content, *button, *input, *pb, *label;
    Elm_Object_Item *item;
    int row = 0;
    char fullname[1024];
@@ -478,6 +487,9 @@ _edi_welcome_project_details(Evas_Object *naviframe, Edi_Template *template)
       _edi_welcome_project_new_input_row_add(_("Creator Name"), username, template->is_template, row++, content);
    _edi_welcome_project_new_input_row_add(_("Creator Email"), NULL, template->is_template, row++, content);
 
+   _edi_create_label = label = elm_label_add(content);
+   evas_object_show(label);
+   elm_table_pack(content, label, _EDI_WELCOME_PROJECT_NEW_TABLE_WIDTH - 4, row, 2, 1);
 
    _edi_create_progress = pb = elm_progressbar_add(content);
    elm_progressbar_pulse_set(pb, EINA_TRUE);
