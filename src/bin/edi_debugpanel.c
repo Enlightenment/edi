@@ -21,24 +21,13 @@
 
 static Evas_Object *_info_widget, *_entry_widget, *_button_start, *_button_quit;
 static Evas_Object *_button_int, *_button_term;
-static Elm_Code *_debug_output;
-
-static void
-_edi_debugpanel_line_cb(void *data EINA_UNUSED, const Efl_Event *event)
-{
-   Elm_Code_Line *line;
-
-   line = (Elm_Code_Line *)event->info;
-   if (line->data)
-     line->status = ELM_CODE_STATUS_TYPE_ERROR;
-}
 
 static Eina_Bool
 _edi_debugpanel_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
-   elm_code_widget_font_set(_info_widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(_info_widget, _edi_project_config->gui.theme);
-   edi_theme_elm_code_alpha_set(_info_widget);
+   elm_entry_text_style_user_pop(_info_widget);
+   elm_entry_text_style_user_push(_info_widget, eina_slstr_printf("DEFAULT='font=\\'%s\\' font_size=\\'%d\\''", _edi_project_config->font.name, _edi_project_config->font.size));
+   elm_entry_calc_force(_info_widget);
 
    return ECORE_CALLBACK_RENEW;
 }
@@ -79,6 +68,7 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
 
          buf = start = ev->data;
 
+         ecore_thread_main_loop_begin();
          while (start < (buf + ev->size))
            {
               while (*start == '\n') start++;
@@ -87,17 +77,25 @@ _debugpanel_stdout_handler(void *data EINA_UNUSED, int type EINA_UNUSED, void *e
               end = strchr(start, '\n');
               if (!end) end = &buf[ev->size - 1];
 
-              size_t len = end - start + 1;
+              size_t len = 1 + (end - start);
               char *line = malloc(len);
               if (line)
                 {
                    snprintf(line, len, "%s", start);
                    chomp(line);
-                   elm_code_file_line_append(_debug_output->file, line, len, NULL);
+                   char *markup = elm_entry_utf8_to_markup(line);
+                   if (markup)
+                     {
+                        elm_entry_entry_append(_info_widget, eina_slstr_printf("%s<br>", markup));
+                        free(markup);
+                     }
                    free(line);
                 }
               start = end + 1;
            }
+         ecore_thread_main_loop_end();
+
+         elm_entry_cursor_pos_set(_info_widget, strlen(elm_object_text_get(_info_widget)));
     }
 
     return ECORE_CALLBACK_DONE;
@@ -109,7 +107,6 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
    Evas_Event_Key_Down *event;
    const char *text_markup;
    char *command, *text;
-   Eina_Bool res;
    Edi_Debug *debug = edi_debug_get();
 
    event = event_info;
@@ -130,9 +127,7 @@ _edi_debugpanel_keypress_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Ob
              if (!len) return;
              command = malloc(len + 2);
              snprintf(command, len + 2, "%s\n", text);
-             res = ecore_exe_send(debug->exe, command, strlen(command));
-             if (res)
-               elm_code_file_line_append(_debug_output->file, command, strlen(command) - 1, NULL);
+             ecore_exe_send(debug->exe, command, strlen(command));
 
              free(command);
              free(text);
@@ -283,6 +278,8 @@ _edi_debugger_run(Edi_Debug *debug)
         ecore_exe_send(debug->exe, args, strlen(args));
         free(args);
      }
+   if (debug->tool->command_settings)
+     ecore_exe_send(debug->exe, debug->tool->command_settings, strlen(debug->tool->command_settings));
 
    if (debug->tool->command_start)
      ecore_exe_send(debug->exe, debug->tool->command_start, strlen(debug->tool->command_start));
@@ -326,7 +323,7 @@ void edi_debugpanel_start(const char *name)
    elm_object_disabled_set(_button_quit, EINA_FALSE);
    elm_object_disabled_set(_button_start, EINA_TRUE);
 
-   elm_code_file_clear(_debug_output->file);
+   elm_object_text_set(_info_widget, "");
 
    _edi_debugger_run(debug);
 }
@@ -336,8 +333,7 @@ void edi_debugpanel_add(Evas_Object *parent)
    Evas_Object *hbox, *frame, *box, *entry, *bt_term, *bt_int, *bt_start, *bt_quit;
    Evas_Object *separator;
    Evas_Object *ico_int, *ico_term;
-   Elm_Code_Widget *widget;
-   Elm_Code *code;
+   Evas_Object *widget;
 
    frame = elm_frame_add(parent);
    elm_object_text_set(frame, _("Debug"));
@@ -348,12 +344,11 @@ void edi_debugpanel_add(Evas_Object *parent)
    evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
-   code = elm_code_create();
-   widget = elm_code_widget_add(parent, code);
-   elm_code_widget_font_set(widget, _edi_project_config->font.name, _edi_project_config->font.size);
-   edi_theme_elm_code_set(_info_widget, _edi_project_config->gui.theme);
-   elm_code_widget_gravity_set(widget, 0.0, 1.0);
-   efl_event_callback_add(widget, &ELM_CODE_EVENT_LINE_LOAD_DONE, _edi_debugpanel_line_cb, NULL);
+   widget = elm_entry_add(parent);
+   elm_entry_single_line_set(widget, EINA_FALSE);
+   elm_entry_editable_set(widget, EINA_FALSE);
+   elm_entry_scrollable_set(widget, EINA_TRUE);
+   elm_entry_text_style_user_push(widget, eina_slstr_printf("DEFAULT='font=\\'%s\\' font_size=\\'%d\\''", _edi_project_config->font.name, _edi_project_config->font.size));
    evas_object_size_hint_weight_set(widget, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(widget, EVAS_HINT_FILL, EVAS_HINT_FILL);
    evas_object_show(widget);
@@ -418,7 +413,6 @@ void edi_debugpanel_add(Evas_Object *parent)
    elm_box_pack_end(hbox, bt_start);
    elm_box_pack_end(hbox, bt_quit);
 
-   _debug_output = code;
    _info_widget = widget;
    _entry_widget = entry;
 

@@ -34,7 +34,7 @@
 #include "edi_private.h"
 
 Edi_Debug_Tool _debugger_tools[] = {
-    { "gdb", "gdb", NULL, "run\n", "c\n", "set args %s\n", "set follow-fork-mode child\n"},
+    { "gdb", "gdb", NULL, "run\n", "c\n", "set args %s\n", "set prompt\n"},
     { "lldb", "lldb", NULL, "run\n", "c\n", "settings set target.run-args %s", NULL },
     { "pdb", "pdb", NULL, NULL, "c\n", "run %s", NULL },
     { "memcheck", "valgrind", "--tool=memcheck", NULL, NULL, NULL, NULL },
