@@ -590,7 +590,14 @@ edi_content_setup(Evas_Object *win, const char *path)
      evas_object_show(_edi_panel_tab_for_index(_edi_project_config->gui.bottomtab));
    evas_object_smart_callback_add(logpane, "unpress", _edi_panel_dragged_cb, NULL);
 
+   if (!edi_project_mode_get())
+     {
+        elm_panes_content_right_size_set(logpane, 0.0);
+        evas_object_del(tb);
+     }
+
    evas_object_show(logpane);
+
    _edi_bottompanes = logpane;
 
    return logpane;
@@ -1303,9 +1310,13 @@ _edi_menu_setup(Evas_Object *win)
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find-replace"), _("Find & Replace"), _edi_menu_find_cb, NULL);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), _("Find file"), _edi_menu_findfile_cb, NULL);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-jump"), MENU_ELLIPSIS(_("Goto Line")), _edi_menu_goto_cb, NULL);
-   elm_menu_item_separator_add(menu, menu_it);
-   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
-   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find-replace"), MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
+
+   if (edi_project_mode_get())
+     {
+        elm_menu_item_separator_add(menu, menu_it);
+        elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find"), MENU_ELLIPSIS(_("Find in project")), _edi_menu_find_project_cb, NULL);
+        elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("edit-find-replace"), MENU_ELLIPSIS(_("Replace in project")), _edi_menu_find_replace_project_cb, NULL);
+     }
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("View"), NULL, NULL);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("window-new"), _("New Window"), _edi_menu_view_open_window_cb, NULL);

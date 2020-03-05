@@ -524,7 +524,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
 
 static void
 _item_menu_open_terminal_cb(void *data, Evas_Object *obj EINA_UNUSED,
-                   void *event_info EINA_UNUSED)
+                            void *event_info EINA_UNUSED)
 {
    const char *format;
    char *cmd;
@@ -532,10 +532,33 @@ _item_menu_open_terminal_cb(void *data, Evas_Object *obj EINA_UNUSED,
    Edi_Dir_Data *sd;
 
    sd = data;
-   format = "terminology -d=\"%s\"";
 
    if (!sd->isdir)
      return;
+
+   format = "terminology -d=\"%s\"";
+
+   cmdlen = strlen(sd->path) + strlen(format) + 1;
+   cmd = malloc(sizeof(char) * cmdlen);
+   snprintf(cmd, cmdlen, format, sd->path);
+
+   ecore_exe_run(cmd, NULL);
+   free(cmd);
+}
+
+static void
+_item_menu_open_rage_cb(void *data, Evas_Object *obj EINA_UNUSED,
+                        void *event_info EINA_UNUSED)
+{
+   const char *format;
+   Edi_Dir_Data *sd;
+   char *cmd;
+   int cmdlen;
+
+   sd = data;
+   if (!sd->isdir) return;
+
+   format = "rage \"%s\"";
 
    cmdlen = strlen(sd->path) + strlen(format) + 1;
    cmd = malloc(sizeof(char) * cmdlen);
@@ -619,6 +642,11 @@ _item_menu_dir_create(Evas_Object *win, Edi_Dir_Data *sd)
         elm_menu_item_add(menu, menu_it, "document-save-as", _("Rename Directory"), _item_menu_rename_cb, sd);
         if (ecore_file_dir_is_empty(sd->path))
           elm_menu_item_add(menu, menu_it, "edit-delete", _("Remove Directory"), _item_menu_rmdir_cb, sd);
+     }
+   if (ecore_file_app_installed("rage"))
+     {
+        elm_menu_item_separator_add(menu, menu_it);
+        elm_menu_item_add(menu, menu_it, "rage", _("Open with Rage"), _item_menu_open_rage_cb, sd);
      }
 }
 
