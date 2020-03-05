@@ -50,6 +50,7 @@ _edi_settings_panel_create(Evas_Object *parent, const char *title)
 
    frame = elm_frame_add(parent);
    elm_object_text_set(frame, title);
+   elm_object_style_set(frame, "outdent_top");
    elm_object_part_content_set(frame, "default", box);
    evas_object_size_hint_weight_set(frame, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(frame, EVAS_HINT_FILL, EVAS_HINT_FILL);
@@ -272,6 +273,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_padding_set(table, EDI_SETTINGS_TABLE_PADDING, EDI_SETTINGS_TABLE_PADDING);
    evas_object_show(table);
+   elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Font"));
@@ -363,10 +365,21 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_smart_callback_add(slider, "slider,drag,stop", _edi_settings_display_alpha_changed_cb, NULL);
    evas_object_smart_callback_add(slider, "delay,changed", _edi_settings_display_alpha_changed_cb, NULL);
 
+   frame = _edi_settings_panel_create(parent, _("Toolbar"));
+   box = elm_object_part_content_get(frame, "default");
+   elm_box_pack_end(container, frame);
+
+   table = elm_table_add(parent);
+   evas_object_size_hint_weight_set(table, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_table_padding_set(table, EDI_SETTINGS_TABLE_PADDING, EDI_SETTINGS_TABLE_PADDING);
+   evas_object_show(table);
+   elm_box_pack_end(box, table);
+
    label = elm_label_add(table);
    elm_object_text_set(label, _("Hide Toolbar"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 4, 1, 1);
+   elm_table_pack(table, label, 0, 0, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -375,14 +388,13 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_toolbar_hidden_cb, NULL);
-   elm_table_pack(table, check, 1, 4, 1, 1);
+   elm_table_pack(table, check, 1, 0, 1, 1);
    evas_object_show(check);
-   elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Horizontal Toolbar"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 5, 1, 1);
+   elm_table_pack(table, label, 0, 1, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -391,14 +403,14 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_toolbar_horizontal_cb, NULL);
-   elm_table_pack(table, check, 1, 5, 1, 1);
+   elm_table_pack(table, check, 1, 1, 1, 1);
    evas_object_show(check);
    elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Show Toolbar Text"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 6, 1, 1);
+   elm_table_pack(table, label, 0, 2, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -408,12 +420,12 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_toolbar_text_visible_cb, NULL);
    evas_object_show(check);
-   elm_table_pack(table, check, 1, 6, 1, 1);
+   elm_table_pack(table, check, 1, 2, 1, 1);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Internal Icons"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 7, 1, 1);
+   elm_table_pack(table, label, 0, 3, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -422,7 +434,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, EVAS_HINT_FILL, 0.0);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_internal_icons_changed_cb, NULL);
-   elm_table_pack(table, check, 1, 7, 1, 1);
+   elm_table_pack(table, check, 1, 3, 1, 1);
    evas_object_show(check);
    elm_box_pack_end(box, table);
 
@@ -435,6 +447,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(table, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_table_padding_set(table, EDI_SETTINGS_TABLE_PADDING, EDI_SETTINGS_TABLE_PADDING);
    evas_object_show(table);
+   elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
    elm_object_text_set(label, _("Display whitespace"));
