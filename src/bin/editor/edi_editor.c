@@ -1213,7 +1213,10 @@ _edi_editor_config_changed(void *data, int type EINA_UNUSED, void *event EINA_UN
    edi_theme_elm_code_set(widget, _edi_project_config->gui.theme);
    elm_code_widget_show_whitespace_set(widget, _edi_project_config->gui.show_whitespace);
    elm_code_widget_tab_inserts_spaces_set(widget, _edi_project_config->gui.tab_inserts_spaces);
-   elm_code_widget_line_width_marker_set(widget, _edi_project_config->gui.width_marker);
+   if (!_edi_project_config->gui.show_width_marker)
+     elm_code_widget_line_width_marker_set(widget, 0);
+   else
+     elm_code_widget_line_width_marker_set(widget, _edi_project_config->gui.width_marker);
    elm_code_widget_tabstop_set(widget, _edi_project_config->gui.tabstop);
 
    return ECORE_CALLBACK_RENEW;

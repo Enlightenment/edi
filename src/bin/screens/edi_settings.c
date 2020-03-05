@@ -81,7 +81,16 @@ _edi_settings_display_tab_inserts_spaces_cb(void *data EINA_UNUSED, Evas_Object 
 }
 
 static void
-_edi_settings_display_widthmarker_cb(void *data EINA_UNUSED, Evas_Object *obj,
+_edi_settings_display_show_width_marker_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                          void *event EINA_UNUSED)
+{
+   Evas_Object *check = (Evas_Object *)obj;
+   _edi_project_config->gui.show_width_marker = elm_check_state_get(check);
+   _edi_project_config_save();
+}
+
+static void
+_edi_settings_display_width_marker_cb(void *data EINA_UNUSED, Evas_Object *obj,
                                      void *event EINA_UNUSED)
 {
    Evas_Object *spinner;
@@ -443,8 +452,25 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(check);
 
    label = elm_label_add(box);
-   elm_object_text_set(label, _("Line width marker"));
+   elm_object_text_set(label, _("Display line width marker"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(label, 0.0, 0.5);
+   evas_object_show(label);
+   elm_table_pack(table, label, 3, 1, 1, 1);
+
+   check = elm_check_add(box);
+   elm_check_state_set(check, _edi_project_config->gui.show_width_marker);
+   evas_object_size_hint_weight_set(check, 0, 0.0);
+   evas_object_size_hint_align_set(check, 0.0, 0.5);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_display_show_width_marker_cb, NULL);
+   evas_object_show(check);
+   elm_table_pack(table, check, 2, 1, 1, 1);
+
+   label = elm_label_add(box);
+   elm_object_text_set(label, _("Line width marker"));
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.5);
+   evas_object_size_hint_align_set(label, 1.0, 0.5);
    elm_table_pack(table, label, 0, 1, 1, 1);
    evas_object_show(label);
 
@@ -454,10 +480,10 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_spinner_step_set(spinner, 1);
    elm_spinner_wrap_set(spinner, EINA_FALSE);
    elm_spinner_min_max_set(spinner, 0, 1024);
-   evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_weight_set(spinner, 0.0, 0.0);
    evas_object_size_hint_align_set(spinner, 0.0, 0.95);
    evas_object_smart_callback_add(spinner, "changed",
-                                  _edi_settings_display_widthmarker_cb, NULL);
+                                  _edi_settings_display_width_marker_cb, NULL);
    elm_table_pack(table, spinner, 1, 1, 1, 1);
    evas_object_show(spinner);
 
@@ -483,7 +509,7 @@ _edi_settings_display_create(Evas_Object *parent)
    label = elm_label_add(box);
    elm_object_text_set(label, ("Insert spaces when tab is pressed"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 3, 1, 1);
+   elm_table_pack(table, label, 3, 2, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -492,7 +518,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, 0.0, 0.5);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_display_tab_inserts_spaces_cb, NULL);
-   elm_table_pack(table, check, 1, 3, 1, 1);
+   elm_table_pack(table, check, 2, 2, 1, 1);
    evas_object_show(check);
    elm_box_pack_end(box, table);
 
