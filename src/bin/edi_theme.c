@@ -11,6 +11,7 @@
 #include "edi_private.h"
 
 static Eina_List *_edi_themes = NULL;
+static Eina_Bool _edi_theme_internal_icons;
 
 void
 edi_theme_window_alpha_set(void)
@@ -171,3 +172,14 @@ edi_theme_icon_path_get(const char *name)
    return icon_path;
 }
 
+void
+edi_theme_internal_icons_set(Eina_Bool enabled)
+{
+   _edi_theme_internal_icons = enabled;
+}
+
+Eina_Bool
+edi_theme_internal_icons_get(void)
+{
+   return _edi_theme_internal_icons;
+}

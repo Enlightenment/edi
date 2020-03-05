@@ -60,6 +60,8 @@ Edi_Theme *edi_theme_theme_by_name(const char *name);
 void edi_theme_window_alpha_set(void);
 void edi_theme_elm_code_alpha_set(Evas_Object *obj);
 const char *edi_theme_icon_path_get(const char *name);
+void edi_theme_internal_icons_set(Eina_Bool enabled);
+Eina_Bool edi_theme_internal_icons_get(void);
 
 /**
  * @}
