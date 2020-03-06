@@ -159,6 +159,9 @@ edi_theme_icon_path_get(const char *name)
    const char *icon_path, *directory = PACKAGE_DATA_DIR "/icons";
    icon_path = name;
 
+   if (!edi_theme_internal_icons_get())
+     return name;
+
    path = edi_path_append(directory, eina_slstr_printf("%s.png", name));
    if (path)
      {

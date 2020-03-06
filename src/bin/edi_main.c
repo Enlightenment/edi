@@ -1369,10 +1369,7 @@ _edi_toolbar_item_add(Evas_Object *tb, const char *icon, const char *name, Evas_
    if (_edi_project_config->gui.toolbar_text_visible)
      item_name = name;
 
-   if (!_edi_project_config->gui.internal_icons)
-     tb_it = elm_toolbar_item_append(tb, icon, item_name, func, NULL);
-   else
-     tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), item_name, func, NULL);
+   tb_it = elm_toolbar_item_append(tb, edi_theme_icon_path_get(icon), item_name, func, NULL);
 
    content = elm_toolbar_item_object_get(tb_it);
    elm_object_tooltip_text_set(content, name);
@@ -1597,6 +1594,7 @@ _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EI
    edi_theme_window_alpha_set();
 
    _edi_toolbar_config_changed();
+   edi_filepanel_refresh_all();
 
    return ECORE_CALLBACK_RENEW;
 }

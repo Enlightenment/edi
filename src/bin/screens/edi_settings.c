@@ -265,6 +265,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_show(container);
 
    frame = _edi_settings_panel_create(parent, _("Display"));
+   elm_object_style_set(frame, "pad_small");
    box = elm_object_part_content_get(frame, "default");
    elm_box_pack_end(container, frame);
 
