@@ -801,12 +801,17 @@ void
 edi_mainview_panel_goto_position(Edi_Mainview_Panel *panel, unsigned int row, unsigned int col)
 {
    Edi_Editor *editor;
+   Elm_Code *code;
 
    if (!panel || !panel->current)
      return;
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (!editor || row <= 0 || col <= 0)
+     return;
+
+   code = elm_code_widget_code_get(editor->entry);
+   if (row > elm_code_file_lines_get(code->file))
      return;
 
    elm_code_widget_cursor_position_set(editor->entry, row, col);
