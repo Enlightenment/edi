@@ -452,7 +452,8 @@ _edi_settings_display_create(Evas_Object *parent)
    label = elm_label_add(table);
    elm_object_text_set(label, _("Display whitespace"));
    evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
-   elm_table_pack(table, label, 0, 0, 1, 1);
+   evas_object_size_hint_align_set(label, 0.0, 0.5);
+   elm_table_pack(table, label, 3, 0, 1, 1);
    evas_object_show(label);
 
    check = elm_check_add(box);
@@ -461,7 +462,7 @@ _edi_settings_display_create(Evas_Object *parent)
    evas_object_size_hint_align_set(check, 0.0, 0.5);
    evas_object_smart_callback_add(check, "changed",
                                   _edi_settings_display_whitespace_cb, NULL);
-   elm_table_pack(table, check, 1, 0, 1, 1);
+   elm_table_pack(table, check, 2, 0, 1, 1);
    evas_object_show(check);
 
    label = elm_label_add(box);
