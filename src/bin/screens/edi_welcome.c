@@ -620,6 +620,9 @@ _edi_welcome_project_new_cb(void *data, Evas_Object *obj EINA_UNUSED, void *even
    EINA_LIST_FREE(_available_templates, template)
      _edi_template_free(template);
 
+   EINA_LIST_FREE(_available_examples, template)
+     _edi_template_free(template);
+
    _edi_templates_discover(PACKAGE_DATA_DIR "/templates");
    _edi_examples_discover(PACKAGE_DATA_DIR "/examples");
 
