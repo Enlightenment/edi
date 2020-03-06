@@ -40,6 +40,7 @@ Edi_Debug_Tool _debugger_tools[] = {
     { "memcheck", "valgrind", "--tool=memcheck", NULL, NULL, NULL, NULL },
     { "massif", "valgrind", "--tool=massif", NULL, NULL, NULL, NULL },
     { "callgrind", "valgrind", "--tool=callgrind", NULL, NULL, NULL, NULL },
+    { "Mono Debug", "mono", "--debug", NULL, NULL, NULL, NULL },
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
 };
 
