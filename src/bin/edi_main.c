@@ -1440,6 +1440,7 @@ _edi_toolbar_config_changed()
    elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
    evas_object_del(_edi_toolbar);
 
+   edi_theme_internal_icons_set(_edi_project_config->gui.internal_icons);
    // Create our toolbar.
    edi_toolbar_setup();
    elm_box_recalculate(_edi_main_box);
@@ -1448,7 +1449,6 @@ _edi_toolbar_config_changed()
    _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
    _edi_toolbar_text_visible_set(_edi_project_config->gui.toolbar_text_visible);
    _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
-   edi_theme_internal_icons_set(_edi_project_config->gui.internal_icons);
 }
 
 static void
