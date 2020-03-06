@@ -1,4 +1,4 @@
-EDI contains two different licenses, this is due to it being the
+EDI contains three different licenses, this is due to it being the
 development space for various components that expect to be 
 moved to the Enlightenment Foundation Libraries in the future.
 
@@ -6,12 +6,17 @@ With the exception of "edi" which constitutes all remaining work
 in this code base the licenses apply to projects within their
 own top level directory. The project licenses are as follows:
 
-data/extra/templates/	No license - public domain
+data/extra/templates/    No license - public domain
 
-Icons by <matthieu.james@gmail.com> from "Faenza" icon theme (GPLv2):
-        data/extra/templates/images/c.png
-        data/extra/templates/images/python.png
-        data/icons/*.png
+Icons by <matthieu.james@gmail.com> from "Faenza" icon theme:
+    COPYING.GPLv2:
+            data/extra/templates/images/c.png
+            data/extra/templates/images/python.png
+            data/icons/*.png
 
-edi:			COPYING.GPLv2
+Icons by Marcus (madmaxms) from "Obsidian" icon theme.
+    COPYING.GPLv3:
+        data/extra/examples/images/mono-runtime.png
+
+edi:    COPYING.GPLv2
 

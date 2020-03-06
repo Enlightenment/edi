@@ -64,4 +64,70 @@ collections {
             }
         }
     }
+
+    group {
+        name: "life_csharp";
+        max: 128 128;
+
+        data {
+            item: "title" "C# EFL Game of Life";
+            item: "path" "apps/csharp/life/";
+            item: "description"
+                  "Game of Life using the EFL C# APIs.";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "mono-runtime.png" COMP;
+                    image.normal: "mono-runtime.png";
+                }
+            }
+        }
+    }
+
+    group {
+        name: "calculator_csharp";
+        max: 128 128;
+
+        data {
+            item: "title" "C# EFL Calculator";
+            item: "path" "apps/csharp/calculator/";
+            item: "description"
+                  "Calculator using the EFL C# APIs.";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "mono-runtime.png" COMP;
+                    image.normal: "mono-runtime.png";
+                }
+            }
+        }
+    }
+
+    group {
+        name: "texteditor_csharp";
+        max: 128 128;
+
+        data {
+            item: "title" "C# Text Editor";
+            item: "path" "apps/csharp/texteditor/";
+            item: "description"
+                  "A basic text editor using the EFL C# APIs.";
+        }
+
+        parts {
+            part { name: "icon";
+                description { state: "default" 0.0;
+                    max: 128 128;
+                    images.image: "mono-runtime.png" COMP;
+                    image.normal: "mono-runtime.png";
+                }
+            }
+        }
+    }
 }

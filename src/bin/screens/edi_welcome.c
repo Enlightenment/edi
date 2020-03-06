@@ -262,6 +262,17 @@ _edi_template_free(Edi_Template *t)
    free(t);
 }
 
+static int
+_templates_sort_cb(const void *d1, const void *d2)
+{
+   const Edi_Template *ex1 = d1, *ex2 = d2;
+
+   if (!ex1 || !ex1->title) return 1;
+   if (!ex2 || !ex2->title) return -1;
+
+   return strcmp(ex1->title, ex2->title);
+}
+
 static void
 _edi_templates_discover(const char *directory)
 {
@@ -283,6 +294,9 @@ _edi_templates_discover(const char *directory)
         template->is_template = EINA_TRUE;
         _available_templates = eina_list_append(_available_templates, template);
      }
+
+   _available_templates = eina_list_sort(_available_templates, eina_list_count(_available_templates),
+                                         _templates_sort_cb);
 
    edje_mmap_collection_list_free(collection);
 }
@@ -308,6 +322,9 @@ _edi_examples_discover(const char *directory)
         example->is_template = EINA_FALSE;
         _available_examples = eina_list_append(_available_examples, example);
      }
+
+   _available_examples = eina_list_sort(_available_examples, eina_list_count(_available_examples),
+                                        _templates_sort_cb);
 
    edje_mmap_collection_list_free(collection);
 }
