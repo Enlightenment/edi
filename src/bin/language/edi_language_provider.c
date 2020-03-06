@@ -62,6 +62,8 @@ Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime)
      id = "python";
    if (!strcasecmp(mime, "text/x-go"))
      id = "go";
+   if (!strcasecmp(mime, "text/x-csharp"))
+     id = "csharp";
 
    if (!id)
      return NULL;
