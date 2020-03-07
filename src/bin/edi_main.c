@@ -1423,9 +1423,13 @@ _edi_toolbar_visible_set(Eina_Bool visible)
      }
 }
 
+/* Our config has changed, apply UI changes where appropriate. */
 static void
-_edi_toolbar_config_changed()
+_edi_ui_config_changed()
 {
+   Eina_Bool icons_changed = EINA_FALSE;
+
+   edi_theme_window_alpha_set();
 
    // No change.
    if ((_edi_project_config->gui.toolbar_horizontal == _edi_toolbar_horizontal_get()) &&
@@ -1440,15 +1444,23 @@ _edi_toolbar_config_changed()
    elm_box_unpack(_edi_main_box, _edi_toolbar_main_box);
    evas_object_del(_edi_toolbar);
 
-   edi_theme_internal_icons_set(_edi_project_config->gui.internal_icons);
+   if (_edi_project_config->gui.internal_icons != edi_theme_internal_icons_get())
+     {
+        edi_theme_internal_icons_set(_edi_project_config->gui.internal_icons);
+        icons_changed = EINA_TRUE;
+     }
+
    // Create our toolbar.
    edi_toolbar_setup();
    elm_box_recalculate(_edi_main_box);
 
-  // Toolbar has changed, update current state.
+   // Toolbar has changed, update current state.
    _edi_toolbar_horizontal_set(_edi_project_config->gui.toolbar_horizontal);
    _edi_toolbar_text_visible_set(_edi_project_config->gui.toolbar_text_visible);
    _edi_toolbar_visible_set(!_edi_project_config->gui.toolbar_hidden);
+
+   if (icons_changed)
+     edi_filepanel_refresh_all();
 }
 
 static void
@@ -1591,10 +1603,7 @@ _edi_resize_cb(void *data EINA_UNUSED, Evas *e EINA_UNUSED, Evas_Object *obj,
 static Eina_Bool
 _edi_config_changed(void *data EINA_UNUSED, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
-   edi_theme_window_alpha_set();
-
-   _edi_toolbar_config_changed();
-   edi_filepanel_refresh_all();
+   _edi_ui_config_changed();
 
    return ECORE_CALLBACK_RENEW;
 }
