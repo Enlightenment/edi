@@ -83,10 +83,19 @@ _edi_settings_display_tab_inserts_spaces_cb(void *data EINA_UNUSED, Evas_Object 
 
 static void
 _edi_settings_display_show_width_marker_cb(void *data EINA_UNUSED, Evas_Object *obj,
-                                          void *event EINA_UNUSED)
+                                           void *event EINA_UNUSED)
 {
    Evas_Object *check = (Evas_Object *)obj;
    _edi_project_config->gui.show_width_marker = elm_check_state_get(check);
+   _edi_project_config_save();
+}
+
+static void
+_edi_settings_display_line_numbers_cb(void *data EINA_UNUSED, Evas_Object *obj,
+                                      void *event EINA_UNUSED)
+{
+   Evas_Object *check = (Evas_Object *)obj;
+   _edi_project_config->gui.show_line_numbers = elm_check_state_get(check);
    _edi_project_config_save();
 }
 
@@ -451,8 +460,23 @@ _edi_settings_display_create(Evas_Object *parent)
    elm_box_pack_end(box, table);
 
    label = elm_label_add(table);
+   elm_object_text_set(label, _("Display line numbers"));
+   evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, 0.5);
+   elm_table_pack(table, label, 0, 0, 1, 1);
+   evas_object_show(label);
+
+   check = elm_check_add(box);
+   elm_check_state_set(check, _edi_project_config->gui.show_line_numbers);
+   evas_object_size_hint_weight_set(check, 0.0, 0.0);
+   evas_object_size_hint_align_set(check, 0.0, 0.5);
+   evas_object_smart_callback_add(check, "changed",
+                                  _edi_settings_display_line_numbers_cb, NULL);
+   elm_table_pack(table, check, 1, 0, 1, 1);
+   evas_object_show(check);
+
+   label = elm_label_add(table);
    elm_object_text_set(label, _("Display whitespace"));
-   evas_object_size_hint_align_set(label, EVAS_HINT_EXPAND, 0.5);
    evas_object_size_hint_align_set(label, 0.0, 0.5);
    elm_table_pack(table, label, 3, 0, 1, 1);
    evas_object_show(label);

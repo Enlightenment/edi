@@ -96,6 +96,7 @@ struct _Edi_Project_Config
 
         Eina_Bool tab_inserts_spaces;
         Eina_Bool show_width_marker;
+        Eina_Bool show_line_numbers;
      } gui;
 
    Edi_Project_Config_Launch launch;

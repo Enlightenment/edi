@@ -285,6 +285,7 @@ _edi_config_init(void)
    EDI_CONFIG_VAL(D, T, gui.show_whitespace, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.width_marker, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.show_width_marker, EET_T_UCHAR);
+   EDI_CONFIG_VAL(D, T, gui.show_line_numbers, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.tabstop, EET_T_UINT);
    EDI_CONFIG_VAL(D, T, gui.toolbar_hidden, EET_T_UCHAR);
    EDI_CONFIG_VAL(D, T, gui.toolbar_horizontal, EET_T_UCHAR);
@@ -523,6 +524,7 @@ _edi_project_config_load()
 
    _edi_project_config->gui.width_marker = 80;
    _edi_project_config->gui.show_width_marker = EINA_TRUE;
+   _edi_project_config->gui.show_line_numbers = EINA_TRUE;
    _edi_project_config->gui.tabstop = 8;
    _edi_project_config->gui.internal_icons = EINA_TRUE;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
