@@ -47,18 +47,17 @@ extern int EDI_EVENT_FILE_SAVED;
 #define FONT_PREVIEW " Evas *dostuff(void) {...}"
 
 Eina_Bool edi_open(const char *path);
-
+void edi_open_new(const char *path);
 Evas_Object *edi_main_win_get(void);
+void edi_main_win_title_set(const char *path);
+void edi_main_win_title_reset(void);
 
 void edi_close();
 
 void edi_open_url();
 
-Eina_Bool edi_noproject();
-
 void edi_launcher_config_missing();
 void edi_debug_exe_missing(void);
-
 
 Eina_Bool _edi_project_config_save_no_notify(void);
 

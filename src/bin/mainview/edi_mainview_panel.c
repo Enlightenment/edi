@@ -449,6 +449,11 @@ _closetab(void *data, Evas_Object *obj EINA_UNUSED,
 
    if (eina_list_count(panel->items))
      _edi_mainview_panel_current_tab_show(panel);
+
+   if (eina_list_count(panel->items) == 0 && edi_mainview_panel_count() == 1)
+     {
+        edi_main_win_title_reset();
+     }
 }
 
 static Evas_Object *

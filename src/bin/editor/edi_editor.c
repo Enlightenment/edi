@@ -64,6 +64,64 @@ _edi_editor_file_change_ignore_cb(void *data, Evas_Object *obj EINA_UNUSED, void
 }
 
 static void
+_edi_editor_file_save_fail_popup(Evas_Object *parent, Edi_Editor *editor)
+{
+   Evas_Object *table, *frame, *box, *label, *sep, *icon, *button;
+
+   if (editor->popup)
+     return;
+
+   editor->popup = elm_popup_add(parent);
+   elm_popup_orient_set(editor->popup, ELM_POPUP_ORIENT_CENTER);
+   elm_popup_scrollable_set(editor->popup, EINA_TRUE);
+   elm_object_part_text_set(editor->popup, "title,text", _("Permission Denied"));
+   evas_object_size_hint_align_set(editor->popup, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_weight_set(editor->popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+
+   table = elm_table_add(editor->popup);
+   icon = elm_icon_add(table);
+   elm_icon_standard_set(icon, "dialog-warning");
+   evas_object_size_hint_min_set(icon, 48 * elm_config_scale_get(), 48 * elm_config_scale_get());
+   evas_object_size_hint_weight_set(icon, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(icon, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_show(icon);
+   elm_table_pack(table, icon, 0, 0, 1, 1);
+
+   frame = elm_frame_add(editor->popup);
+   elm_object_content_set(frame, table);
+   evas_object_show(frame);
+
+   box = elm_box_add(editor->popup);
+   label = elm_label_add(editor->popup);
+   elm_object_text_set(label, _("Unable to save file. Would you like to reload <br> the contents of this file?"));
+   evas_object_show(label);
+   elm_box_pack_end(box, label);
+
+   sep = elm_separator_add(box);
+   elm_separator_horizontal_set(sep, EINA_TRUE);
+   evas_object_show(sep);
+   elm_box_pack_end(box, sep);
+   evas_object_show(box);
+   elm_table_pack(table, box, 1, 0, 1, 1);
+
+   elm_object_content_set(editor->popup, frame);
+   evas_object_show(table);
+
+   button = elm_button_add(editor->popup);
+   elm_object_text_set(button, _("Reload"));
+   elm_object_part_content_set(editor->popup, "button1", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_reload_cb, editor);
+
+   button = elm_button_add(editor->popup);
+   elm_object_text_set(button, _("No, continue editing"));
+   elm_object_part_content_set(editor->popup, "button2", button);
+   evas_object_smart_callback_add(button, "clicked", _edi_editor_file_change_ignore_cb, editor);
+
+   evas_object_show(editor->popup);
+}
+
+
+static void
 _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
 {
    Evas_Object *table, *frame, *box, *label, *sep, *icon, *button;
@@ -132,6 +190,13 @@ edi_editor_save(Edi_Editor *editor)
    code = elm_code_widget_code_get(editor->entry);
 
    filename = elm_code_file_path_get(code->file);
+
+   // TODO: elm_code_file_save() should handle this.
+   if (!ecore_file_can_write(filename))
+     {
+	_edi_editor_file_save_fail_popup(editor->entry, editor);
+        return;
+     }
 
    elm_code_file_save(code->file);
 
@@ -1107,6 +1172,8 @@ _focused_cb(void *data, Evas_Object *obj EINA_UNUSED, void *event_info EINA_UNUS
    code = elm_code_widget_code_get(editor->entry);
    filename = elm_code_file_path_get(code->file);
    mtime = ecore_file_mod_time(filename);
+
+   edi_main_win_title_set(filename);
 
    if ((editor->save_time) && (editor->save_time < mtime))
      {

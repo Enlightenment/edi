@@ -2,10 +2,6 @@
 # include "config.h"
 #endif
 
-/* NOTE: Respecting header order is important for portability.
- * Always put system first, then EFL, then your public header,
- * and finally your private one. */
-
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
 #include <Eio.h>
@@ -1559,6 +1555,8 @@ _edi_win_title_get()
    provider = edi_build_provider_for_project_get();
    if (provider)
      type = provider->id;
+   else if (!edi_project_mode_get())
+     type = _("editor");
    else
      type = _("unknown");
 
@@ -1568,6 +1566,31 @@ _edi_win_title_get()
    snprintf(winname, len, _("Edi :: %s (%s)"), name, type);
 
    return winname;
+}
+
+void
+edi_main_win_title_set(const char *path)
+{
+   char *title;
+
+   if (edi_project_mode_get() || !path)
+     {
+        title = _edi_win_title_get();
+     }
+   else
+     {
+        title = strdup(eina_slstr_printf(_("%s - Edi"), path));
+     }
+
+   elm_win_title_set(edi_main_win_get(), title);
+
+   free(title);
+}
+
+void
+edi_main_win_title_reset(void)
+{
+   edi_main_win_title_set(NULL);
 }
 
 static void
@@ -1846,6 +1869,12 @@ edi_close()
 }
 
 void
+edi_open_new(const char *path)
+{
+   ecore_exe_run(eina_slstr_printf("edi %s", path), NULL);
+}
+
+void
 edi_open_url(const char *url)
 {
    const char *format;
@@ -1858,12 +1887,6 @@ edi_open_url(const char *url)
    ecore_exe_run(cmd, NULL);
 
    free(cmd);
-}
-
-Eina_Bool
-edi_noproject()
-{
-   return !_edi_main_win;
 }
 
 static Eina_Bool
@@ -1970,12 +1993,27 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
      }
    else if (!ecore_file_is_dir(project_path))
      {
+        FILE *f;
         const char *mime;
+
+        /* Here we attempt to open a file that exists or create one if it does not. */
 
         if (!ecore_file_exists(project_path))
           {
-             fprintf(stderr, _("Could not open file (%s)\n"), project_path);
-             goto end;
+             f = fopen(project_path, "w");
+             if (f)
+               {
+                  if (fclose(f))
+                    {
+                       fprintf(stderr, _("Could not create file (%s) (%s)\n"), project_path, strerror(errno));
+                       goto end;
+                    }
+               }
+             else
+               {
+                  fprintf(stderr, _("Could not open file (%s) (%s)\n"), project_path, strerror(errno));
+                  goto end;
+               }
           }
 
         mime = edi_mime_type_get(project_path);

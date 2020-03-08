@@ -25,11 +25,7 @@ static Evas_Object *_main_win, *_mainview_panel;
 static Evas_Object *_edi_mainview_search_project_popup;
 
 static Edi_Mainview_Panel *_current_panel;
-static Eina_List *_edi_mainview_panels = NULL, *_edi_mainview_wins = NULL;
-
-static void
-dummy()
-{}
+static Eina_List *_edi_mainview_panels = NULL;
 
 Eina_Bool
 edi_mainview_is_empty(void)
@@ -158,117 +154,6 @@ edi_mainview_tab_select(unsigned int id)
    edi_mainview_panel_tab_select(_current_panel, id);
 }
 
-static void
-_edi_mainview_win_exit(void *data EINA_UNUSED, Evas_Object *obj, void *event_info EINA_UNUSED)
-{
-   Edi_Mainview_Item *it;
-
-   evas_object_hide(obj);
-
-   it = evas_object_data_get(obj, "edi_mainview_item");
-   _edi_mainview_wins = eina_list_remove(_edi_mainview_wins, it);
-
-   _edi_project_config_tab_remove(it->path, EINA_TRUE, 0);
-   eina_stringshare_del(it->path);
-
-   if (edi_noproject())
-     edi_close();
-   free(it);
-}
-
-static const char *
-_edi_mainview_win_title_get(const char *path)
-{
-   return eina_slstr_printf(_("Edi :: %s"), ecore_file_file_get(path));
-}
-
-static Evas_Object *
-_edi_mainview_content_create(Edi_Mainview_Item *item, Evas_Object *parent)
-{
-
-   Evas_Object *container;
-
-   container = elm_box_add(parent);
-   evas_object_size_hint_weight_set(container, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(container, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_show(container);
-
-   item->loaded = EINA_FALSE;
-   item->container = container;
-// TODO not in 2 halfs
-   Edi_Content_Provider *provider;
-   Evas_Object *child;
-
-   provider = edi_content_provider_for_id_get(item->editortype);
-   if (!provider)
-     {
-        ERR("No content provider found for type %s", item->editortype);
-        return container;
-     }
-   child = provider->content_ui_add(item->container, item);
-
-   evas_object_size_hint_weight_set(child, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(child, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_end(item->container, child);
-   evas_object_show(child);
-
-   item->loaded = EINA_TRUE;
-   return container;
-}
-
-static void
-_edi_mainview_item_win_add(Edi_Path_Options *options, const char *mime)
-{
-   Evas_Object *win, *content;
-   Edi_Mainview_Item *item;
-   Edi_Editor *editor;
-
-   win = elm_win_util_standard_add("mainview", _edi_mainview_win_title_get(options->path));
-   if (!win) return;
-
-   elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
-   evas_object_smart_callback_add(win, "delete,request", _edi_mainview_win_exit, NULL);
-   item = edi_mainview_item_add(options, mime, NULL, win);
-   _edi_mainview_wins = eina_list_append(_edi_mainview_wins, item);
-   evas_object_data_set(win, "edi_mainview_item", item);
-
-   content = _edi_mainview_content_create(item, win);
-   elm_win_resize_object_add(win, content);
-
-   // Set focus on the newly opening window so that one can just start typing
-   editor = (Edi_Editor *)evas_object_data_get(content, "editor");
-   if (editor)
-     elm_object_focus_set(editor->entry, EINA_TRUE);
-
-   evas_object_resize(win, 380 * elm_config_scale_get(), 260 * elm_config_scale_get());
-   evas_object_show(win);
-
-   _edi_project_config_tab_add(options->path, mime?mime:options->type, EINA_TRUE, 0);
-}
-
-static void
-_edi_mainview_win_stat_done(void *data, Eio_File *handler EINA_UNUSED, const Eina_Stat *stat)
-{
-   Edi_Path_Options *options;
-   Edi_Content_Provider *provider;
-   const char *mime;
-
-   options = data;
-   if (!S_ISREG(stat->mode))
-     return;
-
-   mime = edi_mime_type_get(options->path);
-   provider = edi_content_provider_for_mime_get(mime);
-   if (!provider)
-     {
-//TODO        _edi_mainview_mime_content_safe_popup();
-        return;
-     }
-
-   options->type = provider->id;
-   _edi_mainview_item_win_add(options, mime);
-}
-
 void
 edi_mainview_open_path(const char *path)
 {
@@ -358,26 +243,7 @@ edi_mainview_open_window(Edi_Path_Options *options)
 {
    edi_mainview_item_close_path(options->path);
 
-   if (options->type == NULL)
-     {
-        eio_file_direct_stat(options->path, _edi_mainview_win_stat_done, dummy, options);
-     }
-   else if (!edi_content_provider_for_id_get(options->type))
-     {
-        const char *mime = options->type;
-        Edi_Content_Provider *provider = edi_content_provider_for_mime_get(mime);
-
-        if (provider)
-          options->type = provider->id;
-        else
-          options->type = NULL;
-
-        _edi_mainview_item_win_add(options, mime);
-     }
-   else
-     {
-        _edi_mainview_item_win_add(options, NULL);
-     }
+   edi_open_new(options->path);
 }
 
 void
@@ -435,8 +301,8 @@ edi_mainview_new_window()
    item = edi_mainview_item_current_get();
    if (!item)
      return;
-// TODO OPTIONS!
-   edi_mainview_open_window_path(item->path);
+
+   edi_open_new(item->path);
 }
 
 void

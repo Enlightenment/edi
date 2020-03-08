@@ -250,7 +250,7 @@ _item_menu_open_window_cb(void *data, Evas_Object *obj EINA_UNUSED,
    if (sd->isdir)
      return;
 
-   _open_cb(sd->path, NULL, EINA_TRUE);
+   edi_open_new(sd->path);
 }
 
 static void
