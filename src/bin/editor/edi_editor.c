@@ -194,7 +194,7 @@ edi_editor_save(Edi_Editor *editor)
    // TODO: elm_code_file_save() should handle this.
    if (!ecore_file_can_write(filename))
      {
-	_edi_editor_file_save_fail_popup(editor->entry, editor);
+        _edi_editor_file_save_fail_popup(editor->entry, editor);
         return;
      }
 
