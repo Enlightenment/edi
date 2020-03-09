@@ -95,17 +95,17 @@ _icon_status(Edi_Scm_Status_Code code, Eina_Bool *staged)
            *staged = EINA_TRUE;
            return NULL;
         case EDI_SCM_STATUS_ADDED:
-           return "document-new";
+           return edi_theme_icon_path_get("document-new");
         case EDI_SCM_STATUS_ADDED_STAGED:
            *staged = EINA_TRUE;
-           return "document-new";
+           return edi_theme_icon_path_get("document-new");
         case EDI_SCM_STATUS_MODIFIED:
-           return "document-save-as";
+           return edi_theme_icon_path_get("document-save-as");
         case EDI_SCM_STATUS_MODIFIED_STAGED:
            *staged = EINA_TRUE;
-           return "document-save-as";
+           return edi_theme_icon_path_get("document-save-as");
         case EDI_SCM_STATUS_UNTRACKED:
-           return "dialog-question";
+           return edi_theme_icon_path_get("dialog-question");
      }
 
    return NULL;
@@ -461,7 +461,7 @@ _item_menu_filetype_create(Evas_Object *menu, Elm_Object_Item *parent, const cha
    if (!provider)
      return;
 
-   elm_menu_item_add(menu, parent, provider->icon, provider->id, func, sd);
+   elm_menu_item_add(menu, parent, edi_theme_icon_path_get(provider->icon), provider->id, func, sd);
 }
 
 static void
@@ -722,9 +722,9 @@ _content_get(void *data, Evas_Object *obj, const char *source)
 
    provider = _get_provider_from_hashset(sd->path);
    if (provider)
-     icon_name = provider->icon;
+     icon_name = edi_theme_icon_path_get(provider->icon);
    else
-     icon_name = "empty";
+     icon_name = edi_theme_icon_path_get("empty");
 
    box = elm_box_add(obj);
    elm_box_horizontal_set(box, EINA_TRUE);
@@ -767,7 +767,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         if (staged)
           {
              ic = elm_icon_add(mbox);
-             elm_icon_standard_set(ic, "dialog-information");
+             elm_icon_standard_set(ic, edi_theme_icon_path_get("dialog-information"));
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
              elm_box_pack_end(rbox, ic);
@@ -777,7 +777,7 @@ _content_get(void *data, Evas_Object *obj, const char *source)
         else
           {
              ic = elm_icon_add(mbox);
-             elm_icon_standard_set(ic, "dialog-error");
+             elm_icon_standard_set(ic, edi_theme_icon_path_get("dialog-error"));
              evas_object_size_hint_min_set(ic, ELM_SCALE_SIZE(16), ELM_SCALE_SIZE(16));
              evas_object_show(ic);
              elm_box_pack_end(rbox, ic);

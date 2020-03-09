@@ -10,7 +10,10 @@ install_data(['document-new.png', 'window-close.png', 'window-close.png',
               'object-flip-horizontal.png', 'object-flip-vertical.png',
               'edit-clear.png','applications-electronics.png', 'mail-send.png',
               'dialog-error.png', 'go-home.png', 'network-server.png',
-              'edit-delete.png',
+              'edit-delete.png', 'text-x-generic.png', 'text-x-csrc.png',
+              'image-x-generic.png', 'empty.png',
+              'document-save-as.png', 'dialog-question.png', 'dialog-error.png',
+              'dialog-information.png',
              ],
              install_dir: join_paths(get_option('prefix'), get_option('datadir'), 'edi', 'icons')
 )
