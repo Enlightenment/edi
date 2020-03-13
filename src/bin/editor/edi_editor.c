@@ -245,7 +245,7 @@ _edi_editor_async_save(Edi_Editor *editor)
    async_save->editor = editor;
    async_save->code = code;
 
-   uditor->save_thread = ecore_thread_run(_async_save_thread_run_cb, _async_save_thread_end_cb, _async_save_thread_end_cb, async_save);
+   editor->save_thread = ecore_thread_run(_async_save_thread_run_cb, _async_save_thread_end_cb, _async_save_thread_end_cb, async_save);
 }
 
 void
