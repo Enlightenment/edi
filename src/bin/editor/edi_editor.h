@@ -63,6 +63,8 @@ struct _Edi_Editor
 
    Ecore_Thread *highlight_thread;
    Eina_Bool highlight_cancel;
+
+   Ecore_Thread *save_thread;
    time_t save_time;
 
    const char *mimetype;

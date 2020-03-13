@@ -178,6 +178,63 @@ _edi_editor_file_change_popup(Evas_Object *parent, Edi_Editor *editor)
    evas_object_show(editor->popup);
 }
 
+typedef struct {
+   Edi_Editor *editor;
+   Elm_Code *code;
+} Async_Save;
+
+static void
+_async_save_thread_end_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Edi_Editor *editor;
+   Async_Save *async_save = data;
+
+   editor = async_save->editor;
+
+   if (edi_language_provider_has(editor))
+     edi_language_provider_get(editor)->refresh(editor);
+
+   editor->save_thread = NULL;
+
+   free(async_save);
+
+   ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
+}
+
+static void
+_async_save_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
+{
+   Elm_Code *code;
+   Edi_Editor *editor;
+   Async_Save *async_save = data;
+
+   editor = async_save->editor;
+   code = async_save->code;
+
+   elm_code_file_save(code->file);
+
+   editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
+   editor->modified = EINA_FALSE;
+
+   if (editor->save_timer)
+     {
+        ecore_timer_del(editor->save_timer);
+        editor->save_timer = NULL;
+     }
+}
+
+static void
+_edi_editor_async_save(Edi_Editor *editor, Elm_Code *code)
+{
+   Async_Save *async_save = calloc(1, sizeof(Async_Save));
+   if (!async_save) return;
+
+   async_save->editor = editor;
+   async_save->code = code;
+
+   editor->save_thread = ecore_thread_run(_async_save_thread_run_cb, _async_save_thread_end_cb, _async_save_thread_end_cb, async_save);
+}
+
 void
 edi_editor_save(Edi_Editor *editor)
 {
@@ -187,8 +244,10 @@ edi_editor_save(Edi_Editor *editor)
    if (!editor->modified)
      return;
 
-   code = elm_code_widget_code_get(editor->entry);
+   if (editor->save_thread)
+     return;
 
+   code = elm_code_widget_code_get(editor->entry);
    filename = elm_code_file_path_get(code->file);
 
    // TODO: elm_code_file_save() should handle this.
@@ -198,22 +257,7 @@ edi_editor_save(Edi_Editor *editor)
         return;
      }
 
-   elm_code_file_save(code->file);
-
-   editor->save_time = ecore_file_mod_time(filename);
-
-   editor->modified = EINA_FALSE;
-
-   if (editor->save_timer)
-     {
-        ecore_timer_del(editor->save_timer);
-        editor->save_timer = NULL;
-     }
-
-   if (edi_language_provider_has(editor))
-     edi_language_provider_get(editor)->refresh(editor);
-
-   ecore_event_add(EDI_EVENT_FILE_SAVED, NULL, NULL, NULL);
+   _edi_editor_async_save(editor, code);
 }
 
 static Eina_Bool
