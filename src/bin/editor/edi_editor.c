@@ -224,28 +224,10 @@ _async_save_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 }
 
 static void
-_edi_editor_async_save(Edi_Editor *editor, Elm_Code *code)
-{
-   Async_Save *async_save = calloc(1, sizeof(Async_Save));
-   if (!async_save) return;
-
-   async_save->editor = editor;
-   async_save->code = code;
-
-   editor->save_thread = ecore_thread_run(_async_save_thread_run_cb, _async_save_thread_end_cb, _async_save_thread_end_cb, async_save);
-}
-
-void
-edi_editor_save(Edi_Editor *editor)
+_edi_editor_async_save(Edi_Editor *editor)
 {
    Elm_Code *code;
    const char *filename;
-
-   if (!editor->modified)
-     return;
-
-   if (editor->save_thread)
-     return;
 
    code = elm_code_widget_code_get(editor->entry);
    filename = elm_code_file_path_get(code->file);
@@ -257,7 +239,25 @@ edi_editor_save(Edi_Editor *editor)
         return;
      }
 
-   _edi_editor_async_save(editor, code);
+   Async_Save *async_save = calloc(1, sizeof(Async_Save));
+   if (!async_save) return;
+
+   async_save->editor = editor;
+   async_save->code = code;
+
+   uditor->save_thread = ecore_thread_run(_async_save_thread_run_cb, _async_save_thread_end_cb, _async_save_thread_end_cb, async_save);
+}
+
+void
+edi_editor_save(Edi_Editor *editor)
+{
+   if (!editor->modified)
+     return;
+
+   if (editor->save_thread)
+     return;
+
+   _edi_editor_async_save(editor);
 }
 
 static Eina_Bool
