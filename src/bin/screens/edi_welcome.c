@@ -722,7 +722,7 @@ _edi_welcome_clone_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
 {
    Edi_Welcome_Data *wd = data;
 
-   wd->status = edi_scm_git_clone(wd->url, wd->dir);
+   wd->status = edi_scm_git_clone(wd->url, wd->dir, EINA_TRUE);
 }
 
 static void

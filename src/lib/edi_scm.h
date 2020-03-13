@@ -132,11 +132,13 @@ EAPI int edi_scm_git_new(void);
  *
  * @param url The URL to clone from.
  * @param dir The new directory that will be created to clone into.
+ * @param history Whether to clone a full git history or single commit.
+ *
  * @return The status code of the clone command.
  *
  * @ingroup Scm
  */
-EAPI int edi_scm_git_clone(const char *url, const char *dir);
+EAPI int edi_scm_git_clone(const char *url, const char *dir, Eina_Bool history);
 
 /**
  * Update a local git repository from remote source.

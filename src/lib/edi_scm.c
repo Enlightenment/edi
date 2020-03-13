@@ -73,12 +73,16 @@ edi_scm_git_new(void)
 }
 
 EAPI int
-edi_scm_git_clone(const char *url, const char *dir)
+edi_scm_git_clone(const char *url, const char *dir, Eina_Bool history)
 {
    int code;
    Eina_Strbuf *command = eina_strbuf_new();
 
-   eina_strbuf_append_printf(command, "git clone '%s' '%s'", url, dir);
+   if (history)
+     eina_strbuf_append_printf(command, "git clone '%s' '%s'", url, dir);
+   else
+     eina_strbuf_append_printf(command, "git clone --depth 1 '%s' '%s'", url, dir);
+
    code = edi_exe_wait(eina_strbuf_string_get(command));
 
    eina_strbuf_free(command);

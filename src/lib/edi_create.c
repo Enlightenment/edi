@@ -406,7 +406,7 @@ edi_create_example(const char *example_name, const char *parentdir,
    if (ecore_file_exists(examplepath))
      status = edi_scm_git_update(examplepath);
    else
-     status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath);
+     status = edi_scm_git_clone(EXAMPLES_GIT_URL, examplepath, EINA_FALSE);
 
    if (status)
      {
