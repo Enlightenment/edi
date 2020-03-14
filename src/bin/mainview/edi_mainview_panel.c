@@ -304,13 +304,17 @@ edi_mainview_panel_item_close(Edi_Mainview_Panel *panel, Edi_Mainview_Item *item
 
    if (item->view)
      evas_object_del(item->view);
-   elm_box_unpack(panel->tabs, item->tab);
-   evas_object_del(item->tab);
+   elm_box_unpack(panel->tabs, item->tab->button);
+   evas_object_del(item->tab->button);
    panel->items = eina_list_remove(panel->items, item);
 
    _edi_project_config_tab_remove(item->path, EINA_FALSE,
                                   edi_mainview_panel_index_get(panel));
    eina_stringshare_del(item->path);
+
+   if (item->tab->path)
+     free(item->tab->path);
+   free(item->tab);
    free(item);
 
    if (!current)
@@ -346,8 +350,8 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
      {
         EINA_LIST_FOREACH(panel->items, list, it)
           {
-             elm_object_signal_emit(it->tab, "mouse,up,1", "base");
-             evas_object_geometry_get(it->tab, NULL, NULL, &w, NULL);
+             elm_object_signal_emit(it->tab->button, "mouse,up,1", "base");
+             evas_object_geometry_get(it->tab->button, NULL, NULL, &w, NULL);
              if (item == it) region_x = total_w;
              total_w += w;
           }
@@ -356,9 +360,9 @@ edi_mainview_panel_item_select(Edi_Mainview_Panel *panel, Edi_Mainview_Item *ite
           _content_load(item);
 
         _edi_mainview_panel_show(panel, item->view);
-        elm_object_signal_emit(item->tab, "mouse,down,1", "base");
+        elm_object_signal_emit(item->tab->button, "mouse,down,1", "base");
 
-        evas_object_geometry_get(item->tab, NULL, NULL, &tabw, NULL);
+        evas_object_geometry_get(item->tab->button, NULL, NULL, &tabw, NULL);
         elm_scroller_region_bring_in(efl_parent_get(panel->tabs), region_x, 0, tabw, 0);
 
         _edi_project_config_tab_current_set(edi_mainview_panel_index_get(panel),
@@ -496,14 +500,7 @@ _font_width_get(Evas_Object *parent, const char *text)
 
 // TODO: Allow tab moving between panels.
 
-typedef struct {
-   Evas_Object *toolbar;
-   Evas_Object *tab;
-   Evas_Object *btn;
-   char        *path;
-} Tab_Drag;
-
-static char *_tab_drag_path = NULL;
+static char *_tab_dragging_path = NULL;
 
 static void
 _tab_swap(const char *old, const char *new)
@@ -545,16 +542,16 @@ _tab_swap(const char *old, const char *new)
 
     EINA_LIST_FOREACH_SAFE(panel->items, l, l_next, item)
       {
-	 if (item == first)
-	   l = eina_list_data_set(l, tmp2);
-	 if (item == second)
+         if (item == first)
+           l = eina_list_data_set(l, tmp2);
+         if (item == second)
            l = eina_list_data_set(l, tmp);
       }
 
     elm_box_unpack_all(panel->tabs);
     EINA_LIST_FOREACH(panel->items, l, item)
       {
-         elm_box_pack_end(panel->tabs, item->tab);
+         elm_box_pack_end(panel->tabs, item->tab->button);
       }
     elm_box_recalculate(panel->tabs);
 
@@ -566,31 +563,31 @@ _tab_move_display_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUS
                      void *event_info)
 {
    Evas_Event_Mouse_Move *ev;
-   Tab_Drag *drag = data;
+   Edi_Mainview_Item_Tab *tab = data;
 
-   if (!drag) return;
+   if (!tab) return;
 
    ev = event_info;
 
-   evas_object_move(drag->btn, ev->cur.canvas.x, ev->cur.canvas.y);
-   evas_object_show(drag->btn);
+   evas_object_move(tab->drag_btn, ev->cur.canvas.x, ev->cur.canvas.y);
+   evas_object_show(tab->drag_btn);
 }
 
 static void
 _tab_move_done_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                   void *event_info EINA_UNUSED)
 {
-   Tab_Drag *drag = data;
-   if (!drag) return;
+   Edi_Mainview_Item_Tab *tab = data;
+   if (!tab) return;
 
-   evas_object_event_callback_del(drag->tab, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb);
-   evas_object_event_callback_del(drag->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb);
-   evas_object_del(drag->btn);
+   evas_object_event_callback_del(tab->button, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb);
+   evas_object_event_callback_del(tab->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb);
+   evas_object_del(tab->drag_btn);
 
-   if (_tab_drag_path)
+   if (_tab_dragging_path)
      {
-        free(_tab_drag_path);
-        _tab_drag_path = NULL;
+        free(_tab_dragging_path);
+        _tab_dragging_path = NULL;
      }
 }
 
@@ -600,34 +597,33 @@ _tab_move_begin_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED
 {
    Evas_Event_Mouse_Down *ev;
    Evas_Object *btn;
-   Tab_Drag *drag = data;
+   Edi_Mainview_Item_Tab *tab = data;
 
-   if (!drag || _tab_drag_path) return;
+   if (!tab || _tab_dragging_path) return;
 
    ev = event_info;
 
-   drag->btn = btn = elm_button_add(edi_main_win_get());
+   tab->drag_btn = btn = elm_button_add(edi_main_win_get());
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_text_set(btn, ecore_file_file_get(drag->path));
+   elm_object_text_set(btn, ecore_file_file_get(tab->path));
    evas_object_show(btn);
    evas_object_move(btn, ev->canvas.x, ev->canvas.y);
-   _tab_drag_path = strdup(drag->path);
+   _tab_dragging_path = strdup(tab->path);
 
-   evas_object_event_callback_add(drag->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb, drag);
-   evas_object_event_callback_add(drag->tab, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb, drag);
+   evas_object_event_callback_add(tab->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb, tab);
+   evas_object_event_callback_add(tab->button, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb, tab);
 }
 
 static void
 _tab_mouse_in_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                  void *event_info EINA_UNUSED)
 {
-   Tab_Drag *drag = data;
+   Edi_Mainview_Item_Tab *tab = data;
 
-   if (!drag || !drag->path || !_tab_drag_path) return;
+   if (!tab || !tab->path || !_tab_dragging_path) return;
 
-   _tab_swap(drag->path, _tab_drag_path);
-
+   _tab_swap(tab->path, _tab_dragging_path);
 }
 
 static void
@@ -675,15 +671,15 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
    elm_object_part_text_set(tab, "elm.btn.text", eina_slstr_printf("<style align=left> %s</>", ecore_file_file_get(options->path)));
 
-   // TODO: Allow dragging between panels.
+   item->tab->toolbar = panel->tabs;
+   item->tab->button = tab;
+   item->tab->path = strdup(item->path);
+
+   // TODO: Allow tab movement between panels.
    if (edi_mainview_panel_id(panel) == 0)
      {
-        Tab_Drag *drag = calloc(1, sizeof(Tab_Drag));
-        drag->toolbar = panel->tabs;
-        drag->tab = tab;
-        drag->path = strdup(item->path);
-        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, drag);
-        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, drag);
+        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, item->tab);
+        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, item->tab);
      }
 
    width = _font_width_get(tab, ecore_file_file_get(options->path));
@@ -695,7 +691,7 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    elm_box_pack_end(panel->tabs, tab);
    evas_object_show(tab);
    elm_box_recalculate(panel->tabs);
-   item->tab = tab;
+   item->tab->button = tab;
 
    if (!options->background)
      edi_mainview_panel_item_select(panel, item);

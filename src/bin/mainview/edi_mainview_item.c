@@ -23,10 +23,11 @@ edi_mainview_item_add(Edi_Path_Options *path, const char *mime,
    item->path = eina_stringshare_add(path->path);
    item->editortype = path->type;
    item->mimetype = mime;
-   item->tab = tab;
    item->win = win;
-
+   item->tab = calloc(1, sizeof(Edi_Mainview_Item_Tab));
+   item->tab->button = tab;
    item->view = NULL;
+
    return item;
 }
 

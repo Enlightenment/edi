@@ -15,6 +15,13 @@ extern "C" {
  * @brief These routines are used for managing views within the main area of the Edi interface.
  */
 
+typedef struct _Edi_Mainview_Item_Tab {
+   Evas_Object     *toolbar;
+   Elm_Object_Item *button;
+   Evas_Object     *drag_btn;
+   char            *path;
+} Edi_Mainview_Item_Tab;
+
 /**
  * @struct _Edi_Mainview_Item
  * An item being displayed in the mainview.
@@ -23,17 +30,17 @@ typedef struct _Edi_Mainview_Item
 {
    const char *path; /**< The path of the file in this mainview item */
 
-   Elm_Object_Item *tab; /**< The tab object connected to this view */
-   Elm_Object_Item *view; /**< The naviframe item that contains the view for this item */
-   Evas_Object *win; /**< The window for the item if it's displayed in a seperate window */
+   Edi_Mainview_Item_Tab *tab;  /**< The tab object connected to this view */
+   Elm_Object_Item       *view; /**< The naviframe item that contains the view for this item */
+   Evas_Object           *win;  /**< The window for the item if it's displayed in a seperate window */
 
-   const char *mimetype; /**< The detected mime type for the item */
+   const char *mimetype;   /**< The detected mime type for the item */
    const char *editortype; /**< The requested editor type for this item */
 
    /* Private */
 
    Evas_Object *container; /**< The visual container that the item will display within */
-   Evas_Object *pos; /**< The object pointing to the item's statusbar in the editor */
+   Evas_Object *pos;       /**< The object pointing to the item's statusbar in the editor */
    Eina_Bool loaded;
 } Edi_Mainview_Item;
 
