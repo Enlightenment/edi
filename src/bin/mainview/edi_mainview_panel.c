@@ -139,7 +139,7 @@ _edi_mainview_panel_current_tab_show(Edi_Mainview_Panel *panel)
 
    editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
    if (editor)
-     {
+    {
         evas_object_show(editor->entry);
         elm_object_focus_set(editor->entry, EINA_TRUE);
      }
@@ -506,28 +506,12 @@ typedef struct {
 static char *_tab_drag_path = NULL;
 
 static void
-_swap(Edi_Mainview_Item *a, Edi_Mainview_Item *b)
-{
-   const void *tmp = a->path;
-
-   a->path = b->path;
-   b->path = tmp;
-
-   tmp = a->editortype;
-   a->editortype = b->editortype;
-   b->editortype = tmp;
-
-   tmp = a->mimetype;
-   a->mimetype = b->mimetype;
-   b->mimetype = tmp;
-}
-
-static void
 _tab_swap(const char *old, const char *new)
 {
    Edi_Mainview_Panel *panel, *panel_selected;
    Edi_Mainview_Item *first, *second, *item;
-   Eina_List *l;
+   Edi_Mainview_Item *tmp, *tmp2;
+   Eina_List *l, *l_next;
    int count, i;
 
    first = second = NULL;
@@ -557,16 +541,24 @@ _tab_swap(const char *old, const char *new)
 
     if (!first || !second) return;
 
-    _swap(first, second);
+    tmp = first; tmp2 = second;
 
-    for (i = 0; i < count; i++)
+    EINA_LIST_FOREACH_SAFE(panel->items, l, l_next, item)
       {
-         panel = edi_mainview_panel_by_index(i);
-         edi_mainview_panel_refresh_all(panel);
+	 if (item == first)
+	   l = eina_list_data_set(l, tmp2);
+	 if (item == second)
+           l = eina_list_data_set(l, tmp);
       }
 
-   if (panel_selected)
-     edi_mainview_panel_item_select_path(panel_selected, new);
+    elm_box_unpack_all(panel->tabs);
+    EINA_LIST_FOREACH(panel->items, l, item)
+      {
+         elm_box_pack_end(panel->tabs, item->tab);
+      }
+    elm_box_recalculate(panel->tabs);
+
+    edi_mainview_panel_item_select_path(panel_selected, new);
 }
 
 static void
@@ -636,8 +628,6 @@ _tab_mouse_in_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 
    _tab_swap(drag->path, _tab_drag_path);
 
-   free(drag->path);
-   free(drag);
 }
 
 static void
