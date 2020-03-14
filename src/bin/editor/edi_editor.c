@@ -211,6 +211,7 @@ _async_save_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
    editor = async_save->editor;
    code = async_save->code;
 
+   ecore_thread_main_loop_begin();
    elm_code_file_save(code->file);
 
    editor->save_time = ecore_file_mod_time(elm_code_file_path_get(code->file));
@@ -221,6 +222,7 @@ _async_save_thread_run_cb(void *data, Ecore_Thread *thread EINA_UNUSED)
         ecore_timer_del(editor->save_timer);
         editor->save_timer = NULL;
      }
+   ecore_thread_main_loop_end();
 }
 
 static void
