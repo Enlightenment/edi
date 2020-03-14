@@ -500,7 +500,7 @@ _font_width_get(Evas_Object *parent, const char *text)
 
 // TODO: Allow tab moving between panels.
 
-static char *_tab_dragging_path = NULL;
+static char *_tab_move_src_path = NULL;
 
 static void
 _tab_swap(const char *old, const char *new)
@@ -570,8 +570,8 @@ _tab_move_display_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUS
    ev = event_info;
 
    elm_object_tooltip_hide(tab->button);
-   evas_object_move(tab->drag_btn, ev->cur.canvas.x, ev->cur.canvas.y);
-   evas_object_show(tab->drag_btn);
+   evas_object_move(tab->button_drag, ev->cur.canvas.x, ev->cur.canvas.y);
+   evas_object_show(tab->button_drag);
 }
 
 static void
@@ -583,12 +583,12 @@ _tab_move_done_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 
    evas_object_event_callback_del(tab->button, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb);
    evas_object_event_callback_del(tab->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb);
-   evas_object_del(tab->drag_btn);
+   evas_object_del(tab->button_drag);
 
-   if (_tab_dragging_path)
+   if (_tab_move_src_path)
      {
-        free(_tab_dragging_path);
-        _tab_dragging_path = NULL;
+        free(_tab_move_src_path);
+        _tab_move_src_path = NULL;
      }
 }
 
@@ -600,16 +600,16 @@ _tab_move_begin_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED
    Evas_Object *btn;
    Edi_Mainview_Item_Tab *tab = data;
 
-   if (!tab || _tab_dragging_path) return;
+   if (!tab || _tab_move_src_path) return;
 
    ev = event_info;
 
-   tab->drag_btn = btn = elm_button_add(edi_main_win_get());
+   tab->button_drag = btn = elm_button_add(edi_main_win_get());
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_text_set(btn, ecore_file_file_get(tab->path));
    evas_object_move(btn, ev->canvas.x, ev->canvas.y);
-   _tab_dragging_path = strdup(tab->path);
+   _tab_move_src_path = strdup(tab->path);
 
    evas_object_event_callback_add(tab->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb, tab);
    evas_object_event_callback_add(tab->button, EVAS_CALLBACK_MOUSE_UP, _tab_move_done_cb, tab);
@@ -621,9 +621,9 @@ _tab_mouse_in_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 {
    Edi_Mainview_Item_Tab *tab = data;
 
-   if (!tab || !tab->path || !_tab_dragging_path) return;
+   if (!tab || !tab->path || !_tab_move_src_path) return;
 
-   _tab_swap(tab->path, _tab_dragging_path);
+   _tab_swap(tab->path, _tab_move_src_path);
 }
 
 static void

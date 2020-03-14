@@ -18,7 +18,7 @@ extern "C" {
 typedef struct _Edi_Mainview_Item_Tab {
    Evas_Object     *toolbar;
    Elm_Object_Item *button;
-   Evas_Object     *drag_btn;
+   Evas_Object     *button_drag;
    char            *path;
 } Edi_Mainview_Item_Tab;
 
