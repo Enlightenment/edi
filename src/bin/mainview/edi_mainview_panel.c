@@ -503,49 +503,49 @@ _font_width_get(Evas_Object *parent, const char *text)
 static char *_tab_move_src_path = NULL;
 
 static void
-_tab_swap(const char *old, const char *new)
+_tab_swap(const char *path1, const char *path2)
 {
-   Edi_Mainview_Panel *panel, *panel_selected;
-   Edi_Mainview_Item *first, *second, *item;
-   Edi_Mainview_Item *tmp, *tmp2;
+   Edi_Mainview_Panel *panel, *p1, *p2;
+   Edi_Mainview_Item *item, *it1, *it2;
+   Edi_Mainview_Item *tmp1, *tmp2;
    Eina_List *l, *l_next;
-   int count, i;
 
-   first = second = NULL;
+   it1 = it2 = NULL;
 
-   if (!strcmp(old, new)) return;
+   if (!strcmp(path1, path2)) return;
 
-   count = edi_mainview_panel_count();
-
-   for (i = 0; i < count; i++)
+   int count = edi_mainview_panel_count();
+   for (int i = 0; i < count; i++)
      {
         panel = edi_mainview_panel_by_index(i);
         EINA_LIST_FOREACH(panel->items, l, item)
           {
-            if (!strcmp(item->path, old))
-              {
-                 first = item;
-              }
-            else if (!strcmp(item->path, new))
-              {
-                 second = item;
-                 panel_selected = panel;
-              }
-
-            if (first && second) break;
+             if (!strcmp(item->path, path1))
+               {
+                  it1 = item;
+                  p1 = panel;
+               }
+             else if (!strcmp(item->path, path2))
+               {
+                  it2 = item;
+                  p2 = panel;
+               }
+             if (it1 && it2) break;
           }
      }
 
-    if (!first || !second) return;
+    if ((!it1 || !it2) || (p1 != p2)) return;
 
-    tmp = first; tmp2 = second;
+    tmp1 = it1;
+    tmp2 = it2;
 
+    panel = p1;
     EINA_LIST_FOREACH_SAFE(panel->items, l, l_next, item)
       {
-         if (item == first)
+         if (item == it1)
            l = eina_list_data_set(l, tmp2);
-         if (item == second)
-           l = eina_list_data_set(l, tmp);
+         if (item == it2)
+           l = eina_list_data_set(l, tmp1);
       }
 
     elm_box_unpack_all(panel->tabs);
@@ -555,7 +555,7 @@ _tab_swap(const char *old, const char *new)
       }
     elm_box_recalculate(panel->tabs);
 
-    edi_mainview_panel_item_select_path(panel_selected, new);
+    edi_mainview_panel_item_select_path(panel, path2);
 }
 
 static void
@@ -674,13 +674,8 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    item->tab->toolbar = panel->tabs;
    item->tab->button = btn;
    item->tab->path = strdup(item->path);
-
-   // TODO: Allow tab movement between panels.
-   if (edi_mainview_panel_id(panel) == 0)
-     {
-        evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, item->tab);
-        evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, item->tab);
-     }
+   evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, item->tab);
+   evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, item->tab);
 
    width = _font_width_get(btn, ecore_file_file_get(options->path));
 
