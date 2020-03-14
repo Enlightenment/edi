@@ -59,6 +59,20 @@ int edi_mainview_panel_id(Edi_Mainview_Panel *panel)
    return i;
 }
 
+Eina_Bool edi_mainview_select_path(const char *path)
+{
+    Edi_Mainview_Panel *p;
+    Eina_List *it;
+
+    EINA_LIST_FOREACH(_edi_mainview_panels, it, p)
+      {
+         if (edi_mainview_panel_item_select_path(p, path))
+           return EINA_TRUE;
+      }
+
+   return EINA_FALSE;
+}
+
 Edi_Mainview_Panel *
 edi_mainview_panel_by_index(int index)
 {

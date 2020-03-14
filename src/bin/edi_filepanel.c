@@ -399,6 +399,7 @@ _item_menu_scm_undo_cb(void *data, Evas_Object *obj EINA_UNUSED,
    edi_scm_undo(sd->path);
    edi_filepanel_scm_status_update();
    edi_filepanel_item_update(sd->path);
+   edi_mainview_select_path(sd->path);
 }
 
 
@@ -411,6 +412,7 @@ _item_menu_scm_unstage_cb(void *data, Evas_Object *obj EINA_UNUSED,
    edi_scm_unstage(sd->path);
    edi_filepanel_scm_status_update();
    edi_filepanel_item_update(sd->path);
+   edi_mainview_select_path(sd->path);
 }
 
 static void

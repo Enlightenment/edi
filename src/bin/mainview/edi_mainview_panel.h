@@ -64,7 +64,7 @@ void edi_mainview_panel_free(Edi_Mainview_Panel *panel);
  * Close mainview by path.
  *
  * @param panel the mainview panel context
- * @praram path The path of file to close.
+ * @param path The path of file to close.
  *
  * @ingroup UI
  */
@@ -74,11 +74,12 @@ void edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *p
  * Select mainview by path.
  *
  * @param panel the mainview panel context
- * @praram path The path of file to select.
+ * @param path The path of file to select.
+ * @return bool On success.
  *
  * @ingroup UI
  */
-void edi_mainview_panel_item_select_path(Edi_Mainview_Panel *panel, const char *path);
+Eina_Bool edi_mainview_panel_item_select_path(Edi_Mainview_Panel *panel, const char *path);
 
 /**
  * Close all existing open files.

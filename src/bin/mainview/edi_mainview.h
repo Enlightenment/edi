@@ -407,6 +407,15 @@ void edi_mainview_panel_focus(Edi_Mainview_Panel *panel);
  * @ingroup Panels
  */
 void edi_mainview_panel_remove(Edi_Mainview_Panel *panel);
+
+/* Bring an item into view by its path.
+ *
+ * @param path The path of the file to bring into view.
+ * @return true if the path was selected.
+ *
+ * @ingroup Panels
+ */
+Eina_Bool edi_mainview_select_path(const char *path);
 /**
  * @}
  *

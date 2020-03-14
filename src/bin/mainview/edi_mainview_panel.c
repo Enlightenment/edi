@@ -607,7 +607,6 @@ _tab_move_begin_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_text_set(btn, ecore_file_file_get(tab->path));
-   evas_object_show(btn);
    evas_object_move(btn, ev->canvas.x, ev->canvas.y);
    _tab_dragging_path = strdup(tab->path);
 
@@ -629,7 +628,7 @@ _tab_mouse_in_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 static void
 _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *options, const char *mime)
 {
-   Evas_Object *content, *tab;
+   Evas_Object *content, *btn;
    Edi_Mainview_Item *item;
    Edi_Editor *editor;
    Elm_Code *code;
@@ -654,10 +653,10 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
 
    evas_object_geometry_get(panel->tabs, NULL, NULL, NULL, &h);
 
-   tab = elm_button_add(panel->tabs);
-   evas_object_size_hint_weight_set(tab, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(tab, 0.0, EVAS_HINT_FILL);
-   elm_object_focus_allow_set(tab, EINA_FALSE);
+   btn = elm_button_add(panel->tabs);
+   evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(btn, 0.0, EVAS_HINT_FILL);
+   elm_object_focus_allow_set(btn, EINA_FALSE);
 
    path = strstr(item->path, edi_project_get());
    if (path)
@@ -665,33 +664,32 @@ _edi_mainview_panel_item_tab_add(Edi_Mainview_Panel *panel, Edi_Path_Options *op
    else
      path = item->path;
 
-   elm_object_tooltip_text_set(tab, path);
-   elm_object_tooltip_window_mode_set(tab, EINA_TRUE);
+   elm_object_tooltip_text_set(btn, path);
+   elm_object_tooltip_window_mode_set(btn, EINA_TRUE);
 
-   elm_layout_theme_set(tab, "multibuttonentry", "btn", "default");
-   elm_object_part_text_set(tab, "elm.btn.text", eina_slstr_printf("<style align=left> %s</>", ecore_file_file_get(options->path)));
+   elm_layout_theme_set(btn, "multibuttonentry", "btn", "default");
+   elm_object_part_text_set(btn, "elm.btn.text", eina_slstr_printf("<style align=left> %s</>", ecore_file_file_get(options->path)));
 
    item->tab->toolbar = panel->tabs;
-   item->tab->button = tab;
+   item->tab->button = btn;
    item->tab->path = strdup(item->path);
 
    // TODO: Allow tab movement between panels.
    if (edi_mainview_panel_id(panel) == 0)
      {
-        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, item->tab);
-        evas_object_event_callback_add(tab, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, item->tab);
+        evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_DOWN, _tab_move_begin_cb, item->tab);
+        evas_object_event_callback_add(btn, EVAS_CALLBACK_MOUSE_IN, _tab_mouse_in_cb, item->tab);
      }
 
-   width = _font_width_get(tab, ecore_file_file_get(options->path));
+   width = _font_width_get(btn, ecore_file_file_get(options->path));
 
-   elm_layout_signal_callback_add(tab, "mouse,clicked,1", "*", _promote, item);
-   elm_layout_signal_callback_add(tab, "elm,deleted", "elm", _closetab, item);
-   evas_object_size_hint_min_set(tab, width * elm_config_scale_get(), h);
+   elm_layout_signal_callback_add(btn, "mouse,clicked,1", "*", _promote, item);
+   elm_layout_signal_callback_add(btn, "elm,deleted", "elm", _closetab, item);
+   evas_object_size_hint_min_set(btn, width * elm_config_scale_get(), h);
 
-   elm_box_pack_end(panel->tabs, tab);
-   evas_object_show(tab);
+   elm_box_pack_end(panel->tabs, btn);
+   evas_object_show(btn);
    elm_box_recalculate(panel->tabs);
-   item->tab->button = tab;
 
    if (!options->background)
      edi_mainview_panel_item_select(panel, item);
@@ -1226,13 +1224,13 @@ edi_mainview_panel_item_close_path(Edi_Mainview_Panel *panel, const char *path)
      }
 }
 
-void
+Eina_Bool
 edi_mainview_panel_item_select_path(Edi_Mainview_Panel *panel, const char *path)
 {
    Eina_List *item;
    Edi_Mainview_Item *it;
 
-   if (!panel) return;
+   if (!panel) return EINA_FALSE;
 
    EINA_LIST_FOREACH(panel->items, item, it)
      {
@@ -1240,9 +1238,11 @@ edi_mainview_panel_item_select_path(Edi_Mainview_Panel *panel, const char *path)
           {
              edi_mainview_panel_item_select(panel, it);
              _edi_mainview_panel_current_tab_show(panel);
-             return;
+             return EINA_TRUE;
           }
      }
+
+   return EINA_FALSE;
 }
 
 static void

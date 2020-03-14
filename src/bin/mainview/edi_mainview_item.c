@@ -15,7 +15,7 @@
 
 Edi_Mainview_Item *
 edi_mainview_item_add(Edi_Path_Options *path, const char *mime,
-                      Elm_Object_Item *tab, Evas_Object *win)
+                      Elm_Object_Item *btn, Evas_Object *win)
 {
    Edi_Mainview_Item *item;
 
@@ -25,7 +25,7 @@ edi_mainview_item_add(Edi_Path_Options *path, const char *mime,
    item->mimetype = mime;
    item->win = win;
    item->tab = calloc(1, sizeof(Edi_Mainview_Item_Tab));
-   item->tab->button = tab;
+   item->tab->button = btn;
    item->view = NULL;
 
    return item;
