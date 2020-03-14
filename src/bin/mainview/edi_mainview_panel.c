@@ -569,6 +569,7 @@ _tab_move_display_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUS
 
    ev = event_info;
 
+   elm_object_tooltip_hide(tab->button);
    evas_object_move(tab->drag_btn, ev->cur.canvas.x, ev->cur.canvas.y);
    evas_object_show(tab->drag_btn);
 }
