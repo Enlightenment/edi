@@ -149,6 +149,7 @@ typedef enum {
    EDI_FILE_STATUS_UNMODIFIED,
    EDI_FILE_STATUS_STAGED,
    EDI_FILE_STATUS_UNSTAGED,
+   EDI_FILE_STATUS_UNTRACKED,
 } Edi_File_Status;
 
 static Edi_File_Status
@@ -162,6 +163,7 @@ _edi_filepanel_file_scm_status(const char *path)
 
    if (!code) return EDI_FILE_STATUS_UNMODIFIED;
 
+   if (*code == EDI_SCM_STATUS_UNTRACKED) return EDI_FILE_STATUS_UNTRACKED;
    if (*code == EDI_SCM_STATUS_RENAMED_STAGED || *code == EDI_SCM_STATUS_DELETED_STAGED ||
        *code == EDI_SCM_STATUS_ADDED_STAGED || *code == EDI_SCM_STATUS_MODIFIED_STAGED)
      return EDI_FILE_STATUS_STAGED;
@@ -500,7 +502,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
         menu_it = elm_menu_item_add(menu, menu_it2, NULL, eina_slstr_printf("%s...", _("Source Control")), NULL, NULL);
 
         menu_it2 = elm_menu_item_add(menu, menu_it, "edit-undo", _("Undo Changes"), _item_menu_scm_undo_cb, sd);
-        if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_STAGED)
+        if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_STAGED || status == EDI_FILE_STATUS_UNTRACKED)
           elm_object_item_disabled_set(menu_it2, EINA_TRUE);
 
         elm_menu_item_separator_add(menu, menu_it);
@@ -510,7 +512,7 @@ _item_menu_create(Evas_Object *win, Edi_Dir_Data *sd)
           elm_object_item_disabled_set(menu_it2, EINA_TRUE);
 
         menu_it2 = elm_menu_item_add(menu, menu_it, "edit-undo", _("Unstage Changes"), _item_menu_scm_unstage_cb, sd);
-        if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_UNSTAGED)
+        if (status == EDI_FILE_STATUS_UNMODIFIED || status == EDI_FILE_STATUS_UNSTAGED || status == EDI_FILE_STATUS_UNTRACKED)
           elm_object_item_disabled_set(menu_it2, EINA_TRUE);
 
         elm_menu_item_separator_add(menu, menu_it);
