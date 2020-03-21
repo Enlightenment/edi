@@ -45,8 +45,8 @@ color_classes {
     color_class { name: "elm/code/token/number"; color: 42 161 152 255; }
     color_class { name: "elm/code/token/brace"; color: 101 123 131 255; }
     color_class { name: "elm/code/token/type"; color: 181 137 0 255; }
-    color_class { name: "elm/code/token/class"; color: 255 255 255 255; }
-    color_class { name: "elm/code/token/function"; color: 255 255 255 255; }
+    color_class { name: "elm/code/token/class"; color: 88 110 117 255; }
+    color_class { name: "elm/code/token/function"; color: 88 110 117 255; }
     color_class { name: "elm/code/token/param"; color: 133 153 0 255; }
     color_class { name: "elm/code/token/keyword"; color: 133 153 0 255; }
     color_class { name: "elm/code/token/preprocessor"; color: 203 75 22 255; }
