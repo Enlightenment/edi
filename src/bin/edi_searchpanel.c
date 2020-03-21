@@ -797,8 +797,5 @@ edi_taskspanel_add(Evas_Object *parent)
    elm_box_pack_end(parent, frame);
 
    ecore_event_handler_add(EDI_EVENT_CONFIG_CHANGED, _edi_taskspanel_config_changed_cb, NULL);
-
-   if (edi_project_mode_get())
-     edi_taskspanel_find();
 }
 
