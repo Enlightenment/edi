@@ -1004,7 +1004,6 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
    if (!win) return NULL;
 
    elm_win_title_set(win, _("Edi Settings"));
-   elm_win_focus_highlight_enabled_set(win, EINA_FALSE);
    evas_object_smart_callback_add(win, "delete,request", _edi_settings_exit, win);
 
    bg = elm_bg_add(win);
@@ -1058,8 +1057,9 @@ edi_settings_show(Evas_Object *mainwin, Edi_Settings_Tab type)
 
    tb_it = elm_toolbar_item_append(tb, NULL, NULL, NULL, NULL);
    elm_toolbar_item_separator_set(tb_it, EINA_TRUE);
-   elm_toolbar_item_append(tb, "application-internet", _("Global"), NULL, NULL);
-   elm_object_item_disabled_set(tb, EINA_TRUE);
+   tb_it = elm_toolbar_item_append(tb, "application-internet", _("Global"), NULL, NULL);
+   elm_object_item_disabled_set(tb_it, EINA_TRUE);
+   elm_object_item_disabled_set(tb, EINA_FALSE);
 
    it_behaviour = elm_toolbar_item_append(tb, "preferences-other", _("Behaviour"),
                                          _edi_settings_category_cb, _edi_settings_behaviour);
