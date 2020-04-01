@@ -27,6 +27,7 @@ Bug fixes:
   * Many stability fixes.
   * Improvements to the EFL code widget.
   * Improve file save behaviour.
+  * Fix welcome content black hole (Escape).
 
 =======
 Edi 0.7

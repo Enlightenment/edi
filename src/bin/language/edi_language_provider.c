@@ -12,6 +12,7 @@
 #include "edi_language_provider_python.c"
 #include "edi_language_provider_rust.c"
 #include "edi_language_provider_go.c"
+#include "edi_language_provider_csharp.c"
 
 static Edi_Language_Provider _edi_language_provider_registry[] =
 {
@@ -35,6 +36,12 @@ static Edi_Language_Provider _edi_language_provider_registry[] =
       _edi_language_go_mime_name, _edi_language_go_snippet_get,
       NULL, NULL
    },
+   {
+      "csharp", _edi_language_csharp_add, _edi_language_csharp_refresh, _edi_language_csharp_del,
+      _edi_language_csharp_mime_name, _edi_language_csharp_snippet_get,
+      NULL, NULL
+   },
+
 
    {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 };
@@ -71,7 +78,7 @@ Edi_Language_Provider *edi_language_provider_for_mime_get(const char *mime)
    provider = _edi_language_provider_registry;
    while (provider != NULL && provider->id != NULL)
      {
-        if (!strncmp(id, provider->id, strlen(provider->id)))
+        if (!strcmp(id, provider->id))
           return provider;
 
         provider++;
