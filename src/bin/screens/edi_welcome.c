@@ -899,6 +899,12 @@ _edi_welcome_button_create(const char *title, const char *icon_name,
    return button;
 }
 
+static Eina_Bool
+_naviframe_pop_stop_nop_cb(void *data EINA_UNUSED, Elm_Object_Item *it EINA_UNUSED)
+{
+   return EINA_FALSE;
+}
+
 Evas_Object *edi_welcome_show()
 {
    Evas_Object *win, *hbx, *box, *button, *frame, *image, *naviframe;
@@ -917,6 +923,7 @@ Evas_Object *edi_welcome_show()
    elm_win_resize_object_add(win, naviframe);
    evas_object_show(naviframe);
    _welcome_naviframe = naviframe;
+
 
    hbx = elm_box_add(naviframe);
    elm_box_horizontal_set(hbx, EINA_TRUE);
@@ -974,6 +981,12 @@ Evas_Object *edi_welcome_show()
                                 NULL,
                                 hbx,
                                 NULL);
+
+   /* This prevents us losing the content when popping last item from the
+    * naviframe.
+    */
+   item = elm_naviframe_top_item_get(naviframe);
+   elm_naviframe_item_pop_cb_set(item, _naviframe_pop_stop_nop_cb, NULL);
 
    elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
    evas_object_resize(win, ELM_SCALE_SIZE(480), ELM_SCALE_SIZE(260));
