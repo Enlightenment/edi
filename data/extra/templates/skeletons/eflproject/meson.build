@@ -1,6 +1,6 @@
 ##### Project
-project('asdas', 'c',
-	version      : '0.0.1',
+project('${edi_name}', 'c',
+	version       : '0.0.1',
 	meson_version : '>= 0.40.0')
 
 efl_version = '>= 1.22.0'
@@ -29,8 +29,8 @@ subdir('src')
 
 ##### config.h
 cfg.set('HAVE_CONFIG_H', 1)
-cfg.set_quoted('PACKAGE', 'asdas')
+cfg.set_quoted('PACKAGE', '${edi_name}')
 cfg.set_quoted('PACKAGE_VERSION', meson.project_version())
-cfg.set_quoted('PACKAGE_DATA_DIR', join_paths(dir_data, 'asdas'))
+cfg.set_quoted('PACKAGE_DATA_DIR', join_paths(dir_data, '${edi_name}'))
 configure_file(output: 'config.h', configuration: cfg)
 

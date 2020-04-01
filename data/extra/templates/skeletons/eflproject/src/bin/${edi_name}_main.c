@@ -38,6 +38,7 @@ ${edi_name}_win_setup(void)
    elm_win_resize_object_add(win, label);
    evas_object_resize(win, 300 * elm_config_scale_get(),
                            200 * elm_config_scale_get());
+   elm_win_center(win, EINA_TRUE, EINA_TRUE);
 
    evas_object_show(win);
 
