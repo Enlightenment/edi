@@ -1,0 +1,2 @@
+subdir('desktop')
+subdir('themes')

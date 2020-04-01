@@ -1,10 +1,4 @@
-#ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
-
-/* NOTE: Respecting header order is important for portability.
- * Always put system first, then EFL, then your public header,
- * and finally your private one. */
 
 #if ENABLE_NLS
 # include <libintl.h>
@@ -12,8 +6,6 @@
 
 #include <Ecore_Getopt.h>
 #include <Elementary.h>
-
-#include "${Edi_Name}.h"
 
 #include "${edi_name}_private.h"
 
@@ -91,8 +83,6 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    textdomain(PACKAGE);
 #endif
 
-   ${edi_name}_init();
-
    args = ecore_getopt_parse(&optdesc, values, argc, argv);
    if (args < 0)
      {
@@ -109,12 +99,9 @@ elm_main(int argc EINA_UNUSED, char **argv EINA_UNUSED)
    if (!(win = ${edi_name}_win_setup()))
      goto end;
 
-   ${edi_name}_library_call();
-
    elm_run();
 
  end:
-   ${edi_name}_shutdown();
    elm_shutdown();
 
    return 0;
