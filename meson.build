@@ -2,7 +2,7 @@ project(
   'edi', 'c',
   version : '0.8.0',
   default_options: [ 'c_std=gnu99', 'warning_level=2' ],
-  meson_version : '>= 0.39.0')
+  meson_version : '>= 0.50.0')
 
 add_global_arguments('-DHAVE_CONFIG_H=1', '-DHAVE_CONFIG=1', language: 'c')
 
