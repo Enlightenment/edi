@@ -982,13 +982,14 @@ Evas_Object *edi_welcome_show()
                                 hbx,
                                 NULL);
 
+   elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
+
    /* This prevents us losing the content when popping last item from the
     * naviframe.
     */
    item = elm_naviframe_top_item_get(naviframe);
    elm_naviframe_item_pop_cb_set(item, _naviframe_pop_stop_nop_cb, NULL);
 
-   elm_naviframe_item_title_enabled_set(item, EINA_FALSE, EINA_FALSE);
    evas_object_resize(win, ELM_SCALE_SIZE(480), ELM_SCALE_SIZE(260));
    elm_win_center(win, EINA_TRUE, EINA_TRUE);
    evas_object_show(win);
