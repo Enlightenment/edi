@@ -4,12 +4,28 @@ Edi 0.8
 
 Features:
 
-  *
+  * C# syntax-highlighting and project support.
+  * UI rearrangement.
+  * Internal icons.
+  * Toolbar configurable.
+  * Tab movement (dragging).
+  * Tab bar mouse scrolling.
+  * Support for EDI as standalone text editor.
+  * Improved mime type handling.
+  * Complete widget configuration in settings.
+  * API additions and improvements.
 
 Bug fixes:
 
-  *
-
+  * Debugging reliability.
+  * SCM filepanel improvements.
+  * Fix wizard reliablity.
+  * Search stabililty improvements.
+  * Fixes and improvements for FreeBSD and OpenBSD.
+  * Transparancy fixes.
+  * Many stability fixes.
+  * Improvements to the EFL code widget.
+  * Improve file save behaviour.
 
 =======
 Edi 0.7

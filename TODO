@@ -1,14 +1,18 @@
-This project is in heavy development, we are currenty working towards the
-"Code aware editor" phase, the following work is still to be done:
+This project is under heavy and active development. We are working on
+both a "Code-aware editor" as well as the IDE functionality at the same
+time.
 
+Editor
 * Code folding
 * Automatic code indenting / formatting
 * notepad, emacs and vim and editing modes (key bindings)
 * LLVM parsing
-* Integrated console
 * Cross reference for c, c++ and some scripting language
 * Support for EditorConfig - http://editorconfig.org/
 
-The next phase is "Basic IDE" and it, along with other future phases
-are documented online at https://phab.enlightenment.org/w/projects/edi/
+IDE
+* Integrated console
 
+Widget (elm_code_widget)
+* Improve the efficiency of the widget. Need to use much fewer
+textgrids where possible.

@@ -1,6 +1,6 @@
 project(
   'edi', 'c',
-  version : '0.7.99',
+  version : '0.8.0',
   default_options: [ 'c_std=gnu99', 'warning_level=2' ],
   meson_version : '>= 0.39.0')
 
@@ -23,7 +23,7 @@ config_h.set_quoted('PACKAGE_DOC_DIR', join_paths(get_option('prefix'), get_opti
 
 config_h.set_quoted('EFL_BETA_API_SUPPORT'     , '1')
 
-elm = dependency('elementary', version : '>=1.22.0')
+elm = dependency('elementary', version : '>=1.23.99')
 top_inc = include_directories('.')
 
 host_os = host_machine.system()

@@ -1,134 +1,4119 @@
-2016-06-10 ajwillia.ms (Andy Williams)
+2020-03-21 Alastair Poole <netstar@gmail.com>
+	* theme: Solarized Fix w/libclang syntax.
 
-	* Remove elm_code from this codebase now it's within Elementary
+2020-03-21 Alastair Poole <netstar@gmail.com>
+	* tasks: Search only when specified.
 
-2016-05-16 ajwillia.ms (Andy Williams)
+2020-03-21 Alastair Poole <netstar@gmail.com>
+	* settings: Use Global as Title.
 
-	* Make build providers pluggable and auto-detected for project
-	* Filter file list based on ignored build files
+2020-03-21 Alastair Poole <netstar@gmail.com>
+	* screens: welcome text and image (revert).
 
-2016-05-15 ajwillia.ms (Andy Williams)
+2020-03-15 Alastair Poole <netstar@gmail.com>
+	* scm: Correct SCM file panel behaviour.
 
-	* Allow user searching of file list using regexp
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: refactor tab swap.
 
-2016-03-31 ajwillia.ms (Andy Williams)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: rename struct members.
 
-	* Split elm_code lines apart and insert status messages (inline errors)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* save: wrong thread for this api
 
-2016-02-21 ajwillia.ms (Andy Williams)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: hide tab tooltip on drag.
 
-	* Fix crash when deleting a selection ending in newline
-	* Begin the re-add of the undo feature (just keyboard input so far)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: Changes.
 
-2016-02-11 ajwillia.ms (Andy Williams)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: Introduce Edi_Mainview_Item Tab.
 
-	* Add a filename filter to the filepanel
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* tabs: Make this move faster.
 
-2015-11-19 ajwillia.ms (Andy Williams)
+2020-03-14 Alastair Poole <netstar@gmail.com>
+	* mainview: allow panel tab dragging.
 
-	* Update for the efl 1.16 release
+2020-03-13 Alastair Poole <netstar@gmail.com>
+	* scm: Add clone depth.
 
-2015-08-27 ajwillia.ms (Andy Williams)
+2020-03-13 Alastair Poole <netstar@gmail.com>
+	* editor: Fix build break.
 
-	* Trim trailing whitespace from lines during save
+2020-03-13 Alastair Poole <netstar@gmail.com>
+	* editor: small change.
 
-2015-07-17 ajwillia.ms (Andy Williams)
+2020-03-13 Alastair Poole <netstar@gmail.com>
+	* editor: Use a separate thread to save.
 
-	* Create new files in the selected directory rather than project root
+2020-03-09 Alastair Poole <netstar@gmail.com>
+	* filepanel: Use edi_theme_icon_path_get.
 
-2015-06-07 ajwillia.ms (Andy Williams)
+2020-03-08 Alastair Poole <netstar@gmail.com>
+	* editor: Typo.
 
-	* Indent newlines to match whitespace in the previous line
+2020-03-08 Alastair Poole <netstar@gmail.com>
+	* editor: Changes in Editor Mode.
 
-2015-05-31 ajwillia.ms (Andy Williams)
+2020-03-07 Alastair Poole <netstar@gmail.com>
+	* settings: Line numbers (enable/disable).
 
-	* Add launch configuration so we can run a built binary
+2020-03-07 Alastair Poole <netstar@gmail.com>
+	* config: Place all UI changes into one function.
 
-2015-05-30 ajwillia.ms (Andy Williams)
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* welcome: clear templates on welcome.
 
-	* Added a monospaced font picker to settings
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* main: logic fix for icon changes.
 
-2015-05-26 ajwillia.ms (Andy Williams)
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* Examples: Introduce C# Examples.
 
-	* Add new icon from raster and update welcome/about image layouts
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* DEBUG: Add Mono Debugging Support.
 
-2015-05-18 ajwillia.ms (Andy Williams)
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* CSharp: Support syntax-highligting.
 
-	* Remember open tabs and windows per project
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* theme: Refresh filepanel on icon theme change.
+
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* settings: more impovement
+
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* toolbar: Add "clean" build option.
+
+2020-03-06 Alastair Poole <netstar@gmail.com>
+	* mainview: check end bounds also.
+
+2020-03-05 Alastair Poole <netstar@gmail.com>
+	* settings: Internal Icons.
+
+2020-03-05 Alastair Poole <netstar@gmail.com>
+	* Settings: Tidying up more
+
+2020-03-05 Alastair Poole <netstar@gmail.com>
+	* config: Add show/hide line width marker.
+
+2020-03-05 Alastair Poole <netstar@gmail.com>
+	* editor: Improve non development mode.
+
+2020-03-05 Alastair Poole <netstar@gmail.com>
+	* debug: Improve this functionality.
+
+2020-03-03 Alastair Poole <netstar@gmail.com>
+	* welcome: Help the user.
+
+2020-03-02 Alastair Poole <netstar@gmail.com>
+	* welcome: Examples.
+
+2020-02-24 Alastair Poole <netstar@gmail.com>
+	* config: Change default font size.
+
+2020-02-24 Alastair Poole <netstar@gmail.com>
+	* filepane: Only expand if project.
+
+2020-02-24 Alastair Poole <netstar@gmail.com>
+	* search: Tasks only if project.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* searchpanel: Refactor search code.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* config: Better default values.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* searchpanel: Set minimum search string size.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* searchpanel: remove pointless line append at end.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* debugpanel: Improve this somewhat.
+
+2020-02-09 Alastair Poole <netstar@gmail.com>
+	* searchpanel: Skip leading newlines.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* searchpanel: Tidy
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* search: Use a search entry.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* Settings: Set check properly.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* settings: SHow toolbar text setting.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* search: Cancel thread when closing.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* Editor: When an editor forget past tabs.
+
+2020-02-02 Alastair Poole <netstar@gmail.com>
+	* search: improve stability.
+
+2020-01-25 Alastair Poole <netstar@gmail.com>
+	* toolbar: Show icon text.
+
+2020-01-25 Alastair Poole <netstar@gmail.com>
+	* fileselector: Do not expand.
+
+2020-01-24 Alastair Poole <netstar@gmail.com>
+	* welcome: Fix issue when create fails.
+
+2020-01-22 Alastair Poole <netstar@gmail.com>
+	* panel: Change lower panel alignment.
+
+2020-01-19 Alastair Poole <netstar@gmail.com>
+	* debug: FreeBSD debugging improve.
+
+2020-01-19 Alastair Poole <netstar@gmail.com>
+	* mainview: Let mouse scroll move tabs.
+
+2020-01-12 Alastair Poole <netstar@gmail.com>
+	* edit: When running as an editor use HOME.
+
+2020-01-12 Alastair Poole <netstar@gmail.com>
+	* fonts: Use a more efficient method.
+
+2020-01-08 Alastair Poole <netstar@gmail.com>
+	* Search: Slight changes.
+
+2020-01-08 Alastair Poole <netstar@gmail.com>
+	* main: Remove unused function.
+
+2020-01-08 Alastair Poole <netstar@gmail.com>
+	* edi_mime: Only map what is needed.
+
+2020-01-08 Alastair Poole <netstar@gmail.com>
+	* EDI: Be more defensie when opening files/projects.
+
+2020-01-08 Alastair Poole <netstar@gmail.com>
+	* project: Hide project settings if not project.
+
+2020-01-07 Alastair Poole <netstar@gmail.com>
+	* editor: Disable items build related.
+
+2020-01-04 Alastair Poole <netstar@gmail.com>
+	* Toolbar: Change position on-the-fly.
+
+2020-01-03 Alastair Poole <netstar@gmail.com>
+	* gitignore: Ignore VIM .swp files!!!
+
+2020-01-03 Alastair Poole <netstar@gmail.com>
+	* debug: Use appropriate array size.
+
+2020-01-03 Alastair Poole <netstar@gmail.com>
+	* debug: Break when found
+
+2020-01-03 Alastair Poole <netstar@gmail.com>
+	* edi: Fix debugging on OpenBSD.
+
+2020-01-02 Alastair Poole <netstar@gmail.com>
+	* debug: Improve the functionality greatly.
+
+2019-12-31 Alastair Poole <netstar@gmail.com>
+	* icons: Add Faenza edit-delete.
+
+2019-12-30 Alastair Poole <netstar@gmail.com>
+	* fileselector: Dont set expandable
+
+2019-12-30 Alastair Poole <netstar@gmail.com>
+	* toolbar: Use focus on mouse-in and animate.
+
+2019-12-29 Alastair Poole <netstar@gmail.com>
+	* background: Use our edi_about image for bg.
+
+2019-12-29 Alastair Poole <netstar@gmail.com>
+	* Toolbar: Use smaller icons.
+
+2019-12-29 Alastair Poole <netstar@gmail.com>
+	* filepanel: fix menu when scm disabled
+
+2019-12-29 Alastair Poole <netstar@gmail.com>
+	* Mime: Fix for 0 size files.
+
+2019-12-28 Alastair Poole <netstar@gmail.com>
+	* desktop: Add text/plain as default mime type.
+
+2019-12-28 Alastair Poole <netstar@gmail.com>
+	* welcome: Fix for clones project templates.
+
+2019-12-28 Alastair Poole <netstar@gmail.com>
+	* main: Add usage as an editor.
+
+2019-12-28 Alastair Poole <netstar@gmail.com>
+	* main: minor tidying.
+
+2019-12-28 Alastair Poole <netstar@gmail.com>
+	* Toolbar: Bring back to single window.
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* icons: More icons.
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* icons: Add more generic default icons
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* tb: More changes
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* Menu: Minor changes
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* Menu: Change behaviour
+
+2019-12-26 Alastair Poole <netstar@gmail.com>
+	* ICONS: Use internal icons.
+
+2019-12-24 Alastair Poole <netstar@gmail.com>
+	* Fix transparancy
+
+2019-12-24 Alastair Poole <netstar@gmail.com>
+	* toolbar: use static state storage.
+
+2019-12-22 Alastair Poole <netstar@gmail.com>
+	* toolbar: Some minor changes
+
+2019-12-22 Alastair Poole <netstar@gmail.com>
+	* meson: Fix build
+
+2019-12-22 Alastair Poole <netstar@gmail.com>
+	* Toolbar: Controversy. Horizontal or vertical.
+
+2019-12-21 Alastair Poole <netstar@gmail.com>
+	* Revert "toolbar: experiment"
+
+2019-12-21 Alastair Poole <netstar@gmail.com>
+	* toolbar: experiment
+
+2019-12-20 Alastair Poole <netstar@gmail.com>
+	* edi_welcome: Formatting.
+
+2019-12-20 Alastair Poole <netstar@gmail.com>
+	* Accidentally included file (remove)
+
+2019-12-20 Alastair Poole <netstar@gmail.com>
+	* welcome: Much better exec and then exit.
+
+2019-12-20 Alastair Poole <netstar@gmail.com>
+	* Edi_Mime: Use our own variation to detect mime.
+
+2019-12-16 Alastair Poole <netstar@gmail.com>
+	* Settings: Fix debugger combobox sizing.
+
+2019-12-16 Alastair Poole <netstar@gmail.com>
+	* Welcome: Fix icon size and create project UI.
+
+2019-12-16 Alastair Poole <netstar@gmail.com>
+	* process: Check for NULL return value.
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* Meson: Simplify
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* OpenBSD: -lkvm and use PID_MAX
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* filepanel: Use consistent icon size.
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* filepanel: Add Undo (checkout) to SCM Menu.
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* editor: Add Shift+Insert Handling
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* Toolbar: Make icons homogeneous.
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* Panel: Increase icon size.
+
+2019-12-15 Alastair Poole <netstar@gmail.com>
+	* toolbar: Return to toolbar at top.
+
+2019-12-06 Alastair Poole <netstar@gmail.com>
+	* statusbar: remove hack workaround.
+
+2019-05-03 Andy Williams <andy@andy.xyz>
+	* Return to next development version
+
+2019-05-03 Andy Williams <andy@andy.xyz>
+	* Merge tag 'v0.7.1' into develop
+
+2019-05-03 Andy Williams <andy@andy.xyz>
+	* Merge branch 'release/v0.7.1'
+
+2019-05-03 Andy Williams <andy@andy.xyz>
+	* Prep for 0.7.1 release
+
+2019-05-02 Andy Williams <andy@andy.xyz>
+	* Update docs for latest EFL api usage
+
+2019-05-02 Rob Hensley <hensleyrob@gmail.com>
+	* Quick missing word fix.
+
+2019-03-24 Alastair Poole <netstar@gmail.com>
+	* BUILD: Fix changes in API for EFL 1.22
+
+2018-12-17 Alastair Poole <netstar@gmail.com>
+	* edi_settings: allow settings window tab open choice.
+
+2018-11-25 Alastair Poole <netstar@gmail.com>
+	* edi_process: Introduce new process API.
+
+2018-11-21 Alastair Poole <netstar@gmail.com>
+	* edi_theme: use appropriate API.
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* Merge tag '0.7.0' into develop
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'release/0.7.0'
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'release/v0.7.0'
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* Fix dependency numbers now they are released
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* And moving on to next develop
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* prep for 0.7 release
+
+2018-09-13 Andy Williams <andy@andywilliams.me>
+	* Update News for release
+
+2018-09-11 Alastair Poole <netstar@gmail.com>
+	* mainview: no need for popup when entry is empty.
+
+2018-09-07 Alastair Poole <netstar@gmail.com>
+	* provider: ensure we handle python3 mimetype.
+
+2018-09-06 Alastair Poole <netstar@gmail.com>
+	* Revert "editor: fix multiline comment syntax highlighting."
+
+2018-09-06 Alastair Poole <netstar@gmail.com>
+	* editor: fix multiline comment syntax highlighting.
+
+2018-09-04 Alastair Poole <netstar@gmail.com>
+	* main: use scroller as container for logpane.
+
+2018-09-03 Alastair Poole <netstar@gmail.com>
+	* examples: update examples if repository exists.
+
+2018-08-31 Alastair Poole <netstar@gmail.com>
+	* searchpanel: ignore ELF files.
+
+2018-08-30 Andy Williams <andy@andywilliams.me>
+	* Fix false positives in search-in-project
+
+2018-08-24 Alastair Poole <netstar@gmail.com>
+	* settings: add option to show hidden files.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* create: bring back callback to notify UI.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* filepanel: update callback to match exp. prototype.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* build: silence warnings due to unused params/vars.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* settings: disable highlight settings win display.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* welcome: fix issue with template creation.
+
+2018-08-22 Alastair Poole <netstar@gmail.com>
+	* settings: move check into method.
+
+2018-08-21 Alastair Poole <netstar@gmail.com>
+	* editor: Fix typo.
+
+2018-08-21 Alastair Poole <netstar@gmail.com>
+	* editor: register modify on cut and paste.
+
+2018-08-21 Alastair Poole <netstar@gmail.com>
+	* settings: only allow one settings window instance.
+
+2018-08-21 Alastair Poole <netstar@gmail.com>
+	* filepanel: remove timer check for select path.
+
+2018-08-19 Alastair Poole <netstar@gmail.com>
+	* filepanel: remove bogus minsize.
+
+2018-08-19 Alastair Poole <netstar@gmail.com>
+	* settings: on alpha window change keep on top.
+
+2018-08-19 Alastair Poole <netstar@gmail.com>
+	* welcome: evas_object_rectangle_add needs Evas.
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* theme: add translucency to Edi.
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* fade:
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* transparancy: update other widgets.
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* This should work it does not
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* Do this better
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* Revert "Fix translucency again."
+
+2018-08-13 Alastair Poole <netstar@gmail.com>
+	* Fix translucency again.
+
+2018-08-07 Alastair Poole <netstar@gmail.com>
+	* fade:
+
+2018-08-06 Alastair Poole <netstar@gmail.com>
+	* transparancy: update other widgets.
+
+2018-08-06 Alastair Poole <netstar@gmail.com>
+	* This should work it does not
+
+2018-08-04 Alastair Poole <netstar@gmail.com>
+	* build: fix unused variable warning.
+
+2018-08-04 Alastair Poole <netstar@gmail.com>
+	* tabs: let tabs with large filenames grow.
+
+2018-08-04 Alastair Poole <netstar@gmail.com>
+	* settings: fix visual error when choosing font.
+
+2018-08-04 Alastair Poole <netstar@gmail.com>
+	* tabs: make tabs consistent size.
+
+2018-08-03 Alastair Poole <netstar@gmail.com>
+	* mainview: show path in tooltip when hovering tab.
+
+2018-08-01 Alastair Poole <netstar@gmail.com>
+	* Do this better
+
+2018-08-01 Alastair Poole <netstar@gmail.com>
+	* Revert "Fix translucency again."
+
+2018-07-31 Alastair Poole <netstar@gmail.com>
+	* Fix translucency again.
+
+2018-07-24 Alastair Poole <netstar@gmail.com>
+	* goto line: fix crash when inputting with keyboard.
+
+2018-07-23 Alastair Poole <netstar@gmail.com>
+	* search in project: Use proper widget hierarchy.
+
+2018-07-19 Alastair Poole <netstar@gmail.com>
+	* welcome: display template icon at correct ratio.
+
+2018-06-22 Cedric BAIL <cedric@ddlm.me>
+	* searchpanel: complete rewrite to have low hoverhead when processing search.
+
+2018-06-13 Alastair Poole <netstar@gmail.com>
+	* debugpanel: fix crash.
+
+2018-06-06 Alastair Poole <netstar@gmail.com>
+	* tab: right-click tab for filename path.
+
+2018-06-06 Alastair Poole <netstar@gmail.com>
+	* filepanel: on tab focus improve visibility.
+
+2018-05-17 Andy Williams <andy@andywilliams.me>
+	* Better explanations of the build options
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Revert "theme: We don't need to build a theme until that's supported"
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Revert "theme: roll back for the 0.7 releaes"
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Merge in from 0.6.1 release branch
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'release/edi-0.7'
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Version down for release
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Attempting a meson build fix
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* logpanel: fix crash when appending lots of lines.
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* scm_git: Allow us to unstage even if there is no remote url.
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* credits_check/scm_ui: Fix bugs that crash.
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* scm: init. Fix a crash on new project initializing SCM.
+
+2018-05-15 Andy Williams <andy@andywilliams.me>
+	* Rolling back release numbers for 0.6.1 next
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* panels: add a frame around each panel for depth and clarity.
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* main: increase lower toolbar icon size slightly.
+
+2018-05-15 Alastair Poole <netstar@gmail.com>
+	* screens: improve settings popup slightly.
+
+2018-05-14 Alastair Poole <netstar@gmail.com>
+	* logpanel: fix crash when appending lots of lines.
+
+2018-05-14 Alastair Poole <netstar@gmail.com>
+	* scm_git: Allow us to unstage even if there is no remote url.
+
+2018-05-14 Alastair Poole <netstar@gmail.com>
+	* credits_check/scm_ui: Fix bugs that crash.
+
+2018-05-13 Alastair Poole <netstar@gmail.com>
+	* edi_theme: use new method to update theme after layout change.
+
+2018-05-13 Alastair Poole <netstar@gmail.com>
+	* scm: init. Fix a crash on new project initializing SCM.
+
+2018-05-11 Andy Williams <andy@andywilliams.me>
+	* Display the text position rather than the visual column in info
+
+2018-05-11 Andy Williams <andy@andywilliams.me>
+	* Remove duplicate line
+
+2018-05-11 Andy Williams <andy@andywilliams.me>
+	* Display the text position rather than the visual column in info
+
+2018-05-11 Andy Williams <andy@andywilliams.me>
+	* Remove duplicate line
+
+2018-05-01 Alastair Poole <netstar@gmail.com>
+	* settings: Fix crash with non-SCM project.
+
+2018-05-01 Al Poole <netstar@gmail.com>
+	* AUTHORS: update to use my real name.
+
+2018-04-14 Alastair Poole <netstar@gmail.com>
+	* settings: Fix crash with non-SCM project.
+
+2018-03-22 Al Poole <netstar@gmail.com>
+	* AUTHORS: update to use my real name.
+
+2018-03-22 Andy Williams <andy@andywilliams.me>
+	* Improve safety and simplify mime display code
+
+2018-03-21 Andy Williams <andy@andywilliams.me>
+	* Fix escaping of names in git parameters
+
+2018-03-21 Al Poole <netstar@gmail.com>
+	* scm:  use cached value, but do check for "" return too.
+
+2018-03-21 Al Poole <netstar@gmail.com>
+	* scm: do not check for git credentials on a LOCAL none-commit op.
+
+2018-03-21 Andy Williams <andy@andywilliams.me>
+	* Fix EFL version required for release branch
+
+2018-03-21 Andy Williams <andy@andywilliams.me>
+	* Oops, fix compile error from merge conflict
+
+2018-03-21 Al Poole <netstar@gmail.com>
+	* screens: add a dialogue with a button for close and settings panel.
+
+2018-03-21 Al Poole <netstar@gmail.com>
+	* content: dont check line endings for image.
+
+2018-03-20 Al Poole <netstar@gmail.com>
+	* screens: add a dialogue with a button for close and settings panel.
+
+2018-03-19 Al Poole <netstar@gmail.com>
+	* scm: store scm credentials and fix UI stash and commit.
+
+2018-03-18 Al Poole <netstar@gmail.com>
+	* statusbar: undo recursive dependency.
+
+2018-03-17 Al Poole <netstar@gmail.com>
+	* content: move statusbar into edi_content.
+
+2018-03-17 Al Poole <netstar@gmail.com>
+	* content: move alternative content to edi_content.c
+
+2018-03-03 Andy Williams <andy@andywilliams.me>
+	* Default to tab indenting for go projects
+
+2018-03-03 Andy Williams <andy@andywilliams.me>
+	* Fix possible crash on consolepanel
+
+2018-03-03 Andy Williams <andy@andywilliams.me>
+	* Rely on fixes in latest EFL release
+
+2018-02-22 Al Poole <netstar@gmail.com>
+	* tabs: Ensure that all content types load with good dimensions.
+
+2018-02-22 Andy Williams <andy@andywilliams.me>
+	* Load the test results for Golang builds
+
+2018-02-21 Al Poole <netstar@gmail.com>
+	* editor: fix tab sizing with multiple panels.
+
+2018-02-17 Andy Williams <andy@andywilliams.me>
+	* build: Add support for Go building
+
+2018-02-17 Andy Williams <andy@andywilliams.me>
+	* Fix typo in string constructon
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* block on efl-git for edi-git
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* Update EFL version required
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* theme: We don't need to build a theme until that's supported
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* develop is now heading to 0.8
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* Update for latest feature additions
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* theme: roll back for the 0.7 releaes
+
+2018-02-10 Andy Williams <andy@andywilliams.me>
+	* Completion of examples feature
+
+2018-02-03 Andy Williams <andy@andywilliams.me>
+	* Fix compile error for non-c99 buids
+
+2018-02-03 Andy Williams <andy@andywilliams.me>
+	* Fix compile error for non-c99 buids
+
+2018-01-06 Andy Williams <andy@andywilliams.me>
+	* examples: extract example from git to create new projects
+
+2018-01-06 Andy Williams <andy@andywilliams.me>
+	* suggest: fix potential crash. Don't list un-named methods?
+
+2018-01-06 Andy Williams <andy@andywilliams.me>
+	* templtaes: refactor to use template name rather than path
+
+2018-01-06 Andy Williams <andy@andywilliams.me>
+	* examples: refactor template code to work for examples too
+
+2018-01-02 Andy Williams <andy@andywilliams.me>
+	* examples: refactor data to be tidier
+
+2018-01-02 Andy Williams <andy@andywilliams.me>
+	* examples: Crash fix on going back
+
+2018-01-01 Andy Williams <andy@andywilliams.me>
+	* Example: Add more content for the main examples
+
+2018-01-01 Andy Williams <andy@andywilliams.me>
+	* examples: First pass add of examples info.
+
+2017-12-31 Andy Williams <andy@andywilliams.me>
+	* Fix unsafe usages of basename
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: Update layout for scm commits for usability
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* avatar: Don't clip rotated avatar
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: If we can guess user credentials don't block
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: Consistent dir usage in win titles
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: pass new --commit param to edi_scm for commit workflow
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: Add command line options to specify path if we want.
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: Fix initialisation to be based either on path or on CWD/edi_project_get
+
+2017-12-30 Andy Williams <andy@andywilliams.me>
+	* scm: Make the titles consistent and add them to translations
+
+2017-12-30 Al Poole <netstar@gmail.com>
+	* scm_ui: remove unnecessary check.
+
+2017-12-29 Al Poole <netstar@gmail.com>
+	* scm_ui: use already stored value, no need to query again.
+
+2017-12-29 Al Poole <netstar@gmail.com>
+	* edi_scm: Consistent results for SCM root_directory.
+
+2017-12-29 Al Poole <netstar@gmail.com>
+	* scm_ui: Add border to avatar w/effect (rotation)
+
+2017-12-28 Al Poole <netstar@gmail.com>
+	* scm: refactor of scm
+
+2017-12-27 Al Poole <netstar@gmail.com>
+	* edi_scm: move project root detection into the library.
+
+2017-12-27 Al Poole <netstar@gmail.com>
+	* edi_scm: allow stage/unstaging outside of top scm dir.
+
+2017-12-23 Andy Williams <andy@andywilliams.me>
+	* Up to date translations
+
+2017-12-23 Andy Williams <andy@andywilliams.me>
+	* Add translation info to the about screen
+
+2017-12-20 Al Poole <netstar@gmail.com>
+	* edi_scm: Add support for staging and unstaging.
+
+2017-12-17 Andy Williams <andy@andywilliams.me>
+	* settings: Fix slider for scroll wheel usage
+
+2017-12-15 Al Poole <netstar@gmail.com>
+	* edi_exe: workaround for ecore_con_server_del
+
+2017-12-09 Al Poole <netstar@gmail.com>
+	* editor_search: make it clearer in the code when we reset the cursor.
+
+2017-12-09 Al Poole <netstar@gmail.com>
+	* welcome: add visual indication for required but missing fields.
+
+2017-12-09 Al Poole <netstar@gmail.com>
+	* editor: search wrapping inconsistencies fix.
+
+2017-12-09 Al Poole <netstar@gmail.com>
+	* filepanel: only pack the box once when showing the file search.
+
+2017-12-08 Andy Williams <andy@andywilliams.me>
+	* settings: Improve layout in display settings
+
+2017-12-08 Andy Williams <andy@andywilliams.me>
+	* Add to news
+
+2017-12-08 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'feature/edi_translucency' into develop
+
+2017-12-08 Andy Williams <andy@andywilliams.me>
+	* alpha: Tidy settings screen for translucency
+
+2017-12-06 Al Poole <netstar@gmail.com>
+	* settings: slight tidy up and make code easier to read.
+
+2017-12-06 Al Poole <netstar@gmail.com>
+	* theme: remove unnecessary call, and slight tidy.
+
+2017-12-06 Al Poole <netstar@gmail.com>
+	* alpha: make sure window alpha is set on config change.
+
+2017-12-06 Al Poole <netstar@gmail.com>
+	* Merge branch 'feature/edi_translucency' of git+ssh://github.com/enlightenment/edi into feature/edi_translucency
+
+2017-12-06 Al Poole <netstar@gmail.com>
+	* theme: fix small bug and change label.
+
+2017-12-06 Andy Williams <andy@andywilliams.me>
+	* alpha: Fix config defaults
+
+2017-12-05 Al Poole <netstar@gmail.com>
+	* theme: add settings for alpha
+
+2017-12-05 Al Poole <netstar@gmail.com>
+	* Revert "theme: "finish" settings for the theme translucency/shininig"
+
+2017-12-05 Al Poole <netstar@gmail.com>
+	* theme: "finish" settings for the theme translucency/shininig
+
+2017-12-03 Al Poole <netstar@gmail.com>
+	* settings: some minor visual changes to layout.
+
+2017-12-03 Al Poole <netstar@gmail.com>
+	* themes: introduce theme support with themes
+
+2017-12-03 Al Poole <netstar@gmail.com>
+	* themes: final changes remove black.edc
+
+2017-12-02 Al Poole <netstar@gmail.com>
+	* theme: sort themes.
+
+2017-12-02 Al Poole <netstar@gmail.com>
+	* theme: set generic value to generic title.
+
+2017-12-02 Al Poole <netstar@gmail.com>
+	* theme: add a title to theme edcs and use that.
+
+2017-12-01 Al Poole <netstar@gmail.com>
+	* mainview: react to config changes for split editors.
+
+2017-12-01 Al Poole <netstar@gmail.com>
+	* mainview: react properly to config changes.
+
+2017-12-01 Al Poole <netstar@gmail.com>
+	* edi_theme: add solarized basic theme.
+
+2017-12-01 Al Poole <netstar@gmail.com>
+	* themes: add solarized theme (dark)
+
+2017-12-01 Al Poole <netstar@gmail.com>
+	* split_view: store and load split views between sessions.
+
+2017-11-27 Al Poole <netstar@gmail.com>
+	* edi_theme: Add support for colour themes in EDI.
+
+2017-11-24 Al Poole <netstar@gmail.com>
+	* edi_settings: set the default debugger as the selected if none set.
+
+2017-11-24 Al Poole <netstar@gmail.com>
+	* editor: split view. allow deletion of views.
+
+2017-11-24 Andy Williams <andy@andywilliams.me>
+	* build: Rplace PKGBUILD with a working script
+
+2017-11-24 Andy Williams <andy@andywilliams.me>
+	* build: Fix chmod for DESTDIR builds
+
+2017-11-24 Andy Williams <andy@andywilliams.me>
+	* Update TODO doc
+
+2017-11-24 Andy Williams <andy@andywilliams.me>
+	* build: Fix install location for template files
+
+2017-11-23 Al Poole <netstar@gmail.com>
+	* edi_filepanel: select on focus.
+
+2017-11-23 Al Poole <netstar@gmail.com>
+	* mainview: store an actual copy of the path.
+
+2017-11-22 Andy Williams <andy@andywilliams.me>
+	* Avoid infite tab focus loops
+
+2017-11-22 Al Poole <netstar@gmail.com>
+	* Revert "editor: on focus dont highlight file in panel."
+
+2017-11-22 Al Poole <netstar@gmail.com>
+	* editor: on focus dont highlight file in panel.
+
+2017-11-22 Al Poole <netstar@gmail.com>
+	* editor: dont use smart parent object.
+
+2017-11-20 Al Poole <netstar@gmail.com>
+	* edi_filepanel: make the filepanel unfocusable.
+
+2017-11-19 Andy Williams <andy@andywilliams.me>
+	* gui: Merge debugger menu into build menu
+
+2017-11-19 Andy Williams <andy@andywilliams.me>
+	* Remove trailing symbols from translations
+
+2017-11-19 Andy Williams <andy@andywilliams.me>
+	* mainview: Don't shuffle tabs on background close
+
+2017-11-19 Andy Williams <andy@andywilliams.me>
+	* mainview: Scroll tabs correctly on open new tab
+
+2017-11-19 Andy Williams <andy@andywilliams.me>
+	* mainview: Don't promote a tab immediately before closing it
+
+2017-11-16 Al Poole <netstar@gmail.com>
+	* edi_settings: simplify font test and allow for some variation.
+
+2017-11-11 Al Poole <netstar@gmail.com>
+	* language: add initial support for Golang editing.
+
+2017-11-09 Al Poole <netstar@gmail.com>
+	* edi_debugpanel:  fix debug panel buttons to work more reliably.
+
+2017-11-08 Al Poole <netstar@gmail.com>
+	* edi_debug: improve debugging support.
+
+2017-11-05 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into develop
+
+2017-11-05 Andy Williams <andy@andywilliams.me>
+	* Update name casing
+
+2017-11-05 Al Poole <netstar@gmail.com>
+	* mainview_panel: fix focus issue and panel closing.
+
+2017-11-04 Marcel <marcel@osg.samsung.com>
+	* build: use a include directory and not relative paths
+
+2017-11-04 Marcel <marcel@osg.samsung.com>
+	* Revert "meson: remove exposure of lookup paths"
+
+2017-11-04 Marcel <marcel@osg.samsung.com>
+	* build: version 39.0 should be enough
+
+2017-10-31 Al Poole <netstar@gmail.com>
+	* edi_about: include Edi version in title again.
+
+2017-10-29 Al Poole <netstar@gmail.com>
+	* Revert "edi_filepanel: if file is deleted close item in view."
+
+2017-10-29 Al Poole <netstar@gmail.com>
+	* edi_filepanel: if file is deleted close item in view.
+
+2017-10-28 Al Poole <netstar@gmail.com>
+	* edi_main: don't start build,test,clean when unknown project type.
+
+2017-10-28 Al Poole <netstar@gmail.com>
+	* mainview: add support for the new EFL focus subsystem.
+
+2017-10-28 Al Poole <netstar@gmail.com>
+	* tests: fix build on FreeBSD.
+
+2017-10-24 Al Poole <netstar@gmail.com>
+	* editor: align search and replace entries. Neater.
+
+2017-10-23 Andy Williams <andy@andywilliams.me>
+	* Fix meson tests for OS X as well
+
+2017-10-23 Andy Williams <andy@andywilliams.me>
+	* meson: remove exposure of lookup paths
+
+2017-10-22 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* meson: alternative location for apple
+
+2017-10-22 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* meson: add a option where to find the clang library and header
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* Merge branch 'master' of git+ssh://git.enlightenment.org/tools/edi
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* build: meson, fine tweaking of meson preparation.
+
+2017-10-21 Andy Williams <andy@andywilliams.me>
+	* Remove old autotools build files - meson only now
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* edi_main: find a consistent icon for "close" across icon themes.
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* edi_scm: use better gravity when loading the diff into the widget.
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* edi_file: replace. use a local temp directory rather than /tmp.
+
+2017-10-21 Al Poole <netstar@gmail.com>
+	* edi_scm: remove bogus hack when clearing elm_code_file.
+
+2017-10-19 Andy Williams <andy@andywilliams.me>
+	* Fix versioning of meson build
+
+2017-10-19 Andy Williams <andy@andywilliams.me>
+	* Update ignores of template tarballs
+
+2017-10-19 Andy Williams <andy@andywilliams.me>
+	* clang: Don't bail on first error
+
+2017-10-19 Andy Williams <andy@andywilliams.me>
+	* clang: Let's load clang relative to the build commands
+
+2017-10-19 Al Poole <netstar@gmail.com>
+	* mainview: remove pointless code and guard against crash.
+
+2017-10-19 Al Poole <netstar@gmail.com>
+	* build: small fix for meson builds.
+
+2017-10-18 Andy Williams <andy@andywilliams.me>
+	* build: Allow meson builds to be tested
+
+2017-10-18 Andy Williams <andy@andywilliams.me>
+	* Run edi tests in meson
+
+2017-10-18 Jean-Philippe Andre <jp.andre@samsung.com>
+	* build: Fix build in build dir
+
+2017-10-16 Al Poole <netstar@gmail.com>
+	* COPYING: include license information of icons taken from Faenza.
+
+2017-10-16 Andy Williams <andy@andywilliams.me>
+	* welcome: Improve layout of project chooser
+
+2017-10-16 Al Poole <netstar@gmail.com>
+	* welcome: make _edi_welcome_user_fullname_get less complex.
+
+2017-10-15 Al Poole <netstar@gmail.com>
+	* skeletons: rearrange template/skeleton directory structure
+
+2017-10-15 Al Poole <netstar@gmail.com>
+	* welcome: change layout, making it slightly smaller.
+
+2017-10-14 Al Poole <netstar@gmail.com>
+	* welcome: add visual notifcation when fields are empty.
+
+2017-10-13 Al Poole <netstar@gmail.com>
+	* welcome: Improve project creation.
+
+2017-10-11 Andy Williams <andy@andywilliams.me>
+	* build: Fix edi_build with meson to compile from scratch in one pass
+
+2017-10-11 Andy Williams <andy@andywilliams.me>
+	* l10n: latest strings from new features
+
+2017-10-11 Andy Williams <andy@andywilliams.me>
+	* l10n: Update strings to remove non-translation and trailing symbols we can add in code
+
+2017-10-11 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* edi: edi_lib is not edi_lib but edi
+
+2017-10-10 Al Poole <netstar@gmail.com>
+	* replace: fix a typo.
+
+2017-10-10 Al Poole <netstar@gmail.com>
+	* mainview: Add support for split-panes.
+
+2017-10-10 Stephen Houston <stephen@localhost.localdomain>
+	* Fix meson build when clang headers don't exist.
+
+2017-10-10 Andy Williams <andy@andywilliams.me>
+	* Fix meson build for non-dev libclang
+
+2017-10-08 Al Poole <netstar@gmail.com>
+	* edi_scm: fix use after free.
+
+2017-10-08 Al Poole <netstar@gmail.com>
+	* libedi_scm: make sure we always change to valid directory.
+
+2017-10-08 Al Poole <netstar@gmail.com>
+	* edi_scm: sanitize titie.
+
+2017-10-06 Andy Williams <andy@andywilliams.me>
+	* missing dirs mess up build
+
+2017-10-06 Andy Williams <andy@andywilliams.me>
+	* Fix meson issues for OSX
+
+2017-10-06 Al Poole <netstar@gmail.com>
+	* Revert "edi_scm: make sure we give a sensible window title."
+
+2017-10-06 Al Poole <netstar@gmail.com>
+	* edi_scm: make sure we give a sensible window title.
+
+2017-10-06 Andy Williams <andy@andywilliams.me>
+	* Fixing up linux again - need a better solution for OSX as meson bails
+
+2017-10-05 Al Poole <netstar@gmail.com>
+	* edi_scm: dont scroll on additions to elm_code_widget.
+
+2017-10-05 Andy Williams <andy@andywilliams.me>
+	* filepanel: don't update status and scm etc for hidden files
+
+2017-10-05 Andy Williams <andy@andywilliams.me>
+	* And link libintl
+
+2017-10-04 Andy Williams <andy@andywilliams.me>
+	* Ignore build dir
+
+2017-10-04 Andy Williams <andy@andywilliams.me>
+	* Fix clang lookup dirs on osx
+
+2017-10-04 Andy Williams <andy@andywilliams.me>
+	* Fix build on OSX with clang but no bear
+
+2017-10-04 Al Poole <netstar@gmail.com>
+	* edi_main: don't use exit, goto and shutdown properly.
+
+2017-10-03 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* meson: install AUTHORS
+
+2017-10-03 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* meson: prefix need to be before that!
+
+2017-10-03 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* meson: handle also cases when the options are disabled
+
+2017-10-03 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* time for meson!
+
+2017-10-03 Andy Williams <andy@andywilliams.me>
+	* Update text for SCM changes
+
+2017-10-03 Andy Williams <andy@andywilliams.me>
+	* scm_ui: Show user icon or a fallback, not both
+
+2017-10-03 Andy Williams <andy@andywilliams.me>
+	* scm: fix avatar caching memory handling
+
+2017-10-03 Andy Williams <andy@andywilliams.me>
+	* Ignore new binary
+
+2017-10-03 Andy Williams <andy@andywilliams.me>
+	* about: Fix background alpha for changes in EFL
+
+2017-10-03 Al Poole <netstar@gmail.com>
+	* main: parsing command-line options.
+
+2017-10-02 Al Poole <netstar@gmail.com>
+	* Revert "about: explicitly set bg colour and alpha."
+
+2017-10-01 Al Poole <netstar@gmail.com>
+	* edi_scm: initalise to quieten compiler.
+
+2017-10-01 Al Poole <netstar@gmail.com>
+	* mainview: search + search/replace popups, UI improvement.
+
+2017-10-01 Al Poole <netstar@gmail.com>
+	* about: explicitly set bg colour and alpha.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: fix memory leak.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: small stylistic.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: show window at appropriate time.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* scm_ui: make sure we clear the widget.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: handle thread cancel and shutdown properly.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: refactor code and use threads.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: rename some borrowed functions.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: Monitor for changes and update when possible
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* edi_scm: pack list and commit dialogue on same line.
+
+2017-09-30 Al Poole <netstar@gmail.com>
+	* filepanel: simplify code by using existing method.
+
+2017-09-29 Al Poole <netstar@gmail.com>
+	* edi_scm: win title.
+
+2017-09-29 Al Poole <netstar@gmail.com>
+	* scm: Actually allow for checking of scm anywhere within a git tree.
+
+2017-09-29 Al Poole <netstar@gmail.com>
+	* scm: header file function erroneous description.
+
+2017-09-29 Al Poole <netstar@gmail.com>
+	* scm: Create edi_scm binary for commit dialogue and use elsewhere.
+
+2017-09-28 Al Poole <netstar@gmail.com>
+	* welcome: don't show progressbar until downloaing.
+
+2017-09-28 Al Poole <netstar@gmail.com>
+	* welcome: Add progressbar during retrievel of remote repository.
+
+2017-09-28 Al Poole <netstar@gmail.com>
+	* edi_file: use a static buffer for the path.
+
+2017-09-28 Al Poole <netstar@gmail.com>
+	* search: Add project-wide search and replace feature.
+
+2017-09-27 Al Poole <netstar@gmail.com>
+	* screens: scm. Stylistic changes.
+
+2017-09-27 Al Poole <netstar@gmail.com>
+	* scm: refactor scm screens.
+
+2017-09-27 Al Poole <netstar@gmail.com>
+	* edi: escape paths
+
+2017-09-27 Al Poole <netstar@gmail.com>
+	* edi: escape paths where necessary.
+
+2017-09-27 Andy Williams <andy@andywilliams.me>
+	* Update TODO following release
+
+2017-09-26 Andy Williams <andy@andywilliams.me>
+	* begin 0.7 devel
+
+2017-09-26 Andy Williams <andy@andywilliams.me>
+	* change list for release
+
+2017-09-26 Andy Williams <andy@andywilliams.me>
+	* Update translations
+
+2017-09-26 Andy Williams <andy@andywilliams.me>
+	* Fix make dist
+
+2017-09-24 Andy Williams <andy@andywilliams.me>
+	* filepanel: fix menu icon for folders
+
+2017-09-24 Andy Williams <andy@andywilliams.me>
+	* autosuggest: avoid lingering tab-complete suggestions
+
+2017-09-24 Andy Williams <andy@andywilliams.me>
+	* snippet: fix indentation of inserted lines
+
+2017-09-24 Al Poole <netstar@gmail.com>
+	* exe: fix cleanup on FreeBSD of ecore_con_server/clients.
+
+2017-09-22 Al Poole <netstar@gmail.com>
+	* filepanel: make dir menu behave as file menu does.
+
+2017-09-22 Al Poole <netstar@gmail.com>
+	* filepanel: make dialogues more informative.
+
+2017-09-22 Andy Williams <andy@andywilliams.me>
+	* filepanel: Make the filename in menu informational
+
+2017-09-22 Andy Williams <andy@andywilliams.me>
+	* snippet: add some python snippets
+
+2017-09-22 Andy Williams <andy@andywilliams.me>
+	* autosuggest: Add safety for optional language features
+
+2017-09-21 Andy Williams <andy@andywilliams.me>
+	* about: fix layout of AUTHORS content in about
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* screens: scm. only show staged changes.
+
+2017-09-21 Andy Williams <andy@andywilliams.me>
+	* create: Escape single quotes in project and user name
+
+2017-09-21 Andy Williams <andy@andywilliams.me>
+	* disable broken tests - need to move from including C code!!!
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* scm: use relative path not absolute.
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* screens: scm, remove unnecessary hash clear.
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* scm screens: select text when staged changes made.
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* Merge Andy's fix
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* screeens: scm. Replace list with genlist and make commit entry more usable.
+
+2017-09-21 Andy Williams <andy@andywilliams.me>
+	* autosuggest: veto tab propagation for all inserts
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* edi_main: use proper method to disable menu items.
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* exe: add header.
+
+2017-09-21 Al Poole <netstar@gmail.com>
+	* edi_exe: fix bad bugs.
+
+2017-09-20 Andy Williams <andy@andywilliams.me>
+	* autosuggest: speed up suggeestions
+
+2017-09-20 Andy Williams <andy@andywilliams.me>
+	* autosuggest: Show first match for tab completion
+
+2017-09-20 Al Poole <netstar@gmail.com>
+	* filepanel: do allow focus, else this causes problems.
+
+2017-09-20 Al Poole <netstar@gmail.com>
+	* Build: make build proces more robust.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* filepanel: add filename to the root of the filepanel menus.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* notify: less text is more.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* build: fix race-condition.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* stash: fix bug missed. make sure to update all items on stash.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* screens: scm popup align icons.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* filepanel: 100% ontinuity.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* filepanel: 99% consistent icons
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* screens: scm fix icons
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* scm status: filepanel and commit screen.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* screens: scm. update label to be more sensible.
+
+2017-09-19 Al Poole <netstar@gmail.com>
+	* filepanel: add icon statuses.
+
+2017-09-18 Al Poole <netstar@gmail.com>
+	* Revert "filepanel: update on contract."
+
+2017-09-18 Al Poole <netstar@gmail.com>
+	* filepanel: update on contract.
+
+2017-09-17 Al Poole <netstar@gmail.com>
+	* filepanel: don't duplicate unnecessary code and no need to memcpy.
+
+2017-09-17 Al Poole <netstar@gmail.com>
+	* filepanel: move function for clarity.
+
+2017-09-17 Al Poole <netstar@gmail.com>
+	* scm: reimplement support for file listing file status.
+
+2017-09-16 Al Poole <netstar@gmail.com>
+	* filepanel: remove uneccessary methods.
+
+2017-09-16 Al Poole <netstar@gmail.com>
+	* filepanel: Bad indentation.
+
+2017-09-16 Al Poole <netstar@gmail.com>
+	* scm: undo the filepanel scm status far too slow.
+
+2017-09-16 Al Poole <netstar@gmail.com>
+	* scm: fix init.
+
+2017-09-16 Al Poole <netstar@gmail.com>
+	* scm: add support for file listing file status.
+
+2017-09-13 Al Poole <netstar@gmail.com>
+	* popup: more UI tweaks.
+
+2017-09-13 Al Poole <netstar@gmail.com>
+	* popups: more UI tweaks.
+
+2017-09-12 Al Poole <netstar@gmail.com>
+	* debugpanel: previous commit typo.
+
+2017-09-12 Al Poole <netstar@gmail.com>
+	* debugpanel: add useful comment.
+
+2017-09-12 Al Poole <netstar@gmail.com>
+	* scm: fix loss of last line.
+
+2017-09-12 Al Poole <netstar@gmail.com>
+	* scm: add elm code widget for diff in commit screen.
+
+2017-09-11 Andy Williams <andy@andywilliams.me>
+	* Add translation support
+
+2017-09-11 Al Poole <netstar@gmail.com>
+	* popups: refactor popups.
+
+2017-09-11 Al Poole <netstar@gmail.com>
+	* screens: slight UI improvement to scm commit popup.
+
+2017-09-11 Al Poole <netstar@gmail.com>
+	* scm: add method to get diff of changes in SCM repository.
+
+2017-09-09 Al Poole <netstar@gmail.com>
+	* edi_exe: don't send data if socket connect fails.
+
+2017-09-09 Al Poole <netstar@gmail.com>
+	* edi_exe: Don't use global variables.
+
+2017-09-08 Al Poole <netstar@gmail.com>
+	* build: status. MOre verbose notfication title.
+
+2017-09-08 Al Poole <netstar@gmail.com>
+	* edi_exe: modify method to allow additional data parameter.
+
+2017-09-07 Andy Williams <andy@andywilliams.me>
+	* syntax: Fix python syntax by adding a basic provider
+
+2017-09-07 Al Poole <netstar@gmail.com>
+	* editor: background file changes. Fix editor reload on background file change.
+
+2017-09-06 Al Poole <netstar@gmail.com>
+	* build: Add status detection of all build types.
+
+2017-09-05 Al Poole <netstar@gmail.com>
+	* main: show console panel before we start the build process.
+
+2017-09-05 Al Poole <netstar@gmail.com>
+	* exe: Add methods to handle async shell execution and acting on exit status.
+
+2017-09-04 Al Poole <netstar@gmail.com>
+	* build: Add support for tracking build process exit code and add notification.
+
+2017-09-02 Al Poole <netstar@gmail.com>
+	* widgets: Use consistent text style across widgets in the application.
+
+2017-09-02 Al Poole <netstar@gmail.com>
+	* mainview: also select filepanel on tab focus.
+
+2017-09-02 Al Poole <netstar@gmail.com>
+	* filepanek: set the filepanel focus on editor focus.
+
+2017-09-02 Al Poole <netstar@gmail.com>
+	* screens: move popup creation to screens.
+
+2017-09-02 Al Poole <netstar@gmail.com>
+	* main: change "split" option to "new panel"
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* mainview_panel: remove unnecessary cast.
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* filepanel: Add documentation for new method.
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* filepanel: add method to select by path and select upon tab promotion.
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* mainview: clicking on tabs or filename will focus the editor entry.
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* welcome: center file selector window when opening existing project.
+
+2017-09-01 Al Poole <netstar@gmail.com>
+	* mainview: ensure only one instance of file is open across tabs and panels.
+
+2017-08-30 Al Poole <netstar@gmail.com>
+	* scm stash: on stash don't refresh all panels, let user decide on focus.
+
+2017-08-30 Al Poole <netstar@gmail.com>
+	* mainview_panel: do safe checks before accessing panel->current->view
+
+2017-08-30 Al Poole <netstar@gmail.com>
+	* editor: unset focus on tab change.
+
+2017-08-28 Al Poole <netstar@gmail.com>
+	* mainview_panel: fix panel focus on click of empty panel.
+
+2017-08-28 Al Poole <netstar@gmail.com>
+	* edi_scm: make sure we always delete the file if it is untracked.
+
+2017-08-26 Al Poole <netstar@gmail.com>
+	* mainview: unrecognise mime popup UI improvements.
+
+2017-08-22 Al Poole <netstar@gmail.com>
+	* popups: improve visual display/style of the main popup widgets.
+
+2017-08-22 Al Poole <netstar@gmail.com>
+	* windows: make windows work properly and autosave properly.
+
+2017-08-21 Andy Williams <andy@andywilliams.me>
+	* Fix possible crashes in windowed editor
+
+2017-08-21 Al Poole <netstar@gmail.com>
+	* editor: handle file modifications properly.
+
+2017-08-18 Al Poole <netstar@gmail.com>
+	* mainview: add separators between panels.
+
+2017-08-18 Andy Williams <andy@andywilliams.me>
+	* build: fall back to make don't try it first.
+
+2017-08-18 Al Poole <netstar@gmail.com>
+	* fdo icons: install in correct location.
+
+2017-08-13 Al Poole <netstar@gmail.com>
+	* mainview: fix close_all and close.
+
+2017-08-12 Andy Williams <andy@andywilliams.me>
+	* ui: fix cancel of goto popup
+
+2017-08-12 Al Poole <netstar@gmail.com>
+	* mainview: add method for testing if mainview is empty.
+
+2017-08-09 Al Poole <netstar@gmail.com>
+	* search: Fix Project Search
+
+2017-08-09 Andy Williams <andy@andywilliams.me>
+	* scm: Fix refreshing of panels on stash
+
+2017-08-09 Andy Williams <andy@andywilliams.me>
+	* refactoring mainview panel freeing and docs
+
+2017-08-09 Andy Williams <andy@andywilliams.me>
+	* Use EFL release
+
+2017-08-09 Andy Williams <andy@andywilliams.me>
+	* mainview: Fix potential segvs from D5052
+
+2017-07-26 Al Poole <netstar@gmail.com>
+	* mainview: improve documentation.
+
+2017-07-26 Andy Williams <andy@andywilliams.me>
+	* mainview: fix removal of panels from the ui
+
+2017-07-25 Andy Williams <andy@andywilliams.me>
+	* filepanel: reorder menu
+
+2017-07-25 Al Poole <netstar@gmail.com>
+	* filepanel: Add proper icon for "open in new pane".
+
+2017-07-25 Al Poole <netstar@gmail.com>
+	* mainview: Always open in first panel.
+
+2017-07-25 Al Poole <netstar@gmail.com>
+	* config: remove panel from config when we remove a panel from the UI.
+
+2017-07-25 Al Poole <netstar@gmail.com>
+	* mainview_panels: on close tab focus on existing tab and always keep one mainview panel.
+
+2017-07-24 Andy Williams <andy@andywilliams.me>
+	* settings: fix graphical glitch on smaller screens
+
+2017-07-24 Andy Williams <andy@andywilliams.me>
+	* config: Save the current tab of each panel
+
+2017-07-24 Andy Williams <andy@andywilliams.me>
+	* panels: Track focus of editors when we're changing panel
+
+2017-07-24 Andy Williams <andy@andywilliams.me>
+	* update feature list
+
+2017-07-24 Andy Williams <andy@andywilliams.me>
+	* config: Be less notification-happy when saving
+
+2017-07-23 Al Poole <netstar@gmail.com>
+	* add open files in new tab.
+
+2017-07-22 Al Poole <netstar@gmail.com>
+	* search: fix segv on wrap!
+
+2017-07-16 Al Poole <netstar@gmail.com>
+	* screens: add confirmation dialogue to screens.
+
+2017-07-16 Andy Williams <andy@andywilliams.me>
+	* Fix tests check / defaults
+
+2017-07-11 Jean-Philippe Andre <jp.andre@samsung.com>
+	* build: Add crude meson/ninja support
+
+2017-07-08 Al Poole <netstar@gmail.com>
+	* editor: replace refactor to coincide with search optimisations.
+
+2017-07-07 Andy Williams <andy@andywilliams.me>
+	* Update news file with recent changes
+
+2017-07-07 Andy Williams <andy@andywilliams.me>
+	* tests: we removed c++ syntax - don't test for it
+
+2017-07-05 Andy Williams <andy@andywilliams.me>
+	* search: Reset search highlights on cancel
+
+2017-07-05 Andy Williams <andy@andywilliams.me>
+	* search: highlight each found search result
+
+2017-07-05 Andy Williams <andy@andywilliams.me>
+	* ui: Remove duplicate code from menu fix
+
+2017-07-05 Andy Williams <andy@andywilliams.me>
+	* build: Add support for cargo based rust projects
+
+2017-07-04 Jean-Philippe Andre <jp.andre@samsung.com>
+	* main: Fix some invalid API usages
+
+2017-07-04 Jean-Philippe Andre <jp.andre@samsung.com>
+	* Revert "menu: hide by default until we can fix elm menu calcs"
+
+2017-06-29 Al Poole <netstar@gmail.com>
+	* edi_screens_scm: convert markup to utf8 for commit message.
+
+2017-06-29 Andy Williams <andy@andywilliams.me>
+	* ui: Use correct icon naming for FDO arrows
+
+2017-06-29 Andy Williams <andy@andywilliams.me>
+	* config: Correct project name comparison for substrings
+
+2017-06-28 Andy Williams <andy@andywilliams.me>
+	* debug: remove warning on OSX
+
+2017-06-28 Andy Williams <andy@andywilliams.me>
+	* debug: Fix libtool command for OSX
+
+2017-06-28 Al Poole <netstar@gmail.com>
+	* debugpanel: fix debug process.
+
+2017-06-27 Andy Williams <andy@andywilliams.me>
+	* tabs: correct remembering of mime types
+
+2017-06-25 Andy Williams <andy@andywilliams.me>
+	* make: use our CPU count to speed up build
+
+2017-06-25 Al Poole <netstar@gmail.com>
+	* debugpanel: fix segv if "make clean" has removed debug executable.
+
+2017-06-25 Al Poole <netstar@gmail.com>
+	* debugpanel: fix OSX and add OpenBSD support.
+
+2017-06-25 Andy Williams <andy@andywilliams.me>
+	* Merge build fixes from 'arcpatch-D4917'
+
+2017-06-25 YeongJong Lee <cleanlyj@naver.com>
+	* Fix build warning
+
+2017-06-18 Al Poole <netstar@gmail.com>
+	* general input: work around elm_entry assuming markup in input.
+
+2017-06-18 Al Poole <netstar@gmail.com>
+	* searchpanel/tasks: ignore further extensions.
+
+2017-06-18 Al Poole <netstar@gmail.com>
+	* toolbar bottom: make panel tabs easier to read.
+
+2017-06-18 Sanjeev BA <iamsanjeev@gmail.com>
+	* Fix typos.
+
+2017-06-18 Al Poole <netstar@gmail.com>
+	* screens: scm_commit, add scroller to list widget for commit popup.
+
+2017-06-18 Andy Williams <andy@andywilliams.me>
+	* ui: don't allow menu to be added more than once
+
+2017-06-17 Al Poole <netstar@gmail.com>
+	* edi_scm: add support to add status of changes to the commit dialogue.
+
+2017-06-16 Andy Williams <andy@andywilliams.me>
+	* menu: hide by default until we can fix elm menu calcs
+
+2017-06-16 Andy Williams <andy@andywilliams.me>
+	* editor: Record undo for autosuggest insertions
+
+2017-06-16 Andy Williams <andy@andywilliams.me>
+	* taskpanel: Better ignore files that are not relevant
+
+2017-06-16 Al Poole <netstar@gmail.com>
+	* menu: revert hack for when the ELM panel/menu issue is resolved upstream in EFL.
+
+2017-06-14 Al Poole <netstar@gmail.com>
+	* popups/focus: add improvment to popup visuals. Also select items in settings panel to improve behaviour.
+
+2017-06-11 Andy Williams <andy@andywilliams.me>
+	* debug: Fix up exe_free usage as it is not needed for pipe_run calls
+
+2017-06-09 Andy Williams <andy@andywilliams.me>
+	* console: Jump to column on click when available in errors
+
+2017-06-09 Andy Williams <andy@andywilliams.me>
+	* console: Fix error highlighting for builds
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* welcome: Add support to clone a project from the welcome screen
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* popups: Move text to content to render in latest EFL
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* ui: Speed up screen load and remember current tab
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* welcome: Tidy up our display and add button icons
+
+2017-06-08 Al Poole <netstar@gmail.com>
+	* settings: project panel - make entry widgets inset.
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* Update to changed EFL setup for frame titles
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* scm: Adding avatars to commit dialog
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* scm: OK avatars working now :)
+
+2017-06-08 Andy Williams <andy@andywilliams.me>
+	* scm: Improving stability of avatar rendering.
+
+2017-06-07 Al Poole <netstar@gmail.com>
+	* about: linux to unix wording in about.
+
+2017-06-07 Andy Williams <andy@andywilliams.me>
+	* scm: Add avatar to commit window
+
+2017-06-07 Andy Williams <andy@andywilliams.me>
+	* scm: Add a nicer commit screen saying who you are committing as
+
+2017-06-07 Andy Williams <andy@andywilliams.me>
+	* scm: Fix naming and hide implementation details
+
+2017-06-06 Andy Williams <andy@andywilliams.me>
+	* scm: make remote adding not overwrite previous remotes
+
+2017-06-06 Andy Williams <andy@andywilliams.me>
+	* scm: Update settings screen to be a little smoother
+
+2017-06-06 Andy Williams <andy@andywilliams.me>
+	* scm: add safety in code and in git branching
+
+2017-06-06 Al Poole <netstar@gmail.com>
+	* scm: add support for SCM (git) in library and the UI.
+
+2017-06-06 Al Poole <netstar@gmail.com>
+	* welcome: fix initial project selection issue.
+
+2017-06-04 Andrew Williams <ajw@docere.local>
+	* exe: capture command output to console
+
+2017-06-02 Dave Andreoli <dave@gurumeditation.it>
+	* python skeleton: added FDO stuff
+
+2017-05-30 Andy Williams <andy@andywilliams.me>
+	* exe: add a helper for exe waiting
+
+2017-05-30 Al Poole <netstar@gmail.com>
+	* edi_file_screens: refactor UI create/rm/rdir and add directory and file renaming method.
+
+2017-05-29 Dave Andreoli <dave@gurumeditation.it>
+	* Improve the python build provider
+
+2017-05-29 Dave Andreoli <dave@gurumeditation.it>
+	* Added a python project skeleton
+
+2017-05-28 Andy Williams <andy@andywilliams.me>
+	* create: Allow detection of skeletons of different type.
+
+2017-05-28 Andy Williams <andy@andywilliams.me>
+	* cmdline: Fix create for out-of-project creation
+
+2017-05-28 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: Refactor suggest list show function
+
+2017-05-26 Al Poole <netstar@gmail.com>
+	* filepanel: add menu for filepanel when no file is clicked.
+
+2017-05-26 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'edi-0.5'
+
+2017-05-26 Andy Williams <andy@andywilliams.me>
+	* Releasing 0.5.1 with latest efl fixes
+
+2017-05-26 Al Poole <netstar@gmail.com>
+	* provider: add fallback for text-based mimetypes.
+
+2017-05-26 Andy Williams <andy@andywilliams.me>
+	* build: Fix python project detection
+
+2017-05-26 Andy Williams <andy@andywilliams.me>
+	* cmdline: don't try to open unknown file types
+
+2017-05-26 Al Poole <netstar@gmail.com>
+	* EDI -> Save -> Menu/Toolbar Indicator (w/o autosave)
+
+2017-05-26 Al Poole <netstar@gmail.com>
+	* build_provider: add support for BSD using GNU make.
+
+2017-05-26 Al Poole <netstar@gmail.com>
+	* skeleton: Add header to empty files to get proper mimetype discovery.
+
+2017-05-21 Al Poole <netstar@gmail.com>
+	* provider: add fallback for text-based mimetypes.
+
+2017-05-16 Andy Williams <andy@andywilliams.me>
+	* build: Fix python project detection
+
+2017-05-16 Andy Williams <andy@andywilliams.me>
+	* editor: With EFL fixes we can have multiline snippets
+
+2017-05-15 Al Poole <netstar@gmail.com>
+	* language_provider: quiten compiler if no LIBCLANG
+
+2017-05-14 Andy Williams <andy@andywilliams.me>
+	* Actually we only need the next EFL point release :)
+
+2017-05-14 Al Poole <netstar@gmail.com>
+	* mainview: Don't allow any file without text/* mimetype to be opened.
+
+2017-05-14 Andy Williams <andy@andywilliams.me>
+	* editor: Initial work in snippet support
+
+2017-05-14 Andy Williams <andy@andywilliams.me>
+	* whitespace
+
+2017-05-14 Andy Williams <andy@andywilliams.me>
+	* search: ignore more binary files
+
+2017-05-13 Andy Williams <andy@andywilliams.me>
+	* search: ignore more binary file types in project search
+
+2017-05-13 Andy Williams <andy@andywilliams.me>
+	* cmdline: don't try to open unknown file types
+
+2017-05-10 Al Poole <netstar@gmail.com>
+	* debugpanel: automatically run gdb according to project type. libtool/generic.
+
+2017-05-03 Al Poole <netstar@gmail.com>
+	* filepanel: when opening as different file type, close first then open to ensure the file is instantly accessible as text or code (editing).w
+
+2017-05-03 Al Poole <netstar@gmail.com>
+	* debugpanel: OSX uses different struct kp_proc layout. Adjust for that.
+
+2017-05-02 Al Poole <netstar@gmail.com>
+	* debugpanel: update icons if process is resumed from the "console"
+
+2017-05-02 Al Poole <netstar@gmail.com>
+	* debugpanel : Use correct system process state naming for 4.4BSD derivatives and Linux.
+
+2017-05-02 Andy Williams <andy@andywilliams.me>
+	* metadata
+
+2017-05-02 Al Poole <netstar@gmail.com>
+	* EDI -> Debugpanel -> Debug Process States/Signals -> Linux, OSX and FreeBSD et. al.
+
+2017-04-28 Al Poole <netstar@gmail.com>
+	* EDI -> DEBUGPANEL -> GDB INTEGRATION -> START
+
+2017-04-28 Andy Williams <andy@andywilliams.me>
+	* refactoring for re-use
+
+2017-04-28 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'edi-0.5'
+
+2017-04-26 Andy Williams <andy@andywilliams.me>
+	* Use correct future API
+
+2017-04-26 Andy Williams <andy@andywilliams.me>
+	* Fix issue where replaced items could not be undone.
+
+2017-04-22 Al Poole <netstar@gmail.com>
+	* EDI -> Save -> Menu/Toolbar Indicator (w/o autosave)
+
+2017-04-14 Andy Williams <andy@andywilliams.me>
+	* Correctly ship the language C provider
+
+2017-04-14 Andy Williams <andy@andywilliams.me>
+	* Update to EFL release
+
+2017-04-14 Andy Williams <andy@andywilliams.me>
+	* Prep for 0.5 release
+
+2017-04-09 Al Poole <netstar@gmail.com>
+	* EDI -> Main Menu -> Open Project (No tabs) -> Dancing window on Start Weirdness Fix
+
+2017-04-07 Andy Williams <andy@andywilliams.me>
+	* gui: Update undo/redo icons to show what actions can apply.
+
+2017-04-05 Andy Williams <andy@andywilliams.me>
+	* searchpanel: Update render to give more space for results
+
+2017-04-05 Al Poole <netstar@gmail.com>
+	* EDI -> Tasks -> TODO/FIXME -> Panel (NEW FEATURE)
+
+2017-04-05 Al Poole <netstar@gmail.com>
+	* EDI -> Mainview -> Prev/Next tab Buttons -> FEATURE
+
+2017-04-03 Andy Williams <andy@andywilliams.me>
+	* disable broken tests - figure out why later
+
+2017-03-31 Al Poole <netstar@gmail.com>
+	* EDI -> Welcome -> New Project -> Fix (OpenBSD)
+
+2017-03-30 Al Poole <netstar@gmail.com>
+	* Edi -> Search Project - Add initial support for search in project.
+
+2017-03-30 Andy Williams <andy@andywilliams.me>
+	* filepanel: use data object to avoid file lookups
+
+2017-03-27 Al Poole <netstar@gmail.com>
+	* Move File/Dir Creation to edi_file.c/h
+
+2017-03-27 Andy Williams <andy@andywilliams.me>
+	* filepanel: Update directory context after refactoring
+
+2017-03-26 Al Poole <netstar@gmail.com>
+	* Add optional menu for directories in file view.
+
+2017-03-25 Andy Williams <andy@andywilliams.me>
+	* welcome: correct showing the panel when all tabs are closed
+
+2017-03-25 Andy Williams <andy@andywilliams.me>
+	* welcome: Fix layout when not tabs are open
+
+2017-03-25 Andy Williams <andy@andywilliams.me>
+	* Add item to TODO
+
+2017-03-25 Al Poole <netstar@gmail.com>
+	* Fix SEGV on right click of file browser that is empty!
+
+2017-03-25 Al Poole <netstar@gmail.com>
+	* Fix SEGV on goto line when out of range
+
+2017-03-24 Al Poole <netstar@gmail.com>
+	* Add option to delete file in browser
+
+2017-03-24 Al Poole <netstar@gmail.com>
+	* Fix not catching reload of files outside of program.
+
+2017-03-23 Al Poole <netstar@gmail.com>
+	* Mostly working...
+
+2017-03-23 Al Poole <netstar@gmail.com>
+	* Center the welcome window on start
+
+2017-03-21 Al Poole <netstar@gmail.com>
+	* Fix SEGV on shutdown with main window and project open...
+
+2017-03-19 Andy Williams <andy@andywilliams.me>
+	* search: Show a notification that we wrapped search
+
+2017-03-19 Andy Williams <andy@andywilliams.me>
+	* fix whitespace
+
+2017-03-19 Andy Williams <andy@andywilliams.me>
+	* search: Fix off by one/utf8 issues in replace
+
+2017-03-18 Al Poole <netstar@gmail.com>
+	* @fix for T1852
+
+2017-03-18 Andy Williams <andy@andywilliams.me>
+	* Update TODO for milestone 2
+
+2017-03-04 Andy Williams <andy@andywilliams.me>
+	* syntax: trigger eolian highlighting
+
+2017-03-03 Stephen 'Okra' Houston <smhouston88@gmail.com>
+	* Edi: Add double click expand/contract support on the file panel.
+
+2017-02-27 Andy Williams <andy@andywilliams.me>
+	* Fix configure for bear-less machines
+
+2017-02-19 Andy Williams <andy@andywilliams.me>
+	* hint that bear is not needed for cmake
+
+2017-02-19 Andy Williams <andy@andywilliams.me>
+	* clang: Update clang command database to support cmake too
+
+2017-02-19 Andy Williams <andy@andywilliams.me>
+	* Centralise some more path handling methods
+
+2017-02-18 Andy Williams <andy@andywilliams.me>
+	* clang: re-scan after save to get latest changes.
+
+2017-02-18 Andy Williams <andy@andywilliams.me>
+	* build: Split make from cmake so we can specialise better
+
+2017-02-18 Andy Williams <andy@andywilliams.me>
+	* clang: Generate compile_commands.json using cmake builtin
+
+2017-02-17 Andy Williams <andy@andywilliams.me>
+	* clang: Add support for compile command databases
+
+2017-02-10 Andy Williams <andy@andywilliams.me>
+	* cmdline: Add a little user feedback
+
+2017-02-07 Andy Williams <andy@andywilliams.me>
+	* build: add trivial python project support
+
+2017-02-02 Andy Williams <andy@andywilliams.me>
+	* Update TODO based on latest EFL
+
+2017-01-31 Andy Williams <andy@andywilliams.me>
+	* syntax: Still ask clang to highlight preprocessor/macros
+
+2017-01-31 Andy Williams <andy@andywilliams.me>
+	* filepanel: remove unneeded vars
+
+2017-01-31 Andy Williams <andy@andywilliams.me>
+	* filepanel: Don't apply filter to folders
+
+2017-01-31 YeongJong Lee <cleanlyj@naver.com>
+	* ui: Bring in current tab
+
+2017-01-31 YeongJong Lee <cleanlyj@naver.com>
+	* filepanel: fix bug that unable to expand again
+
+2017-01-29 Andy Williams <andy@andywilliams.me>
+	* filepanel: Fix file duplication bug.
+
+2017-01-28 Andy Williams <andy@andywilliams.me>
+	* EFL fixes make this not needed
+
+2017-01-22 Andy Williams <andy@andywilliams.me>
+	* search: Fix multiple search and bringing offscreen matches in
+
+2017-01-21 Andy Williams <andy@andywilliams.me>
+	* editor: Use elm_code for most of our syntax now.
+
+2017-01-15 Andy Williams <andy@andywilliams.me>
+	* filepanel: Hide standard hidden files
+
+2017-01-13 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: Fix segment fault when type long word
+
+2017-01-12 Andy Williams <andy@andywilliams.me>
+	* editor: Display mime type description
+
+2017-01-11 Andy Williams <andy@andywilliams.me>
+	* suggest: Move to a language provider
+
+2017-01-11 Andy Williams <andy@andywilliams.me>
+	* suggest: Move documentaton lookup to suggeest provider
+
+2017-01-11 Andy Williams <andy@andywilliams.me>
+	* suggest: Simplify sugggest API
+
+2017-01-02 Andy Williams <andy@andywilliams.me>
+	* config: Store relative paths for open files
+
+2017-01-02 Andy Williams <andy@andywilliams.me>
+	* elm_code: update for latest elm init
+
+2017-01-01 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: Fix position when the suggest list is hidden.
+
+2016-12-29 YeongJong Lee <cleanlyj@naver.com>
+	* update AUTHORS.
+
+2016-12-28 Andy Williams <andy@andywilliams.me>
+	* documentation: correct size for scaled displays
+
+2016-12-28 YeongJong Lee <cleanlyj@naver.com>
+	* editor_doc: Add documentation finding support using libclang
+
+2016-12-27 Andy Williams <andy@andywilliams.me>
+	* elm_code: Update to new API signature
+
+2016-12-27 Andy Williams <andy@andywilliams.me>
+	* we depend on elementary in git again
+
+2016-12-27 Andy Williams <andy@andywilliams.me>
+	* autosuggest: add tests to clang suggest provider
+
+2016-12-26 Andy Williams <andy@andywilliams.me>
+	* build: Fix some issues with the build output
+
+2016-12-26 Andy Williams <andy@andywilliams.me>
+	* filepanel: correctly look up files within their dir
+
+2016-12-26 Andy Williams <andy@andywilliams.me>
+	* ui: When tests are running show the build results first
+
+2016-12-24 Andy Williams <andy@andywilliams.me>
+	* autosuggest: refactor to split clang suggest code from editor
+
+2016-12-23 Andy Williams <andy@andywilliams.me>
+	* autosuggest: Move formatting to 1 place
+
+2016-12-23 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: One editor has one suggest evas object
+
+2016-12-22 Andy Williams <andy@andywilliams.me>
+	* editor: cleanup methods a little
+
+2016-12-22 Andy Williams <andy@andywilliams.me>
+	* don't crash on invalid lines
+
+2016-12-22 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: Support detail of suggest
+
+2016-12-19 YeongJong Lee <cleanlyj@naver.com>
+	* autosuggest: Change the variable name from 'autocomplete' to 'suggest' for readability.
+
+2016-12-19 YeongJong Lee <cleanlyj@naver.com>
+	* filelist: Check that the filelist has same file before insertion.
+
+2016-12-17 Andy Williams <andy@andywilliams.me>
+	* editor: grab keys that should not feed down to elm_code
+
+2016-12-17 Andy Williams <andy@andywilliams.me>
+	* autosuggest: properly guard the clang variables
+
+2016-12-16 YeongJong Lee <cleanlyj@naver.com>
+	* autocomplete: fix screen flicker when use autocomplete
+
+2016-12-13 YeongJong Lee <cleanlyj@naver.com>
+	* autocomplete: Refresh candidate list when typing.
+
+2016-12-12 Andy Williams <andy@andywilliams.me>
+	* elm_code: update parameter order
+
+2016-12-12 Andy Williams <andy@andywilliams.me>
+	* fix typo in patch
+
+2016-12-12 YeongJong Lee <cleanlyj@naver.com>
+	* autocomplete: Add code autocomplete using clang
+
+2016-11-30 Jean-Philippe Andre <jp.andre@samsung.com>
+	* editor: Fix crash when resizing without any code open
+
+2016-11-30 Andy Williams <andy@andywilliams.me>
+	* fix extension lookup so we can see .eo files again
+
+2016-11-30 Andy Williams <andy@andywilliams.me>
+	* files: Avoid missing mime check
+
+2016-11-29 Andy Williams <andy@andywilliams.me>
+	* filelist: Actually update on file add/rm
+
+2016-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix crash when opening a new window
+
+2016-11-29 Andy Williams <andy@andywilliams.me>
+	* ui: Don't how open context menu for directories
+
+2016-11-29 Andy Williams <andy@andywilliams.me>
+	* ui: Fix file listing to stop duplicating entries
+
+2016-11-28 Andy Williams <andy@andywilliams.me>
+	* highlight: cancel the file parsing on line events
+
+2016-11-27 Andy Williams <andy@andywilliams.me>
+	* about: Update report issue link
+
+2016-11-26 Andy Williams <andy@andywilliams.me>
+	* ui: Reset search term when activating search
+
+2016-11-20 Andy Williams <andy@andywilliams.me>
+	* Fix pkg-config script.
+
+2016-11-06 Andy Williams <andy@andywilliams.me>
+	* filepanel: don't reload on monitor until we have it fixed
+
+2016-11-06 Andy Williams <andy@andywilliams.me>
+	* ui: Make file tabs scrollable and highlight current tab
+
+2016-11-06 Andy Williams <andy@andywilliams.me>
+	* Fix build warning
+
+2016-11-04 Andy Williams <andy@andywilliams.me>
+	* Fix gitignore
+
+2016-11-04 Andy Williams <andy@andywilliams.me>
+	* config: Move project config into global config area
+
+2016-10-23 Andy Williams <andy@andywilliams.me>
+	* fix typo
+
+2016-10-22 Andy Williams <andy@andywilliams.me>
+	* Change sed usage to be portable.
+
+2016-10-11 Andy Williams <andy@andywilliams.me>
+	* lib: add pkgconfig support for libedi
+
+2016-09-30 Andy Williams <andy@andywilliams.me>
+	* files: tidy code to be easier to read
+
+2016-09-30 Andy Williams <andy@andywilliams.me>
+	* files: Also ignore .a and .la for a make project
+
+2016-09-29 Andy Williams <andy@andywilliams.me>
+	* config: update defaults since elm_code_widget fixed width marker
+
+2016-09-25 Andy Williams <andy@andywilliams.me>
+	* ui: Move toolbar to left and remove the text labels
+
+2016-09-25 Andy Williams <andy@andywilliams.me>
+	* lib: let the callback to create be optional
+
+2016-09-11 Andy Williams <andy@andywilliams.me>
+	* ui: only use help lookup if control pressed
+
+2016-09-11 Andy Williams <andy@andywilliams.me>
+	* oops, fixing the right temporary code
+
+2016-09-11 Andy Williams <andy@andywilliams.me>
+	* ui: use the style from multibuttonentry for tabs
+
+2016-09-11 Andy Williams <andy@andywilliams.me>
+	* Authors fix since Elm_Code merged to efl
+
+2016-09-11 Andy Williams <andy@andywilliams.me>
+	* ui: drop toolbar for tabs, start rolling my own
+
+2016-09-10 Andy Williams <andy@andywilliams.me>
+	* ui: Fix various toolbar items since tab chnges
+
+2016-09-10 Andy Williams <andy@andywilliams.me>
+	* logs: disable logging for a while
+
+2016-09-10 Andy Williams <andy@andywilliams.me>
+	* ui: Fix the behaviour of tabs
+
+2016-09-09 Andy Williams <andy@andywilliams.me>
+	* template: Update build and default app settings
+
+2016-09-09 Andy Williams <andy@andywilliams.me>
+	* template: More ignores of use
+
+2016-09-09 Andy Williams <andy@andywilliams.me>
+	* syntax: Fix bad racey thread conditions
+
+2016-09-09 Andy Williams <andy@andywilliams.me>
+	* template: Set skeleton to ignore the edi storage that will be created as soon as we load
+
+2016-09-09 Andy Williams <andy@andywilliams.me>
+	* Correct the EDI license in packaging - GPLv2.
+
+2016-09-04 Marcel Hollerbach <marcel-hollerbach@t-online.de>
+	* edi: follow namespace change from Eo_Event to Efl_Event
+
+2016-08-26 Andy Williams <andy@andywilliams.me>
+	* Add Create Project menu item
+
+2016-08-26 Andy Williams <andy@andywilliams.me>
+	* Fix broken pkgbuild
+
+2016-08-26 Andy Williams <andy@andywilliams.me>
+	* Update our requirements for latest efl
+
+2016-08-23 Andy Williams <andy@andywilliams.me>
+	* Update test suite to remove old elm_code references
+
+2016-08-23 Andy Williams <andy@andywilliams.me>
+	* Update for a new release with Elm_Code and efl 1.18
+
+2016-08-18 Andy Williams <andy@andywilliams.me>
+	* Update to the EFL 1.18 release
+
+2016-07-20 Andy Williams <andy@andywilliams.me>
+	* Depend on the first (pre) release of efl 1.18 so it's a known state
+
+2016-07-03 Andy Williams <andy@andywilliams.me>
+	* Add single file mode to help
+
+2016-07-03 Andy Williams <andy@andywilliams.me>
+	* ui: allow loading of a single file
+
+2016-07-03 Andy Williams <andy@andywilliams.me>
+	* create: Fix crash creating new projects
+
+2016-07-01 YeongJong Lee <cleanlyj@naver.com>
+	* Adjust the code according to the eo event stop changes.
+
+2016-06-10 Andy Williams <andy@andywilliams.me>
+	* Update metadata etc
+
+2016-06-10 Andy Williams <andy@andywilliams.me>
+	* Fix compile errors with latest elementary from efl
+
+2016-06-10 Andy Williams <andy@andywilliams.me>
+	* elm_code: Removed and migrated to using the elementary merged version
+
+2016-05-25 YeongJong Lee <cleanlyj@naver.com>
+	* ui:fix title bar attribute of settings, about window
+
+2016-05-25 Andy Williams <andy@andywilliams.me>
+	* ui: Update close icon to document-close
+
+2016-05-21 Andy Williams <andy@andywilliams.me>
+	* ui: Fix icon naming to standard
+
+2016-05-19 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix build for updated eolian_gen output
+
+2016-05-18 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix undo code for deleting tab
+
+2016-05-17 Andy Williams <andy@andywilliams.me>
+	* editor: re-enable undo
+
+2016-05-17 Andy Williams <andy@andywilliams.me>
+	* elm_code: Revert an optimisation to fix a crash
+
+2016-05-17 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix crash when tabbing in a small widget
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* elm_code: unbreak previous commit
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* elm_code: ensure lines are visible when scrolling
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* elm_code: fix crash from previous commits
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* elm_code: remove useless variable
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* elm_code: Fix scroller size when appending new lines
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* [test] use correct parsing of test errors
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* [elm_code] don't double free standard parsers
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* [test] Fix parsing for tests that crash.
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* elm_code: Fix log test case
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* tests: add a test case for log viewer
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* Update meta and news
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* fix doc
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* [files] Filter file list to ignore hidden files
+
+2016-05-16 Andy Williams <andy@andywilliams.me>
+	* [build] Abstract build logic to provider lookup
+
+2016-05-16 Jean-Philippe ANDRE <jpeg@videolan.org>
+	* welcome: show after resize
+
+2016-05-15 Andy Williams <andy@andywilliams.me>
+	* [files] Filter file names using regexp
+
+2016-05-14 Andy Williams <andy@andywilliams.me>
+	* Fix build for latest API
+
+2016-04-29 Andy Williams <andy@andywilliams.me>
+	* Update the default license shipped with the skeletons.
+
+2016-04-28 Andy Williams <andy@andywilliams.me>
+	* [editor] fix issue where selections didn't refresh
+
+2016-04-28 Andy Williams <andy@andywilliams.me>
+	* [editor] Stop jumping around on click
+
+2016-04-28 Andy Williams <andy@andywilliams.me>
+	* welcome: Fix icon sizing to not be bigger than we want
+
+2016-04-28 Andy Williams <andy@andywilliams.me>
+	* ui: use standard icon names
+
+2016-04-24 Andy Williams <andy@andywilliams.me>
+	* Update to latest eo specs
+
+2016-04-14 Hermet Park <hermet@hermet.pe.kr>
+	* fix build break.
+
+2016-04-10 Carsten Holtkamp <carsten-holtkamp@t-online.de>
+	* Opens welcome screen now under mouse, to follow enlightenments policy. Evas is picky about function call order.
+
+2016-04-09 Hermet Park <hermet@hermet.pe.kr>
+	* remove duplicated variable declaration.
+
+2016-04-07 Andy Williams <andy@andywilliams.me>
+	* [help] Stub out a right-click-help UI
+
+2016-04-07 Andy Williams <andy@andywilliams.me>
+	* [selection] split words on * and & also
+
+2016-04-07 Andy Williams <andy@andywilliams.me>
+	* tidy old stubs
+
+2016-04-07 Andy Williams <andy@andywilliams.me>
+	* [settings] list all monospaced fonts
+
+2016-04-07 Andy Williams <andy@andywilliams.me>
+	* [editor] fix line geometry when scrolled
+
+2016-03-31 Andy Williams <andy@andywilliams.me>
+	* [editor] Split out lines from a standard grid in rendering
+
+2016-03-30 Andy Williams <andy@andywilliams.me>
+	* [editor] move tooltips to inline error meessages
+
+2016-03-30 Andy Williams <andy@andywilliams.me>
+	* [editor] split out the grid into rendered rows.
+
+2016-03-22 Andy Williams <andy@andywilliams.me>
+	* Fix the local lookup of diffs in the test app.
+
+2016-03-22 Andy Williams <andy@andywilliams.me>
+	* Fix the local lookup of diffs in the test app.
+
+2016-03-18 Andy Williams <andy@andywilliams.me>
+	* Update to latest eo_add syntax
+
+2016-03-18 Andy Williams <andy@andywilliams.me>
+	* Update to latest eo_add syntax
+
+2016-03-10 Andy Williams <andy@andywilliams.me>
+	* Update to latest eo syntax
+
+2016-03-08 Andy Williams <andy@andywilliams.me>
+	* Fix make dist
+
+2016-03-01 Andy Williams <andy@andywilliams.me>
+	* Update to new eo event callback signature
+
+2016-02-25 Andy Williams <andy@andywilliams.me>
+	* [editor] draw line width marker after file end
+
+2016-02-25 Andy Williams <andy@andywilliams.me>
+	* [editor] a bunch of optimisations for redraw
+
+2016-02-24 Yomi <abyomi0@gmail.com>
+	* Edit welcome message.
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* [ui] re-add the undo button, it's back
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* [editor] add delete and backspace undo hooks
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* Complete the ending newline crash fix
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* Fix crash when undoing a soft tab insert
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* Add arc config
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* [editor] begin re-adding the undo feature.
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* easier debugging of ck_assert_strn_eq
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* [editor] Fix crash when deleting selections
+
+2016-02-21 Andy Williams <andy@andywilliams.me>
+	* [editor] various tidies
+
+2016-02-16 Andy Williams <andy@andywilliams.me>
+	* optimise edge case checking
+
+2016-02-16 Andy Williams <andy@andywilliams.me>
+	* [tabs] add a close all feature
+
+2016-02-15 Andy Williams <andy@andywilliams.me>
+	* [editor] stop auto selection on symbols too
+
+2016-02-15 Andy Williams <andy@andywilliams.me>
+	* [editor] double click and triple do selections
+
+2016-02-15 Andy Williams <andy@andywilliams.me>
+	* fix some autogen warnings
+
+2016-02-15 Andy Williams <andy@andywilliams.me>
+	* Elm_Interface_Atspi_Text changed to Elm.Interface_Atspi_Text.
+
+2016-02-11 Andy Williams <andy@andywilliams.me>
+	* Fix typos in change log
+
+2016-02-11 Andy Williams <andy@andywilliams.me>
+	* remove trailing whitespace
+
+2016-02-11 Andy Williams <andy@andywilliams.me>
+	* [ui] Add feature to filter file list
+
+2016-02-09 Tom Hacohen <tom@stosb.com>
+	* Fix out of source builds.
+
+2016-02-09 Andy Williams <andy@andywilliams.me>
+	* Update NEWS file for changes since 0.2
+
+2016-02-09 Andy Williams <andy@andywilliams.me>
+	* [editor] Support space insertion instead of tabs
+
+2016-02-08 Andy Williams <andy@andywilliams.me>
+	* Fix clang detection on Fedora.
+
+2016-02-05 Andy Williams <andy@andywilliams.me>
+	* Important bug fixes out in 1.17.0, let's require it across the board
+
+2016-02-01 Andy Williams <andy@andywilliams.me>
+	* [ui] one more toolbar fix to match scale changes
+
+2016-01-30 Andy Williams <andy@andywilliams.me>
+	* Revert "[ui] set icon size based on scale"
+
+2016-01-29 Andy Williams <andy@andywilliams.me>
+	* [ui] set icon size based on scale
+
+2016-01-21 Andy Williams <andy@andywilliams.me>
+	* [ui] Correctly focus popup inputs
+
+2016-01-21 Andy Williams <andy@andywilliams.me>
+	* [newfile] Check for filename and permissions
+
+2016-01-17 Andy Williams <andy@andywilliams.me>
+	* [builder] use builtin sh support in Ecore_Exe
+
+2016-01-17 Andy Williams <andy@andywilliams.me>
+	* Fix maybe-uninitialized warnings
+
+2016-01-17 Andy Williams <andy@andywilliams.me>
+	* Supress libtool warning on windows
+
+2016-01-16 Andy Williams <andy@andywilliams.me>
+	* [builder] Lauch /bin/sh to avoid local shell issues.
+
+2016-01-16 Andy Williams <andy@andywilliams.me>
+	* [ui] Tidy open file toolbar
+
+2016-01-16 Andy Williams <andy@andywilliams.me>
+	* [elm_code] Update line status icons for additions
+
+2015-12-21 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' of git+ssh://git.enlightenment.org/tools/edi
+
+2015-12-11 Andy Williams <andy@andywilliams.me>
+	* [ui] Smooth file panel scrolling
+
+2015-12-11 Andy Williams <andy@andywilliams.me>
+	* [build] Set up test environment in a way that supports fish and others
+
+2015-11-19 Andy Williams <andy@andywilliams.me>
+	* metadata for release
+
+2015-11-19 Andy Williams <andy@andywilliams.me>
+	* Update to new eolian_gen usage
+
+2015-10-10 Andy Williams <andy@andywilliams.me>
+	* [whitespace] Fix indentation after newline when splitting.
+
+2015-10-10 Andy Williams <andy@andywilliams.me>
+	* [log] filter out lots of efl debug
+
+2015-10-10 Andy Williams <andy@andywilliams.me>
+	* [logs] Ignore some common log lines to avoid clutter in panel.
+
+2015-10-10 Andy Williams <andy@andywilliams.me>
+	* [editor] Show a highlight for the current cursor line
+
+2015-09-29 Andy Williams <andy@andywilliams.me>
+	* Update to efl on git
+
+2015-09-20 Andy Williams <andy@andywilliams.me>
+	* Update NEWS with fixes since 0.1
+
+2015-09-20 Andy Williams <andy@andywilliams.me>
+	* [highlight] Merge highlight tokens on line merge
+
+2015-09-20 Andy Williams <andy@andywilliams.me>
+	* [highlight] Split highlight tokens on line split
+
+2015-09-16 Andy Williams <andy@andywilliams.me>
+	* [selection] Fix so selecting backwards works
+
+2015-09-16 Andy Williams <andy@andywilliams.me>
+	* [editor] Fix indenting of newlines
+
+2015-09-16 Andy Williams <andy@andywilliams.me>
+	* [config] don't re-open files not really opened
+
+2015-09-07 Andy Williams <andy@andywilliams.me>
+	* Update to latest eolian spec
+
+2015-09-07 Andy Williams <andy@andywilliams.me>
+	* Update version requirements for release
+
+2015-08-31 Andy Williams <andy@andywilliams.me>
+	* Merge commit '28bae570050d47d03a22ff49b570efbf31935679'
+
+2015-08-31 Andrew Williams <andy@andywilliams.me>
+	* Merge pull request #5 from ilkosta/sh_create_new_project
+
+2015-08-31 ilkosta <costantino.giuliodori@gmail.com>
+	* sh for git scripts
+
+2015-08-31 ilkosta <costantino.giuliodori@gmail.com>
+	* removed a $ typo from sed command
+
+2015-08-30 Andy Williams <andy@andywilliams.me>
+	* Fix NEWS file to respect the 0.0.9 release
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* Fix make distcheck
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* prep for release of 0.1
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [create] use /bin/sh to execute the sed script
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [editor] Make whitespace trimming an option
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [settings] Fix typo causing compile error
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [elm_code] don't strip whitespace on current line
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [tests] Correct checking of just length chars
+
+2015-08-29 Andy Williams <andy@andywilliams.me>
+	* [elm_code] trim all trailing whitespace on save
+
+2015-08-28 Andy Williams <andy@andywilliams.me>
+	* [elm_code] Trim empty lines on save
+
+2015-08-28 Andy Williams <andy@andywilliams.me>
+	* typo--
+
+2015-08-28 Andy Williams <andy@andywilliams.me>
+	* [editor] fix stability of the highlighting thread
+
+2015-08-23 Andy Williams <andy@andywilliams.me>
+	* Fix some bad memory access during widget creation
+
+2015-07-17 Andy Williams <andy@andywilliams.me>
+	* new file: create in selected directory
+
+2015-07-16 Andy Williams <andy@andywilliams.me>
+	* editor: improve goto line dialog
+
+2015-06-10 Andy Williams <andy@andywilliams.me>
+	* editor: allow cursor placement in blank file
+
+2015-06-10 Andy Williams <andy@andywilliams.me>
+	* editor: Fix crash opening empty files
+
+2015-06-09 Andy Williams <andy@andywilliams.me>
+	* editor: fix a strange crash in calculations
+
+2015-06-09 Andy Williams <andy@andywilliams.me>
+	* tabs: load in the correct order...
+
+2015-06-08 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix tab behaviour following API changes
+
+2015-06-07 Andy Williams <andy@andywilliams.me>
+	* elm_code: remove selections if moving cursor
+
+2015-06-07 Andy Williams <andy@andywilliams.me>
+	* remove tabs from indent
+
+2015-06-07 Andy Williams <andy@andywilliams.me>
+	* texts: fix tests broken in previous refactor
+
+2015-06-07 Andy Williams <andy@andywilliams.me>
+	* elm_code: indent lines to match whitespace above
+
+2015-06-04 Andy Williams <andy@andywilliams.me>
+	* docs: Fix manpage and skeleton manpage
+
+2015-06-03 Andy Williams <andy@andywilliams.me>
+	* elm_code: consistently use 0 based text index
+
+2015-06-02 Andy Williams <andy@andywilliams.me>
+	* elm_code: add legacy API.
+
+2015-06-02 Andy Williams <andy@andywilliams.me>
+	* Fix dist of licenses
+
+2015-06-02 Andy Williams <andy@andywilliams.me>
+	* Fix making after updating COPYING text
+
+2015-06-01 Andy Williams <andy@andywilliams.me>
+	* Fixing make dist
+
+2015-06-01 Andy Williams <andy@andywilliams.me>
+	* Clarify EDI licensing.
+
+2015-06-01 Andy Williams <andy@andywilliams.me>
+	* Remove confusion with old GPLv2 files
+
+2015-06-01 Andy Williams <andy@andywilliams.me>
+	* Fix header location
+
+2015-05-31 Andy Williams <andy@andywilliams.me>
+	* Fix many warnings.
+
+2015-05-31 Andy Williams <andy@andywilliams.me>
+	* run: Add args to settings for default run button
+
+2015-05-31 Andy Williams <andy@andywilliams.me>
+	* We're working towards 0.1
+
+2015-05-31 Andy Williams <andy@andywilliams.me>
+	* builds: Add a run button and the launch config to support.
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* highlighting: Fix threading to avoid overlap crash
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* performance: Fix issue where EDI would slow down
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* tests: make content provider test work again
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* fix crash when deleting over a line ending
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* setting: Add a font picker
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* editor: trigger saves if selection cut or pasted
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* diff: Respect configured font (size)
+
+2015-05-30 Andy Williams <andy@andywilliams.me>
+	* elm_code: support setting custom fonts
+
+2015-05-29 Andy Williams <andy@andywilliams.me>
+	* Fix deletion inserting random data.
+
+2015-05-26 Andy Williams <andy@andywilliams.me>
+	* Update icons and about imagery
+
+2015-05-24 Andy Williams <andy@andywilliams.me>
+	* settings: Split into project and global settings
+
+2015-05-24 Andy Williams <andy@andywilliams.me>
+	* settings: Fix alignment of display settings
+
+2015-05-24 Andy Williams <andy@andywilliams.me>
+	* selection: fix crash when deleting large selection
+
+2015-05-21 Andy Williams <andy@andywilliams.me>
+	* update intro docs for newer build requirements etc
+
+2015-05-21 Andy Williams <andy@andywilliams.me>
+	* Fix casing of app in desktop icon
+
+2015-05-21 Andy Williams <andy@andywilliams.me>
+	* better crash fix - mimic standard free() method
+
+2015-05-20 Andy Williams <andy@andywilliams.me>
+	* Fix crash if closing with no project open
+
+2015-05-20 Andy Williams <andy@andywilliams.me>
+	* Update to latest eolian (getting stable we hope).
+
+2015-05-19 Andy Williams <andy@andywilliams.me>
+	* menu: flesh out our application menu
+
+2015-05-19 Andy Williams <andy@andywilliams.me>
+	* Create helper for opening URLs
+
+2015-05-19 Andy Williams <andy@andywilliams.me>
+	* add a main menu to EDI
+
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* list of important changes
+
+2015-05-18 Andy Williams <andy@andywilliams.me>
 	* Allow hiding of the toolbar
-	* Added a main menu to move items off toolbar
 
-2015-08-15 ajwillia.ms (Andy Williams)
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* Fixup tests
 
-	* Remember UI settings per-project in <proj>/.edi/
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* Use portable eina util methods for paths.
 
-2015-04-20 ajwillia.ms (Andy Williams)
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* Update to latest .eo file type
 
-	* Highlight lines containing TODO or FIXME
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* config: free up memory when removing projects
 
-2015-03-15 ajwillia.ms (Andy Williams)
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* editor: Remember open tabs and windows.
 
-	* Fix issues with re-opening closed tabs
-	* Fix crash-on-open for some systems
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* editor: fix nulls being appended to lines
 
-2015-03-08 ajwillia.ms (Andy Williams)
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* fix compile error
 
-	* Add a settings screen
+2015-05-18 Andy Williams <andy@andywilliams.me>
+	* editor: fix memory corruption when opening new win
 
-2015-02-28 Vincent Torri
+2015-05-16 Andy Williams <andy@andywilliams.me>
+	* headers: remove includes if they are not needed
 
-	* Fix username lookup for Windows
+2015-05-16 Andy Williams <andy@andywilliams.me>
+	* config: save project config in the project dir
 
-2015-02-21 ajwillia.ms (Andy Williams)
+2015-05-16 Andy Williams <andy@andywilliams.me>
+	* Settings: add a background to the window
 
-	* Release 0.0.1
+2015-05-15 Andy Williams <andy@andywilliams.me>
+	* Fix issue with symbol visibility
 
-2015-02-11 ajwillia.ms (Andy Williams)
+2015-05-12 Andy Williams <andy@andywilliams.me>
+	* editor: add pageup/down support
 
-	* Make sure clang syntax loading follows auto saves
+2015-05-12 Andy Williams <andy@andywilliams.me>
+	* Add visibility=hidden
 
-2015-02-08 ajwillia.ms (Andy Williams)
+2015-05-11 Andy Williams <andy@andywilliams.me>
+	* eolian_gen fixes to inheritance
 
-	* Add an about window to credit our contributors
+2015-05-11 Andy Williams <andy@andywilliams.me>
+	* Update elm_code widget .eo doc for EFL master
 
-2015-02-07 wilsonk (Kelly Wilson)
+2015-05-05 Andy Williams <andy@andywilliams.me>
+	* editor: wrap left and right cursor moves around
 
-	* Remember file types when we open-as in the editor
+2015-05-05 Andy Williams <andy@andywilliams.me>
+	* editor: bind home and end keys
 
-2014-11-22 ajwillia.ms (Andy Williams)
+2015-05-05 Andy Williams <andy@andywilliams.me>
+	* editor: correctly paste multiline windows text
 
-	* Add a diff rendering component to edi
+2015-05-05 Andy Williams <andy@andywilliams.me>
+	* editor: Fix crash when pasting multi line
 
-2014-11-09 ajwillia.ms (Andy Williams)
+2015-04-20 Andy Williams <andy@andywilliams.me>
+	* elm_code: add a TODO/FIXME standard parser
 
-	* Add build and test functions to toolbar
+2015-04-19 Andy Williams <andy@andywilliams.me>
+	* elm_code: add multiline paste support.
 
-2014-10-09 ajwillia.ms (Andy Williams)
+2015-04-13 Andy Williams <andy@andywilliams.me>
+	* elm_code: retain line formatting on file callback
 
-	* Add clang syntax highlighting
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* clang: Fix crash if error is not related to a file
 
-2014-09-28 ajwillia.ms (Andy Williams)
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* syntax: Only display errors for current file
 
-	* Add the ability to create a new project from our welcome screen
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* syntax: reset status and hints when we reset token
 
-2014-07-29 ajwillia.ms (Andy Williams)
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* clang: fix paths used in syntax lookup
 
-	* Add a welcome screen to choose recently opened projects
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* syntax: don't slow down by repeating tokens
 
-2014-06-07 ajwillia.ms (Andy Williams)
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* search: Fix issue when text is at end of line
 
-	* Add line numbers to the text editpr
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* clang: remove debugging
 
-2014-05-15 ajwillia.ms (Andy Williams)
+2015-04-12 Andy Williams <andy@andywilliams.me>
+	* Fix crash where clang encounters too many errors
 
-	* Add basic undo support
+2015-04-07 Andy Williams <andy@andywilliams.me>
+	* elm_code: Correctly delete tabs when mid-tab
 
-2014-04-27 ajwillia.ms (Andy Williams)
+2015-04-07 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix position calculations at line end
 
-	* Add simple build functions
-	* Create an edi_build binary for command line building
-	* Added simple search and goto line functions
+2015-04-04 Andy Williams <andy@andywilliams.me>
+	* elm_code: bring widget_text into widget object
 
-2014-03-31 ajwillia.ms (Andy Williams)
+2015-04-04 Andy Williams <andy@andywilliams.me>
+	* elm_code: refactor widget to seperate space.
 
-	* Complete the features of the Basic text editor
+2015-04-04 Andy Williams <andy@andywilliams.me>
+	* editor: Add a tooltip popup if you hover over a line with a warning attached
+
+2015-04-02 Andy Williams <andy@andywilliams.me>
+	* editor: Fix performance of loading large files
+
+2015-04-02 Andy Williams <andy@andywilliams.me>
+	* editor: Fix performance of adding deleting lines
+
+2015-03-30 Andy Williams <andy@andywilliams.me>
+	* Summarise the changes that elm_code editor brings
+
+2015-03-30 Andy Williams <andy@andywilliams.me>
+	* elm_code editor: Fix bug with newlines
+
+2015-03-30 Andy Williams <andy@andywilliams.me>
+	* elm_code editor: handle tabs when deleting
+
+2015-03-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: fix tests to provide elm_code widget
+
+2015-03-29 Andy Williams <andy@andywilliams.me>
+	* editor: add tabstop configuration
+
+2015-03-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix minor mistakes with tab commit
+
+2015-03-29 Andy Williams <andy@andywilliams.me>
+	* elm_code editor: display cursor over selection
+
+2015-03-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: Support rendering tabs
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: Cut, copy and paste working
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* search: Update replace for elm_code selection code
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: Support selection deletion
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* settings: Allow configuration of line width marker
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* clang: tidy clang disposal and remove notes
+
+2015-03-28 Andy Williams <andy@andywilliams.me>
+	* tidy includes
+
+2015-03-27 Andy Williams <andy@andywilliams.me>
+	* highlighting: clear errors that no longer apply
+
+2015-03-27 Andy Williams <andy@andywilliams.me>
+	* clang: save errors and display if clicked
+
+2015-03-27 Andy Williams <andy@andywilliams.me>
+	* Note that a fix is now temporary
+
+2015-03-27 Andy Williams <andy@andywilliams.me>
+	* elm_code file: test windows with new eina fixes
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* fix wrong types / names
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: complete multiline text get
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: support two line selection
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: test and implement single line
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* settings: Fix compile error due to wrong type name
+
+2015-03-25 Andy Williams <andy@andywilliams.me>
+	* elm_code: Remove accidental dep on efl-git
+
+2015-03-23 Andy Williams <andy@andywilliams.me>
+	* editor: Delay goto until we've loaded the ui
+
+2015-03-22 Andy Williams <andy@andywilliams.me>
+	* elm_code: add text search functions.
+
+2015-03-22 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: move cursor to selection
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* editor: fix goto line
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* testpanel: fix crash for short log lines
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* elm_code widget: fire user change events
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* editor: save using elm_code's new save method
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* elm_code file: add save method to write out lines
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* elm_code file: get line ending chars
+
+2015-03-21 Andy Williams <andy@andywilliams.me>
+	* editor: display the line endings for the file
+
+2015-03-18 Andy Williams <andy@andywilliams.me>
+	* elm_code selection: Input selecttion from mouse
+
+2015-03-18 Andy Williams <andy@andywilliams.me>
+	* elm_code whitespace: only display actual newlines
+
+2015-03-17 Andy Williams <andy@andywilliams.me>
+	* elm_code: selection highlighting
+
+2015-03-15 Andy Williams <andy@andywilliams.me>
+	* elm_code file: detect line endings
+
+2015-03-15 Andy Williams <andy@andywilliams.me>
+	* Fix issue referencing missing file
+
+2015-03-15 Andy Williams <andy@andywilliams.me>
+	* Update news for 0.0.2
+
+2015-03-15 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into devs/ajwillia-ms/elm_code
+
+2015-03-14 Andy Williams <andy@andywilliams.me>
+	* elm_code unicode: highlight tokens correctly
+
+2015-03-14 Andy Williams <andy@andywilliams.me>
+	* settings: configure the display of whitespace
+
+2015-03-12 Andy Williams <andy@andywilliams.me>
+	* welcome: Fix launch crash issue on some systems
+
+2015-03-15 Andy Williams <andy@andywilliams.me>
+	* editor: fix issue with closed tabs
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* config: Update editor when font size changes
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into devs/ajwillia-ms/elm_code
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* config: add settings screen
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* gui: break toolbar in 2 so we can right align.
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code editor: fix crash backspacing last line
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code edit: split content on newline.
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code widget: backspace or delete merges lines
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code line: move freeing to the line file
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code line: unsigned int for length
+
+2015-03-08 Andy Williams <andy@andywilliams.me>
+	* elm_code edit: support backspace and delete.
+
+2015-03-07 Andy Williams <andy@andywilliams.me>
+	* elm_code unicode: update when editing
+
+2015-03-07 Andy Williams <andy@andywilliams.me>
+	* Add initial unicode support for elm_code
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* elm_code editor: adjust tokens when we insert text
+
+2015-02-27 Andy Williams <andy@andywilliams.me>
+	* elm_code demo: Show multiple widgets for one code.
+
+2015-02-27 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into devs/ajwillia-ms/elm_code
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* editor: update to latest elm_code and show whitespace
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* elm_code widget: add show_whitespace option
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: support line insertion
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: require an elm_code for each widget
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* elm_code tests: fix test path
+
+2015-02-27 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix finalized check macro
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* rework configure.ac, remove attribute and quicklaunch  tests are they are not used.
+
+2015-02-28 Andy Williams <andy@andywilliams.me>
+	* create: Pick up username in Windows.
+
+2015-02-27 Andy Williams <andy@andywilliams.me>
+	* filesystem: Use standardised icon names
+
+2015-02-26 Andy Williams <andy@andywilliams.me>
+	* elm_code edit: Support insert of any single char.
+
+2015-02-26 Andy Williams <andy@andywilliams.me>
+	* elm_code parse: Add standard parsers starting with diff.
+
+2015-02-26 Andy Williams <andy@andywilliams.me>
+	* merge changes from master
+
+2015-02-26 Andy Williams <andy@andywilliams.me>
+	* elm_code: Move parser callbacks to private.
+
+2015-02-25 Andy Williams <andy@andywilliams.me>
+	* console: Fix possible crash if errors occur before make starts
+
+2015-02-24 Andy Williams <andy@andywilliams.me>
+	* syntax: Actually use the elm_code parser api.
+
+2015-02-24 Andy Williams <andy@andywilliams.me>
+	* elm_code: Add missing status icons from new states
+
+2015-02-23 Andy Williams <andy@andywilliams.me>
+	* create: Merge in welcome crash fixes from master
+
+2015-02-23 Andy Williams <andy@andywilliams.me>
+	* elm_code: display a line-width marker if requested
+
+2015-02-22 Andy Williams <andy@andywilliams.me>
+	* Merge branch master
+
+2015-02-22 Andy Williams <andy@andywilliams.me>
+	* elm_code: Support text insertion for simple edits.
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* syntax: Add line highlighting for clang errors
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* syntax: Remove unneeded timers and threads.
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* elm_code: Support multi-line tokens
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* syntax: Update clang to output elm_code tokens
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* Back on to next release features
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* elm_code: Ignore eolian generated files
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* let's re-release 0.0.1
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* filesystem: don't refresh on every change
+
+2015-02-21 Andy Williams <andy@andywilliams.me>
+	* console: Fix where clicking an error does nothing
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* Update to 0.0.2 for builds now
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* eo: remove generated files from git
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* about: Show version in about window
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* Adding news about the 0.0.1 status
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* elm_code: Update FIXME to be realisic - the textgrid size_set does not append
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* filesystem: Update our listing if files are added or removed @fix T1857.
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* elm_code: get / set the cursor position
+
+2015-02-19 Andy Williams <andy@andywilliams.me>
+	* elm_code: Actually use it as our main editor window!
+
+2015-02-17 Andy Williams <andy@andywilliams.me>
+	* Add a temporary fix for some scroll/append/refresh issue with layout
+
+2015-02-15 Andy Williams <andy@andywilliams.me>
+	* create: Replace user lookup with a more efficient implementation
+
+2015-02-15 Andy Williams <andy@andywilliams.me>
+	* Fix a crash if andy env is not present
+
+2015-02-22 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fill the widget and gutter to the end
+
+2015-02-22 Andy Williams <andy@andywilliams.me>
+	* elm_code: don't run resize code more than needed
+
+2015-02-22 Andy Williams <andy@andywilliams.me>
+	* files: Use correct icon for mime/editor type
+
+2015-02-15 Andy Williams <andy@andywilliams.me>
+	* welcome: Fix issue where project browsing is cancelled.
+
+2015-02-15 Andy Williams <andy@andywilliams.me>
+	* An update to get closer to make check passing for windows.
+
+2015-02-15 Andy Williams <andy@andywilliams.me>
+	* Fix some warnings when compiled without clang.
+
+2015-02-14 Andy Williams <andy@andywilliams.me>
+	* editor: Let's reduce calls to saving files or resetting highlights.
+
+2015-02-14 Andy Williams <andy@andywilliams.me>
+	* Update many missed changes of note
+
+2015-02-14 Andy Williams <andy@andywilliams.me>
+	* elm_code: Tidying our callbacks and line manipulation.
+
+2015-02-14 Andy Williams <andy@andywilliams.me>
+	* elm_code: focus: block focus leaving text area when editable.
+
+2015-02-11 Andy Williams <andy@andywilliams.me>
+	* editor: delay autosave to 5 secs but save on unfocus too
+
+2015-02-11 Andy Williams <andy@andywilliams.me>
+	* Improving focus control a little
+
+2015-02-11 Andy Williams <andy@andywilliams.me>
+	* Fixing some warnings on Windows.
+
+2015-02-11 Andy Williams <andy@andywilliams.me>
+	* Use public types as far as possible
+
+2015-02-10 Andy Williams <andy@andywilliams.me>
+	* elm_code: Update demo to split various functions. Adding more pages as use cases emerge
+
+2015-02-10 Andy Williams <andy@andywilliams.me>
+	* elm_code: Tidy up some unused code and fix up some focus management
+
+2015-02-09 Andy Williams <andy@andywilliams.me>
+	* about: Fix window to be a dialog and layout a little to fit the dialog theme
+
+2015-02-08 Andy Williams <andy@andywilliams.me>
+	* editor: Control the auto-save function locally so we can re-sync with clang.
+
+2015-02-08 Andy Williams <andy@andywilliams.me>
+	* about: add a donate button too
+
+2015-02-08 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Mainview: prior/next tabbing wrap
+
+2015-02-08 Andy Williams <andy@andywilliams.me>
+	* Fix a few warnings and possible build issues
+
+2015-02-08 Andy Williams <andy@andywilliams.me>
+	* help: Add an about EDI screen.
+
+2015-02-07 Andy Williams <andy@andywilliams.me>
+	* Let's ignore make's dirstamp files
+
+2015-02-07 Andy Williams <andy@andywilliams.me>
+	* config: Fix indentation, pluralisation and tests for remember-mime work
+
+2015-02-07 Andy Williams <andy@andywilliams.me>
+	* Merge remote-tracking branch 'github/master'
+
+2015-02-07 Andy Williams <andy@andywilliams.me>
+	* Finally fix make distcheck - clean up Makefiles properly
+
+2015-02-07 Andy Williams <andy@andywilliams.me>
+	* skeleton: Distribute the skeleton files as tarballs.
+
+2015-02-07 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Config: remember file types
+
+2015-02-06 Andy Williams <andy@andywilliams.me>
+	* Fix issues with distcheck.
+
+2015-02-06 Andy Williams <andy@andywilliams.me>
+	* Split code editor type from text, don't try to highlight text.
+
+2015-02-05 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Content Provider: add new types
+
+2015-02-05 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Build: add cmake builder
+
+2015-02-03 Andy Williams <andy@andywilliams.me>
+	* Provide project creation through the edi_build command line app
+
+2015-02-03 Andy Williams <andy@andywilliams.me>
+	* elm_code: Bring in line numbers and a left gutter
+
+2015-02-03 Andy Williams <andy@andywilliams.me>
+	* Fix the tests to work with widget improvements
+
+2015-02-02 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Welcome: modify welcome popup
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* Correctly lookup icon paths - @fix T2044.
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* Merge in a new skeleton implentation.
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* Use FDO icons for the toolbar.
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* Update TODO with latest work
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* Wait until the filtering is done to put everything in git
+
+2015-02-02 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Welcome: conform to naming conventions
+
+2015-02-02 Andy Williams <andy@andywilliams.me>
+	* A working skeleton processor built into EDI, no scripts needed
+
+2015-02-02 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Merge branch 'hy_mixup'
+
+2015-02-02 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Comment fix
+
+2015-02-02 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Merge branch 'remove_project_button'
+
+2015-02-01 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Merge branch 'open_file_new_win'
+
+2015-02-01 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Merge branch 'horizontal_scroll'
+
+2015-02-01 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Edi_welcome.c: Ability to delete project
+
+2015-02-01 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Edi_editor.c: Fix segfault
+
+2015-01-31 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Fix horizontal scroll highlighting
+
+2015-01-31 Andy Williams <andy@andywilliams.me>
+	* Expand skeleton.tar.gz and substitute replaceable text with variables.
+
+2015-01-30 Andrew Williams <andy@andywilliams.me>
+	* Merge pull request #1 from wilsonk/mainview_focus
+
+2015-01-30 Kelly Wilson <wilsonk@cpsc.ucalgary.ca>
+	* Fix things so that opening a new file also grabs the focus. Add to AUTHORS file also.
+
+2015-01-30 Andy Williams <andy@andywilliams.me>
+	* Cleaner test output, add click on test failures.
+
+2015-01-29 Andy Williams <andy@andywilliams.me>
+	* Merging in line numbers feature.
+
+2015-01-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: Update style and alignment of gutter
+
+2015-01-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: And complete the line number render first case.
+
+2015-01-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: Merge n scrolling work from branch 'elm_code'
+
+2015-01-29 Andy Williams <andy@andywilliams.me>
+	* elm_code: initial work on line numbers
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* Replace consolepanel with elm_code.
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: Fix click calculations.
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* Add proper gravity control when lines are being added to the widget.
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: update scroller so content fills space.
+
+2015-01-28 Andy Williams <andy@andywilliams.me>
+	* elm_code: When appending lines ignore widget size now we're scrolling
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* windows support: remove the last fork
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Fix crash when creating a new file
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* elm_code: Update resizing to reflect only the space that's required
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Allow up/down/left/right to participate in focus control.
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Add TODO note to list
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Update TODO with recent changes
+
+2015-01-27 Stephen Houston <smhouston88@gmail.com>
+	* Elm_Code: Keep up with min size so scroller works properly.
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* And document the wiget API
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Bind up/down/left/right to cursor control.
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Merge in key_down fixes from branch 'devs/ajwillia-ms/elm_code'
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Refactor eo widget2 to widget - update in edi too
+
+2015-01-26 Stephen Houston <smhouston88@gmail.com>
+	* Elm_Code: For box to get key down, it needs to have a child receiving key down.
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Port everything to use new widget API. Remove old widget API
+
+2015-01-25 Andy Williams <andy@andywilliams.me>
+	* Manipulate the position of the cursor.
+
+2015-01-25 Andy Williams <andy@andywilliams.me>
+	* elm_code: Add focus support for the elm_code widget.
+
+2015-01-24 Andy Williams <andy@andywilliams.me>
+	* Complete port of elm_code widget to eo as widget2
+
+2015-01-24 Andy Williams <andy@andywilliams.me>
+	* Fix eo and regen to generate the right code based on okra's changes.
+
+2015-01-23 Stephen Houston <smhouston88@gmail.com>
+	* Elm_Code_Widget2: Inherit from box instead of layout since a layout is not provided.
+
+2015-01-23 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'master' into elm_code
+
+2015-01-23 Andy Williams <andy@andywilliams.me>
+	* install our test diff for elm_code_test binaries
+
+2015-01-23 Andy Williams <andy@andywilliams.me>
+	* Let's open .eo files too
+
+2015-01-23 Andy Williams <andy@andywilliams.me>
+	* Experimental eo commit - structure in place and it's resizing but won't render
+
+2015-01-18 Andy Williams <andy@andywilliams.me>
+	* Adding replace support to our search bar.
+
+2015-01-17 Andy Williams <andy@andywilliams.me>
+	* Merge in master
+
+2015-01-17 Andy Williams <andy@andywilliams.me>
+	* Don't allow users to open multiple project choosers. Avoiding issues of trying to open a second project in 1 app instance. Submitted by Kelly Wilson
+
+2015-01-17 Andy Williams <andy@andywilliams.me>
+	* Add a click handler for lines in a widget
+
+2015-01-10 Andy Williams <andy@andywilliams.me>
+	* Tidying some more headers to try and get windows builds working
+
+2015-01-10 Andy Williams <andy@andywilliams.me>
+	* More updates to correct API/export declarations for Windows.
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Allow up/down/left/right to participate in focus control.
+
+2015-01-27 Andy Williams <andy@andywilliams.me>
+	* Add TODO note to list
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Update TODO with recent changes
+
+2015-01-26 Andy Williams <andy@andywilliams.me>
+	* Merge in the new elm_code widget.
+
+2015-01-10 Andy Williams <andy@andywilliams.me>
+	* Improving portability again
+
+2015-01-10 Andy Williams <andy@andywilliams.me>
+	* cleaning up fork/wait removal
+
+2015-01-17 Andy Williams <andy@andywilliams.me>
+	* Move project creation to our Edi library.
+
+2015-01-17 Andy Williams <andy@andywilliams.me>
+	* Update year in skeleton user files
+
+2015-01-15 Andy Williams <andy@andywilliams.me>
+	* Don't try to open recent projects if they can't be found.
+
+2015-01-15 Andy Williams <andy@andywilliams.me>
+	* Avoid a crash when right clicking empty space on file list.
+
+2015-01-15 Andy Williams <andy@andywilliams.me>
+	* Fix a crash on building a brand new project.
+
+2015-01-14 Andy Williams <andy@andywilliams.me>
+	* Better escape sed commands so URLs can include some rather special characters
+
+2015-01-04 Andy Williams <andy@andywilliams.me>
+	* To be more portable let's use built in cross_compiling definitions...
+
+2015-01-04 Andy Williams <andy@andywilliams.me>
+	* Tidying up intl a little
+
+2015-01-04 Andy Williams <andy@andywilliams.me>
+	* Disable NLS by default when cross compiling, remove broken need for libintl
+
+2015-01-04 Andy Williams <andy@andywilliams.me>
+	* Elm_Code now compiling on Windows, thanks to Vincent Torri for the patch. Next to tackle some non-standard EDI code to complete the compilation
+
+2014-12-24 Andy Williams <andy@andywilliams.me>
+	* Update various headers to use Elm_Code to load all our public headers and fix a few build glitches
+
+2014-12-24 Andy Williams <andy@andywilliams.me>
+	* Remove circular include of the elm_code_file.h header
+
+2014-12-21 Andy Williams <andy@andywilliams.me>
+	* Fix logging so the bin is not trying to access the private lib domain - fixes build issues
+
+2014-12-16 Andy Williams <andy@andywilliams.me>
+	* correctly created nulled data for our lists which need to be NULL by default. Fixes T1928
+
+2014-12-08 Andy Williams <andy@andywilliams.me>
+	* Fix indentation of code
+
+2014-12-08 Andy Williams <andy@andywilliams.me>
+	* Make incremental highlighting refresh a line at a time to reduce flicker on redraw
+
+2014-12-06 Andy Williams <andy@andywilliams.me>
+	* Improvement to incremental highlighting - its not fast but it will not get slower. Next the refresh window needs to reduce and any edits should adjust the tokens we have loaded
+
+2014-12-06 Andy Williams <andy@andywilliams.me>
+	* Improvement to incremental highlighting - its not fast but it will not get slower. Next the refresh window needs to reduce and any edits should adjust the tokens we have loaded
+
+2014-12-05 Andy Williams <andy@andywilliams.me>
+	* Fix up headers and tests to remove the exposure of some private methods. Add some documentation whilst we're there too
+
+2014-12-05 Andy Williams <andy@andywilliams.me>
+	* Add a cursor to the view. Create a backing data structure to start tracking more useful widget information
+
+2014-12-04 Andy Williams <andy@andywilliams.me>
+	* Update the highlight code to refresh only what's on screen. This is a temporary solution - saving CPUs mostly until elm_code is ready
+
+2014-12-03 Andy Williams <andy@andywilliams.me>
+	* Extend config and use it to store window size and panel states.
+
+2014-12-01 Andy Williams <andy@andywilliams.me>
+	* Add a config system for remembering settings etc . Add a recent projects list to our welcome page which remembers what we open
+
+2014-12-01 Andy Williams <andy@andywilliams.me>
+	* Fix a crash bby removing some dead code. Parsing will move to elm_code in the long term anyway
+
+2014-11-30 Andy Williams <andy@andywilliams.me>
+	* Fix crash when highlighting multiple files in the background
+
+2014-11-30 Andy Williams <andy@andywilliams.me>
+	* Update syntax highlighting to run in the background. Hook the highlight runner into ctrl-s so you can get it to re-parse appropriately (this will be slicker with elm_code)
+
+2014-11-30 Andy Williams <andy@andywilliams.me>
+	* Smoothen panel animations to work from current space if closing
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix bug with undo not operating on current tab - fixes issue T1853.
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix crash when ctrl-pgdn beyond first file
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Adding keyboard support for search box and improve focus control - resolves T1851.
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Use an Elm_Transit to animate showing and hiding of panels. They still need to remember where users want them to expand to - requires storage setup
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix make check after refactoring of content_provider
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix issue where first tap on bottom toolbar would not open the correct tab
+
+2014-11-29 Andy Williams <andy@andywilliams.me>
+	* Fix issue where first tap on bottom toolbar would not open the correct tab
+
+2014-11-28 Andy Williams <andy@andywilliams.me>
+	* Merging in refactoring of elm_code file lookups and edi mime lookups. Elm_Code file no longer required for elm_code to function (in memory is created automatically).
+
+2014-11-28 Andy Williams <andy@andywilliams.me>
+	* Refactor mime type lookup and UI creation code to use a content_provider registry.
+
+2014-11-28 Andy Williams <andy@andywilliams.me>
+	* Use an in-memory file for new elm_codes by default. This is overridden as before by calling elm_code_file_open which will free the previously set file on that elm_code instance
+
+2014-11-25 Andy Williams <andy@andywilliams.me>
+	* Fix the director parsing of build output. It seems that different quotes are used so let's stop at the space and assume a sing quote of some sort follows
+
+2014-11-25 Andy Williams <andy@andywilliams.me>
+	* Heading to a working windows build. Copy fixes into Skeleton file too so that it creates libraries that work in the same way
+
+2014-11-25 Sanjeev BA <as2902.b@samsung.com>
+	* Fix the pattern to be matched for setting current_dir. Resolves edi crash on build errors.
+
+2014-11-23 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'devs/ajwillia-ms/elm_code'
+
+2014-11-23 Andy Williams <andy@andywilliams.me>
+	* Render all filename headers in a diff widget
+
+2014-11-23 Andy Williams <andy@andywilliams.me>
+	* Open diffs in a new window if requested
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Let's use a consistant font size
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Fix warning
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'devs/ajwillia-ms/elm_code'
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Add a simple diff widget based on an incoming diff file.
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Add an option to change the font size of our widget
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Small layout tweak to panels. Bar controlling bottom panels should be same width as the panels
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Merge master
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Merge branch 'devs/ajwillia-ms/elm_code'
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Fix a test missed in move to mem-mapping
+
+2014-11-22 Andy Williams <andy@andywilliams.me>
+	* Lay out the UI better so you can use with panels open
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Moving the issues to phab
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Moving the issues to phab
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Fix a test missed in move to mem-mapping
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Fix minor issues I saw in passing
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Fix a memory corruption issue on some systems
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Actually use the eina_file memory mapping
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Fix minor issues I saw in passing
+
+2014-11-19 Andy Williams <andy@andywilliams.me>
+	* Fix a memory corruption issue on some systems
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Fix render test and an end of line corner case
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Fix render test and an end of line corner case
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Merge branch devs/ajwillia-ms/elm_code
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Add some text mode icons to markup the lines for now
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Fix potential crash when going to the line of a large file.
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Improve displaying of test panel when running test
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Fix potential crash when going to the line of a large file.
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Add tests PASSED and FAILED to elm_code statuses and the widget rendering.
+
+2014-11-18 Andy Williams <andy@andywilliams.me>
+	* Fix crash when appending a line off and the body is already larger than the viewport
+
+2014-11-16 Andy Williams <andy@andywilliams.me>
+	* Add parse hooks for lines and files within elm_code. This required changing the load order so file opens would read the elm_code->parsers setup. This makes for a better setup anyhow
+
+2014-11-13 Andy Williams <andy@andywilliams.me>
+	* Refactor the widget token parsing so we can put it under test. Add simple test that demonstrates tokens split by space.
+
+2014-11-13 Andy Williams <andy@andywilliams.me>
+	* A little more markup to the diff example with character add/rem/change highlighting
+
+2014-11-13 Andy Williams <andy@andywilliams.me>
+	* change the colour of strings - does not seem to apply to all strangely, will dig further into CLANG tokens later
+
+2014-11-13 Andy Williams <andy@andywilliams.me>
+	* Add a simple token system to allow us to render some text styles
+
+2014-11-12 Andy Williams <andy@andywilliams.me>
+	* Fix issue where console error items would not open when tapped
+
+2014-11-12 Andy Williams <andy@andywilliams.me>
+	* Fix issue where console error items would not open when tapped
+
+2014-11-12 Andy Williams <andy@andywilliams.me>
+	* Add a file load callback also - respect that with a widget refresh when called
+
+2014-11-12 Andy Williams <andy@andywilliams.me>
+	* Fix compilation of tests
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Adding simple build check and clean support to the CLI and main toolbar
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Fix the types of Eo Events - addresses lots of compiler warnings
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Fixing some warnings. Not ideal handling of the Eo_Event_Description but it's less warn-tastic
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Add some simple version control status for lines too. Add a simple display of how that could work to elm_code_tesst
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Adding simple build check and clean support to the CLI and main toolbar
+
+2014-11-09 Andy Williams <andy@andywilliams.me>
+	* Take line coloring to the end of the line
+
+2014-11-06 Andy Williams <andy@andywilliams.me>
+	* Passing Eo events from Elm_Code to the Evas_Object when the backend data changes. Track a list of all widgets connected to the Elm_Code so we can signal them all. Add API to change status of a line which will refresh the widget too.
+
+2014-11-05 Andy Williams <andy@andywilliams.me>
+	* Add a simple elm_code_test binary that loads the widget and inserts some demo text
+
+2014-11-05 Andy Williams <andy@andywilliams.me>
+	* Fix a crash when resizing if the file is longer than the viewport
+
+2014-11-05 Andy Williams <andy@andywilliams.me>
+	* Adding some initial concept of status flags for a line and default enum to start working on color pallette in our widget. Load enough colors to provide these statuses and hook into the EDI log panel implementation
+
+2014-11-04 Andy Williams <andy@andywilliams.me>
+	* Add an initial stab at an elm_code widget. It currently does not refresh at any time other than load or resize, so is not respecting content updates, but it's a start. Use it in place of the list of elm_label objects that were rendered in the log panel. Not colour highlighted yet, but one thing at a time.
+
+2014-11-04 Andy Williams <andy@andywilliams.me>
+	* Allow appending of lines to an Elm_Code_File, allow Elm_Code_File objects to be created empty without reading from a filesystem source
+
+2014-10-26 Andy Williams <andy@andywilliams.me>
+	* Add basic structure for elm_code object - namespacing the elm_code_file properly to keep it clean
+
+2014-10-26 Andy Williams <andy@andywilliams.me>
+	* Add some documentation grouping
+
+2014-10-23 Andy Williams <andy@andywilliams.me>
+	* Merging in master
+
+2014-10-23 Andy Williams <andy@andywilliams.me>
+	* Update the syntax highlighting to work after text set - thanks a lot to herdsman for the initial patch
+
+2014-10-22 Andy Williams <andy@andywilliams.me>
+	* fix syntax mistake after changing markup type
+
+2014-10-22 Andy Williams <andy@andywilliams.me>
+	* Warn if the passed parameter is not a valid project location. Currently EDI can only open existing directories or create them - no single file mode
+
+2014-10-22 Andy Williams <andy@andywilliams.me>
+	* Fix building out of tree
+
+2014-10-22 Boris Faure <billiob@gmail.com>
+	* fix some compiler warnings
+
+2014-10-22 Boris Faure <billiob@gmail.com>
+	* use waitpid() instead of wait()
+
+2014-10-21 Andy Williams <andy@andywilliams.me>
+	* Update tests to use the proper api check
+
+2014-10-21 Andy Williams <andy@andywilliams.me>
+	* warning--
+
+2014-10-21 Andy Williams <andy@andywilliams.me>
+	* Use the recommended formatting for colour, avoid font weight right now as it doesn't stack properly
+
+2014-10-21 Andy Williams <andy@andywilliams.me>
+	* Use the recommended formatting for colour, avoid font weight right now as it doesn't stack properly
+
+2014-10-20 Andy Williams <andy@andywilliams.me>
+	* Using the +/- format application to remove bold etc where used. This requires a patch from herdsman to evas to work effectively
+
+2014-10-20 Andy Williams <andy@andywilliams.me>
+	* Using the +/- format application to remove bold etc where used. This requires a patch from herdsman to evas to work effectively
+
+2014-10-19 Andy Williams <andy@andywilliams.me>
+	* Load the content and verify from our test files. Includes an eina_file_map_lines workaround for blank lines
+
+2014-10-19 Andy Williams <andy@andywilliams.me>
+	* Load lines sequentially and insert to a structure for reference
+
+2014-10-17 Andy Williams <andy@andywilliams.me>
+	* updated gitignore
+
+2014-10-17 Andy Williams <andy@andywilliams.me>
+	* Disable a broken test for now - we're focussing on testing elm_code at the moment
+
+2014-10-17 Andy Williams <andy@andywilliams.me>
+	* Disable a broken test for now - we're focussing on testing elm_code at the moment
+
+2014-10-17 Andy Williams <andy@andywilliams.me>
+	* A pretty slim test of file loading and initial path apis
+
+2014-10-17 Andy Williams <andy@andywilliams.me>
+	* Base addition of elm_code area within the edi codebase, including an empty test to verify it's working
+
+2014-10-16 Andy Williams <andy@andywilliams.me>
+	* Trying some slight optimisations for highlighting
+
+2014-10-12 Andy Williams <andy@andywilliams.me>
+	* Tweaking syntax a little to have 1) less vivid comments and 2) the same colour for macro introducing punctuation characters as the macro they introduce
+
+2014-10-12 Andy Williams <andy@andywilliams.me>
+	* Update TODO list in sync with feature completion and wiki changes
+
+2014-10-12 Andy Williams <andy@andywilliams.me>
+	* Fix scrolling to added line in console panel. Scroll to the bottom manually rather than relying on gravity
+
+2014-10-10 Andy Williams <andy@andywilliams.me>
+	* Implement the colouring of code based on the clang parser. Has some issues with performance and failing on large files which need to be looked into.
+
+2014-10-09 Andy Williams <andy@andywilliams.me>
+	* Merge the clang syntax highlight parsing work from edi PROTO. That's the parsing complete but I need to hook it into style the elm_entry widget...
+
+2014-09-28 Andy Williams <andy@andywilliams.me>
+	* Add basic creation of new projects using the skeleton tool
+
+2014-09-13 Andy Williams <andy@andywilliams.me>
+	* Include the skeleton tool in the edi build so we can work on project creation
+
+2014-09-13 Andy Williams <andy@andywilliams.me>
+	* TODO notes
+
+2014-09-13 Andy Williams <andy@andywilliams.me>
+	* Add mime or requested type to text editor status bar. Some refactoring to start splitting out file management from UI
+
+2014-07-19 Andy Williams <andy@andywilliams.me>
+	* Add/remove the serch panel as elm calculations are not working if we just how / hide
+
+2030-07-13 Andy Williams <andy@andywilliams.me>
+	* Fix new window sizing following the layout changes
+
+2030-07-12 Andy Williams <andy@andywilliams.me>
+	* Move search UI into a panel at the top of the editor. Correct search to work across multiple tabs within one Edi instance. Fix various issues around searc.
+
+2030-07-10 Andy Williams <andy@andywilliams.me>
+	* reducing complexity a little
+
+2030-07-10 Andy Williams <andy@andywilliams.me>
+	* Adding a status bar to editors, currently displaying line & col info
+
+2014-06-29 Andy Williams <andy@andywilliams.me>
+	* tweaking readme for GitHub
+
+2014-06-29 Andy Williams <andy@andywilliams.me>
+	* Initial welcome screen, working on adding the create project support
+
+2014-06-28 Andy Williams <andy@andywilliams.me>
+	* Re-add the original readme to make the builds work properly
+
+2014-06-28 Andy Williams <andy@andywilliams.me>
+	* Fix wrong relative path
+
+2014-06-28 Andy Williams <andy@andywilliams.me>
+	* Move to a markdown file for  github readers
+
+2014-06-15 Andy Williams <andy@andywilliams.me>
+	* Update line numbers to be the same length as content to better match the rows.
+
+2014-06-15 Andy Williams <andy@andywilliams.me>
+	* Use the shiny EDI icon I made
+
+2014-06-07 Andy Williams <andy@andywilliams.me>
+	* Correct the lining up of numbers, still a little off for scale=2, not sure why
+
+2014-06-07 Andy Williams <andy@andywilliams.me>
+	* Adding line numbers to the text editor. Not the prettiest approach right now, but we've got a scrolling list of lines that stays aligned with the text scroll
+
+2014-06-07 Andy Williams <andy@andywilliams.me>
+	* scroll to the line not the cursor
+
+2014-05-18 Andy Williams <andy@andywillias.me>
+	* kill warning about ignored return
+
+2014-05-20 Andy Williams <andy@andywilliams.me>
+	* sync TODO with web changes and add a couple of my lower level ones too
+
+2014-05-19 Andy Williams <andy@andywilliams.me>
+	* Scale windows per elm scale configuration
+
+2014-05-19 Andy Williams <andy@andywilliams.me>
+	* Tidying up lots of warnings and fixing issues along the way
+
+2014-05-18 Andy Williams <andy@andywillias.me>
+	* Let's open files that are reported on the console. Adding support to open at a specific line when opening files or switching tabs.
+
+2014-05-15 Andy Williams <andy@andywilliams.me>
+	* Added basic undo support - thanks to ecrire (Tasn) for the undo_redo_do function
+
+2014-05-15 Andy Williams <andy@andywilliams.me>
+	* Begin factoring out the text editor from the mainview code
+
+2014-03-15 Andy Williams <andy@andywillias.me>
+	* Scroll found text onto screen even horizontally. A few other minor search enhancements
+
+2014-03-15 Andy Williams <andy@andywillias.me>
+	* Added goto line feature, hook in ctrl-f for search (find...)
+
+2014-04-30 Andy Williams <andy@andywilliams.me>
+	* Added simple search function based on Ecrire's Find/Replace
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* re-add to match sentinal
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Add some more testing too
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Fix some warnings
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Add icons to the console output that display next to warnings / errors etc
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Fix builds when running from a different directory
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* remember to remember the path
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Added edi_build command line application for headless operation
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Actually use our library for building. Support ./configure and ./autogen.sh. Move some common functions to the library too
+
+2014-04-27 Andy Williams <andy@andywilliams.me>
+	* Simple make function invoked from a build button and displayed in a console tab next to logs
+
+2014-03-31 Andy Williams <andy@andywilliams.me>
+	* Add a new file button to create new files
+
+2014-03-26 Andy Williams <andy@andywilliams.me>
+	* Key bindings. Ctrl-s triggers save, ctrl-prior and ctrl-next cycle through open tabs
+
+2014-03-14 Andy Williams <andy@andywillias.me>
+	* Allow the mime popup to cover the whole window
+
+2014-03-14 Andy Williams <andy@andywillias.me>
+	* Add buttons that extend the area that's tappable to show the panels
+
+2014-03-14 Andy Williams <andy@andywillias.me>
+	* Add icons to the file type picker
+
+2014-03-14 Andy Williams <andy@andywillias.me>
+	* Add a simple content type picker if the mime is not recognised
+
+2014-03-14 Andy Williams <andy@andywillias.me>
+	* Use panel overlays so we can slide in the extra content
+
+2014-03-13 Andy Williams <andy@andywillias.me>
+	* Add the app name to the title of the file windows
+
+2014-03-13 Andy Williams <andy@andywillias.me>
+	* Manage open-in-new-window requests for files or open tabs. When selecting a file that is in a window raise the window rather than selecting the tab
+
+2014-03-13 Andy Williams <andy@andywillias.me>
+	* Use more standard icons
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Make the text editable even on latest elementary
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Track tabs and content together to fix the sync bug.
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Remove the extra callback, we can just make type a required parameter that can be null
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Update TODO for previous work
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Add an open-as menu so we can override the mime type detection
+
+2014-02-26 Andy Williams <andy@andywillias.me>
+	* Add actual log output to the log panel.
+
+2014-02-22 Andy Williams <andy@andywillias.me>
+	* Some docs for interested people
+
+2014-02-22 Andy Williams <andy@andywillias.me>
+	* Add an image preview type as well - why not
+
+2014-02-23 Andy Williams <andy@andywilliams.me>
+	* Fix monospaced text
+
+2014-02-23 Andy Williams <andy@andywilliams.me>
+	* Add a right click menu for xdg-open
+
+2014-02-22 Andy Williams <andy@andywilliams.me>
+	* Make the filepanel expandable
+
+2014-02-19 Andy Williams <andy@andywillias.me>
+	* attempt to look up icons for the file
+
+2014-02-19 Andy Williams <andy@andywillias.me>
+	* Let's only open plain text fils mkay?
+
+2014-02-16 Andy Williams <andy@andywillias.me>
+	* Load a project directory from the command line or by displaying a folder picker
+
+2014-02-16 Andy Williams <andy@andywillias.me>
+	* Add a more useful toolbar of functions. Set a more usable font for editing and make autosave a config option
+
+2014-02-16 Andy Williams <andy@andywillias.me>
+	* whitespace fixes
+
+2014-02-16 Andy Williams <andy@andywillias.me>
+	* If a file is open then re-focus the loaded file. Don't open directories or non-files
+
+2014-02-15 Andy Williams <andy@andywillias.me>
+	* Adding (blind) loading of files as text for editing. Use a naviframe for holding the content and a callback from filepanel through main to open new files
+
+2014-02-15 Andy Williams <andy@andywillias.me>
+	* Order files by name in the tree
+
+2014-02-15 Andy Williams <andy@andywillias.me>
+	* Using Eina_File instead of Eio makes the tree much easier
+
+2014-02-14 Andy Williams <andy@andywilliams.me>
+	* Loading the panel from the filesystem. organise out a little and commit where i've got to
+
+2014-02-12 Andy Williams <andy@andywilliams.me>
+	* Correct the toolbar issue
+
+2014-02-12 Andy Williams <andy@andywilliams.me>
+	* Add a description
+
+2014-02-12 Andy Williams <andy@andywilliams.me>
+	* Add some layout and dummy content
+
+2014-02-12 Andy Williams <andy@andywilliams.me>
+	* Update some copyright bugs from script
+
+2014-02-12 Andy Williams <andy@andywilliams.me>
+	* Output of eflprj with a couple of tweaks - and EDI is born
+
