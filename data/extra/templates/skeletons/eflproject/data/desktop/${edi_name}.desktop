@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=@VERSION@
+Type=Application
+Name=@PACKAGE_NAME@
+Name[fr]=@PACKAGE_NAME@
+GenericName=${Edi_Name}
+Comment=Efl Application ${Edi_Name}
+Icon=@PACKAGE_NAME@
+TryExec=@PACKAGE_NAME@
+Exec=@PACKAGE_NAME@
+Categories=Development;Utility;
