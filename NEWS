@@ -14,6 +14,7 @@ Features:
   * Improved mime type handling.
   * Complete widget configuration in settings.
   * API additions and improvements.
+  * Move all examples to meson.
 
 Bug fixes:
 

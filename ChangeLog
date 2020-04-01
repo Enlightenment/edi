@@ -1,3 +1,6 @@
+2020-04-01 Alastair Poole <netstar@gmail.com>
+	* skeletons: move from autotools to meson.
+
 2020-03-21 Alastair Poole <netstar@gmail.com>
 	* theme: Solarized Fix w/libclang syntax.
 
