@@ -514,8 +514,8 @@ _edi_project_config_load()
 
    /* setup defaults */
    IFPCFG(0x0001);
-   _edi_project_config->gui.width = 640;
-   _edi_project_config->gui.height = 480;
+   _edi_project_config->gui.width = 800;
+   _edi_project_config->gui.height = 600;
    _edi_project_config->gui.leftsize = 0.25;
    _edi_project_config->gui.leftopen = EINA_TRUE;
    _edi_project_config->gui.bottomsize = 0.2;
@@ -523,18 +523,18 @@ _edi_project_config_load()
    _edi_project_config->gui.bottomtab = 0;
 
    _edi_project_config->gui.width_marker = 80;
-   _edi_project_config->gui.show_width_marker = EINA_TRUE;
+   _edi_project_config->gui.show_width_marker = EINA_FALSE;
    _edi_project_config->gui.show_line_numbers = EINA_TRUE;
    _edi_project_config->gui.tabstop = 8;
    _edi_project_config->gui.internal_icons = EINA_TRUE;
    _edi_project_config->gui.toolbar_hidden = EINA_FALSE;
    _edi_project_config->gui.toolbar_horizontal = EINA_TRUE;
-   _edi_project_config->gui.toolbar_text_visible = EINA_TRUE;
+   _edi_project_config->gui.toolbar_text_visible = EINA_FALSE;
    IFPCFGEND;
 
    IFPCFG(0x0002);
    _edi_project_config->font.name = eina_stringshare_add("Mono");
-   _edi_project_config->font.size = 12;
+   _edi_project_config->font.size = 11;
    IFPCFGEND;
 
    IFPCFG(0x0003);
