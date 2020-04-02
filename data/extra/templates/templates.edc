@@ -7,7 +7,7 @@ collections {
             item: "title" "C EFL Project";
             item: "path"  "eflproject";
             item: "description"
-                  "Begin your C programming EFL project. All content is freely modifiable and distributable and licensed in the public-domain.<br><br>Happy hacking!";
+                  "Begin your C programming EFL project. All content is freely modifiable and distributable and licensed in the public-domain.";
         }
 
         parts {

@@ -4,10 +4,10 @@ collections {
         max: 128 128;
 
         data {
-            item: "title" "C EFL Beta Hello World";
+            item: "title" "C EFL Hello World";
             item: "path" "tutorial/c/hello-gui/";
             item: "description"
-                  "Hello World using the EFL Beta APIs";
+                  "Hello World using the EFL unified APIs";
         }
 
         parts {
@@ -26,10 +26,10 @@ collections {
         max: 128 128;
 
         data {
-            item: "title" "C EFL Beta Game of Life";
+            item: "title" "C EFL Game of Life";
             item: "path" "apps/c/life/";
             item: "description"
-                  "Game of Life using the EFL Beta APIs";
+                  "Game of Life using the EFL unified APIs.";
         }
 
         parts {
@@ -48,10 +48,10 @@ collections {
         max: 128 128;
 
         data {
-            item: "title" "C EFL Beta Basic Text Editor";
+            item: "title" "C EFL Basic Text Editor";
             item: "path" "apps/c/texteditor/";
             item: "description"
-                  "A basic text editor app using the EFL Beta APIs";
+                  "A basic text editor app using the EFL unified APIs.";
         }
 
         parts {
