@@ -1780,8 +1780,6 @@ edi_open(const char *inputpath)
 
    _edi_main_win = win;
    elm_win_focus_highlight_enabled_set(win, EINA_TRUE);
-   elm_win_focus_highlight_animate_set(win, EINA_TRUE);
-   elm_config_focus_move_policy_set(ELM_FOCUS_MOVE_POLICY_IN);
    evas_object_smart_callback_add(win, "delete,request", _edi_exit, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_RESIZE, _edi_resize_cb, NULL);
    evas_object_smart_callback_add(win, "focused", _edi_focused_cb, NULL);
