@@ -1264,6 +1264,13 @@ _edi_menu_scm_push_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
 }
 
 static void
+_edi_menu_documentation_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
+                     void *event_info EINA_UNUSED)
+{
+   edi_open_url("https://www.enlightenment.org/docs/start#EFL_Documentation");
+}
+
+static void
 _edi_menu_website_cb(void *data EINA_UNUSED, Evas_Object *obj EINA_UNUSED,
                      void *event_info EINA_UNUSED)
 {
@@ -1350,6 +1357,8 @@ _edi_menu_setup(Evas_Object *win)
      }
 
    menu_it = elm_menu_item_add(menu, NULL, NULL, _("Help"), NULL, NULL);
+   elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-home"), _("Documentation"), _edi_menu_documentation_cb, NULL);
+   elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("go-home"), _("Visit Website"), _edi_menu_website_cb, NULL);
    elm_menu_item_separator_add(menu, menu_it);
    elm_menu_item_add(menu, menu_it, edi_theme_icon_path_get("help-about"), _("About"), _edi_menu_about_cb, NULL);
