@@ -598,17 +598,30 @@ _tab_move_begin_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED
 {
    Evas_Event_Mouse_Down *ev;
    Evas_Object *btn;
-   Edi_Mainview_Item_Tab *tab = data;
+   Edi_Mainview_Item_Tab *tab;
+   Evas_Coord w, h;
+
+   tab = data;
 
    if (!tab || _tab_move_src_path) return;
 
    ev = event_info;
 
-   tab->button_drag = btn = elm_button_add(edi_main_win_get());
+   /* Duplicate our tab visually in a box we can drag. */
+   evas_object_geometry_get(obj, NULL, NULL, &w, &h);
+
+   tab->button_drag = elm_box_add(edi_main_win_get());
+   btn = elm_button_add(tab->button_drag);
+   elm_box_pack_end(tab->button_drag, btn);
+   elm_layout_theme_set(btn, "multibuttonentry", "btn", "default");
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_text_set(btn, ecore_file_file_get(tab->path));
-   evas_object_move(btn, ev->canvas.x, ev->canvas.y);
+   elm_object_part_text_set(btn, "elm.btn.text", elm_object_part_text_get(obj, "elm.btn.text"));
+   evas_object_show(btn);
+
+   evas_object_move(tab->button_drag, ev->output.x, ev->output.y);
+   evas_object_resize(tab->button_drag, w, h);
+
    _tab_move_src_path = strdup(tab->path);
 
    evas_object_event_callback_add(tab->toolbar, EVAS_CALLBACK_MOUSE_MOVE, _tab_move_display_cb, tab);
