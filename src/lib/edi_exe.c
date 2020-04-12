@@ -23,6 +23,7 @@ _edi_exe_notify_client_data_cb(void *data, int type EINA_UNUSED, void *event EIN
 {
    int *status;
    Edi_Exe_Args *args;
+   Ecore_Con_Server *srv;
    Ecore_Con_Event_Client_Data *ev = event;
 
    status = ev->data;
@@ -35,6 +36,9 @@ _edi_exe_notify_client_data_cb(void *data, int type EINA_UNUSED, void *event EIN
    ecore_con_client_send(ev->client, status, sizeof(int));
 
    free(args);
+
+   srv = ecore_con_client_server_get(ev->client);
+   ecore_con_server_del(srv);
 
    return ECORE_CALLBACK_DONE;
 }
@@ -61,25 +65,9 @@ static Eina_Bool
 _edi_exe_notify_server_data_cb(void *data, int type EINA_UNUSED, void *event EINA_UNUSED)
 {
    Edi_Exe_Args *args;
-   char *path;
-   Ecore_Con_Event_Server_Data *ev = event;
-
-   path = ecore_con_local_path_new(ECORE_CON_LOCAL_USER, ecore_con_server_name_get(ev->server), 0);
 
    args = data;
-
    ecore_event_handler_del(args->handler);
-   ecore_con_server_del(ev->server);
-
-   // FIXME: workaround.
-   if (path)
-     {
-        if (ecore_file_exists(path))
-          unlink(path);
-
-        free(path);
-     }
-
    free(args);
 
    return ECORE_CALLBACK_DONE;
