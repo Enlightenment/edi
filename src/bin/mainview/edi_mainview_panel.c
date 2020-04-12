@@ -617,6 +617,7 @@ _tab_move_begin_cb(void *data, Evas *e EINA_UNUSED, Evas_Object *obj EINA_UNUSED
    evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_part_text_set(btn, "elm.btn.text", elm_object_part_text_get(obj, "elm.btn.text"));
+   elm_object_focus_set(btn, EINA_TRUE);
    evas_object_show(btn);
 
    evas_object_move(tab->button_drag, ev->output.x, ev->output.y);
