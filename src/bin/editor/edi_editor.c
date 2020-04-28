@@ -911,6 +911,10 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           {
              edi_mainview_goto_popup_show();
           }
+        else if (!strcmp(ev->key, "Del"))
+          {
+             edi_mainview_cut();
+          }
         else if (!strcmp(ev->key, "Home"))
           {
              edi_mainview_goto_start();

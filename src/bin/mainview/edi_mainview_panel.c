@@ -970,7 +970,6 @@ edi_mainview_panel_goto_position(Edi_Mainview_Panel *panel, unsigned int row, un
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
-
 void
 edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
 {
@@ -990,13 +989,13 @@ edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
    code = elm_code_widget_code_get(editor->entry);
    if (!code) return;
 
+   tabstop = elm_code_widget_tabstop_get(editor->entry);
+
    row = elm_code_file_lines_get(code->file);
    if (row <= 0) return;
 
    line = elm_code_file_line_get(code->file, row);
-   if (!line) return;
-
-   tabstop = elm_code_widget_tabstop_get(editor->entry);
+   if (!line || !line->content) return;
 
    for (ch = line->content; *ch; ch++)
      {
