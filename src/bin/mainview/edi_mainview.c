@@ -411,6 +411,22 @@ edi_mainview_goto(unsigned int number)
 }
 
 void
+edi_mainview_goto_start(void)
+{
+   if (edi_mainview_is_empty()) return;
+
+   edi_mainview_panel_goto_start(_current_panel);
+}
+
+void
+edi_mainview_goto_end(void)
+{
+   if (edi_mainview_is_empty()) return;
+
+   edi_mainview_panel_goto_end(_current_panel);
+}
+
+void
 edi_mainview_goto_position(unsigned int row, unsigned int col)
 {
    if (edi_mainview_is_empty()) return;

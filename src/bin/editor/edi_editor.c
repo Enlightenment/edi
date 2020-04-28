@@ -911,6 +911,14 @@ _smart_cb_key_down(void *data EINA_UNUSED, Evas *e EINA_UNUSED,
           {
              edi_mainview_goto_popup_show();
           }
+        else if (!strcmp(ev->key, "Home"))
+          {
+             edi_mainview_goto_start();
+          }
+        else if (!strcmp(ev->key, "End"))
+          {
+             edi_mainview_goto_end();
+          }
         else if (edi_language_provider_has(editor) && !strcmp(ev->key, "space"))
           {
              _suggest_list_load(editor);

@@ -320,6 +320,24 @@ void edi_mainview_panel_goto_popup_show();
 unsigned int edi_mainview_panel_item_count(Edi_Mainview_Panel *panel);
 
 /**
+ * Go to the beginning of the file in the panel's editor view.
+ *
+ * @param panel the mainview panel context
+ *
+ * @ingroup Content
+ */
+void edi_mainview_panel_goto_start(Edi_Mainview_Panel *panel);
+
+/**
+ * Go to the end of the file in the panel's editor view.
+ *
+ * @param panel the mainview panel context
+ *
+ * @ingroup Content
+ */
+void edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel);
+
+/**
  * @}
  *
  */

@@ -222,6 +222,20 @@ void edi_mainview_search();
 void edi_mainview_goto(unsigned int line);
 
 /**
+ * Go to the beginning of the file in the current view.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_goto_start(void);
+
+/**
+ * Go to the end of the file in the current view.
+ *
+ * @ingroup Content
+ */
+void edi_mainview_goto_end(void);
+
+/**
  * Go to a requested line, column position in the current view's contents.
  *
  * @param row the line number (1 based) to scroll to

@@ -970,6 +970,68 @@ edi_mainview_panel_goto_position(Edi_Mainview_Panel *panel, unsigned int row, un
    elm_object_focus_set(editor->entry, EINA_TRUE);
 }
 
+
+void
+edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
+{
+   Edi_Editor *editor;
+   Elm_Code *code;
+   Elm_Code_Line *line;
+   const char *ch;
+   unsigned int row, tabstop, length = 0;
+
+   if (!panel || !panel->current)
+     return;
+
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (!editor)
+     return;
+
+   code = elm_code_widget_code_get(editor->entry);
+   if (!code) return;
+
+   row = elm_code_file_lines_get(code->file);
+   if (row <= 0) return;
+
+   line = elm_code_file_line_get(code->file, row);
+   if (!line) return;
+
+   tabstop = elm_code_widget_tabstop_get(editor->entry);
+
+   for (ch = line->content; *ch; ch++)
+     {
+       if (*ch == '\t')
+         length += tabstop;
+       else
+         length++;
+     }
+
+   elm_code_widget_cursor_position_set(editor->entry, elm_code_file_lines_get(code->file), length);
+}
+
+void
+edi_mainview_panel_goto_start(Edi_Mainview_Panel *panel)
+{
+   Edi_Editor *editor;
+   Elm_Code *code;
+   unsigned int row;
+
+   if (!panel || !panel->current)
+     return;
+
+   editor = (Edi_Editor *)evas_object_data_get(panel->current->view, "editor");
+   if (!editor)
+     return;
+
+   code = elm_code_widget_code_get(editor->entry);
+   if (!code) return;
+
+   row = elm_code_file_lines_get(code->file);
+   if (row <= 0) return;
+
+   elm_code_widget_cursor_position_set(editor->entry, 1, 1);
+}
+
 static void
 _edi_mainview_panel_goto_popup_go_cb(void *data,
                              Evas_Object *obj EINA_UNUSED,
