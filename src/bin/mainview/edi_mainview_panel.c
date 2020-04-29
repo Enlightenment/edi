@@ -976,8 +976,7 @@ edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
    Edi_Editor *editor;
    Elm_Code *code;
    Elm_Code_Line *line;
-   const char *ch;
-   unsigned int row, tabstop, length = 0;
+   unsigned int row, length;
 
    if (!panel || !panel->current)
      return;
@@ -989,26 +988,13 @@ edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
    code = elm_code_widget_code_get(editor->entry);
    if (!code) return;
 
-   tabstop = elm_code_widget_tabstop_get(editor->entry);
-
    row = elm_code_file_lines_get(code->file);
    if (row <= 0) return;
 
    line = elm_code_file_line_get(code->file, row);
    if (!line) return;
 
-   if (line->content)
-     {
-        for (ch = line->content; *ch; ch++)
-          {
-             if (*ch == '\t')
-               length += tabstop;
-             else
-               length++;
-          }
-     }
-   else
-     length = line->length;
+   length = elm_code_widget_line_text_column_width_get(editor->entry, line) + 1;
 
    elm_code_widget_cursor_position_set(editor->entry, elm_code_file_lines_get(code->file), length);
 }
