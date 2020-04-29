@@ -995,15 +995,20 @@ edi_mainview_panel_goto_end(Edi_Mainview_Panel *panel)
    if (row <= 0) return;
 
    line = elm_code_file_line_get(code->file, row);
-   if (!line || !line->content) return;
+   if (!line) return;
 
-   for (ch = line->content; *ch; ch++)
+   if (line->content)
      {
-       if (*ch == '\t')
-         length += tabstop;
-       else
-         length++;
+        for (ch = line->content; *ch; ch++)
+          {
+             if (*ch == '\t')
+               length += tabstop;
+             else
+               length++;
+          }
      }
+   else
+     length = line->length;
 
    elm_code_widget_cursor_position_set(editor->entry, elm_code_file_lines_get(code->file), length);
 }
